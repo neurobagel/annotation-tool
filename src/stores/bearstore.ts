@@ -11,7 +11,7 @@ export type Actions = {
   updateBears: (bears: number) => void;
 };
 
-const useBearStore = create<State>((set) => ({
+const useBearStore = create<State>()((set) => ({
   bears: 0,
   actions: {
     increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),

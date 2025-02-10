@@ -34,3 +34,5 @@ cypress/downloads
 coverage
 .nyc_output
 
+venv
+
