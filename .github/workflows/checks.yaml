@@ -8,6 +8,7 @@ on:
   # Enables GH merge queues
   # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#merge_group
   merge_group:
+  workflow_dispatch:
 
 jobs:
   tsc:
