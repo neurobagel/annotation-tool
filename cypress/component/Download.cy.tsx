@@ -1,8 +1,8 @@
-import ColumnAnnotation from '../../src/components/ColumnAnnotation';
+import Download from '../../src/components/Download';
 
-describe('ColumnAnnotation', () => {
+describe('Download', () => {
   it('should render correctly', () => {
-    cy.mount(<ColumnAnnotation />);
+    cy.mount(<Download />);
     cy.contains('Download');
   });
 });
