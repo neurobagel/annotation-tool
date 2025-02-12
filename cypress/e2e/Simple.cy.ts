@@ -1,5 +1,5 @@
 describe('Simlpe e2e test', () => {
-  it('Steps through differnt app views', () => {
+  it('Steps through different app views', () => {
     cy.visit('http://localhost:5173');
     cy.contains('Welcome');
     cy.contains('Start - Upload').click();
