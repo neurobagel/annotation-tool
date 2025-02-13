@@ -10,7 +10,7 @@ export default {
         },
       },
       animation: {
-        'spin-slow': 'spin-slow 5s linear infinite', // 5s for one full rotation
+        'spin-slow': 'spin-slow 5s linear infinite',
       },
     },
   },
