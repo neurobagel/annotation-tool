@@ -10,7 +10,7 @@ function App() {
 
   const renderView = () => {
     switch (currentView) {
-      case 'welcome':
+      case 'ladning':
         return <Landing />;
       case 'upload':
         return <Upload />;
