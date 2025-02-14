@@ -15,7 +15,7 @@ function NavigationButton({
   };
 
   return (
-    <Button variant="contained" onClick={handleClick}>
+    <Button data-cy={`${label.toLowerCase()}-button`} variant="contained" onClick={handleClick}>
       {label}
     </Button>
   );
