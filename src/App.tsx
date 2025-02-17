@@ -1,4 +1,4 @@
-import useStore from './stores/store';
+import useViewStore from './stores/view';
 import Landing from './components/Landing';
 import Upload from './components/Upload';
 import ColumnAnnotation from './components/ColumnAnnotation';
@@ -6,11 +6,11 @@ import ValueAnnotation from './components/ValueAnnotation';
 import Download from './components/Download';
 
 function App() {
-  const currentView = useStore((state) => state.currentView);
+  const currentView = useViewStore((state) => state.currentView);
 
   const renderView = () => {
     switch (currentView) {
-      case 'ladning':
+      case 'landing':
         return <Landing />;
       case 'upload':
         return <Upload />;
