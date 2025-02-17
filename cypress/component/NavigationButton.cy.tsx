@@ -1,5 +1,5 @@
 import NavigationButton from '../../src/components/NavigationButton';
-import useStore from '../../src/stores/store';
+import useStore from '../../src/stores/view';
 
 const props = {
   label: 'Next',
