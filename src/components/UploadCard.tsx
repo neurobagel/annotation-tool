@@ -4,6 +4,7 @@ import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import FileUploader from './FileUploader';
 
 interface UploadCardProps {
+  title: string;
   allowedFileType: string;
   uploadedFileName: string | null;
   onFileUpload: (file: File) => void;
@@ -11,6 +12,7 @@ interface UploadCardProps {
 }
 
 function UploadCard({
+  title,
   allowedFileType,
   uploadedFileName,
   onFileUpload,
@@ -49,11 +51,11 @@ function UploadCard({
   return (
     <div className="mx-auto w-full max-w-[1024px] px-4">
       <Card
-        data-cy="data-table-card"
+        data-cy={`${title}-upload-card`}
         className="rounded-3xl border-2 border-solid border-gray-300 p-4 text-center"
       >
         <Typography variant="h5" component="h2" className="mb-4 text-left">
-          Data Table
+          {title}
         </Typography>
 
         <FileUploader

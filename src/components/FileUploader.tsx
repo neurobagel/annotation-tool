@@ -41,7 +41,7 @@ function FileUploader({
       <Typography variant="body1" className="mb-2">
         Upload your file ({allowedFileType.replace(/,/g, ', ')})
       </Typography>
-      <Typography variant="body2" className="mb-4 text-gray-500">
+      <Typography variant="body2" className="mb-4">
         <span
           style={{
             fontWeight: 'bold',

@@ -19,6 +19,7 @@ function Upload() {
     <div className="flex flex-col items-center">
       <h1>Upload</h1>
       <UploadCard
+        title="Data Table"
         allowedFileType=".tsv"
         uploadedFileName={uploadedDataTableFileName}
         onFileUpload={handleFileUpload}
