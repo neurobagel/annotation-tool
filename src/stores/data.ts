@@ -19,33 +19,42 @@ const useDataStore = create<DataStore>((set) => ({
   initializeColumns: (data: Columns) => set({ columns: data }),
   setUploadedDataTableFileName: (fileName: string | null) =>
     set({ uploadedDataTableFileName: fileName }),
-  processFile: async (file: File) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const content = e.target?.result as string;
-      const rows = content.split('\n').map((row) => row.split('\t'));
-      const headers = rows[0];
-      const data = rows.slice(1);
+  processFile: async (file: File) =>
+    new Promise<void>((resolve, reject) => {
+      const reader = new FileReader();
 
-      // Transform data into column-based structure
-      const columnData: DataTable = {};
-      headers.forEach((_, columnIndex) => {
-        columnData[columnIndex + 1] = data.map((row) => row[columnIndex]);
-      });
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        const rows = content.split('\n').map((row) => row.split('\t'));
+        const headers = rows[0];
+        const data = rows.slice(1);
 
-      const columns: Columns = headers.reduce((acc, header, index) => {
-        acc[index + 1] = { header };
-        return acc;
-      }, {} as Columns);
+        // Transform data into column-based structure
+        const columnData: DataTable = {};
+        headers.forEach((_, columnIndex) => {
+          columnData[columnIndex + 1] = data.map((row) => row[columnIndex]);
+        });
 
-      set({
-        dataTable: columnData,
-        columns,
-        uploadedDataTableFileName: file.name,
-      });
-    };
-    reader.readAsText(file);
-  },
+        const columns: Columns = headers.reduce((acc, header, index) => {
+          acc[index + 1] = { header };
+          return acc;
+        }, {} as Columns);
+
+        set({
+          dataTable: columnData,
+          columns,
+          uploadedDataTableFileName: file.name,
+        });
+
+        resolve();
+      };
+
+      reader.onerror = (error) => {
+        reject(error);
+      };
+
+      reader.readAsText(file);
+    }),
 }));
 
 export default useDataStore;

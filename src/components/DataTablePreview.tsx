@@ -10,20 +10,23 @@ import {
   TablePagination,
 } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
-import { DataTable, Columns } from '../utils/types';
+import { DataTable, Columns, Column } from '../utils/types';
 
 function DataTablePreview({ dataTable, columns }: { dataTable: DataTable; columns: Columns }) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  // Define a type for the column object
-  type Column = { header: string };
-
-  // Use the Column type in the map function
   const headers = Object.values(columns).map((column: Column) => column.header);
-  const rows = Object.values(dataTable);
 
-  const slicedRows = rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  // Transform column-based data into row-based data for rendering
+  const rowData =
+    Object.keys(dataTable).length > 0
+      ? Object.values(dataTable)[0].map((_, rowIndex) =>
+          Object.keys(dataTable).map((colKey) => dataTable[Number(colKey)][rowIndex])
+        )
+      : [];
+
+  const slicedRows = rowData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage);
@@ -37,12 +40,12 @@ function DataTablePreview({ dataTable, columns }: { dataTable: DataTable; column
   return (
     <div className="mt-6">
       <TableContainer component={Paper} elevation={3} className="w-full overflow-x-auto shadow-lg">
-        <Table className="min-w-[768px]" data-cy="data-table">
+        <Table className="min-w-[768px]" data-cy="data-table-preview">
           <TableHead>
             <TableRow className="bg-blue-50">
               {headers.map((header) => (
                 <TableCell
-                  key={uuidv4()} // Use uuid for key
+                  key={uuidv4()}
                   align="left"
                   sx={{ fontWeight: 'bold', color: 'primary.main' }}
                 >
@@ -53,11 +56,11 @@ function DataTablePreview({ dataTable, columns }: { dataTable: DataTable; column
           </TableHead>
           <TableBody>
             {slicedRows.map((row) => {
-              const rowId = uuidv4(); // Generate a unique ID for the row
+              const rowId = uuidv4();
               return (
                 <TableRow key={rowId}>
                   {row.map((cell) => {
-                    const cellId = uuidv4(); // Generate a unique ID for the cell
+                    const cellId = uuidv4();
                     return (
                       <TableCell key={cellId} align="left">
                         {cell}
@@ -73,7 +76,7 @@ function DataTablePreview({ dataTable, columns }: { dataTable: DataTable; column
           data-cy="datatable-preview-pagination"
           rowsPerPageOptions={[5, 10, 25, 50, 100]}
           component="div"
-          count={rows.length}
+          count={rowData.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

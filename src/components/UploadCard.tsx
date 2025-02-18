@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button, Card, Typography, Collapse } from '@mui/material';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import FileUploader from './FileUploader';
@@ -59,6 +59,7 @@ function UploadCard({
         </Typography>
 
         <FileUploader
+          displayText={`Upload your file (${allowedFileType})`}
           handleClickToUpload={handleClickToUpload}
           handleDrop={handleDrop}
           handleDragOver={handleDragOver}
@@ -69,11 +70,15 @@ function UploadCard({
 
         {uploadedFileName && (
           <div className="mt-4">
-            <Typography variant="body1" className="mb-2" data-cy="uploaded-datatable-file-name">
+            <Typography
+              variant="body1"
+              className="mb-2"
+              data-cy={`${title}-card-uploaded-file-name`}
+            >
               <strong>{uploadedFileName}</strong>
             </Typography>
             <Button
-              data-cy="toggle-datatable-preview"
+              data-cy={`toggle-${title}-card-preview`}
               variant="outlined"
               onClick={togglePreview}
               endIcon={isPreviewOpen ? <ExpandLess /> : <ExpandMore />}

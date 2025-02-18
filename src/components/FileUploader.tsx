@@ -2,6 +2,7 @@ import { Card, Typography, useTheme } from '@mui/material';
 import { CloudUpload } from '@mui/icons-material';
 
 interface FileUploaderProps {
+  displayText: string;
   handleClickToUpload: () => void;
   handleDrop: (event: React.DragEvent<HTMLDivElement>) => void;
   handleDragOver: (event: React.DragEvent<HTMLDivElement>) => void;
@@ -11,6 +12,7 @@ interface FileUploaderProps {
 }
 
 function FileUploader({
+  displayText,
   handleClickToUpload,
   handleDrop,
   handleDragOver,
@@ -39,7 +41,7 @@ function FileUploader({
         style={{ color: theme.palette.primary.main }}
       />
       <Typography variant="body1" className="mb-2">
-        Upload your file ({allowedFileType.replace(/,/g, ', ')})
+        {displayText}
       </Typography>
       <Typography variant="body2" className="mb-4">
         <span

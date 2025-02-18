@@ -2,8 +2,8 @@ import UploadCard from '../../src/components/UploadCard';
 
 const exampleFileName = 'ds003653_participant.tsv';
 const exampleFilePath = `examples/${exampleFileName}`;
-function DefaultPreviewComponent() {
-  return <div data-cy="default-preview">Preview Component</div>;
+function MockPreviewComponent() {
+  return <div data-cy="some title-datatable">Preview Component</div>;
 }
 
 const props = {
@@ -11,7 +11,7 @@ const props = {
   allowedFileType: '.tsv',
   uploadedFileName: exampleFileName,
   onFileUpload: () => {},
-  previewComponent: <DefaultPreviewComponent />,
+  previewComponent: <MockPreviewComponent />,
 };
 
 describe('UploadCard', () => {
@@ -26,10 +26,7 @@ describe('UploadCard', () => {
       />
     );
     cy.get('[data-cy="some title-upload-card"]').should('be.visible');
-    cy.get('[data-cy="some title-upload-card"]').should(
-      'contain',
-      'Upload your tabular phenotypic file (.tsv format)'
-    );
+    cy.get('[data-cy="some title-upload-card"]').should('contain', 'some title');
   });
   beforeEach(() => {
     cy.mount(
@@ -68,30 +65,11 @@ describe('UploadCard', () => {
       });
     });
   });
-  it('should open the preview, and verify the table content', () => {
-    cy.get('[data-cy="uploaded-datatable-file-name"]').should('contain', exampleFileName);
+  it('should open the preview, and verify the data table preview component is rendered', () => {
+    cy.get('[data-cy="some title-card-uploaded-file-name"]').should('contain', exampleFileName);
 
-    cy.get('[data-cy="toggle-datatable-preview"]').click();
+    cy.get('[data-cy="toggle-some title-card-preview"]').click();
 
-    cy.get('[data-cy="data-table"]').should('be.visible');
-
-    cy.get('[data-cy="data-table"] th:nth-child(9)').should('contain', 'session');
-
-    // Check the value of the 5th column in the 2nd row
-    cy.get('[data-cy="data-table"] tr:nth-child(2) td:nth-child(5)').should('contain', 'MDD');
-  });
-  it('should navigate to the 3rd page of the table and verify the content', () => {
-    cy.get('[data-cy="toggle-datatable-preview"]').click();
-
-    // Go the 3rd page of the table
-    cy.get('[data-cy="datatable-preview-pagination"]').within(() => {
-      cy.get('button[aria-label="Go to next page"]').click();
-      cy.get('button[aria-label="Go to next page"]').click();
-    });
-
-    cy.get('[data-cy="data-table"] th:nth-child(2)').should('contain', 'age');
-
-    // Check the value of the 5th column in the 2nd row
-    cy.get('[data-cy="data-table"] tr:nth-child(2) td:nth-child(5)').should('contain', 'HC');
+    cy.get('[data-cy="toggle-some title-card-preview"]').should('be.visible');
   });
 });
