@@ -27,9 +27,10 @@ const useDataStore = create<DataStore>((set) => ({
       const headers = rows[0];
       const data = rows.slice(1);
 
-      const rowData: DataTable = {};
-      data.forEach((row, rowIndex) => {
-        rowData[rowIndex + 1] = row;
+      // Transform data into column-based structure
+      const columnData: DataTable = {};
+      headers.forEach((_, columnIndex) => {
+        columnData[columnIndex + 1] = data.map((row) => row[columnIndex]);
       });
 
       const columns: Columns = headers.reduce((acc, header, index) => {
@@ -38,7 +39,7 @@ const useDataStore = create<DataStore>((set) => ({
       }, {} as Columns);
 
       set({
-        dataTable: rowData,
+        dataTable: columnData,
         columns,
         uploadedDataTableFileName: file.name,
       });
