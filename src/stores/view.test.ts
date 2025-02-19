@@ -1,10 +1,10 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import useStore from './store';
+import useViewStore from './view';
 
 describe('store actions', () => {
   it('should set currentView', () => {
-    const { result } = renderHook(() => useStore());
+    const { result } = renderHook(() => useViewStore());
     act(() => {
       result.current.setCurrentView('upload');
     });
