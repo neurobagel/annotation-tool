@@ -1,6 +1,6 @@
 import React from 'react';
 import { Typography, Button, Collapse } from '@mui/material';
-import logo from '../assets/logo.png';
+import emoji from '../assets/errorboundary-emoji.png';
 
 type ErrorBoundaryProps = {
   children: React.ReactNode;
@@ -39,7 +39,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
       // Fallback UI
       return (
         <div className="flex h-screen w-screen flex-col items-center justify-center space-y-5">
-          <img src={logo} alt="Logo" className="max-h-20 animate-pulse" />
+          <img src={emoji} alt="Emoji" className="max-h-20 animate-pulse" />
           <Typography variant="h5" className="text-center">
             This is not supposed to happen. Please try again, or{' '}
             <a
