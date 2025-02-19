@@ -38,7 +38,7 @@ function FileUploader({
     >
       <CloudUpload
         className="mb-4 text-4xl text-gray-400"
-        style={{ color: theme.palette.primary.main }}
+        sx={{ color: theme.palette.primary.main }}
       />
       <Typography variant="body1" className="mb-2">
         {displayText}

@@ -21,6 +21,8 @@ function UploadCard({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
+  const isFileUploaded = uploadedFileName !== null;
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const uploadedFile = event.target.files?.[0];
     if (uploadedFile) {
@@ -68,7 +70,7 @@ function UploadCard({
           allowedFileType={allowedFileType}
         />
 
-        {uploadedFileName && (
+        {isFileUploaded && (
           <div className="mt-4">
             <Typography
               variant="body1"
@@ -90,7 +92,7 @@ function UploadCard({
       </Card>
 
       <Collapse in={isPreviewOpen} timeout="auto" unmountOnExit>
-        {uploadedFileName && previewComponent}
+        {isFileUploaded && previewComponent}
       </Collapse>
     </div>
   );
