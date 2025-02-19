@@ -41,14 +41,14 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
         <div className="flex h-screen w-screen flex-col items-center justify-center space-y-5">
           <img src={emoji} alt="Emoji" className="max-h-20 animate-pulse" />
           <Typography variant="h5" className="text-center">
-            This is not supposed to happen. Please try again,
+            This is not supposed to happen. Please try again,{' '}
             <a
               href="https://neurobagel.org/user_guide/annotation_tool/"
               target="_blank"
               rel="noopener noreferrer"
             >
               check out the documentation,
-            </a>
+            </a>{' '}
             or{' '}
             <a
               href="https://github.com/neurobagel/annotation-tool/issues"
