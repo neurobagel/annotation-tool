@@ -1,5 +1,5 @@
 import { Button } from '@mui/material';
-import useStore from '../stores/store';
+import useViewStore from '../stores/view';
 
 function NavigationButton({
   label,
@@ -8,7 +8,7 @@ function NavigationButton({
   label: string;
   viewToNavigateTo: string;
 }) {
-  const setCurrentView = useStore((state) => state.setCurrentView);
+  const setCurrentView = useViewStore((state) => state.setCurrentView);
 
   const handleClick = () => {
     setCurrentView(viewToNavigateTo);
