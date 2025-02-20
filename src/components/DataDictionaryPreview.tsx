@@ -1,121 +1,46 @@
-import React, { useState } from 'react';
-import {
-  Paper,
-  List,
-  ListItem,
-  ListItemText,
-  Divider,
-  Collapse,
-  IconButton,
-  Button,
-  Typography,
-  useTheme,
-} from '@mui/material';
-import { ExpandMore, ExpandLess } from '@mui/icons-material';
+import ReactJson from '@microlink/react-json-view';
+import { Paper, useTheme } from '@mui/material';
 import { DataDictionary } from '../utils/types';
 
 function DataDictionaryPreview({ dataDictionary }: { dataDictionary: DataDictionary }) {
-  const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
-  const [isAllExpanded, setIsAllExpanded] = useState(false);
   const theme = useTheme();
-
-  const toggleExpand = (key: string) => {
-    setExpandedKeys((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(key)) {
-        newSet.delete(key);
-      } else {
-        newSet.add(key);
-      }
-      return newSet;
-    });
-  };
-
-  const toggleExpandAll = () => {
-    if (isAllExpanded) {
-      setExpandedKeys(new Set());
-    } else {
-      const allKeys = Object.keys(dataDictionary);
-      setExpandedKeys(new Set(allKeys));
-    }
-    setIsAllExpanded(!isAllExpanded);
-  };
-
-  // TODO: update the type of value
-  const renderValue = (value: any, key: string): React.ReactNode => {
-    if (typeof value === 'object' && value !== null) {
-      const isExpanded = expandedKeys.has(key);
-      return (
-        <div>
-          <IconButton
-            onClick={() => toggleExpand(key)}
-            size="small"
-            sx={{ color: theme.palette.primary.main }}
-            data-cy={`${key}-expand-collapse-button`}
-          >
-            {isExpanded ? <ExpandLess /> : <ExpandMore />}
-          </IconButton>
-          <Collapse in={isExpanded} timeout="auto" unmountOnExit data-cy={`${key}-nested-section`}>
-            <List dense>
-              {Object.entries(value).map(([nestedKey, nestedValue]) => (
-                <ListItem key={nestedKey}>
-                  <ListItemText
-                    primary={
-                      <Typography fontWeight="bold" data-cy={`${key}-${nestedKey}-nested-key`}>
-                        {nestedKey}
-                      </Typography>
-                    }
-                    secondary={renderValue(nestedValue, nestedKey)}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          </Collapse>
-        </div>
-      );
-    }
-    return (
-      <Typography variant="body2" data-cy={`${key}-value`}>
-        {JSON.stringify(value)}
-      </Typography>
-    );
-  };
 
   return (
     <div className="mt-6" data-cy="data-dictionary-preview">
-      <Paper elevation={3} className="w-full overflow-x-auto shadow-lg">
-        <div style={{ padding: 16 }}>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
-            <Button
-              variant="outlined"
-              onClick={toggleExpandAll}
-              startIcon={isAllExpanded ? <ExpandLess /> : <ExpandMore />}
-              data-cy="expand-collapse-all-button"
-            >
-              {isAllExpanded ? 'Collapse All' : 'Expand All'}
-            </Button>
-          </div>
-          <List dense>
-            {Object.entries(dataDictionary).map(([key, value]) => (
-              <div key={key} data-cy={key}>
-                <ListItem>
-                  <ListItemText
-                    primary={
-                      <Typography
-                        fontWeight="bold"
-                        color={theme.palette.primary.main}
-                        data-cy={`${key}-key`}
-                      >
-                        {key}
-                      </Typography>
-                    }
-                    secondary={renderValue(value, key)}
-                  />
-                </ListItem>
-                <Divider component="li" />
-              </div>
-            ))}
-          </List>
+      <Paper elevation={3} className="h-[450px] w-full overflow-x-auto shadow-lg">
+        <div className="m-4">
+          <ReactJson
+            src={dataDictionary}
+            collapsed={false}
+            displayDataTypes={false}
+            enableClipboard={false}
+            style={{
+              fontSize: '15px',
+            }}
+            theme={{
+              base00: 'transparent',
+              base01: theme.palette.text.primary,
+              base02: theme.palette.divider,
+              base03: theme.palette.text.disabled,
+              base04: theme.palette.text.primary,
+              base05: theme.palette.text.primary,
+              base06: theme.palette.text.primary,
+              base07: theme.palette.text.primary,
+              base08: theme.palette.error.main,
+              base09: theme.palette.primary.main,
+              base0A: theme.palette.warning.main,
+              base0B: theme.palette.success.main,
+              base0C: theme.palette.info.main,
+              base0D: theme.palette.primary.main,
+              base0E: theme.palette.secondary.main,
+              base0F: theme.palette.error.main,
+            }}
+            name={null}
+            quotesOnKeys={false}
+            collapseStringsAfterLength={50}
+            displayObjectSize={false}
+            indentWidth={2}
+          />
         </div>
       </Paper>
     </div>

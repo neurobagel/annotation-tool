@@ -29,6 +29,21 @@ export const mockInitialColumns = {
   },
 };
 
+export const mockUpdatedColumns = {
+  1: {
+    header: 'participant_id',
+    description: 'A participant ID',
+  },
+  2: {
+    header: 'age',
+    description: 'Age of the participant',
+  },
+  3: {
+    header: 'sex',
+    description: 'Sex of the participant',
+  },
+};
+
 export const mockDataDictionary = {
   participant_id: {
     Description: 'A participant ID',
@@ -40,7 +55,7 @@ export const mockDataDictionary = {
       Identifies: 'participant',
     },
   },
-  pheno_age: {
+  age: {
     Description: 'Age of the participant',
     Annotations: {
       IsAbout: {
@@ -49,7 +64,7 @@ export const mockDataDictionary = {
       },
     },
   },
-  pheno_sex: {
+  sex: {
     Description: 'Sex of the participant',
     Annotations: {
       IsAbout: {

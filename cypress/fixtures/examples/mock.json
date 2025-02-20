@@ -1,0 +1,30 @@
+{
+  "participant_id": {
+    "Description": "A participant ID",
+    "Annotations": {
+      "IsAbout": {
+        "TermURL": "nb:ParticipantID",
+        "Label": "Subject Unique Identifier"
+      },
+      "Identifies": "participant"
+    }
+  },
+  "age": {
+    "Description": "Age of the participant",
+    "Annotations": {
+      "IsAbout": {
+        "TermURL": "nb:Age",
+        "Label": "Age"
+      }
+    }
+  },
+  "sex": {
+    "Description": "Sex of the participant",
+    "Annotations": {
+      "IsAbout": {
+        "TermURL": "nb:Sex",
+        "Label": "Sex"
+      }
+    }
+  }
+}

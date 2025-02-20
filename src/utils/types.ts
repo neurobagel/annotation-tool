@@ -3,6 +3,7 @@ export type DataTable = {
 };
 export type Column = {
   header: string;
+  description?: string;
 };
 export type Columns = {
   [key: number]: Column;
