@@ -3,21 +3,21 @@ import { Button, Card, Typography, Collapse } from '@mui/material';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import FileUploader from './FileUploader';
 
-interface UploadCardProps {
-  title: string;
-  allowedFileType: string;
-  uploadedFileName: string | null;
-  onFileUpload: (file: File) => void;
-  previewComponent: React.ReactNode;
-}
-
 function UploadCard({
   title,
+  FileUploaderDisplayText,
   allowedFileType,
   uploadedFileName,
   onFileUpload,
   previewComponent,
-}: UploadCardProps) {
+}: {
+  title: string;
+  FileUploaderDisplayText: string;
+  allowedFileType: string;
+  uploadedFileName: string | null;
+  onFileUpload: (file: File) => void;
+  previewComponent: React.ReactNode;
+}) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
@@ -61,7 +61,7 @@ function UploadCard({
         </Typography>
 
         <FileUploader
-          displayText={`Upload your file (${allowedFileType})`}
+          displayText={FileUploaderDisplayText}
           handleClickToUpload={handleClickToUpload}
           handleDrop={handleDrop}
           handleDragOver={handleDragOver}
