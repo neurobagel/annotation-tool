@@ -13,6 +13,19 @@ type ErrorBoundaryState = {
   showDetails: boolean;
 };
 
+/**
+ * ErrorBoundary must use the Class API because React's Error Boundary feature
+ * is only available in class components. Specifically, React provides two
+ * lifecycle methods for handling errors:
+ *
+ * 1. `static getDerivedStateFromError(error)`: Updates the state to render a
+ *    fallback UI when an error occurs.
+ * 2. `componentDidCatch(error, errorInfo)`: Captures the error and error info
+ *    for logging or display purposes.
+ *
+ * These lifecycle methods are not available in functional components, so a
+ * class component is required to implement an Error Boundary.
+ */
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
