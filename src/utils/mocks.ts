@@ -28,3 +28,34 @@ export const mockInitialColumns = {
     header: 'sex',
   },
 };
+
+export const mockDataDictionary = {
+  participant_id: {
+    Description: 'A participant ID',
+    Annotations: {
+      IsAbout: {
+        TermURL: 'nb:ParticipantID',
+        Label: 'Subject Unique Identifier',
+      },
+      Identifies: 'participant',
+    },
+  },
+  pheno_age: {
+    Description: 'Age of the participant',
+    Annotations: {
+      IsAbout: {
+        TermURL: 'nb:Age',
+        Label: 'Age',
+      },
+    },
+  },
+  pheno_sex: {
+    Description: 'Sex of the participant',
+    Annotations: {
+      IsAbout: {
+        TermURL: 'nb:Sex',
+        Label: 'Sex',
+      },
+    },
+  },
+};

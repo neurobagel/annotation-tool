@@ -12,12 +12,9 @@ import {
   useTheme,
 } from '@mui/material';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
+import { DataDictionary } from '../utils/types';
 
-interface DataDictionaryPreviewProps {
-  dataDictionary: Record<string, any>;
-}
-
-function DataDictionaryPreview({ dataDictionary }: DataDictionaryPreviewProps) {
+function DataDictionaryPreview({ dataDictionary }: { dataDictionary: DataDictionary }) {
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
   const [isAllExpanded, setIsAllExpanded] = useState(false);
   const theme = useTheme();
@@ -44,6 +41,7 @@ function DataDictionaryPreview({ dataDictionary }: DataDictionaryPreviewProps) {
     setIsAllExpanded(!isAllExpanded);
   };
 
+  // TODO: update the type of value
   const renderValue = (value: any, key: string): React.ReactNode => {
     if (typeof value === 'object' && value !== null) {
       const isExpanded = expandedKeys.has(key);
@@ -57,13 +55,13 @@ function DataDictionaryPreview({ dataDictionary }: DataDictionaryPreviewProps) {
           >
             {isExpanded ? <ExpandLess /> : <ExpandMore />}
           </IconButton>
-          <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+          <Collapse in={isExpanded} timeout="auto" unmountOnExit data-cy={`${key}-nested-section`}>
             <List dense>
               {Object.entries(value).map(([nestedKey, nestedValue]) => (
                 <ListItem key={nestedKey}>
                   <ListItemText
                     primary={
-                      <Typography fontWeight="bold" data-cy={`${nestedKey}-nested-key`}>
+                      <Typography fontWeight="bold" data-cy={`${key}-${nestedKey}-nested-key`}>
                         {nestedKey}
                       </Typography>
                     }
@@ -99,7 +97,7 @@ function DataDictionaryPreview({ dataDictionary }: DataDictionaryPreviewProps) {
           </div>
           <List dense>
             {Object.entries(dataDictionary).map(([key, value]) => (
-              <div key={key} data-cy={`dictionary-item-${key}`}>
+              <div key={key} data-cy={key}>
                 <ListItem>
                   <ListItemText
                     primary={
