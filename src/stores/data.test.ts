@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest';
 import { mockDataTable, mockInitialColumns, mockUpdatedColumns } from '~/utils/mocks';
 import fs from 'fs';
 import path from 'path';
+import * as R from 'ramda';
 import useDataStore from './data';
 
 describe('store actions', () => {
@@ -45,6 +46,23 @@ describe('store actions', () => {
       await result.current.processDataDictionaryFile(dataDictionaryFile);
     });
 
+    expect(result.current.columns).toEqual(mockUpdatedColumns);
+    expect(result.current.uploadedDataDictionaryFileName).toEqual('mock.json');
+
+    act(() => {
+      // Add a description to the first column using ramda
+      const mockColumnsWithDescription = R.assocPath(
+        [1, 'description'],
+        'some description',
+        mockInitialColumns
+      );
+      result.current.initializeColumns(mockColumnsWithDescription);
+    });
+    expect(result.current.columns['1'].description).toEqual('some description');
+
+    await act(async () => {
+      await result.current.processDataDictionaryFile(dataDictionaryFile);
+    });
     expect(result.current.columns).toEqual(mockUpdatedColumns);
     expect(result.current.uploadedDataDictionaryFileName).toEqual('mock.json');
   });
