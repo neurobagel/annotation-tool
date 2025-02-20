@@ -8,7 +8,7 @@ function MockPreviewComponent() {
 
 const props = {
   title: 'some title',
-  FileUploaderDisplayText: 'some dispaly text',
+  FileUploaderDisplayText: 'some display text',
   allowedFileType: '.tsv',
   uploadedFileName: exampleFileName,
   onFileUpload: () => {},
@@ -57,7 +57,7 @@ describe('UploadCard', () => {
   it('should render the component correctly', () => {
     cy.get('[data-cy="some title-upload-card"]').should('be.visible');
     cy.get('[data-cy="some title-upload-card"]').should('contain', 'some title');
-    cy.get('[data-cy="some title-upload-card"]').should('contain', 'some dispaly text');
+    cy.get('[data-cy="some title-upload-card"]').should('contain', 'some display text');
   });
   it('should open the preview, and verify the data table preview component is rendered', () => {
     cy.get('[data-cy="some title-card-uploaded-file-name"]').should('contain', exampleFileName);
