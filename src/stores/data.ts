@@ -1,25 +1,36 @@
 import { create } from 'zustand';
-import { DataTable, Columns } from '../utils/types';
+import * as R from 'ramda';
+import { DataTable, Columns, DataDictionary } from '../utils/types';
 
 type DataStore = {
   dataTable: DataTable;
   columns: Columns;
+  uploadedDataDictionary: DataDictionary;
   uploadedDataTableFileName: string | null;
+  uploadedDataDictionaryFileName: string | null;
   setDataTable: (data: DataTable) => void;
   initializeColumns: (data: Columns) => void;
+  setDataDictionary: (data: DataDictionary) => void;
   setUploadedDataTableFileName: (fileName: string | null) => void;
-  processFile: (file: File) => Promise<void>;
+  setUploadedDataDictionaryFileName: (fileName: string | null) => void;
+  processDataTableFile: (file: File) => Promise<void>;
+  processDataDictionaryFile: (file: File) => Promise<void>;
 };
 
-const useDataStore = create<DataStore>((set) => ({
+const useDataStore = create<DataStore>((set, get) => ({
   dataTable: {},
   columns: {},
+  uploadedDataDictionary: {},
   uploadedDataTableFileName: null,
+  uploadedDataDictionaryFileName: null,
   setDataTable: (data: DataTable) => set({ dataTable: data }),
   initializeColumns: (data: Columns) => set({ columns: data }),
+  setDataDictionary: (data: DataDictionary) => set({ uploadedDataDictionary: data }),
   setUploadedDataTableFileName: (fileName: string | null) =>
     set({ uploadedDataTableFileName: fileName }),
-  processFile: async (file: File) =>
+  setUploadedDataDictionaryFileName: (fileName: string | null) =>
+    set({ uploadedDataDictionaryFileName: fileName }),
+  processDataTableFile: async (file: File) =>
     new Promise<void>((resolve, reject) => {
       const reader = new FileReader();
 
@@ -47,6 +58,51 @@ const useDataStore = create<DataStore>((set) => ({
         });
 
         resolve();
+      };
+
+      reader.onerror = (error) => {
+        reject(error);
+      };
+
+      reader.readAsText(file);
+    }),
+  processDataDictionaryFile: async (file: File) =>
+    new Promise<void>((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        try {
+          const content = e.target?.result as string;
+          const dataDictionary: DataDictionary = JSON.parse(content);
+
+          const currentColumns = get().columns;
+
+          const updatedColumns = Object.entries(dataDictionary).reduce(
+            (acc, [key, value]) => {
+              const columnEntry = Object.entries(currentColumns).find(
+                ([_, column]) => column.header === key
+              );
+
+              if (columnEntry) {
+                const [columnId] = columnEntry;
+                // Use Ramda's assocPath to update the nested column description
+                return R.assocPath([columnId, 'description'], value.Description, acc);
+              }
+              return acc;
+            },
+            { ...currentColumns }
+          );
+
+          set({
+            uploadedDataDictionary: dataDictionary,
+            columns: updatedColumns,
+            uploadedDataDictionaryFileName: file.name,
+          });
+
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
       };
 
       reader.onerror = (error) => {

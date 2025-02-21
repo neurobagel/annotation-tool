@@ -1,15 +1,5 @@
-import { Card, Typography, useTheme } from '@mui/material';
+import { Card, Typography, useTheme, Tooltip } from '@mui/material';
 import { CloudUpload } from '@mui/icons-material';
-
-interface FileUploaderProps {
-  displayText: string;
-  handleClickToUpload: () => void;
-  handleDrop: (event: React.DragEvent<HTMLDivElement>) => void;
-  handleDragOver: (event: React.DragEvent<HTMLDivElement>) => void;
-  handleFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  fileInputRef: React.RefObject<HTMLInputElement>;
-  allowedFileType: string;
-}
 
 function FileUploader({
   displayText,
@@ -19,51 +9,85 @@ function FileUploader({
   handleFileUpload,
   fileInputRef,
   allowedFileType,
-}: FileUploaderProps) {
+  disabled,
+  tooltipContent,
+}: {
+  displayText: string;
+  handleClickToUpload: () => void;
+  handleDrop: (event: React.DragEvent<HTMLDivElement>) => void;
+  handleDragOver: (event: React.DragEvent<HTMLDivElement>) => void;
+  handleFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  fileInputRef: React.RefObject<HTMLInputElement>;
+  allowedFileType: string;
+  disabled?: boolean;
+  tooltipContent?: string;
+}) {
   const theme = useTheme();
 
+  // Disable click, drag, and drop functionality when `disabled` is true
+  const handleClick = disabled ? () => {} : handleClickToUpload;
+  const handleDrag = disabled ? () => {} : handleDrop;
+  const handleDragOverEvent = disabled ? () => {} : handleDragOver;
+
   return (
-    <Card
-      data-cy="upload-area"
-      elevation={3}
-      className="mx-auto max-w-[768px] cursor-pointer rounded-3xl border-2 border-dashed border-gray-300 p-8 transition-colors"
-      onClick={handleClickToUpload}
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      sx={{
-        '&:hover': {
-          borderColor: theme.palette.primary.main,
-        },
-      }}
+    <Tooltip
+      title={disabled ? <Typography variant="body1">{tooltipContent}</Typography> : ''}
+      placement="top"
     >
-      <CloudUpload
-        className="mb-4 text-4xl text-gray-400"
-        sx={{ color: theme.palette.primary.main }}
-      />
-      <Typography variant="body1" className="mb-2">
-        {displayText}
-      </Typography>
-      <Typography variant="body2" className="mb-4">
-        <span
-          style={{
-            fontWeight: 'bold',
-            cursor: 'pointer',
-            color: theme.palette.primary.main,
+      <Card
+        data-cy="upload-area"
+        elevation={3}
+        className={`mx-auto max-w-[768px] rounded-3xl border-2 border-dashed p-8 transition-colors ${
+          disabled
+            ? 'cursor-not-allowed border-gray-200 bg-gray-100'
+            : 'hover:border-primary-main cursor-pointer border-gray-300'
+        }`}
+        onClick={handleClick}
+        onDrop={handleDrag}
+        onDragOver={handleDragOverEvent}
+        sx={{
+          '&:hover': {
+            borderColor: disabled ? theme.palette.grey[400] : theme.palette.primary.main,
+          },
+        }}
+      >
+        <CloudUpload
+          className="mb-4 text-4xl"
+          sx={{
+            color: disabled ? theme.palette.grey[400] : theme.palette.primary.main,
           }}
-        >
-          Click to upload
-        </span>{' '}
-        or drag and drop
-      </Typography>
-      <input
-        type="file"
-        hidden
-        accept={allowedFileType}
-        onChange={handleFileUpload}
-        ref={fileInputRef}
-      />
-    </Card>
+        />
+        <Typography variant="body1" className="mb-2" sx={{ color: theme.palette.text.primary }}>
+          {displayText}
+        </Typography>
+        <Typography variant="body2" className="mb-4" sx={{ color: theme.palette.text.secondary }}>
+          <span
+            style={{
+              fontWeight: 'bold',
+              cursor: disabled ? 'not-allowed' : 'pointer',
+              color: disabled ? theme.palette.grey[400] : theme.palette.primary.main,
+            }}
+          >
+            Click to upload
+          </span>{' '}
+          or drag and drop
+        </Typography>
+        <input
+          type="file"
+          hidden
+          accept={allowedFileType}
+          onChange={handleFileUpload}
+          ref={fileInputRef}
+          disabled={disabled}
+        />
+      </Card>
+    </Tooltip>
   );
 }
+
+FileUploader.defaultProps = {
+  disabled: false,
+  tooltipContent: 'Uploading is disabled',
+};
 
 export default FileUploader;
