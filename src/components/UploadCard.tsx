@@ -3,6 +3,15 @@ import { Button, Card, Typography, Collapse } from '@mui/material';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import FileUploader from './FileUploader';
 
+/*
+Explicitly define the default props since eslint doesn't recognize the default props
+passed along with the arguments
+*/
+const defaultProps = {
+  diableFileUploader: false,
+  FileUploaderToolTipContent: 'Uploading is disabled',
+};
+
 function UploadCard({
   title,
   FileUploaderDisplayText,
@@ -10,8 +19,8 @@ function UploadCard({
   uploadedFileName,
   onFileUpload,
   previewComponent,
-  diableFileUploader,
-  FileUploaderToolTipContent,
+  diableFileUploader = false,
+  FileUploaderToolTipContent = 'Uploading is disabled',
 }: {
   title: string;
   FileUploaderDisplayText: string;
@@ -104,9 +113,6 @@ function UploadCard({
   );
 }
 
-UploadCard.defaultProps = {
-  diableFileUploader: false,
-  FileUploaderToolTipContent: 'Uploading is disabled',
-};
+UploadCard.defaultProps = defaultProps;
 
 export default UploadCard;

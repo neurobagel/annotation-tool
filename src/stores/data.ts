@@ -18,18 +18,14 @@ type DataStore = {
 };
 
 const useDataStore = create<DataStore>((set, get) => ({
+  // Data table
   dataTable: {},
   columns: {},
-  uploadedDataDictionary: {},
   uploadedDataTableFileName: null,
-  uploadedDataDictionaryFileName: null,
   setDataTable: (data: DataTable) => set({ dataTable: data }),
-  initializeColumns: (data: Columns) => set({ columns: data }),
-  setDataDictionary: (data: DataDictionary) => set({ uploadedDataDictionary: data }),
   setUploadedDataTableFileName: (fileName: string | null) =>
     set({ uploadedDataTableFileName: fileName }),
-  setUploadedDataDictionaryFileName: (fileName: string | null) =>
-    set({ uploadedDataDictionaryFileName: fileName }),
+  initializeColumns: (data: Columns) => set({ columns: data }),
   processDataTableFile: async (file: File) =>
     new Promise<void>((resolve, reject) => {
       const reader = new FileReader();
@@ -66,6 +62,14 @@ const useDataStore = create<DataStore>((set, get) => ({
 
       reader.readAsText(file);
     }),
+
+  // Data dictionary
+  uploadedDataDictionary: {},
+  uploadedDataDictionaryFileName: null,
+
+  setDataDictionary: (data: DataDictionary) => set({ uploadedDataDictionary: data }),
+  setUploadedDataDictionaryFileName: (fileName: string | null) =>
+    set({ uploadedDataDictionaryFileName: fileName }),
   processDataDictionaryFile: async (file: File) =>
     new Promise<void>((resolve, reject) => {
       const reader = new FileReader();

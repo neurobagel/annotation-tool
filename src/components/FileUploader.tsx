@@ -1,6 +1,15 @@
 import { Card, Typography, useTheme, Tooltip } from '@mui/material';
 import { CloudUpload } from '@mui/icons-material';
 
+/*
+Explicitly define the default props since eslint doesn't recognize the default props
+passed along with the arguments
+*/
+const defaultProps = {
+  disabled: false,
+  tooltipContent: 'Uploading is disabled',
+};
+
 function FileUploader({
   displayText,
   handleClickToUpload,
@@ -85,9 +94,6 @@ function FileUploader({
   );
 }
 
-FileUploader.defaultProps = {
-  disabled: false,
-  tooltipContent: 'Uploading is disabled',
-};
+FileUploader.defaultProps = defaultProps;
 
 export default FileUploader;

@@ -47,9 +47,11 @@ function CustomDataDictionaryPreview({ dataDictionary }: { dataDictionary: DataD
       return (
         <div>
           <IconButton
+            // TODO: use unique values for keys since many columns are going to have `Annotations`
             onClick={() => toggleExpand(key)}
             size="small"
             sx={{ color: theme.palette.primary.main }}
+            // TODO: update the data-cy selector to be more specific
             data-cy={`${key}-expand-collapse-button`}
           >
             {isExpanded ? <ExpandLess /> : <ExpandMore />}

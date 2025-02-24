@@ -40,6 +40,10 @@ module.exports = {
     */
     '@stylistic/indent': 'off',
     '@stylistic/comma-dangle': 'off',
+    /* 
+    @typescript-eslint/no-unused-vars is turned off since eslint wasn't picking up on using `_` for unused variables
+    which is the solution that we've been using for it.
+    */
     '@typescript-eslint/no-unused-vars': 'off',
   },
 };
