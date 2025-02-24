@@ -12,6 +12,17 @@ const defaultProps = {
   FileUploaderToolTipContent: 'Uploading is disabled',
 };
 
+interface UploadCardProps {
+  title: string;
+  FileUploaderDisplayText: string;
+  allowedFileType: string;
+  uploadedFileName: string | null;
+  onFileUpload: (file: File) => void;
+  previewComponent: React.ReactNode;
+  diableFileUploader?: boolean;
+  FileUploaderToolTipContent?: string;
+}
+
 function UploadCard({
   title,
   FileUploaderDisplayText,
@@ -21,16 +32,7 @@ function UploadCard({
   previewComponent,
   diableFileUploader = false,
   FileUploaderToolTipContent = 'Uploading is disabled',
-}: {
-  title: string;
-  FileUploaderDisplayText: string;
-  allowedFileType: string;
-  uploadedFileName: string | null;
-  onFileUpload: (file: File) => void;
-  previewComponent: React.ReactNode;
-  diableFileUploader?: boolean;
-  FileUploaderToolTipContent?: string;
-}) {
+}: UploadCardProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 

@@ -27,7 +27,7 @@ describe('FileUploader', () => {
     cy.get('[data-cy="upload-area"]').should('be.visible');
     cy.get('[data-cy="upload-area"]').should('contain', 'Upload your file (.csv)');
   });
-  it('Should disable the upload area', () => {
+  it('checks that input element and the upload area are disabled', () => {
     cy.mount(
       <FileUploader
         displayText={props.displayText}
