@@ -1,4 +1,6 @@
+import { ThemeProvider } from '@mui/material/styles';
 import UploadCard from '../../src/components/UploadCard';
+import NBTheme from '../../src/theme';
 
 const exampleFileName = 'ds003653_participant.tsv';
 const exampleFilePath = `examples/${exampleFileName}`;
@@ -18,14 +20,16 @@ const props = {
 describe('UploadCard', () => {
   beforeEach(() => {
     cy.mount(
-      <UploadCard
-        title={props.title}
-        FileUploaderDisplayText={props.FileUploaderDisplayText}
-        allowedFileType={props.allowedFileType}
-        uploadedFileName={props.uploadedFileName}
-        onFileUpload={props.onFileUpload}
-        previewComponent={props.previewComponent}
-      />
+      <ThemeProvider theme={NBTheme}>
+        <UploadCard
+          title={props.title}
+          FileUploaderDisplayText={props.FileUploaderDisplayText}
+          allowedFileType={props.allowedFileType}
+          uploadedFileName={props.uploadedFileName}
+          onFileUpload={props.onFileUpload}
+          previewComponent={props.previewComponent}
+        />
+      </ThemeProvider>
     );
 
     // Load the file from the fixtures folder
