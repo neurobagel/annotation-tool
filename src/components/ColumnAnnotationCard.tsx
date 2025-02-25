@@ -97,6 +97,7 @@ function ColumnAnnotationCard({
               color="secondary"
               aria-label="save"
               onClick={handleSaveDescription}
+              size="small"
               className="mt-4 md:mt-0"
             >
               <SaveIcon />
