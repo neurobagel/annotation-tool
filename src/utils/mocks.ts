@@ -74,3 +74,24 @@ export const mockDataDictionary = {
     },
   },
 };
+
+export const mockStandardizedVariables = {
+  'Subject ID': {
+    identifier: 'nb:ParticipantID',
+  },
+  'Session ID': {
+    identifier: 'nb:SessionID',
+  },
+  Age: {
+    identifier: 'nb:Age',
+  },
+  Sex: {
+    identifier: 'nb:Sex',
+  },
+  Diagnosis: {
+    identifier: 'nb:Diagnosis',
+  },
+  'Assessment Tool': {
+    identifier: 'nb:AssessmentTool',
+  },
+};

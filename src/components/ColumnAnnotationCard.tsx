@@ -76,12 +76,13 @@ function ColumnAnnotationCard({
   };
 
   return (
-    <Card className="mx-auto w-full max-w-5xl shadow-lg">
+    <Card data-cy={`${id}-column-annotation-card`} className="mx-auto w-full max-w-5xl shadow-lg">
       <CardHeader title={header} className="bg-gray-50" />
       <CardContent>
         {isEditingDescription ? (
           <div className="flex flex-col items-center gap-4 md:flex-row">
             <TextField
+              data-cy={`${id}-column-annotation-card-description-input`}
               fullWidth
               multiline
               rows={3}
@@ -92,6 +93,7 @@ function ColumnAnnotationCard({
               className="flex-1"
             />
             <Fab
+              data-cy={`${id}-column-annotation-card-save-description-button`}
               color="secondary"
               aria-label="save"
               onClick={handleSaveDescription}
@@ -106,11 +108,16 @@ function ColumnAnnotationCard({
               <Typography variant="subtitle1" className="mb-2 text-gray-700">
                 Description:
               </Typography>
-              <Typography variant="body1" className="text-gray-700">
+              <Typography
+                data-cy={`${id}-column-annotation-card-description`}
+                variant="body1"
+                className="text-gray-700"
+              >
                 {description || 'No description provided.'}
               </Typography>
             </div>
             <Fab
+              data-cy={`${id}-column-annotation-card-edit-description-button`}
               color="primary"
               aria-label="edit"
               onClick={handleEditDescription}
@@ -128,16 +135,25 @@ function ColumnAnnotationCard({
               Data Type:
             </Typography>
             <ToggleButtonGroup
+              data-cy={`${id}-column-annotation-card-data-type`}
               value={selectedDataType}
               onChange={handleDataTypeChange}
               exclusive
               aria-label="data type"
               color="primary"
             >
-              <ToggleButton value="categorical" aria-label="categorical">
+              <ToggleButton
+                data-cy={`${id}-column-annotation-card-data-type-categorical-button`}
+                value="Categorical"
+                aria-label="categorical"
+              >
                 Categorical
               </ToggleButton>
-              <ToggleButton value="continuous" aria-label="continuous">
+              <ToggleButton
+                data-cy={`${id}-column-annotation-card-data-type-continuous-button`}
+                value="Continuous"
+                aria-label="continuous"
+              >
                 Continuous
               </ToggleButton>
             </ToggleButtonGroup>
@@ -148,6 +164,7 @@ function ColumnAnnotationCard({
               Standardized Variable:
             </Typography>
             <Autocomplete
+              data-cy={`${id}-column-annotation-card-standardized-variable-dropdown`}
               value={selectedStandardizedVariableKey}
               onChange={handleStandardizedVariableChange}
               options={Object.keys(standardizedVariableOptions)}
