@@ -1,20 +1,36 @@
 import { create } from 'zustand';
 import * as R from 'ramda';
-import { DataTable, Columns, DataDictionary } from '../utils/types';
+import defaultConfig from '../../configs/default.json';
+import {
+  DataTable,
+  Columns,
+  DataDictionary,
+  StandardizedVaribles,
+  StandardizedVarible,
+} from '../utils/types';
 
 type DataStore = {
   dataTable: DataTable;
   columns: Columns;
-  uploadedDataDictionary: DataDictionary;
   uploadedDataTableFileName: string | null;
-  uploadedDataDictionaryFileName: string | null;
   setDataTable: (data: DataTable) => void;
   initializeColumns: (data: Columns) => void;
-  setDataDictionary: (data: DataDictionary) => void;
   setUploadedDataTableFileName: (fileName: string | null) => void;
-  setUploadedDataDictionaryFileName: (fileName: string | null) => void;
   processDataTableFile: (file: File) => Promise<void>;
+  updateColumnDescription: (columnId: number, description: string | null) => void;
+  updateColumnDataType: (columnId: number, dataType: ['Categorical' | 'Continuous'] | null) => void;
+  updateColumnStandardizedVariable: (
+    columnId: number,
+    standardizedVariable: StandardizedVarible | null
+  ) => void;
+
+  uploadedDataDictionary: DataDictionary;
+  uploadedDataDictionaryFileName: string | null;
+  setDataDictionary: (data: DataDictionary) => void;
+  setUploadedDataDictionaryFileName: (fileName: string | null) => void;
   processDataDictionaryFile: (file: File) => Promise<void>;
+
+  standardizedVaribles: StandardizedVaribles;
 };
 
 const useDataStore = create<DataStore>((set, get) => ({
@@ -62,6 +78,27 @@ const useDataStore = create<DataStore>((set, get) => ({
 
       reader.readAsText(file);
     }),
+
+  updateColumnDescription: (columnId: number, description: string | null) => {
+    set((state) => ({
+      columns: R.assocPath([columnId, 'description'], description, state.columns),
+    }));
+  },
+
+  updateColumnDataType: (columnId: number, dataType: ['Categorical' | 'Continuous'] | null) => {
+    set((state) => ({
+      columns: R.assocPath([columnId, 'dataType'], dataType, state.columns),
+    }));
+  },
+
+  updateColumnStandardizedVariable: (
+    columnId: number,
+    standardizedVariable: StandardizedVarible | null
+  ) => {
+    set((state) => ({
+      columns: R.assocPath([columnId, 'standardizedVariable'], standardizedVariable, state.columns),
+    }));
+  },
 
   // Data dictionary
   uploadedDataDictionary: {},
@@ -115,6 +152,9 @@ const useDataStore = create<DataStore>((set, get) => ({
 
       reader.readAsText(file);
     }),
+
+  // Config
+  standardizedVaribles: defaultConfig.standardizedVariables,
 }));
 
 export default useDataStore;
