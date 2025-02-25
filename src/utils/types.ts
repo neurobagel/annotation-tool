@@ -4,7 +4,7 @@ export type DataTable = {
 export type Column = {
   header: string;
   description?: string | null;
-  dataType?: ['Categorical' | 'Continuous'] | null;
+  dataType?: 'Categorical' | 'Continuous' | null;
   standardizedVariable?: StandardizedVarible | null;
 };
 export type Columns = {

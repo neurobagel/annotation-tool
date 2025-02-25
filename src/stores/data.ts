@@ -18,7 +18,7 @@ type DataStore = {
   setUploadedDataTableFileName: (fileName: string | null) => void;
   processDataTableFile: (file: File) => Promise<void>;
   updateColumnDescription: (columnId: number, description: string | null) => void;
-  updateColumnDataType: (columnId: number, dataType: ['Categorical' | 'Continuous'] | null) => void;
+  updateColumnDataType: (columnId: number, dataType: 'Categorical' | 'Continuous' | null) => void;
   updateColumnStandardizedVariable: (
     columnId: number,
     standardizedVariable: StandardizedVarible | null
@@ -85,7 +85,7 @@ const useDataStore = create<DataStore>((set, get) => ({
     }));
   },
 
-  updateColumnDataType: (columnId: number, dataType: ['Categorical' | 'Continuous'] | null) => {
+  updateColumnDataType: (columnId: number, dataType: 'Categorical' | 'Continuous' | null) => {
     set((state) => ({
       columns: R.assocPath([columnId, 'dataType'], dataType, state.columns),
     }));

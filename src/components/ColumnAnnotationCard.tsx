@@ -18,11 +18,11 @@ interface ColumnAnnotationCardProps {
   id: number;
   header: string;
   description: string | null;
-  dataType: ['Categorical' | 'Continuous'] | null;
+  dataType: 'Categorical' | 'Continuous' | null;
   standardizedVariable: StandardizedVarible | null;
   standardizedVariableOptions: StandardizedVaribles;
   onDescriptionChange: (columnId: number, newDescription: string | null) => void;
-  onDataTypeChange: (columnId: number, newDataType: ['Categorical' | 'Continuous'] | null) => void;
+  onDataTypeChange: (columnId: number, newDataType: 'Categorical' | 'Continuous' | null) => void;
   onStandardizedVariableChange: (
     columnId: number,
     newStandardizedVariable: StandardizedVarible | null
@@ -42,34 +42,30 @@ function ColumnAnnotationCard({
 }: ColumnAnnotationCardProps) {
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [editedDescription, setEditedDescription] = useState<string | null>(description);
-  const [selectedDataType, setSelectedDataType] = useState<['Categorical' | 'Continuous'] | null>(
+  const [selectedDataType, setSelectedDataType] = useState<'Categorical' | 'Continuous' | null>(
     dataType
   );
   const [selectedStandardizedVariableKey, setSelectedStandardizedVariableKey] = useState<
     string | null
   >(standardizedVariable ? standardizedVariable.identifier : null);
 
-  // Handle description edit
   const handleEditDescription = () => {
     setIsEditingDescription(true);
   };
 
-  // Handle description save
   const handleSaveDescription = () => {
     setIsEditingDescription(false);
     onDescriptionChange(id, editedDescription);
   };
 
-  // Handle data type change
   const handleDataTypeChange = (
     _: React.MouseEvent<HTMLElement>,
-    newDataType: ['Categorical' | 'Continuous'] | null
+    newDataType: 'Categorical' | 'Continuous' | null
   ) => {
     setSelectedDataType(newDataType);
     onDataTypeChange(id, newDataType);
   };
 
-  // Handle standardized variable change
   const handleStandardizedVariableChange = (
     _: React.ChangeEvent<unknown>,
     newValue: string | null

@@ -34,7 +34,7 @@ function ColumnAnnotation() {
 
   const handleDataTypeChange = (
     columnId: number,
-    newDataType: ['Categorical' | 'Continuous'] | null
+    newDataType: 'Categorical' | 'Continuous' | null
   ) => {
     updateColumnDataType(columnId, newDataType);
   };
