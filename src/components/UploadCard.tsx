@@ -3,20 +3,35 @@ import { Button, Card, Typography, Collapse } from '@mui/material';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import FileUploader from './FileUploader';
 
+/*
+Explicitly define the default props since eslint doesn't recognize the default props
+passed along with the arguments
+*/
+const defaultProps = {
+  diableFileUploader: false,
+  FileUploaderToolTipContent: 'Uploading is disabled',
+};
+
 interface UploadCardProps {
   title: string;
+  FileUploaderDisplayText: string;
   allowedFileType: string;
   uploadedFileName: string | null;
   onFileUpload: (file: File) => void;
   previewComponent: React.ReactNode;
+  diableFileUploader?: boolean;
+  FileUploaderToolTipContent?: string;
 }
 
 function UploadCard({
   title,
+  FileUploaderDisplayText,
   allowedFileType,
   uploadedFileName,
   onFileUpload,
   previewComponent,
+  diableFileUploader = false,
+  FileUploaderToolTipContent = 'Uploading is disabled',
 }: UploadCardProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -61,13 +76,15 @@ function UploadCard({
         </Typography>
 
         <FileUploader
-          displayText={`Upload your file (${allowedFileType})`}
+          displayText={FileUploaderDisplayText}
           handleClickToUpload={handleClickToUpload}
           handleDrop={handleDrop}
           handleDragOver={handleDragOver}
           handleFileUpload={handleFileUpload}
           fileInputRef={fileInputRef}
           allowedFileType={allowedFileType}
+          disabled={diableFileUploader}
+          tooltipContent={FileUploaderToolTipContent}
         />
 
         {isFileUploaded && (
@@ -97,5 +114,7 @@ function UploadCard({
     </div>
   );
 }
+
+UploadCard.defaultProps = defaultProps;
 
 export default UploadCard;
