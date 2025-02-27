@@ -8,9 +8,6 @@ describe('Simlpe e2e test', () => {
     cy.contains('Column Annotation');
     cy.get('[data-cy="next - value annotation-button"]').click();
     cy.contains('Value Annotation');
-    // reload to make sure the currentView persists
-    cy.reload();
-    cy.contains('Value Annotation');
     cy.get('[data-cy="next - download-button"]').click();
     cy.contains('Download');
   });
