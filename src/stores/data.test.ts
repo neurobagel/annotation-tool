@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import { mockDataTable, mockInitialColumns, mockUpdatedColumns } from '~/utils/mocks';
+import { mockDataTable, mockInitialColumns, columnsWithDescription } from '~/utils/mocks';
 import fs from 'fs';
 import path from 'path';
 import * as R from 'ramda';
@@ -46,7 +46,7 @@ describe('store actions', () => {
       await result.current.processDataDictionaryFile(dataDictionaryFile);
     });
 
-    expect(result.current.columns).toEqual(mockUpdatedColumns);
+    expect(result.current.columns).toEqual(columnsWithDescription);
     expect(result.current.uploadedDataDictionaryFileName).toEqual('mock.json');
 
     act(() => {
@@ -63,7 +63,7 @@ describe('store actions', () => {
     await act(async () => {
       await result.current.processDataDictionaryFile(dataDictionaryFile);
     });
-    expect(result.current.columns).toEqual(mockUpdatedColumns);
+    expect(result.current.columns).toEqual(columnsWithDescription);
     expect(result.current.uploadedDataDictionaryFileName).toEqual('mock.json');
   });
 });
