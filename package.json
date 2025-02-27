@@ -25,6 +25,7 @@
     "@mui/icons-material": "^6.4.4",
     "@mui/material": "^6.1.10",
     "@mui/system": "^6.4.3",
+    "ajv": "^8.17.1",
     "ramda": "^0.30.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
