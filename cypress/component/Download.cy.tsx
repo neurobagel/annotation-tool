@@ -58,22 +58,24 @@ describe('Download', () => {
 
   it('generates the data dictionary file with descriptions when the download button is clicked', () => {
     useDataStore.setState({ columns: columnsWithDescription });
+    useDataStore.setState({ uploadedDataTableFileName: 'someFileName' });
 
     cy.mount(<Download />);
 
     cy.get('[data-cy="download-data-dictionary-button"]').click();
-    cy.readFile('cypress/downloads/neurobagel-data-dictionary.json').then((fileContent) => {
+    cy.readFile('cypress/downloads/someFileName_annotated.json').then((fileContent) => {
       expect(fileContent).to.deep.equal(mockDataDictionaryWithDescription);
     });
   });
 
   it('generates the data dictionary file with no descriptions when the download button is clicked', () => {
     useDataStore.setState({ columns: columnsWithNoDescription });
+    useDataStore.setState({ uploadedDataTableFileName: 'someFileName' });
 
     cy.mount(<Download />);
 
     cy.get('[data-cy="download-data-dictionary-button"]').click();
-    cy.readFile('cypress/downloads/neurobagel-data-dictionary.json').then((fileContent) => {
+    cy.readFile('cypress/downloads/someFileName_annotated.json').then((fileContent) => {
       expect(fileContent).to.deep.equal(mockDataDictionaryWithNoDescription);
     });
   });

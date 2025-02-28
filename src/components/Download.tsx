@@ -22,6 +22,8 @@ function Download() {
   const [dictionaryCollapsed, setDictionaryCollapsed] = useState(false);
   const [forceAllowDownload, setForceAllowDownload] = useState(false);
 
+  const uploadedDataTableFileName = useDataStore((state) => state.uploadedDataTableFileName);
+
   const columns = useDataStore((state) => state.columns);
 
   const dataDictionary = useMemo(
@@ -58,7 +60,7 @@ function Download() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'neurobagel-data-dictionary.json';
+    a.download = `${uploadedDataTableFileName}_annotated.json`;
     document.body.appendChild(a);
     a.click();
     URL.revokeObjectURL(url);
