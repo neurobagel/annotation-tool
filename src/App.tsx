@@ -1,4 +1,4 @@
-import useViewStore from './stores/view';
+import useViewStore, { getNavigationProps } from './stores/view';
 import Landing from './components/Landing';
 import Upload from './components/Upload';
 import ColumnAnnotation from './components/ColumnAnnotation';
@@ -9,8 +9,8 @@ import { View } from './utils/types';
 
 function App() {
   const currentView = useViewStore((state) => state.currentView);
-  const { backView, nextView } = useViewStore((state) => state.getNavigationViews());
-  const { backLabel, nextLabel, className } = useViewStore((state) => state.getNavigationConfig());
+
+  const { backView, nextView, backLabel, nextLabel, className } = getNavigationProps(currentView);
 
   const renderView = () => {
     switch (currentView) {
