@@ -8,6 +8,6 @@ describe('Landing', () => {
     cy.get('img[alt="Neurobagel Logo"]').should('have.attr', 'alt', 'Neurobagel Logo');
     cy.get('img[alt="Landing emoji"]').should('be.visible');
     cy.get('img[alt="Landing emoji"]').should('have.attr', 'alt', 'Landing emoji');
-    cy.get('[data-cy="get started-button"]').should('be.visible');
+    cy.get('[data-cy="next-button"]').should('be.visible').and('contain', 'Get Started');
   });
 });
