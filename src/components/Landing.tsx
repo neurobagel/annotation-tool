@@ -2,6 +2,7 @@ import { Typography } from '@mui/material';
 import NavigationButton from './NavigationButton';
 import logo from '../assets/logo.svg';
 import landingEmoji from '../assets/landing-emoji.png';
+import { View } from '../utils/types';
 
 function Landing() {
   return (
@@ -22,7 +23,7 @@ function Landing() {
       </div>
       <NavigationButton
         backView={undefined}
-        nextView="upload"
+        nextView={View.Upload}
         nextLabel="Get Started"
         className="mt-6"
       />

@@ -1,7 +1,6 @@
 import UploadCard from './UploadCard';
 import DataTablePreview from './DataTablePreview';
 import useDataStore from '../stores/data';
-import NavigationButton from './NavigationButton';
 import DataDictionaryPreview from './DataDictionaryPreview';
 
 function Upload() {
@@ -52,10 +51,6 @@ function Upload() {
         diableFileUploader={isDataTableEmpty}
         FileUploaderToolTipContent={isDataTableEmpty ? 'Please upload a data table first' : ''}
       />
-      <div className="flex space-x-4">
-        <NavigationButton label="Back - Welcome" viewToNavigateTo="landing" />
-        <NavigationButton label="Next - Column Annotation" viewToNavigateTo="columnAnnotation" />
-      </div>
     </div>
   );
 }

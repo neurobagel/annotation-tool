@@ -1,5 +1,6 @@
 import { Button } from '@mui/material';
 import useViewStore from '../stores/view';
+import { View } from '../utils/types';
 
 const defaultProps = {
   backLabel: 'Back',
@@ -14,8 +15,8 @@ function NavigationButton({
   nextLabel,
   className,
 }: {
-  backView: string | undefined;
-  nextView: string | undefined;
+  backView: View | undefined;
+  nextView: View | undefined;
   backLabel?: string;
   nextLabel?: string;
   className?: string;

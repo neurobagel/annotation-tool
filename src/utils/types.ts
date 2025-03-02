@@ -35,3 +35,11 @@ export interface DataDictionary {
     };
   };
 }
+
+export enum View {
+  Landing = 'landing',
+  Upload = 'upload',
+  ColumnAnnotation = 'columnAnnotation',
+  ValueAnnotation = 'valueAnnotation',
+  Download = 'download',
+}
