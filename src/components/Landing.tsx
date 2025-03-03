@@ -6,7 +6,7 @@ import { View } from '../utils/types';
 
 function Landing() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-6">
+    <div className="m-auto flex flex-col items-center">
       <img src={logo} alt="Neurobagel Logo" className="mb-6 h-36 w-36 animate-spin-slow" />
       <div className="text-center">
         <div className="flex items-center justify-center space-x-4">

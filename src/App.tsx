@@ -5,6 +5,7 @@ import ColumnAnnotation from './components/ColumnAnnotation';
 import ValueAnnotation from './components/ValueAnnotation';
 import Download from './components/Download';
 import NavigationButton from './components/NavigationButton';
+import StepperComponent from './components/Stepper';
 import { View } from './utils/types';
 
 function App() {
@@ -30,10 +31,13 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col place-content-between">
-      <div>{renderView()}</div>
-      <div className="">
-        {currentView !== View.Landing && currentView !== View.Download && (
+    <div className="flex min-h-screen flex-col overflow-x-hidden">
+      {currentView !== View.Landing && <StepperComponent currentView={currentView} />}
+
+      {renderView()}
+
+      {currentView !== View.Landing && currentView !== View.Download && (
+        <div className="mt-auto">
           <NavigationButton
             backView={backView}
             nextView={nextView}
@@ -41,8 +45,8 @@ function App() {
             nextLabel={nextLabel}
             className={className}
           />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
