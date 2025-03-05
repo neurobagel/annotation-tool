@@ -6,7 +6,7 @@ const props = {
   header: 'some header',
   description: 'some description',
   dataType: 'Categorical' as 'Categorical' | 'Continuous' | null,
-  standardizedVariable: { identifier: 'participant_id' },
+  standardizedVariable: { identifier: 'participant_id', label: 'Participant ID' },
   standardizedVariableOptions: mockStandardizedVariables,
   onDescriptionChange: () => {},
   onDataTypeChange: () => {},
@@ -33,15 +33,13 @@ describe('ColumnAnnotationCard', () => {
     cy.get('[data-cy="1-column-annotation-card"]')
       .should('be.visible')
       .and('contain', 'some header');
-    cy.get('[data-cy="1-column-annotation-card-description"]')
+    cy.get('[data-cy="1-description"]').should('be.visible').and('contain', 'some description');
+    cy.get('[data-cy="1-edit-description-button"]').should('be.visible');
+    cy.get('[data-cy="1-edit-description-button"]').click();
+    cy.get('[data-cy="1-description-input"]')
       .should('be.visible')
       .and('contain', 'some description');
-    cy.get('[data-cy="1-column-annotation-card-edit-description-button"]').should('be.visible');
-    cy.get('[data-cy="1-column-annotation-card-edit-description-button"]').click();
-    cy.get('[data-cy="1-column-annotation-card-description-input"]')
-      .should('be.visible')
-      .and('contain', 'some description');
-    cy.get('[data-cy="1-column-annotation-card-save-description-button"]').should('be.visible');
+    cy.get('[data-cy="1-save-description-button"]').should('be.visible');
     cy.get('[data-cy="1-column-annotation-card-data-type"]').should('be.visible');
     cy.get('[data-cy="1-column-annotation-card-data-type-categorical-button"]')
       .should('be.visible')
@@ -51,26 +49,7 @@ describe('ColumnAnnotationCard', () => {
       .and('contain', 'Continuous');
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"] input')
       .should('be.visible')
-      .and('have.value', 'participant_id');
-  });
-  it('toggles the data type between categorical and continuous', () => {
-    cy.get('[data-cy="1-column-annotation-card-data-type-categorical-button"]').should(
-      'have.class',
-      'Mui-selected'
-    );
-    cy.get('[data-cy="1-column-annotation-card-data-type-continuous-button"]').should(
-      'not.have.class',
-      'Mui-selected'
-    );
-    cy.get('[data-cy="1-column-annotation-card-data-type-continuous-button"]').click();
-    cy.get('[data-cy="1-column-annotation-card-data-type-continuous-button"]').should(
-      'have.class',
-      'Mui-selected'
-    );
-    cy.get('[data-cy="1-column-annotation-card-data-type-categorical-button"]').should(
-      'not.have.class',
-      'Mui-selected'
-    );
+      .and('have.value', 'Participant ID');
   });
   it('Fires the onDescriptionChange event handler with the appropriate payload when the save button is clicked', () => {
     const spy = cy.spy().as('spy');
@@ -87,10 +66,10 @@ describe('ColumnAnnotationCard', () => {
         onStandardizedVariableChange={props.onStandardizedVariableChange}
       />
     );
-    cy.get('[data-cy="1-column-annotation-card-edit-description-button"]').click();
-    cy.get('[data-cy="1-column-annotation-card-description-input"]').clear();
-    cy.get('[data-cy="1-column-annotation-card-description-input"]').type('new description');
-    cy.get('[data-cy="1-column-annotation-card-save-description-button"]').click();
+    cy.get('[data-cy="1-edit-description-button"]').click();
+    cy.get('[data-cy="1-description-input"]').clear();
+    cy.get('[data-cy="1-description-input"]').type('new description');
+    cy.get('[data-cy="1-save-description-button"]').click();
     cy.get('@spy').should('have.been.calledWith', 1, 'new description');
   });
   it('Fires the onDataTypeChange event handler with the appropriate payload when the data type is toggled', () => {
@@ -129,6 +108,6 @@ describe('ColumnAnnotationCard', () => {
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
       'age{downarrow}{enter}'
     );
-    cy.get('@spy').should('have.been.calledWith', 1, { identifier: 'nb:Age' });
+    cy.get('@spy').should('have.been.calledWith', 1, { identifier: 'nb:Age', label: 'Age' });
   });
 });

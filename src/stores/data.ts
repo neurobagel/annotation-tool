@@ -5,7 +5,7 @@ import {
   DataTable,
   Columns,
   DataDictionary,
-  StandardizedVaribles,
+  StandardizedVaribleCollection,
   StandardizedVarible,
 } from '../utils/types';
 
@@ -30,7 +30,7 @@ type DataStore = {
   setUploadedDataDictionaryFileName: (fileName: string | null) => void;
   processDataDictionaryFile: (file: File) => Promise<void>;
 
-  standardizedVaribles: StandardizedVaribles;
+  standardizedVaribles: StandardizedVaribleCollection;
 };
 
 const useDataStore = create<DataStore>((set, get) => ({

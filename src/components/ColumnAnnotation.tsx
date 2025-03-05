@@ -24,7 +24,7 @@ function ColumnAnnotation() {
 
   const totalPages = Math.ceil(columnEntries.length / columnsPerPage);
 
-  const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => {
+  const handlePaginationChange = (_: React.ChangeEvent<unknown>, page: number) => {
     setCurrentPage(page);
   };
 
@@ -68,7 +68,7 @@ function ColumnAnnotation() {
         <Pagination
           count={totalPages}
           page={currentPage}
-          onChange={handlePageChange}
+          onChange={handlePaginationChange}
           color="primary"
           shape="rounded"
         />

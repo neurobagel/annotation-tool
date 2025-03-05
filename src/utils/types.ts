@@ -40,8 +40,9 @@ export interface DataDictionary {
 
 export interface StandardizedVarible {
   identifier: string;
+  label: string;
 }
 
-export interface StandardizedVaribles {
+export interface StandardizedVaribleCollection {
   [key: string]: StandardizedVarible;
 }

@@ -85,8 +85,11 @@ describe('store actions', () => {
   it('updates the standardizedVariable field of a column', () => {
     const { result } = renderHook(() => useDataStore());
     act(() => {
-      result.current.updateColumnStandardizedVariable(1, { identifier: 'nb:Some' });
+      result.current.updateColumnStandardizedVariable(1, { identifier: 'nb:Some', label: 'Some' });
     });
-    expect(result.current.columns['1'].standardizedVariable).toEqual({ identifier: 'nb:Some' });
+    expect(result.current.columns['1'].standardizedVariable).toEqual({
+      identifier: 'nb:Some',
+      label: 'Some',
+    });
   });
 });

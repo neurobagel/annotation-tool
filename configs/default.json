@@ -1,22 +1,28 @@
 {
   "standardizedVariables": {
     "Subject ID": {
-      "identifier": "nb:ParticipantID"
+      "identifier": "nb:ParticipantID",
+      "label": "Participant ID"
     },
     "Session ID": {
-      "identifier": "nb:SessionID"
+      "identifier": "nb:SessionID",
+      "label": "Session ID"
     },
     "Age": {
-      "identifier": "nb:Age"
+      "identifier": "nb:Age",
+      "label": "Age"
     },
     "Sex": {
-      "identifier": "nb:Sex"
+      "identifier": "nb:Sex",
+      "label": "Sex"
     },
     "Diagnosis": {
-      "identifier": "nb:Diagnosis"
+      "identifier": "nb:Diagnosis",
+      "label": "Diagnosis"
     },
     "Assessment Tool": {
-      "identifier": "nb:AssessmentTool"
+      "identifier": "nb:AssessmentTool",
+      "label": "Assessment Tool"
     }
   }
 }
