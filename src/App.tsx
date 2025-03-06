@@ -1,31 +1,57 @@
-import useViewStore from './stores/view';
+import useViewStore, { getNavigationProps } from './stores/view';
 import Landing from './components/Landing';
 import Upload from './components/Upload';
 import ColumnAnnotation from './components/ColumnAnnotation';
 import ValueAnnotation from './components/ValueAnnotation';
 import Download from './components/Download';
+import NavigationButton from './components/NavigationButton';
+import NavStepper from './components/NavStepper';
+import { View } from './utils/types';
 
 function App() {
   const currentView = useViewStore((state) => state.currentView);
 
-  const renderView = () => {
+  const { backView, nextView, backLabel, nextLabel, className } = getNavigationProps(currentView);
+
+  const determineView = () => {
     switch (currentView) {
-      case 'landing':
+      case View.Landing:
         return <Landing />;
-      case 'upload':
+      case View.Upload:
         return <Upload />;
-      case 'columnAnnotation':
+      case View.ColumnAnnotation:
         return <ColumnAnnotation />;
-      case 'valueAnnotation':
+      case View.ValueAnnotation:
         return <ValueAnnotation />;
-      case 'download':
+      case View.Download:
         return <Download />;
       default:
         return <Landing />;
     }
   };
 
-  return <div>{renderView()}</div>;
+  // Alias for the better readability
+  const content = determineView();
+
+  return (
+    <div className="flex min-h-screen flex-col overflow-x-hidden">
+      {currentView !== View.Landing && <NavStepper currentView={currentView} />}
+
+      {content}
+
+      {currentView !== View.Landing && currentView !== View.Download && (
+        <div className="mt-auto">
+          <NavigationButton
+            backView={backView}
+            nextView={nextView}
+            backLabel={backLabel}
+            nextLabel={nextLabel}
+            styleClassName={className}
+          />
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default App;

@@ -46,3 +46,17 @@ export interface StandardizedVarible {
 export interface StandardizedVaribleCollection {
   [key: string]: StandardizedVarible;
 }
+
+export enum View {
+  Landing = 'landing',
+  Upload = 'upload',
+  ColumnAnnotation = 'columnAnnotation',
+  ValueAnnotation = 'valueAnnotation',
+  Download = 'download',
+}
+
+export type StepConfig = {
+  label: string;
+  view: View;
+  icon: React.ComponentType;
+};
