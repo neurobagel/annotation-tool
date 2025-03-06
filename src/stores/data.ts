@@ -1,21 +1,37 @@
 import { create } from 'zustand';
 import * as R from 'ramda';
 import { devtools } from 'zustand/middleware';
-import { DataTable, Columns, DataDictionary } from '../utils/types';
+import defaultConfig from '../../configs/default.json';
+import {
+  DataTable,
+  Columns,
+  DataDictionary,
+  StandardizedVaribleCollection,
+  StandardizedVarible,
+} from '../utils/types';
 
 type DataStore = {
   dataTable: DataTable;
   columns: Columns;
-  uploadedDataDictionary: DataDictionary;
   uploadedDataTableFileName: string | null;
-  uploadedDataDictionaryFileName: string | null;
   setDataTable: (data: DataTable) => void;
   initializeColumns: (data: Columns) => void;
-  setDataDictionary: (data: DataDictionary) => void;
   setUploadedDataTableFileName: (fileName: string | null) => void;
-  setUploadedDataDictionaryFileName: (fileName: string | null) => void;
   processDataTableFile: (file: File) => Promise<void>;
+  updateColumnDescription: (columnId: number, description: string | null) => void;
+  updateColumnDataType: (columnId: number, dataType: 'Categorical' | 'Continuous' | null) => void;
+  updateColumnStandardizedVariable: (
+    columnId: number,
+    standardizedVariable: StandardizedVarible | null
+  ) => void;
+
+  uploadedDataDictionary: DataDictionary;
+  uploadedDataDictionaryFileName: string | null;
+  setDataDictionary: (data: DataDictionary) => void;
+  setUploadedDataDictionaryFileName: (fileName: string | null) => void;
   processDataDictionaryFile: (file: File) => Promise<void>;
+
+  standardizedVaribles: StandardizedVaribleCollection;
 };
 
 const useDataStore = create<DataStore>()(
@@ -65,10 +81,35 @@ const useDataStore = create<DataStore>()(
         reader.readAsText(file);
       }),
 
+    // Column updates
+    updateColumnDescription: (columnId: number, description: string | null) => {
+      set((state) => ({
+        columns: R.assocPath([columnId, 'description'], description, state.columns),
+      }));
+    },
+
+    updateColumnDataType: (columnId: number, dataType: 'Categorical' | 'Continuous' | null) => {
+      set((state) => ({
+        columns: R.assocPath([columnId, 'dataType'], dataType, state.columns),
+      }));
+    },
+
+    updateColumnStandardizedVariable: (
+      columnId: number,
+      standardizedVariable: StandardizedVarible | null
+    ) => {
+      set((state) => ({
+        columns: R.assocPath(
+          [columnId, 'standardizedVariable'],
+          standardizedVariable,
+          state.columns
+        ),
+      }));
+    },
+
     // Data dictionary
     uploadedDataDictionary: {},
     uploadedDataDictionaryFileName: null,
-
     setDataDictionary: (data: DataDictionary) => set({ uploadedDataDictionary: data }),
     setUploadedDataDictionaryFileName: (fileName: string | null) =>
       set({ uploadedDataDictionaryFileName: fileName }),
@@ -117,6 +158,9 @@ const useDataStore = create<DataStore>()(
 
         reader.readAsText(file);
       }),
+
+    // Config
+    standardizedVaribles: defaultConfig.standardizedVariables,
   }))
 );
 
