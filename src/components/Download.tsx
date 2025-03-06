@@ -23,12 +23,11 @@ function Download() {
   const [forceAllowDownload, setForceAllowDownload] = useState(false);
 
   const uploadedDataTableFileName = useDataStore((state) => state.uploadedDataTableFileName);
-
   const columns = useDataStore((state) => state.columns);
 
   const dataDictionary = useMemo(
     () =>
-      Object.entries(columns).reduce((acc, [_, column]) => {
+      Object.entries(columns).reduce((acc, [_columnKey, column]) => {
         if (column.header) {
           acc[column.header] = {
             Description: column.description || '',
@@ -45,6 +44,10 @@ function Download() {
     const isValid = validate(dataDictionary);
 
     if (!isValid) {
+      /*
+      Since Ajv uses JSON Pointer format for instance path
+      we need to slice the leading slash of the instance path
+      */
       const errors = validate.errors?.map((error) => error.instancePath.slice(1)) || [];
       return { isValid: false, errors };
     }
@@ -60,7 +63,7 @@ function Download() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${uploadedDataTableFileName}_annotated.json`;
+    a.download = `${uploadedDataTableFileName?.slice(0, -4)}_annotated.json`;
     document.body.appendChild(a);
     a.click();
     URL.revokeObjectURL(url);
@@ -73,7 +76,32 @@ function Download() {
         Download
       </Typography>
 
-      {!schemaValid && (
+      {schemaValid ? (
+        <Alert
+          data-cy="complete-annotations-alert"
+          severity="success"
+          className="mb-6 w-full max-w-2xl"
+        >
+          <div className="flex items-center gap-2">
+            <img src={emoji} alt="bagel confetti" className="h-10 w-10" />
+            <Typography variant="h4" className="font-bold">
+              Congratulations!
+            </Typography>
+          </div>
+          <Typography variant="body1">
+            You have successfully created a{' '}
+            <Link
+              href="https://neurobagel.org/data_models/dictionaries/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              neurobagel annotated .json data dictionary
+            </Link>
+            .
+          </Typography>
+        </Alert>
+      ) : (
         <Alert
           severity="error"
           data-cy="incomplete-annotations-alert"
@@ -105,33 +133,6 @@ function Download() {
               You will not be able to load the data dictionary into the annotation tool to change
               mistakes later.
             </b>
-          </Typography>
-        </Alert>
-      )}
-
-      {schemaValid && (
-        <Alert
-          data-cy="complete-annotations-alert"
-          severity="success"
-          className="mb-6 w-full max-w-2xl"
-        >
-          <div className="flex items-center gap-2">
-            <img src={emoji} alt="bagel confetti" className="h-10 w-10" />
-            <Typography variant="h4" className="font-bold">
-              Congratulations!
-            </Typography>
-          </div>
-          <Typography variant="body1">
-            You have successfully created a{' '}
-            <Link
-              href="https://neurobagel.org/data_models/dictionaries/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:underline"
-            >
-              neurobagel annotated .json data dictionary
-            </Link>
-            .
           </Typography>
         </Alert>
       )}
@@ -200,7 +201,7 @@ function Download() {
       </div>
 
       <div className="flex flex-col items-center">
-        {!schemaValid && (
+        {!schemaValid ? (
           <FormControlLabel
             control={
               <Switch
@@ -211,7 +212,7 @@ function Download() {
             }
             label="Let me download, I know what I'm doing!"
           />
-        )}
+        ) : null}
 
         <Button
           data-cy="download-data-dictionary-button"

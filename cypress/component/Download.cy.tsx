@@ -35,9 +35,11 @@ describe('Download', () => {
   });
 
   it('renders the component correctly when the data dictionary is invalid', () => {
+    // Create a stub validation function that always returns false (invalid)
     const validateStub = cy.stub().returns(false) as ValidateFunction;
+    // Add mock validation errors to the stub
     validateStub.errors = [{ instancePath: '/column1' }, { instancePath: '/column2' }];
-
+    // Stub Ajv.prototype.compile to return our custom validation function
     cy.stub(Ajv.prototype, 'compile').callsFake(() => validateStub);
 
     cy.mount(<Download />);
@@ -56,9 +58,9 @@ describe('Download', () => {
     cy.get('[data-cy="download-data-dictionary-button"]').should('be.enabled');
   });
 
-  it('generates the data dictionary file with descriptions when the download button is clicked', () => {
+  it('generates valid data dictionary with descriptions provided by user', () => {
     useDataStore.setState({ columns: columnsWithDescription });
-    useDataStore.setState({ uploadedDataTableFileName: 'someFileName' });
+    useDataStore.setState({ uploadedDataTableFileName: 'someFileName.tsv' });
 
     cy.mount(<Download />);
 
@@ -68,9 +70,9 @@ describe('Download', () => {
     });
   });
 
-  it('generates the data dictionary file with no descriptions when the download button is clicked', () => {
+  it('generates valid data dictionary even if no descriptions were provided by user', () => {
     useDataStore.setState({ columns: columnsWithNoDescription });
-    useDataStore.setState({ uploadedDataTableFileName: 'someFileName' });
+    useDataStore.setState({ uploadedDataTableFileName: 'someFileName.tsv' });
 
     cy.mount(<Download />);
 
