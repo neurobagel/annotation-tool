@@ -3,7 +3,7 @@ import DescriptionEditor from '../../src/components/DescriptionEditor';
 const props = {
   description: 'Sample description',
   onDescriptionChange: () => {},
-  id: 1,
+  id: '1',
 };
 
 describe('DescriptionEditor', () => {

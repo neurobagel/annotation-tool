@@ -22,7 +22,7 @@ function DataTablePreview({ dataTable, columns }: { dataTable: DataTable; column
   const rowData =
     Object.keys(dataTable).length > 0
       ? Object.values(dataTable)[0].map((_, rowIndex) =>
-          Object.keys(dataTable).map((colKey) => dataTable[Number(colKey)][rowIndex])
+          Object.keys(dataTable).map((colKey) => dataTable[colKey][rowIndex])
         )
       : [];
 

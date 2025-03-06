@@ -29,8 +29,11 @@ function Download() {
     () =>
       Object.entries(columns).reduce((acc, [_columnKey, column]) => {
         if (column.header) {
-          acc[column.header] = {
-            Description: column.description || '',
+          return {
+            ...acc,
+            [column.header]: {
+              Description: column.description || '',
+            },
           };
         }
         return acc;

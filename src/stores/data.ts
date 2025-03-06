@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import * as R from 'ramda';
+import { produce } from 'immer';
 import { devtools } from 'zustand/middleware';
 import defaultConfig from '../../configs/default.json';
 import {
@@ -18,10 +18,10 @@ type DataStore = {
   initializeColumns: (data: Columns) => void;
   setUploadedDataTableFileName: (fileName: string | null) => void;
   processDataTableFile: (file: File) => Promise<void>;
-  updateColumnDescription: (columnId: number, description: string | null) => void;
-  updateColumnDataType: (columnId: number, dataType: 'Categorical' | 'Continuous' | null) => void;
+  updateColumnDescription: (columnId: string, description: string | null) => void;
+  updateColumnDataType: (columnId: string, dataType: 'Categorical' | 'Continuous' | null) => void;
   updateColumnStandardizedVariable: (
-    columnId: number,
+    columnId: string,
     standardizedVariable: StandardizedVarible | null
   ) => void;
 
@@ -57,12 +57,16 @@ const useDataStore = create<DataStore>()(
           // Transform data into column-based structure
           const columnData: DataTable = {};
           headers.forEach((_, columnIndex) => {
-            columnData[columnIndex + 1] = data.map((row) => row[columnIndex]);
+            const key = (columnIndex + 1).toString();
+            columnData[key] = data.map((row) => row[columnIndex]);
           });
 
           const columns: Columns = headers.reduce((acc, header, index) => {
-            acc[index + 1] = { header };
-            return acc;
+            const key = (index + 1).toString();
+            return {
+              ...acc,
+              [key]: { header },
+            };
           }, {} as Columns);
 
           set({
@@ -82,28 +86,30 @@ const useDataStore = create<DataStore>()(
       }),
 
     // Column updates
-    updateColumnDescription: (columnId: number, description: string | null) => {
+    updateColumnDescription: (columnId: string, description: string | null) => {
       set((state) => ({
-        columns: R.assocPath([columnId, 'description'], description, state.columns),
+        columns: produce(state.columns, (draft) => {
+          draft[columnId].description = description;
+        }),
       }));
     },
 
-    updateColumnDataType: (columnId: number, dataType: 'Categorical' | 'Continuous' | null) => {
+    updateColumnDataType: (columnId: string, dataType: 'Categorical' | 'Continuous' | null) => {
       set((state) => ({
-        columns: R.assocPath([columnId, 'dataType'], dataType, state.columns),
+        columns: produce(state.columns, (draft) => {
+          draft[columnId].dataType = dataType;
+        }),
       }));
     },
 
     updateColumnStandardizedVariable: (
-      columnId: number,
+      columnId: string,
       standardizedVariable: StandardizedVarible | null
     ) => {
       set((state) => ({
-        columns: R.assocPath(
-          [columnId, 'standardizedVariable'],
-          standardizedVariable,
-          state.columns
-        ),
+        columns: produce(state.columns, (draft) => {
+          draft[columnId].standardizedVariable = standardizedVariable;
+        }),
       }));
     },
 
@@ -132,8 +138,10 @@ const useDataStore = create<DataStore>()(
 
                 if (columnEntry) {
                   const [columnId] = columnEntry;
-                  // Use Ramda's assocPath to update the nested column description
-                  return R.assocPath([columnId, 'description'], value.Description, acc);
+                  // Use Immer's produce to update the nested column description
+                  return produce(acc, (draft) => {
+                    draft[columnId].description = value.Description;
+                  });
                 }
                 return acc;
               },

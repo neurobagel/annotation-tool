@@ -2,7 +2,7 @@ import ColumnAnnotationCard from '../../src/components/ColumnAnnotationCard';
 import { mockStandardizedVariables } from '../../src/utils/mocks';
 
 const props = {
-  id: 1,
+  id: '1',
   header: 'some header',
   description: 'some description',
   dataType: 'Categorical' as 'Categorical' | 'Continuous' | null,

@@ -1,5 +1,5 @@
 export type DataTable = {
-  [key: number]: string[];
+  [key: string]: string[];
 };
 export type Column = {
   header: string;
@@ -8,7 +8,7 @@ export type Column = {
   standardizedVariable?: StandardizedVarible | null;
 };
 export type Columns = {
-  [key: number]: Column;
+  [key: string]: Column;
 };
 export interface DataDictionary {
   [key: string]: {
