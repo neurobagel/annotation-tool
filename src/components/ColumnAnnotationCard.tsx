@@ -98,7 +98,7 @@ function ColumnAnnotationCard({
             </Typography>
             <Autocomplete
               data-cy={`${id}-column-annotation-card-standardized-variable-dropdown`}
-              value={standardizedVariable?.label}
+              value={standardizedVariable?.label || ''}
               onChange={handleStandardizedVariableChange}
               options={Object.entries(standardizedVariableOptions).map(([_, value]) => value.label)}
               renderInput={(params) => (
