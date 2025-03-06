@@ -46,7 +46,7 @@ function Download() {
     if (!isValid) {
       /*
       Since Ajv uses JSON Pointer format for instance path
-      we need to slice the leading slash of the instance path
+      we need to slice the leading slash off of the instance path
       */
       const errors = validate.errors?.map((error) => error.instancePath.slice(1)) || [];
       return { isValid: false, errors };
