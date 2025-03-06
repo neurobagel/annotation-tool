@@ -43,3 +43,9 @@ export enum View {
   ValueAnnotation = 'valueAnnotation',
   Download = 'download',
 }
+
+export type StepConfig = {
+  label: string;
+  view: View;
+  icon: React.ComponentType;
+};

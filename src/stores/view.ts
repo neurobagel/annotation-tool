@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { View } from '../utils/types';
+import { steps } from '../utils/constants';
 
 type NavigationProps = {
   backView: View | undefined;
@@ -29,56 +30,29 @@ const useViewStore = create<ViewStore>()(
 );
 
 export const getNavigationProps = (currentView: View): NavigationProps => {
-  switch (currentView) {
-    case View.Landing:
-      return {
-        backView: undefined,
-        nextView: undefined,
-        backLabel: undefined,
-        nextLabel: undefined,
-        className: '',
-      };
-    case View.Upload:
-      return {
-        backView: View.Landing,
-        nextView: View.ColumnAnnotation,
-        backLabel: 'Back to Landing',
-        nextLabel: 'Next: Column Annotation',
-        className: 'p-4',
-      };
-    case View.ColumnAnnotation:
-      return {
-        backView: View.Upload,
-        nextView: View.ValueAnnotation,
-        backLabel: 'Back to Upload',
-        nextLabel: 'Next: Value Annotation',
-        className: 'p-4',
-      };
-    case View.ValueAnnotation:
-      return {
-        backView: View.ColumnAnnotation,
-        nextView: View.Download,
-        backLabel: 'Back to Column Annotation',
-        nextLabel: 'Next: Download',
-        className: 'p-4',
-      };
-    case View.Download:
-      return {
-        backView: View.ValueAnnotation,
-        nextView: undefined,
-        backLabel: undefined,
-        nextLabel: undefined,
-        className: '',
-      };
-    default:
-      return {
-        backView: undefined,
-        nextView: undefined,
-        backLabel: undefined,
-        nextLabel: undefined,
-        className: '',
-      };
+  const currentStepIndex = steps.findIndex((step) => step.view === currentView);
+
+  if (currentStepIndex === -1) {
+    return {
+      backView: undefined,
+      nextView: undefined,
+      backLabel: undefined,
+      nextLabel: undefined,
+      className: '',
+    };
   }
+
+  const backStep =
+    currentStepIndex === 0 ? { view: View.Landing, label: 'Landing' } : steps[currentStepIndex - 1];
+  const nextStep = steps[currentStepIndex + 1];
+
+  return {
+    backView: backStep?.view,
+    nextView: nextStep?.view,
+    backLabel: backStep ? `Back to ${backStep.label}` : undefined,
+    nextLabel: nextStep ? `Next: ${nextStep.label}` : undefined,
+    className: 'p-4',
+  };
 };
 
 export default useViewStore;

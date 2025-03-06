@@ -25,7 +25,7 @@ function Landing() {
         backView={undefined}
         nextView={View.Upload}
         nextLabel="Get Started"
-        className="mt-6"
+        styleClassName="mt-6"
       />
     </div>
   );

@@ -5,7 +5,7 @@ import { View } from '../utils/types';
 const defaultProps = {
   backLabel: 'Back',
   nextLabel: 'Next',
-  className: '',
+  styleClassName: '',
 };
 
 function NavigationButton({
@@ -13,13 +13,13 @@ function NavigationButton({
   nextView,
   backLabel,
   nextLabel,
-  className,
+  styleClassName,
 }: {
   backView: View | undefined;
   nextView: View | undefined;
   backLabel?: string;
   nextLabel?: string;
-  className?: string;
+  styleClassName?: string;
 }) {
   const setCurrentView = useViewStore((state) => state.setCurrentView);
 
@@ -36,7 +36,7 @@ function NavigationButton({
   };
 
   return (
-    <div className={`flex flex-row justify-between ${className}`}>
+    <div className={`flex flex-row justify-between ${styleClassName}`}>
       {backView && (
         <Button data-cy="back-button" variant="contained" onClick={handleBack}>
           {backLabel}

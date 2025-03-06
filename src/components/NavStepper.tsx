@@ -2,27 +2,17 @@
 // We need to disable this rule because the MUI Stepper API requires us to pass a component
 // to the `slots.stepIcon` prop, and defining a simple function inline is the most
 // straightforward way to achieve this. The performance impact is minimal in this case.
-import { Stepper as MuiStepper, Step, StepLabel, StepConnector, useTheme } from '@mui/material';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import ViewAgendaIcon from '@mui/icons-material/ViewAgenda';
-import FactCheckIcon from '@mui/icons-material/FactCheck';
-import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import { Stepper, Step, StepLabel, StepConnector, useTheme, SvgIcon } from '@mui/material';
 import { View } from '../utils/types';
+import { steps } from '../utils/constants';
 
-const steps = [
-  { label: 'Upload', view: View.Upload, icon: CloudUploadIcon },
-  { label: 'Column Annotation', view: View.ColumnAnnotation, icon: ViewAgendaIcon },
-  { label: 'Value Annotation', view: View.ValueAnnotation, icon: FactCheckIcon },
-  { label: 'Download', view: View.Download, icon: CloudDownloadIcon },
-];
-
-function Stepper({ currentView }: { currentView: View }) {
+function NavStepper({ currentView }: { currentView: View }) {
   const theme = useTheme();
   const activeStep = steps.findIndex((step) => step.view === currentView);
 
   return (
     <div className="w-full p-4">
-      <MuiStepper
+      <Stepper
         activeStep={activeStep}
         alternativeLabel
         connector={<StepConnector sx={{ top: 20 }} />}
@@ -51,7 +41,8 @@ function Stepper({ currentView }: { currentView: View }) {
               <StepLabel
                 slots={{
                   stepIcon: () => (
-                    <step.icon
+                    <SvgIcon
+                      component={step.icon} // Wrap the icon in SvgIcon
                       sx={{
                         fontSize: 32,
                         color: stepColor,
@@ -65,9 +56,9 @@ function Stepper({ currentView }: { currentView: View }) {
             </Step>
           );
         })}
-      </MuiStepper>
+      </Stepper>
     </div>
   );
 }
 
-export default Stepper;
+export default NavStepper;

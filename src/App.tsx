@@ -5,7 +5,7 @@ import ColumnAnnotation from './components/ColumnAnnotation';
 import ValueAnnotation from './components/ValueAnnotation';
 import Download from './components/Download';
 import NavigationButton from './components/NavigationButton';
-import StepperComponent from './components/Stepper';
+import NavStepper from './components/NavStepper';
 import { View } from './utils/types';
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
 
   const { backView, nextView, backLabel, nextLabel, className } = getNavigationProps(currentView);
 
-  const renderView = () => {
+  const determineView = () => {
     switch (currentView) {
       case View.Landing:
         return <Landing />;
@@ -32,9 +32,9 @@ function App() {
 
   return (
     <div className="flex min-h-screen flex-col overflow-x-hidden">
-      {currentView !== View.Landing && <StepperComponent currentView={currentView} />}
+      {currentView !== View.Landing && <NavStepper currentView={currentView} />}
 
-      {renderView()}
+      {determineView()}
 
       {currentView !== View.Landing && currentView !== View.Download && (
         <div className="mt-auto">
@@ -43,7 +43,7 @@ function App() {
             nextView={nextView}
             backLabel={backLabel}
             nextLabel={nextLabel}
-            className={className}
+            styleClassName={className}
           />
         </div>
       )}

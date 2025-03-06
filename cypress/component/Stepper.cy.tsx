@@ -1,4 +1,4 @@
-import Stepper from '../../src/components/Stepper';
+import NavStepper from '../../src/components/NavStepper';
 import { View } from '../../src/utils/types';
 
 const props = {
@@ -7,7 +7,7 @@ const props = {
 
 describe('Stepper component', () => {
   it('renders the component correctly', () => {
-    cy.mount(<Stepper currentView={props.currentView} />);
+    cy.mount(<NavStepper currentView={props.currentView} />);
     cy.get('[data-cy="stepper"]').should('be.visible');
     cy.get('[data-cy="stepper"]')
       .should('contain', 'Upload')
