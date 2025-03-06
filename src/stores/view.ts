@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { devtools } from 'zustand/middleware';
 import { View } from '../utils/types';
 import { steps } from '../utils/constants';
 
@@ -17,16 +17,10 @@ type ViewStore = {
 };
 
 const useViewStore = create<ViewStore>()(
-  persist(
-    (set) => ({
-      currentView: View.Landing,
-      setCurrentView: (view: View) => set({ currentView: view }),
-    }),
-    {
-      name: 'view-store',
-      storage: createJSONStorage(() => sessionStorage),
-    }
-  )
+  devtools((set) => ({
+    currentView: 'landing',
+    setCurrentView: (view: View) => set({ currentView: view }),
+  }))
 );
 
 export const getNavigationProps = (currentView: View): NavigationProps => {

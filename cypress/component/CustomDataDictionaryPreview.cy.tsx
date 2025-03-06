@@ -1,9 +1,9 @@
 import CustomDataDictionaryPreview from '../../src/components/CustomDataDictionaryPreview';
-import { mockDataDictionary } from '../../src/utils/mocks';
+import { mockDataDictionaryWithAnnotations } from '../../src/utils/mocks';
 
 describe('CustomDataDictionaryPreview', () => {
   beforeEach(() => {
-    cy.mount(<CustomDataDictionaryPreview dataDictionary={mockDataDictionary} />);
+    cy.mount(<CustomDataDictionaryPreview dataDictionary={mockDataDictionaryWithAnnotations} />);
   });
 
   it('should render the component correctly', () => {

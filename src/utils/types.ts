@@ -3,7 +3,9 @@ export type DataTable = {
 };
 export type Column = {
   header: string;
-  description?: string;
+  description?: string | null;
+  dataType?: 'Categorical' | 'Continuous' | null;
+  standardizedVariable?: StandardizedVarible | null;
 };
 export type Columns = {
   [key: number]: Column;
@@ -34,6 +36,15 @@ export interface DataDictionary {
       MissingValues?: string[];
     };
   };
+}
+
+export interface StandardizedVarible {
+  identifier: string;
+  label: string;
+}
+
+export interface StandardizedVaribleCollection {
+  [key: string]: StandardizedVarible;
 }
 
 export enum View {

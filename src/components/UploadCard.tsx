@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Button, Card, Typography, Collapse } from '@mui/material';
+import { Button, Card, CardHeader, CardContent, Typography, Collapse } from '@mui/material';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import FileUploader from './FileUploader';
 
@@ -66,46 +66,45 @@ function UploadCard({
   };
 
   return (
-    <div className="mx-auto w-full max-w-[1024px] px-4">
+    <div className="mx-auto w-full max-w-[1024px] rounded-3xl shadow-lg">
       <Card
         data-cy={`${title}-upload-card`}
-        className="rounded-3xl border-2 border-solid border-gray-300 p-4 text-center"
+        className="rounded-3xl border-2 border-solid border-gray-300 text-center"
       >
-        <Typography variant="h5" component="h2" className="mb-4 text-left">
-          {title}
-        </Typography>
+        <CardHeader title={title} className="bg-gray-50 text-left" />
+        <CardContent>
+          <FileUploader
+            displayText={FileUploaderDisplayText}
+            handleClickToUpload={handleClickToUpload}
+            handleDrop={handleDrop}
+            handleDragOver={handleDragOver}
+            handleFileUpload={handleFileUpload}
+            fileInputRef={fileInputRef}
+            allowedFileType={allowedFileType}
+            disabled={diableFileUploader}
+            tooltipContent={FileUploaderToolTipContent}
+          />
 
-        <FileUploader
-          displayText={FileUploaderDisplayText}
-          handleClickToUpload={handleClickToUpload}
-          handleDrop={handleDrop}
-          handleDragOver={handleDragOver}
-          handleFileUpload={handleFileUpload}
-          fileInputRef={fileInputRef}
-          allowedFileType={allowedFileType}
-          disabled={diableFileUploader}
-          tooltipContent={FileUploaderToolTipContent}
-        />
-
-        {isFileUploaded && (
-          <div className="mt-4">
-            <Typography
-              variant="body1"
-              className="mb-2"
-              data-cy={`${title}-card-uploaded-file-name`}
-            >
-              <strong>{uploadedFileName}</strong>
-            </Typography>
-            <Button
-              data-cy={`toggle-${title}-card-preview`}
-              variant="outlined"
-              onClick={togglePreview}
-              endIcon={isPreviewOpen ? <ExpandLess /> : <ExpandMore />}
-            >
-              {isPreviewOpen ? 'Hide Preview' : 'Show Preview'}
-            </Button>
-          </div>
-        )}
+          {isFileUploaded && (
+            <div className="mt-4">
+              <Typography
+                variant="body1"
+                className="mb-2"
+                data-cy={`${title}-card-uploaded-file-name`}
+              >
+                <strong>{uploadedFileName}</strong>
+              </Typography>
+              <Button
+                data-cy={`toggle-${title}-card-preview`}
+                variant="outlined"
+                onClick={togglePreview}
+                endIcon={isPreviewOpen ? <ExpandLess /> : <ExpandMore />}
+              >
+                {isPreviewOpen ? 'Hide Preview' : 'Show Preview'}
+              </Button>
+            </div>
+          )}
+        </CardContent>
       </Card>
 
       <Collapse in={isPreviewOpen} timeout="auto" unmountOnExit>
