@@ -110,3 +110,30 @@ export const mockDataDictionaryWithAnnotations = {
     },
   },
 };
+
+export const mockStandardizedVariables = {
+  'Subject ID': {
+    identifier: 'nb:ParticipantID',
+    label: 'Participant ID',
+  },
+  'Session ID': {
+    identifier: 'nb:SessionID',
+    label: 'Session ID',
+  },
+  Age: {
+    identifier: 'nb:Age',
+    label: 'Age',
+  },
+  Sex: {
+    identifier: 'nb:Sex',
+    label: 'Sex',
+  },
+  Diagnosis: {
+    identifier: 'nb:Diagnosis',
+    label: 'Diagnosis',
+  },
+  'Assessment Tool': {
+    identifier: 'nb:AssessmentTool',
+    label: 'Assessment Tool',
+  },
+};

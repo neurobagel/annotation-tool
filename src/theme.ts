@@ -11,8 +11,17 @@ const NBTheme = createTheme({
   },
   components: {
     MuiButton: {
-      defaultProps: {
-        sx: { textTransform: 'none' },
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+        },
+      },
+    },
+    MuiToggleButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+        },
       },
     },
   },
