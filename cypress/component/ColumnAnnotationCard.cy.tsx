@@ -70,7 +70,7 @@ describe('ColumnAnnotationCard', () => {
     cy.get('[data-cy="1-description-input"]').clear();
     cy.get('[data-cy="1-description-input"]').type('new description');
     cy.get('[data-cy="1-save-description-button"]').click();
-    cy.get('@spy').should('have.been.calledWith', 1, 'new description');
+    cy.get('@spy').should('have.been.calledWith', '1', 'new description');
   });
   it('Fires the onDataTypeChange event handler with the appropriate payload when the data type is toggled', () => {
     const spy = cy.spy().as('spy');
@@ -88,7 +88,7 @@ describe('ColumnAnnotationCard', () => {
       />
     );
     cy.get('[data-cy="1-column-annotation-card-data-type-continuous-button"]').click();
-    cy.get('@spy').should('have.been.calledWith', 1, 'Continuous');
+    cy.get('@spy').should('have.been.calledWith', '1', 'Continuous');
   });
   it('Fires the onStandardizedVariableChange event handler with the appropriate payload when the standardized variable is changed', () => {
     const spy = cy.spy().as('spy');
@@ -108,6 +108,6 @@ describe('ColumnAnnotationCard', () => {
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
       'age{downarrow}{enter}'
     );
-    cy.get('@spy').should('have.been.calledWith', 1, { identifier: 'nb:Age', label: 'Age' });
+    cy.get('@spy').should('have.been.calledWith', '1', { identifier: 'nb:Age', label: 'Age' });
   });
 });
