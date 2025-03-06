@@ -15,7 +15,7 @@ import NavigationButton from './NavigationButton';
 import DataDictionaryPreview from './DataDictionaryPreview';
 import useDataStore from '../stores/data';
 import schema from '../assets/neurobagel_data_dictionary.schema.json';
-import { DataDictionary } from '../utils/types';
+import { DataDictionary, View } from '../utils/types';
 import emoji from '../assets/download-emoji.png';
 
 function Download() {
@@ -72,10 +72,6 @@ function Download() {
 
   return (
     <div className="flex flex-col items-center p-6" data-cy="download">
-      <Typography variant="h4" className="mb-6 font-bold">
-        Download
-      </Typography>
-
       {schemaValid ? (
         <Alert
           data-cy="complete-annotations-alert"
@@ -225,9 +221,11 @@ function Download() {
         </Button>
       </div>
 
-      <div className="mt-6">
-        <NavigationButton label="Back - Value Annotation" viewToNavigateTo="valueAnnotation" />
-      </div>
+      <NavigationButton
+        backView={View.ValueAnnotation}
+        nextView={undefined}
+        backLabel="Back to Value Annotations"
+      />
     </div>
   );
 }

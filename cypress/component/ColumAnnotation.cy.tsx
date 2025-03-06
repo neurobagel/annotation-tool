@@ -33,7 +33,6 @@ describe('ColumnAnnotation', () => {
 
   it('renders the component correctly', () => {
     cy.mount(<ColumnAnnotation />);
-    cy.contains('Column Annotation');
     cy.get('[data-cy="1-column-annotation-card"]').should('be.visible');
     cy.get('[data-cy="1-description"]').should('be.visible').and('contain', 'This is some column');
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"] input')

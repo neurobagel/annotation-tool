@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Pagination from '@mui/material/Pagination';
 import { StandardizedVarible } from '~/utils/types';
-import NavigationButton from './NavigationButton';
 import ColumnAnnotationCard from './ColumnAnnotationCard';
 import useDataStore from '../stores/data';
 
@@ -48,7 +47,6 @@ function ColumnAnnotation() {
 
   return (
     <div className="flex flex-col items-center">
-      <h1>Column Annotation</h1>
       {currentColumns.map(([columnId, column]) => (
         <ColumnAnnotationCard
           key={columnId}
@@ -72,11 +70,6 @@ function ColumnAnnotation() {
           color="primary"
           shape="rounded"
         />
-      </div>
-
-      <div className="flex space-x-4">
-        <NavigationButton label="Back - Upload" viewToNavigateTo="upload" />
-        <NavigationButton label="Next - Value Annotation" viewToNavigateTo="valueAnnotation" />
       </div>
     </div>
   );
