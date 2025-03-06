@@ -30,11 +30,14 @@ function App() {
     }
   };
 
+  // Alias for the better readability
+  const content = determineView();
+
   return (
     <div className="flex min-h-screen flex-col overflow-x-hidden">
       {currentView !== View.Landing && <NavStepper currentView={currentView} />}
 
-      {determineView()}
+      {content}
 
       {currentView !== View.Landing && currentView !== View.Download && (
         <div className="mt-auto">
