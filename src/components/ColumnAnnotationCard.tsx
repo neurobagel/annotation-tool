@@ -12,16 +12,16 @@ import { StandardizedVarible, StandardizedVaribleCollection } from '../utils/typ
 import DescriptionEditor from './DescriptionEditor';
 
 interface ColumnAnnotationCardProps {
-  id: number;
+  id: string;
   header: string;
   description: string | null;
   dataType: 'Categorical' | 'Continuous' | null;
   standardizedVariable: StandardizedVarible | null;
   standardizedVariableOptions: StandardizedVaribleCollection;
-  onDescriptionChange: (columnId: number, newDescription: string | null) => void;
-  onDataTypeChange: (columnId: number, newDataType: 'Categorical' | 'Continuous' | null) => void;
+  onDescriptionChange: (columnId: string, newDescription: string | null) => void;
+  onDataTypeChange: (columnId: string, newDataType: 'Categorical' | 'Continuous' | null) => void;
   onStandardizedVariableChange: (
-    columnId: number,
+    columnId: string,
     newStandardizedVariable: StandardizedVarible | null
   ) => void;
 }

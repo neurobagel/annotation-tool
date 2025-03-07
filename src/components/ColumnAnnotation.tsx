@@ -27,19 +27,19 @@ function ColumnAnnotation() {
     setCurrentPage(page);
   };
 
-  const handleDescriptionChange = (columnId: number, newDescription: string | null) => {
+  const handleDescriptionChange = (columnId: string, newDescription: string | null) => {
     updateColumnDescription(columnId, newDescription);
   };
 
   const handleDataTypeChange = (
-    columnId: number,
+    columnId: string,
     newDataType: 'Categorical' | 'Continuous' | null
   ) => {
     updateColumnDataType(columnId, newDataType);
   };
 
   const handleStandardizedVariableChange = (
-    columnId: number,
+    columnId: string,
     newStandardizedVariable: StandardizedVarible | null
   ) => {
     updateColumnStandardizedVariable(columnId, newStandardizedVariable);
@@ -50,7 +50,7 @@ function ColumnAnnotation() {
       {currentColumns.map(([columnId, column]) => (
         <ColumnAnnotationCard
           key={columnId}
-          id={parseInt(columnId, 10)}
+          id={columnId}
           header={column.header}
           description={column.description || null}
           dataType={column.dataType || null}

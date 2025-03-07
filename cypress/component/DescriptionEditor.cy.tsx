@@ -3,7 +3,7 @@ import DescriptionEditor from '../../src/components/DescriptionEditor';
 const props = {
   description: 'Sample description',
   onDescriptionChange: () => {},
-  id: 1,
+  id: '1',
 };
 
 describe('DescriptionEditor', () => {
@@ -34,6 +34,6 @@ describe('DescriptionEditor', () => {
     cy.get('[data-cy="1-description-input"]').clear();
     cy.get('[data-cy="1-description-input"]').type('new description');
     cy.get('[data-cy="1-save-description-button"]').click();
-    cy.get('@spy').should('have.been.calledWith', 1, 'new description');
+    cy.get('@spy').should('have.been.calledWith', '1', 'new description');
   });
 });

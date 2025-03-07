@@ -3,8 +3,9 @@ import { describe, it, expect } from 'vitest';
 import { mockDataTable, mockInitialColumns, columnsWithDescription } from '~/utils/mocks';
 import fs from 'fs';
 import path from 'path';
-import * as R from 'ramda';
+import { produce } from 'immer';
 import useDataStore from './data';
+import { Columns } from '../utils/types';
 
 describe('store actions', () => {
   it('processes a data table file and update dataTable, columns, and uploadedDataTableFileName', async () => {
@@ -50,12 +51,10 @@ describe('store actions', () => {
     expect(result.current.uploadedDataDictionaryFileName).toEqual('mock.json');
 
     act(() => {
-      // Add a description to the first column using ramda
-      const mockColumnsWithDescription = R.assocPath(
-        [1, 'description'],
-        'some description',
-        mockInitialColumns
-      );
+      // Add a description to the first column using immer
+      const mockColumnsWithDescription = produce(mockInitialColumns as Columns, (draft) => {
+        draft[1].description = 'some description';
+      });
       result.current.initializeColumns(mockColumnsWithDescription);
     });
     expect(result.current.columns['1'].description).toEqual('some description');
@@ -69,7 +68,7 @@ describe('store actions', () => {
   it('updates the description field of a column', () => {
     const { result } = renderHook(() => useDataStore());
     act(() => {
-      result.current.updateColumnDescription(1, 'some description');
+      result.current.updateColumnDescription('1', 'some description');
     });
     expect(result.current.columns['1'].description).toEqual('some description');
   });
@@ -77,7 +76,7 @@ describe('store actions', () => {
   it('updates the dataType field of a column', () => {
     const { result } = renderHook(() => useDataStore());
     act(() => {
-      result.current.updateColumnDataType(1, 'Continuous');
+      result.current.updateColumnDataType('1', 'Continuous');
     });
     expect(result.current.columns['1'].dataType).toEqual('Continuous');
   });
@@ -85,7 +84,10 @@ describe('store actions', () => {
   it('updates the standardizedVariable field of a column', () => {
     const { result } = renderHook(() => useDataStore());
     act(() => {
-      result.current.updateColumnStandardizedVariable(1, { identifier: 'nb:Some', label: 'Some' });
+      result.current.updateColumnStandardizedVariable('1', {
+        identifier: 'nb:Some',
+        label: 'Some',
+      });
     });
     expect(result.current.columns['1'].standardizedVariable).toEqual({
       identifier: 'nb:Some',

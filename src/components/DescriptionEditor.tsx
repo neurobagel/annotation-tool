@@ -5,8 +5,8 @@ import SaveIcon from '@mui/icons-material/Save';
 
 interface DescriptionEditorProps {
   description: string | null;
-  onDescriptionChange: (id: number, description: string | null) => void;
-  id: number;
+  onDescriptionChange: (id: string, description: string | null) => void;
+  id: string;
 }
 
 function DescriptionEditor({ description, onDescriptionChange, id }: DescriptionEditorProps) {
