@@ -11,6 +11,7 @@ const defaultProps = {
 };
 
 function FileUploader({
+  id,
   displayText,
   handleClickToUpload,
   handleDrop,
@@ -21,6 +22,7 @@ function FileUploader({
   disabled,
   tooltipContent,
 }: {
+  id: string;
   displayText: string;
   handleClickToUpload: () => void;
   handleDrop: (event: React.DragEvent<HTMLDivElement>) => void;
@@ -44,7 +46,7 @@ function FileUploader({
       placement="top"
     >
       <Card
-        data-cy="upload-area"
+        data-cy={`${id}-upload-area`}
         elevation={3}
         className={`mx-auto max-w-[768px] rounded-3xl border-2 border-dashed p-8 transition-colors ${
           disabled
@@ -82,6 +84,7 @@ function FileUploader({
           or drag and drop
         </Typography>
         <input
+          data-cy={`${id}-upload-input`}
           type="file"
           hidden
           accept={allowedFileType}

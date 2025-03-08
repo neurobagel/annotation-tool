@@ -13,6 +13,7 @@ const defaultProps = {
 };
 
 interface UploadCardProps {
+  id: string;
   title: string;
   FileUploaderDisplayText: string;
   allowedFileType: string;
@@ -24,6 +25,7 @@ interface UploadCardProps {
 }
 
 function UploadCard({
+  id,
   title,
   FileUploaderDisplayText,
   allowedFileType,
@@ -68,12 +70,13 @@ function UploadCard({
   return (
     <div className="mx-auto w-full max-w-[1024px] rounded-3xl shadow-lg">
       <Card
-        data-cy={`${title}-upload-card`}
+        data-cy={`${id}-upload-card`}
         className="rounded-3xl border-2 border-solid border-gray-300 text-center"
       >
         <CardHeader title={title} className="bg-gray-50 text-left" />
         <CardContent>
           <FileUploader
+            id={id}
             displayText={FileUploaderDisplayText}
             handleClickToUpload={handleClickToUpload}
             handleDrop={handleDrop}
@@ -87,15 +90,11 @@ function UploadCard({
 
           {isFileUploaded && (
             <div className="mt-4">
-              <Typography
-                variant="body1"
-                className="mb-2"
-                data-cy={`${title}-card-uploaded-file-name`}
-              >
+              <Typography variant="body1" className="mb-2" data-cy={`${id}-uploaded-file-name`}>
                 <strong>{uploadedFileName}</strong>
               </Typography>
               <Button
-                data-cy={`toggle-${title}-card-preview`}
+                data-cy={`${id}-toggle-preview-button`}
                 variant="outlined"
                 onClick={togglePreview}
                 endIcon={isPreviewOpen ? <ExpandLess /> : <ExpandMore />}

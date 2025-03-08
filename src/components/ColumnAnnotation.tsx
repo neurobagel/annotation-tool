@@ -62,7 +62,7 @@ function ColumnAnnotation() {
         />
       ))}
 
-      <div className="my-4">
+      <div className="my-4" data-cy="column-annotation-pagination">
         <Pagination
           count={totalPages}
           page={currentPage}
