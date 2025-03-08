@@ -145,7 +145,7 @@ function Download() {
         </Typography>
 
         <Button
-          data-cy="data-dictionary-toggle-preview-button"
+          data-cy="datadictionary-toggle-preview-button"
           variant="outlined"
           size="small"
           onClick={() => setDictionaryCollapsed(!dictionaryCollapsed)}
@@ -161,7 +161,7 @@ function Download() {
         <Typography variant="h6" className="font-bold">
           Here are some next steps:
         </Typography>
-        <List className="list-disc pl-6" data-cy="data-dictionary-next-steps-list">
+        <List className="list-disc pl-6" data-cy="datadictionary-next-steps-list">
           <ListItem className="list-item">
             <Typography variant="body1">
               Download the .json data dictionary to your local hard drive by clicking the green
@@ -214,7 +214,7 @@ function Download() {
         ) : null}
 
         <Button
-          data-cy="download-data-dictionary-button"
+          data-cy="download-datadictionary-button"
           variant="contained"
           color={schemaValid ? 'success' : 'error'}
           disabled={!schemaValid && !forceAllowDownload}

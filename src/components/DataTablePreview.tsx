@@ -40,7 +40,7 @@ function DataTablePreview({ dataTable, columns }: { dataTable: DataTable; column
   return (
     <div className="mt-6">
       <TableContainer component={Paper} elevation={3} className="w-full overflow-x-auto shadow-lg">
-        <Table className="min-w-[768px]" data-cy="data-table-preview">
+        <Table className="min-w-[768px]" data-cy="datatable-preview">
           <TableHead>
             <TableRow className="bg-blue-50">
               {headers.map((header) => (
