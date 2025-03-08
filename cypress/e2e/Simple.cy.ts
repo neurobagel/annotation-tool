@@ -95,6 +95,7 @@ describe('Simple e2e test', () => {
     const outputFileName = `${exampleDataDictionaryFileName.split('.')[0]}_annotated.json`;
     cy.readFile(`cypress/downloads/${outputFileName}`).then((fileContent) => {
       const fileContentString = JSON.stringify(fileContent);
+      // Check that the old description has been replaced with the new one
       expect(fileContentString).to.not.contain('Age of the participant');
       expect(fileContentString).to.contain('some cool new description');
     });
