@@ -31,22 +31,24 @@ function ValueAnnotation() {
       case 'Continuous':
         return <Continuous />;
       default:
-        return <Typography variant="h6">Please select a valid column type.</Typography>;
+        return (
+          <Typography variant="h6">
+            Please select the appropriate data type for this column.
+          </Typography>
+        );
     }
   };
 
   return (
-    <div className="flex flex-col">
-      <div className="flex">
-        <SideColumnNavBar
-          columns={columns}
-          onSelectColumn={handleSelectColumn}
-          selectedColumnId={selectedColumnId}
-        />
-        <Paper className="flex-2 ml-4 max-w-2xl p-4" elevation={3}>
-          {renderContent()}
-        </Paper>
-      </div>
+    <div className="mx-auto flex w-full max-w-7xl flex-row space-x-4 p-4">
+      <SideColumnNavBar
+        columns={columns}
+        onSelectColumn={handleSelectColumn}
+        selectedColumnId={selectedColumnId}
+      />
+      <Paper className="flex-1 p-4 shadow-lg" elevation={3}>
+        {renderContent()}
+      </Paper>
     </div>
   );
 }

@@ -32,7 +32,7 @@ function SideColumnNavBar({ columns, onSelectColumn, selectedColumnId }: SideCol
   );
 
   return (
-    <Paper className="max-w-64 p-4" elevation={3}>
+    <Paper className="w-full max-w-64 p-4" elevation={3}>
       <div>
         <Button
           className="justify-start"

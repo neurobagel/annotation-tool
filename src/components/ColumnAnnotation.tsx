@@ -46,7 +46,7 @@ function ColumnAnnotation() {
   };
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center gap-4">
       {currentColumns.map(([columnId, column]) => (
         <ColumnAnnotationCard
           key={columnId}
