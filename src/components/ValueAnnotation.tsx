@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Typography, Paper } from '@mui/material';
+import { Typography, Paper as Card } from '@mui/material';
 import useDataStore from '../stores/data';
 import SideColumnNavBar from './SideColumnNavBar';
 import Categorical from './Categorical';
@@ -32,7 +32,7 @@ function ValueAnnotation() {
         return <Continuous />;
       default:
         return (
-          <Typography variant="h6">
+          <Typography data-cy="other-placeholder" variant="h6">
             Please select the appropriate data type for this column.
           </Typography>
         );
@@ -46,9 +46,9 @@ function ValueAnnotation() {
         onSelectColumn={handleSelectColumn}
         selectedColumnId={selectedColumnId}
       />
-      <Paper className="flex-1 p-4 shadow-lg" elevation={3}>
+      <Card className="flex-1 p-4 shadow-lg" elevation={3} data-cy="value-annotation-card">
         {renderContent()}
-      </Paper>
+      </Card>
     </div>
   );
 }

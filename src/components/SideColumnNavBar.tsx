@@ -21,6 +21,10 @@ function SideColumnNavBar({ columns, onSelectColumn, selectedColumnId }: SideCol
     setExpanded((prev) => ({ ...prev, [type]: !prev[type] }));
   };
 
+  /* 
+  TODO: once configuration is in and we have a way to designate certain columns
+  like participant_id and session_id as "doesn't need value annotation", we can filter them out here
+  */
   const categoricalColumns = Object.entries(columns).filter(
     ([_, column]) => column.dataType === 'Categorical'
   );
@@ -32,9 +36,10 @@ function SideColumnNavBar({ columns, onSelectColumn, selectedColumnId }: SideCol
   );
 
   return (
-    <Paper className="w-full max-w-64 p-4" elevation={3}>
-      <div>
+    <Paper className="w-full max-w-64 p-4" elevation={3} data-cy="side-column-nav-bar">
+      <div data-cy="side-column-nav-bar-categorical">
         <Button
+          data-cy="side-column-nav-bar-categorical-toggle-button"
           className="justify-start"
           fullWidth
           onClick={() => toggleExpansion('categorical')}
@@ -55,6 +60,7 @@ function SideColumnNavBar({ columns, onSelectColumn, selectedColumnId }: SideCol
           <List>
             {categoricalColumns.map(([columnId, column]) => (
               <ListItemButton
+                data-cy={`side-column-nav-bar-categorical-${column.header}`}
                 key={columnId}
                 selected={selectedColumnId === columnId}
                 onClick={() => onSelectColumn(columnId, 'Categorical')}
@@ -71,8 +77,9 @@ function SideColumnNavBar({ columns, onSelectColumn, selectedColumnId }: SideCol
         </Collapse>
       </div>
 
-      <div>
+      <div data-cy="side-column-nav-bar-continuous">
         <Button
+          data-cy="side-column-nav-bar-continuous-toggle-button"
           className="justify-start"
           fullWidth
           onClick={() => toggleExpansion('continuous')}
@@ -93,6 +100,7 @@ function SideColumnNavBar({ columns, onSelectColumn, selectedColumnId }: SideCol
           <List>
             {continuousColumns.map(([columnId, column]) => (
               <ListItemButton
+                data-cy={`side-column-nav-bar-continuous-${column.header}`}
                 key={columnId}
                 selected={selectedColumnId === columnId}
                 onClick={() => onSelectColumn(columnId, 'Continuous')}
@@ -109,8 +117,9 @@ function SideColumnNavBar({ columns, onSelectColumn, selectedColumnId }: SideCol
         </Collapse>
       </div>
 
-      <div>
+      <div data-cy="side-column-nav-bar-other">
         <Button
+          data-cy="side-column-nav-bar-other-toggle-button"
           className="justify-start"
           fullWidth
           onClick={() => toggleExpansion('other')}
@@ -131,6 +140,7 @@ function SideColumnNavBar({ columns, onSelectColumn, selectedColumnId }: SideCol
           <List>
             {otherColumns.map(([columnId, column]) => (
               <ListItemButton
+                data-cy={`side-column-nav-bar-other-${column.header}`}
                 key={columnId}
                 selected={selectedColumnId === columnId}
                 onClick={() => onSelectColumn(columnId, null)}

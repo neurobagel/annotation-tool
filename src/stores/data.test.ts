@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import { mockDataTable, mockInitialColumns, columnsWithDescription } from '~/utils/mocks';
+import { mockDataTable, mockInitialColumns, mockColumnsWithDescription } from '~/utils/mocks';
 import fs from 'fs';
 import path from 'path';
 import { produce } from 'immer';
@@ -47,24 +47,25 @@ describe('store actions', () => {
       await result.current.processDataDictionaryFile(dataDictionaryFile);
     });
 
-    expect(result.current.columns).toEqual(columnsWithDescription);
+    expect(result.current.columns).toEqual(mockColumnsWithDescription);
     expect(result.current.uploadedDataDictionaryFileName).toEqual('mock.json');
 
     act(() => {
-      // Add a description to the first column using immer
-      const mockColumnsWithDescription = produce(mockInitialColumns as Columns, (draft) => {
+      // Use a different variable name to avoid shadowing
+      const updatedColumns = produce(mockInitialColumns as Columns, (draft) => {
         draft[1].description = 'some description';
       });
-      result.current.initializeColumns(mockColumnsWithDescription);
+      result.current.initializeColumns(updatedColumns);
     });
     expect(result.current.columns['1'].description).toEqual('some description');
 
     await act(async () => {
       await result.current.processDataDictionaryFile(dataDictionaryFile);
     });
-    expect(result.current.columns).toEqual(columnsWithDescription);
+    expect(result.current.columns).toEqual(mockColumnsWithDescription);
     expect(result.current.uploadedDataDictionaryFileName).toEqual('mock.json');
   });
+
   it('updates the description field of a column', () => {
     const { result } = renderHook(() => useDataStore());
     act(() => {

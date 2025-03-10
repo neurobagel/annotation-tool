@@ -2,8 +2,8 @@ import Ajv from 'ajv';
 import Download from '../../src/components/Download';
 import useDataStore from '../../src/stores/data';
 import {
-  columnsWithDescription,
-  columnsWithNoDescription,
+  mockColumnsWithDescription,
+  mockInitialColumns,
   mockDataDictionaryWithDescription,
   mockDataDictionaryWithNoDescription,
 } from '../../src/utils/mocks';
@@ -59,7 +59,7 @@ describe('Download', () => {
   });
 
   it('generates valid data dictionary with descriptions provided by user', () => {
-    useDataStore.setState({ columns: columnsWithDescription });
+    useDataStore.setState({ columns: mockColumnsWithDescription });
     useDataStore.setState({ uploadedDataTableFileName: 'someFileName.tsv' });
 
     cy.mount(<Download />);
@@ -71,7 +71,7 @@ describe('Download', () => {
   });
 
   it('generates valid data dictionary even if no descriptions were provided by user', () => {
-    useDataStore.setState({ columns: columnsWithNoDescription });
+    useDataStore.setState({ columns: mockInitialColumns });
     useDataStore.setState({ uploadedDataTableFileName: 'someFileName.tsv' });
 
     cy.mount(<Download />);
