@@ -35,4 +35,16 @@ describe('SideColumnNavBar', () => {
     cy.get('[data-cy="side-column-nav-bar-other-toggle-button"]').click();
     cy.get('[data-cy="side-column-nav-bar-other-age"]').should('not.be.visible');
   });
+  it('Fires the onSelectColumn event handler with the appropriate payload when a column is clicked', () => {
+    const spy = cy.spy().as('spy');
+    cy.mount(
+      <SideColumnNavBar
+        columns={props.columns}
+        onSelectColumn={spy}
+        selectedColumnId={props.selectedColumnId}
+      />
+    );
+    cy.get('[data-cy="side-column-nav-bar-categorical-sex"]').click();
+    cy.get('@spy').should('have.been.calledWith', '3', 'Categorical');
+  });
 });

@@ -8,16 +8,14 @@ import Continuous from './Continuous';
 function ValueAnnotation() {
   const columns = useDataStore((state) => state.columns);
   const [selectedColumnId, setSelectedColumnId] = useState<string | null>(null);
-  const [selectedColumnDataType, setSelectedColumnDataType] = useState<
-    'Categorical' | 'Continuous' | null
-  >(null);
+  let selectedColumnDataType = selectedColumnId ? columns[selectedColumnId]?.dataType : null;
 
   const handleSelectColumn = (
     columnId: string | null,
     columnDataType: 'Categorical' | 'Continuous' | null
   ) => {
     setSelectedColumnId(columnId);
-    setSelectedColumnDataType(columnDataType);
+    selectedColumnDataType = columnDataType;
   };
 
   const renderContent = () => {
