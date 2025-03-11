@@ -29,7 +29,7 @@ export const mockInitialColumns = {
   },
 };
 
-export const columnsWithDescription = {
+export const mockColumnsWithDescription = {
   1: {
     header: 'participant_id',
     description: 'A participant ID',
@@ -44,15 +44,17 @@ export const columnsWithDescription = {
   },
 };
 
-export const columnsWithNoDescription = {
+export const mockColumnsWithDataType = {
   1: {
     header: 'participant_id',
+    dataType: 'Continuous' as 'Categorical' | 'Continuous' | null,
   },
   2: {
     header: 'age',
   },
   3: {
     header: 'sex',
+    dataType: 'Categorical' as 'Categorical' | 'Continuous' | null,
   },
 };
 

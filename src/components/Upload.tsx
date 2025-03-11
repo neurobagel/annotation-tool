@@ -31,7 +31,7 @@ function Upload() {
   };
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center gap-8">
       <UploadCard
         id="datatable"
         title="Data Table"
