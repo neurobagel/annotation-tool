@@ -1,7 +1,8 @@
-[![codecov](https://codecov.io/gh/neurobagel/react-bagel/graph/badge.svg?token=mK0zZ2A86F)](https://codecov.io/gh/neurobagel/react-bagel)
-![Tests](https://github.com/neurobagel/react-bagel/actions/workflows/tests.yaml/badge.svg)
-![Checks](https://github.com/neurobagel/react-bagel/actions/workflows/checks.yaml/badge.svg)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Main branch checks status](https://img.shields.io/github/check-runs/neurobagel/annotation-tool/main?style=flat-square&logo=github)](https://github.com/neurobagel/annotation-tool/actions?query=branch:main)
+[![Tests status](https://img.shields.io/github/actions/workflow/status/neurobagel/annotation-tool/tests.yaml?branch=main&style=flat-square&logo=github&label=tests)](https://github.com/neurobagel/annotation-tool/actions/workflows/tests.yaml)
+[![Codecov](https://img.shields.io/codecov/c/github/neurobagel/annotation-tool?style=flat-square&logo=codecov&link=https%3A%2F%2Fapp.codecov.io%2Fgh%2Fneurobagel%2Fannotation-tool)](https://app.codecov.io/gh/neurobagel/annotation-tool)
+[![Node version](https://img.shields.io/badge/node-20-green?style=flat-square&logo=nodedotjs)](https://nodejs.org/en)
+[![License](https://img.shields.io/github/license/neurobagel/annotation-tool?style=flat-square&color=purple&link=LICENSE)](LICENSE)
 
 # React Bagel
 
