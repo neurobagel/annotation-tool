@@ -12,13 +12,18 @@ import {
 import DescriptionEditor from './DescriptionEditor';
 
 interface CategoricalProps {
-  columnId: string;
+  columnID: string;
   uniqueValues: string[];
-  levels: Record<string, { description: string }>;
+  levels: { [key: string]: { description: string } };
   onUpdateDescription: (columnId: string, value: string, description: string) => void;
 }
 
-function Categorical({ columnId, uniqueValues, levels, onUpdateDescription }: CategoricalProps) {
+function Categorical({
+  columnID: columnId,
+  uniqueValues,
+  levels,
+  onUpdateDescription,
+}: CategoricalProps) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -38,9 +43,14 @@ function Categorical({ columnId, uniqueValues, levels, onUpdateDescription }: Ca
   const slicedValues = uniqueValues.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   return (
-    <TableContainer component={Paper} elevation={3} className="shadow-lg">
+    <TableContainer
+      data-cy={`${columnId}-categorical`}
+      component={Paper}
+      elevation={3}
+      className="shadow-lg"
+    >
       <Table className="min-w-[768px]">
-        <TableHead>
+        <TableHead data-cy={`${columnId}-categorical-table-head`}>
           <TableRow className="bg-blue-50">
             <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
               Value
@@ -52,11 +62,12 @@ function Categorical({ columnId, uniqueValues, levels, onUpdateDescription }: Ca
         </TableHead>
         <TableBody>
           {slicedValues.map((value) => (
-            <TableRow key={value}>
+            <TableRow key={value} data-cy={`${columnId}-${value}`}>
               <TableCell align="left">{value}</TableCell>
               <TableCell align="left">
                 <DescriptionEditor
                   columnID={columnId}
+                  levelValue={value}
                   description={levels[value]?.description || ''}
                   onDescriptionChange={(id, description) => {
                     onUpdateDescription(id, value, description || '');
@@ -68,6 +79,7 @@ function Categorical({ columnId, uniqueValues, levels, onUpdateDescription }: Ca
         </TableBody>
       </Table>
       <TablePagination
+        data-cy={`${columnId}-categorical-pagination`}
         rowsPerPageOptions={[5, 10, 25, 50, 100]}
         component="div"
         count={uniqueValues.length}
