@@ -164,9 +164,20 @@ const useDataStore = create<DataStore>()(
 
                 if (columnEntry) {
                   const [columnId] = columnEntry;
-                  // Use Immer's produce to update the nested column description
+                  // Use Immer's produce to update the nested column description and levels
                   return produce(acc, (draft) => {
                     draft[columnId].description = value.Description;
+
+                    if (value.Levels) {
+                      draft[columnId].dataType = 'Categorical';
+                      draft[columnId].levels = Object.entries(value.Levels).reduce(
+                        (levelsAcc, [levelKey, levelValue]) => ({
+                          ...levelsAcc,
+                          [levelKey]: { description: levelValue },
+                        }),
+                        {} as { [key: string]: { description: string } }
+                      );
+                    }
                   });
                 }
                 return acc;
