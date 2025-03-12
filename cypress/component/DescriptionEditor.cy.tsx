@@ -12,7 +12,7 @@ describe('DescriptionEditor', () => {
       <DescriptionEditor
         description={props.description}
         onDescriptionChange={props.onDescriptionChange}
-        id={props.id}
+        columnID={props.id}
       />
     );
     cy.get('[data-cy="1-description"]').should('be.visible').and('contain', 'Sample description');
@@ -28,7 +28,11 @@ describe('DescriptionEditor', () => {
   it('fires the onDescriptionChange event handler with the appropriate payload when the save button is clicked', () => {
     const spy = cy.spy().as('spy');
     cy.mount(
-      <DescriptionEditor description={props.description} onDescriptionChange={spy} id={props.id} />
+      <DescriptionEditor
+        description={props.description}
+        onDescriptionChange={spy}
+        columnID={props.id}
+      />
     );
     cy.get('[data-cy="1-edit-description-button"]').click();
     cy.get('[data-cy="1-description-input"]').clear();

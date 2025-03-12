@@ -56,7 +56,7 @@ function Categorical({ columnId, uniqueValues, levels, onUpdateDescription }: Ca
               <TableCell align="left">{value}</TableCell>
               <TableCell align="left">
                 <DescriptionEditor
-                  id={columnId}
+                  columnID={columnId}
                   description={levels[value]?.description || ''}
                   onDescriptionChange={(id, description) => {
                     onUpdateDescription(id, value, description || '');
