@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Typography } from '@mui/material';
+import { Paper, Typography } from '@mui/material';
 import useDataStore from '../stores/data';
 import SideColumnNavBar from './SideColumnNavBar';
 import Categorical from './Categorical';
@@ -21,7 +21,15 @@ function ValueAnnotation() {
 
   const renderContent = () => {
     if (!selectedColumnId) {
-      return <Typography variant="h6">Select a column to annotate values.</Typography>;
+      return (
+        <Paper
+          data-cy="no-column-selected"
+          elevation={3}
+          className="flex h-full items-center justify-center shadow-lg"
+        >
+          <Typography variant="h6">Please select a column to annotate values.</Typography>
+        </Paper>
+      );
     }
 
     const selectedColumn = columns[selectedColumnId];
@@ -42,15 +50,21 @@ function ValueAnnotation() {
         return <Continuous />;
       default:
         return (
-          <Typography data-cy="other-placeholder" variant="h6">
-            Please select the appropriate data type for this column.
-          </Typography>
+          <Paper
+            data-cy="other-placeholder"
+            elevation={3}
+            className="flex h-full items-center justify-center shadow-lg"
+          >
+            <Typography variant="h6">
+              Please select the appropriate data type for this column.
+            </Typography>
+          </Paper>
         );
     }
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-row space-x-4 p-4">
+    <div className="mx-auto flex w-full max-w-7xl space-x-4 p-4">
       <SideColumnNavBar
         columns={columns}
         onSelectColumn={handleSelectColumn}
