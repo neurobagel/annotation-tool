@@ -7,7 +7,7 @@ import { produce } from 'immer';
 import useDataStore from './data';
 import { Columns } from '../utils/types';
 
-describe('store actions', () => {
+describe('data store actions', () => {
   it('processes a data table file and update dataTable, columns, and uploadedDataTableFileName', async () => {
     const { result } = renderHook(() => useDataStore());
 
@@ -77,9 +77,18 @@ describe('store actions', () => {
   it('updates the dataType field of a column', () => {
     const { result } = renderHook(() => useDataStore());
     act(() => {
+      result.current.dataTable = mockDataTable;
       result.current.updateColumnDataType('1', 'Continuous');
+      result.current.updateColumnDataType('3', 'Categorical');
     });
     expect(result.current.columns['1'].dataType).toEqual('Continuous');
+    expect(result.current.columns['1'].levels).toBeUndefined();
+    expect(result.current.columns['3'].dataType).toEqual('Categorical');
+    expect(result.current.columns['3'].levels).toBeDefined();
+    expect(result.current.columns['3'].levels).toEqual({
+      F: { description: '' },
+      M: { description: '' },
+    });
   });
 
   it('updates the standardizedVariable field of a column', () => {
@@ -93,6 +102,17 @@ describe('store actions', () => {
     expect(result.current.columns['1'].standardizedVariable).toEqual({
       identifier: 'nb:Some',
       label: 'Some',
+    });
+  });
+  it('updates the description for a level of a categorical column', () => {
+    const { result } = renderHook(() => useDataStore());
+    // We have already declared this column as categorical in a previous test
+    act(() => {
+      result.current.updateColumnLevelDescription('3', 'F', 'some description');
+    });
+    expect(result.current.columns['3'].levels).toEqual({
+      F: { description: 'some description' },
+      M: { description: '' },
     });
   });
 });
