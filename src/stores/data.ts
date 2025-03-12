@@ -24,6 +24,7 @@ type DataStore = {
     columnId: string,
     standardizedVariable: StandardizedVarible | null
   ) => void;
+  updateColumnLevelDescription: (columnId: string, value: string, description: string) => void;
 
   uploadedDataDictionary: DataDictionary;
   uploadedDataDictionaryFileName: string | null;
@@ -98,6 +99,21 @@ const useDataStore = create<DataStore>()(
       set((state) => ({
         columns: produce(state.columns, (draft) => {
           draft[columnId].dataType = dataType;
+
+          if (dataType === 'Categorical') {
+            const columnData = state.dataTable[columnId];
+            const uniqueValues = Array.from(new Set(columnData));
+
+            draft[columnId].levels = uniqueValues.reduce(
+              (acc, value) => ({
+                ...acc,
+                [value]: { description: '' },
+              }),
+              {} as { [key: string]: { description: string } }
+            );
+          } else {
+            delete draft[columnId].levels;
+          }
         }),
       }));
     },
@@ -109,6 +125,16 @@ const useDataStore = create<DataStore>()(
       set((state) => ({
         columns: produce(state.columns, (draft) => {
           draft[columnId].standardizedVariable = standardizedVariable;
+        }),
+      }));
+    },
+
+    updateColumnLevelDescription: (columnId: string, value: string, description: string) => {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          if (draft[columnId].levels) {
+            draft[columnId].levels[value].description = description;
+          }
         }),
       }));
     },
