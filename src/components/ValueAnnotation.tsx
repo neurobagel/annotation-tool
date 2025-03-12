@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Typography, Paper as Card } from '@mui/material';
+import { Typography } from '@mui/material';
 import useDataStore from '../stores/data';
 import SideColumnNavBar from './SideColumnNavBar';
 import Categorical from './Categorical';
@@ -7,15 +7,16 @@ import Continuous from './Continuous';
 
 function ValueAnnotation() {
   const columns = useDataStore((state) => state.columns);
+  const dataTable = useDataStore((state) => state.dataTable);
+  const updateColumnLevelDescription = useDataStore((state) => state.updateColumnLevelDescription);
   const [selectedColumnId, setSelectedColumnId] = useState<string | null>(null);
-  let selectedColumnDataType = selectedColumnId ? columns[selectedColumnId]?.dataType : null;
 
-  const handleSelectColumn = (
-    columnId: string | null,
-    columnDataType: 'Categorical' | 'Continuous' | null
-  ) => {
+  const handleSelectColumn = (columnId: string | null) => {
     setSelectedColumnId(columnId);
-    selectedColumnDataType = columnDataType;
+  };
+
+  const handleUpdateDescription = (columnId: string, value: string, description: string) => {
+    updateColumnLevelDescription(columnId, value, description);
   };
 
   const renderContent = () => {
@@ -23,9 +24,20 @@ function ValueAnnotation() {
       return <Typography variant="h6">Select a column to annotate values.</Typography>;
     }
 
-    switch (selectedColumnDataType) {
+    const selectedColumn = columns[selectedColumnId];
+    const columnData = dataTable[selectedColumnId];
+    const uniqueValues = columnData ? Array.from(new Set(columnData)) : [];
+
+    switch (selectedColumn.dataType) {
       case 'Categorical':
-        return <Categorical />;
+        return (
+          <Categorical
+            columnId={selectedColumnId}
+            uniqueValues={uniqueValues}
+            levels={selectedColumn.levels || {}}
+            onUpdateDescription={handleUpdateDescription}
+          />
+        );
       case 'Continuous':
         return <Continuous />;
       default:
@@ -44,9 +56,7 @@ function ValueAnnotation() {
         onSelectColumn={handleSelectColumn}
         selectedColumnId={selectedColumnId}
       />
-      <Card className="flex-1 p-4 shadow-lg" elevation={3} data-cy="value-annotation-card">
-        {renderContent()}
-      </Card>
+      <div className="flex-1">{renderContent()}</div>
     </div>
   );
 }
