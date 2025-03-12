@@ -40,7 +40,7 @@ function ValueAnnotation() {
       case 'Categorical':
         return (
           <Categorical
-            columnId={selectedColumnId}
+            columnID={selectedColumnId}
             uniqueValues={uniqueValues}
             levels={selectedColumn.levels || {}}
             onUpdateDescription={handleUpdateDescription}

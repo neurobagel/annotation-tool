@@ -6,9 +6,11 @@ describe('ValueAnnotation', () => {
   it('renders the component correctly', () => {
     useDataStore.setState({ columns: mockColumnsWithDataType });
     cy.mount(<ValueAnnotation />);
-    cy.contains('Select a column to annotate values.');
+    cy.get('[data-cy="no-column-selected"]')
+      .should('be.visible')
+      .and('contain', 'Please select a column to annotate values.');
     cy.get('[data-cy="side-column-nav-bar-categorical-sex"]').click();
-    cy.get('[data-cy="categorical-placeholder"]').should('be.visible');
+    cy.get('[data-cy="3-categorical"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-continuous-participant_id"]').click();
     cy.get('[data-cy="continuous-placeholder"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-other-age"]').click();
