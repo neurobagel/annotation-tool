@@ -47,7 +47,7 @@ function Categorical({
       data-cy={`${columnId}-categorical`}
       component={Paper}
       elevation={3}
-      className="shadow-lg"
+      className="h-full shadow-lg"
     >
       <Table className="min-w-[768px]">
         <TableHead data-cy={`${columnId}-categorical-table-head`}>

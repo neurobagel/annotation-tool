@@ -63,7 +63,7 @@ function DescriptionEditor({
     <div className="flex flex-col items-center gap-4 md:flex-row">
       <div className="flex-1">
         {label && (
-          <Typography variant="subtitle1" className="mb-2 text-gray-700">
+          <Typography variant="subtitle1" className="mb-2 font-bold text-gray-700">
             {label}
           </Typography>
         )}

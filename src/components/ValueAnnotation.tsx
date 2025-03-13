@@ -6,9 +6,7 @@ import Categorical from './Categorical';
 import Continuous from './Continuous';
 
 function ValueAnnotation() {
-  const columns = useDataStore((state) => state.columns);
-  const dataTable = useDataStore((state) => state.dataTable);
-  const updateColumnLevelDescription = useDataStore((state) => state.updateColumnLevelDescription);
+  const { columns, dataTable, updateColumnLevelDescription } = useDataStore();
   const [selectedColumnId, setSelectedColumnId] = useState<string | null>(null);
 
   const handleSelectColumn = (columnId: string | null) => {

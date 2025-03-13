@@ -33,14 +33,23 @@ type DataStore = {
   processDataDictionaryFile: (file: File) => Promise<void>;
 
   standardizedVaribles: StandardizedVaribleCollection;
+
+  reset: () => void;
+};
+
+const initialState = {
+  dataTable: {},
+  columns: {},
+  uploadedDataTableFileName: null,
+  uploadedDataDictionary: {},
+  uploadedDataDictionaryFileName: null,
+  standardizedVaribles: defaultConfig.standardizedVariables,
 };
 
 const useDataStore = create<DataStore>()(
   devtools((set, get) => ({
     // Data table
-    dataTable: {},
-    columns: {},
-    uploadedDataTableFileName: null,
+    ...initialState,
     setDataTable: (data: DataTable) => set({ dataTable: data }),
     setUploadedDataTableFileName: (fileName: string | null) =>
       set({ uploadedDataTableFileName: fileName }),
@@ -140,8 +149,6 @@ const useDataStore = create<DataStore>()(
     },
 
     // Data dictionary
-    uploadedDataDictionary: {},
-    uploadedDataDictionaryFileName: null,
     setDataDictionary: (data: DataDictionary) => set({ uploadedDataDictionary: data }),
     setUploadedDataDictionaryFileName: (fileName: string | null) =>
       set({ uploadedDataDictionaryFileName: fileName }),
@@ -204,8 +211,7 @@ const useDataStore = create<DataStore>()(
         reader.readAsText(file);
       }),
 
-    // Config
-    standardizedVaribles: defaultConfig.standardizedVariables,
+    reset: () => set(initialState),
   }))
 );
 

@@ -60,6 +60,7 @@ function ColumnAnnotationCard({
       <CardHeader title={header} className="bg-gray-50" />
       <CardContent>
         <DescriptionEditor
+          label="Column description:"
           description={description}
           onDescriptionChange={onDescriptionChange}
           columnID={id}
@@ -67,7 +68,7 @@ function ColumnAnnotationCard({
 
         <div className="mt-4 flex flex-col items-center gap-4 md:flex-row">
           <div className="flex flex-1 flex-col">
-            <Typography variant="subtitle1" className="mb-2 text-gray-700">
+            <Typography variant="subtitle1" className="mb-2 font-bold text-gray-700">
               Data Type:
             </Typography>
             <ToggleButtonGroup
@@ -93,7 +94,7 @@ function ColumnAnnotationCard({
           </div>
 
           <div className="flex flex-1 flex-col">
-            <Typography variant="subtitle1" className="mb-2 text-gray-700">
+            <Typography variant="subtitle1" className="mb-2 font-bold text-gray-700">
               Standardized Variable:
             </Typography>
             <Autocomplete

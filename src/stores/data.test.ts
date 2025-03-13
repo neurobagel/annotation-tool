@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { beforeEach, describe, it, expect } from 'vitest';
 import { mockDataTable, mockInitialColumns, mockColumnsWithDescription } from '~/utils/mocks';
 import fs from 'fs';
 import path from 'path';
@@ -8,8 +8,10 @@ import useDataStore from './data';
 import { Columns } from '../utils/types';
 
 describe('data store actions', () => {
-  it('processes a data table file and update dataTable, columns, and uploadedDataTableFileName', async () => {
+  beforeEach(async () => {
     const { result } = renderHook(() => useDataStore());
+
+    result.current.reset();
 
     const dataTableFilePath = path.resolve(__dirname, '../../cypress/fixtures/examples/mock.tsv');
     const dataTableFileContent = fs.readFileSync(dataTableFilePath, 'utf-8');
@@ -20,6 +22,9 @@ describe('data store actions', () => {
     await act(async () => {
       await result.current.processDataTableFile(dataTableFile);
     });
+  });
+  it('processes a data table file and update dataTable, columns, and uploadedDataTableFileName', async () => {
+    const { result } = renderHook(() => useDataStore());
 
     expect(result.current.dataTable).toEqual(mockDataTable);
     expect(result.current.columns).toEqual(mockInitialColumns);
@@ -106,8 +111,8 @@ describe('data store actions', () => {
   });
   it('updates the description for a level of a categorical column', () => {
     const { result } = renderHook(() => useDataStore());
-    // We have already declared this column as categorical in a previous test
     act(() => {
+      result.current.updateColumnDataType('3', 'Categorical');
       result.current.updateColumnLevelDescription('3', 'F', 'some description');
     });
     expect(result.current.columns['3'].levels).toEqual({
