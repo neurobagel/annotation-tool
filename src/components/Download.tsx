@@ -29,11 +29,23 @@ function Download() {
     () =>
       Object.entries(columns).reduce((acc, [_columnKey, column]) => {
         if (column.header) {
+          const dictionaryEntry: DataDictionary[string] = {
+            Description: column.description || '',
+          };
+
+          if (column.levels) {
+            dictionaryEntry.Levels = Object.entries(column.levels).reduce(
+              (levelsAcc, [levelKey, levelValue]) => ({
+                ...levelsAcc,
+                [levelKey]: levelValue.description,
+              }),
+              {} as { [key: string]: string }
+            );
+          }
+
           return {
             ...acc,
-            [column.header]: {
-              Description: column.description || '',
-            },
+            [column.header]: dictionaryEntry,
           };
         }
         return acc;

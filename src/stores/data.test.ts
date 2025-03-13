@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { beforeEach, describe, it, expect } from 'vitest';
 import { mockDataTable, mockInitialColumns, mockColumnsWithDescription } from '~/utils/mocks';
 import fs from 'fs';
 import path from 'path';
@@ -7,9 +7,11 @@ import { produce } from 'immer';
 import useDataStore from './data';
 import { Columns } from '../utils/types';
 
-describe('store actions', () => {
-  it('processes a data table file and update dataTable, columns, and uploadedDataTableFileName', async () => {
+describe('data store actions', () => {
+  beforeEach(async () => {
     const { result } = renderHook(() => useDataStore());
+
+    result.current.reset();
 
     const dataTableFilePath = path.resolve(__dirname, '../../cypress/fixtures/examples/mock.tsv');
     const dataTableFileContent = fs.readFileSync(dataTableFilePath, 'utf-8');
@@ -20,6 +22,9 @@ describe('store actions', () => {
     await act(async () => {
       await result.current.processDataTableFile(dataTableFile);
     });
+  });
+  it('processes a data table file and update dataTable, columns, and uploadedDataTableFileName', async () => {
+    const { result } = renderHook(() => useDataStore());
 
     expect(result.current.dataTable).toEqual(mockDataTable);
     expect(result.current.columns).toEqual(mockInitialColumns);
@@ -77,9 +82,18 @@ describe('store actions', () => {
   it('updates the dataType field of a column', () => {
     const { result } = renderHook(() => useDataStore());
     act(() => {
+      result.current.dataTable = mockDataTable;
       result.current.updateColumnDataType('1', 'Continuous');
+      result.current.updateColumnDataType('3', 'Categorical');
     });
     expect(result.current.columns['1'].dataType).toEqual('Continuous');
+    expect(result.current.columns['1'].levels).toBeUndefined();
+    expect(result.current.columns['3'].dataType).toEqual('Categorical');
+    expect(result.current.columns['3'].levels).toBeDefined();
+    expect(result.current.columns['3'].levels).toEqual({
+      F: { description: '' },
+      M: { description: '' },
+    });
   });
 
   it('updates the standardizedVariable field of a column', () => {
@@ -93,6 +107,17 @@ describe('store actions', () => {
     expect(result.current.columns['1'].standardizedVariable).toEqual({
       identifier: 'nb:Some',
       label: 'Some',
+    });
+  });
+  it('updates the description for a level of a categorical column', () => {
+    const { result } = renderHook(() => useDataStore());
+    act(() => {
+      result.current.updateColumnDataType('3', 'Categorical');
+      result.current.updateColumnLevelDescription('3', 'F', 'some description');
+    });
+    expect(result.current.columns['3'].levels).toEqual({
+      F: { description: 'some description' },
+      M: { description: '' },
     });
   });
 });

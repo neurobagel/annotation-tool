@@ -24,6 +24,7 @@ type DataStore = {
     columnId: string,
     standardizedVariable: StandardizedVarible | null
   ) => void;
+  updateColumnLevelDescription: (columnId: string, value: string, description: string) => void;
 
   uploadedDataDictionary: DataDictionary;
   uploadedDataDictionaryFileName: string | null;
@@ -32,14 +33,23 @@ type DataStore = {
   processDataDictionaryFile: (file: File) => Promise<void>;
 
   standardizedVaribles: StandardizedVaribleCollection;
+
+  reset: () => void;
+};
+
+const initialState = {
+  dataTable: {},
+  columns: {},
+  uploadedDataTableFileName: null,
+  uploadedDataDictionary: {},
+  uploadedDataDictionaryFileName: null,
+  standardizedVaribles: defaultConfig.standardizedVariables,
 };
 
 const useDataStore = create<DataStore>()(
   devtools((set, get) => ({
     // Data table
-    dataTable: {},
-    columns: {},
-    uploadedDataTableFileName: null,
+    ...initialState,
     setDataTable: (data: DataTable) => set({ dataTable: data }),
     setUploadedDataTableFileName: (fileName: string | null) =>
       set({ uploadedDataTableFileName: fileName }),
@@ -98,6 +108,21 @@ const useDataStore = create<DataStore>()(
       set((state) => ({
         columns: produce(state.columns, (draft) => {
           draft[columnId].dataType = dataType;
+
+          if (dataType === 'Categorical') {
+            const columnData = state.dataTable[columnId];
+            const uniqueValues = Array.from(new Set(columnData));
+
+            draft[columnId].levels = uniqueValues.reduce(
+              (acc, value) => ({
+                ...acc,
+                [value]: { description: '' },
+              }),
+              {} as { [key: string]: { description: string } }
+            );
+          } else {
+            delete draft[columnId].levels;
+          }
         }),
       }));
     },
@@ -113,9 +138,17 @@ const useDataStore = create<DataStore>()(
       }));
     },
 
+    updateColumnLevelDescription: (columnId: string, value: string, description: string) => {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          if (draft[columnId].levels) {
+            draft[columnId].levels[value].description = description;
+          }
+        }),
+      }));
+    },
+
     // Data dictionary
-    uploadedDataDictionary: {},
-    uploadedDataDictionaryFileName: null,
     setDataDictionary: (data: DataDictionary) => set({ uploadedDataDictionary: data }),
     setUploadedDataDictionaryFileName: (fileName: string | null) =>
       set({ uploadedDataDictionaryFileName: fileName }),
@@ -138,9 +171,20 @@ const useDataStore = create<DataStore>()(
 
                 if (columnEntry) {
                   const [columnId] = columnEntry;
-                  // Use Immer's produce to update the nested column description
+                  // Use Immer's produce to update the nested column description and levels
                   return produce(acc, (draft) => {
                     draft[columnId].description = value.Description;
+
+                    if (value.Levels) {
+                      draft[columnId].dataType = 'Categorical';
+                      draft[columnId].levels = Object.entries(value.Levels).reduce(
+                        (levelsAcc, [levelKey, levelValue]) => ({
+                          ...levelsAcc,
+                          [levelKey]: { description: levelValue },
+                        }),
+                        {} as { [key: string]: { description: string } }
+                      );
+                    }
                   });
                 }
                 return acc;
@@ -167,8 +211,7 @@ const useDataStore = create<DataStore>()(
         reader.readAsText(file);
       }),
 
-    // Config
-    standardizedVaribles: defaultConfig.standardizedVariables,
+    reset: () => set(initialState),
   }))
 );
 
