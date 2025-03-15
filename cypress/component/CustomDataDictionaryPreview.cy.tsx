@@ -7,7 +7,7 @@ describe('CustomDataDictionaryPreview', () => {
   });
 
   it('should render the component correctly', () => {
-    cy.get('[data-cy="data-dictionary-preview"]').should('exist');
+    cy.get('[data-cy="datadictionary-preview"]').should('exist');
     cy.get('[data-cy="expand-collapse-all-button"]').should('be.visible');
     cy.get('[data-cy="participant_id-key"]').should('contain', 'participant_id');
     cy.get('[data-cy="age-key"]').should('contain', 'age');

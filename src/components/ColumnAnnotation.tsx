@@ -46,7 +46,7 @@ function ColumnAnnotation() {
   };
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center gap-4">
       {currentColumns.map(([columnId, column]) => (
         <ColumnAnnotationCard
           key={columnId}
@@ -62,7 +62,7 @@ function ColumnAnnotation() {
         />
       ))}
 
-      <div className="my-4">
+      <div className="my-4" data-cy="column-annotation-pagination">
         <Pagination
           count={totalPages}
           page={currentPage}

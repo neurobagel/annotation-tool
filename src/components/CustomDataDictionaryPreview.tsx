@@ -83,7 +83,7 @@ function CustomDataDictionaryPreview({ dataDictionary }: { dataDictionary: DataD
   };
 
   return (
-    <div className="mt-6" data-cy="data-dictionary-preview">
+    <div className="mt-6" data-cy="datadictionary-preview">
       <Paper elevation={3} className="w-full overflow-x-auto shadow-lg">
         <div style={{ padding: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>

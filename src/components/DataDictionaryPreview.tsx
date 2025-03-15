@@ -6,7 +6,7 @@ function DataDictionaryPreview({ dataDictionary }: { dataDictionary: DataDiction
   const theme = useTheme();
 
   return (
-    <div className="mt-6" data-cy="data-dictionary-preview">
+    <div className="mt-6" data-cy="datadictionary-preview">
       <Paper elevation={3} className="h-[450px] w-full overflow-x-auto shadow-lg">
         <div className="m-4">
           <ReactJson

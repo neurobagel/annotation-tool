@@ -31,8 +31,9 @@ function Upload() {
   };
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center gap-8">
       <UploadCard
+        id="datatable"
         title="Data Table"
         FileUploaderDisplayText="Upload your tabular phenotypic .tsv file (required)"
         allowedFileType=".tsv"
@@ -41,6 +42,7 @@ function Upload() {
         previewComponent={<DataTablePreview dataTable={dataTable} columns={columns} />}
       />
       <UploadCard
+        id="datadictionary"
         title="Data Dictionary"
         FileUploaderDisplayText="Upload your data dictionary .json file (optional)"
         allowedFileType=".json"

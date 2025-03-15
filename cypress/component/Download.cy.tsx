@@ -2,8 +2,8 @@ import Ajv from 'ajv';
 import Download from '../../src/components/Download';
 import useDataStore from '../../src/stores/data';
 import {
-  columnsWithDescription,
-  columnsWithNoDescription,
+  mockColumnsWithDescription,
+  mockInitialColumns,
   mockDataDictionaryWithDescription,
   mockDataDictionaryWithNoDescription,
 } from '../../src/utils/mocks';
@@ -24,14 +24,14 @@ describe('Download', () => {
     cy.get('[data-cy="complete-annotations-alert"]')
       .should('be.visible')
       .and('contain', 'You have successfully created');
-    cy.get('[data-cy="data-dictionary-toggle-preview-button"]').should('be.visible');
-    cy.get('[data-cy="data-dictionary-preview"]').should('be.visible');
-    cy.get('[data-cy="data-dictionary-toggle-preview-button"]').click();
-    cy.get('[data-cy="data-dictionary-preview"]').should('not.be.visible');
-    cy.get('[data-cy="data-dictionary-next-steps-list"]')
+    cy.get('[data-cy="datadictionary-toggle-preview-button"]').should('be.visible');
+    cy.get('[data-cy="datadictionary-preview"]').should('be.visible');
+    cy.get('[data-cy="datadictionary-toggle-preview-button"]').click();
+    cy.get('[data-cy="datadictionary-preview"]').should('not.be.visible');
+    cy.get('[data-cy="datadictionary-next-steps-list"]')
       .should('be.visible')
       .and('contain', '.json data dictionary');
-    cy.get('[data-cy="download-data-dictionary-button"]').should('be.visible');
+    cy.get('[data-cy="download-datadictionary-button"]').should('be.visible');
   });
 
   it('renders the component correctly when the data dictionary is invalid', () => {
@@ -51,32 +51,32 @@ describe('Download', () => {
     cy.get('[data-cy="incomplete-annotations-list"]')
       .should('be.visible')
       .and('contain', 'column1');
-    cy.get('[data-cy="data-dictionary-preview"]').should('be.visible');
-    cy.get('[data-cy="download-data-dictionary-button"]').should('be.disabled');
+    cy.get('[data-cy="datadictionary-preview"]').should('be.visible');
+    cy.get('[data-cy="download-datadictionary-button"]').should('be.disabled');
     cy.get('[data-cy="force-download-switch"]').should('be.visible');
     cy.get('[data-cy="force-download-switch"]').click();
-    cy.get('[data-cy="download-data-dictionary-button"]').should('be.enabled');
+    cy.get('[data-cy="download-datadictionary-button"]').should('be.enabled');
   });
 
   it('generates valid data dictionary with descriptions provided by user', () => {
-    useDataStore.setState({ columns: columnsWithDescription });
+    useDataStore.setState({ columns: mockColumnsWithDescription });
     useDataStore.setState({ uploadedDataTableFileName: 'someFileName.tsv' });
 
     cy.mount(<Download />);
 
-    cy.get('[data-cy="download-data-dictionary-button"]').click();
+    cy.get('[data-cy="download-datadictionary-button"]').click();
     cy.readFile('cypress/downloads/someFileName_annotated.json').then((fileContent) => {
       expect(fileContent).to.deep.equal(mockDataDictionaryWithDescription);
     });
   });
 
   it('generates valid data dictionary even if no descriptions were provided by user', () => {
-    useDataStore.setState({ columns: columnsWithNoDescription });
+    useDataStore.setState({ columns: mockInitialColumns });
     useDataStore.setState({ uploadedDataTableFileName: 'someFileName.tsv' });
 
     cy.mount(<Download />);
 
-    cy.get('[data-cy="download-data-dictionary-button"]').click();
+    cy.get('[data-cy="download-datadictionary-button"]').click();
     cy.readFile('cypress/downloads/someFileName_annotated.json').then((fileContent) => {
       expect(fileContent).to.deep.equal(mockDataDictionaryWithNoDescription);
     });

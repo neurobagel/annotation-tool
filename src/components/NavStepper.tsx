@@ -16,7 +16,7 @@ function NavStepper({ currentView }: { currentView: View }) {
         activeStep={activeStep}
         alternativeLabel
         connector={<StepConnector sx={{ top: 20 }} />}
-        data-cy="stepper"
+        data-cy="nav-stepper"
         sx={{
           display: 'flex',
           alignItems: 'center',

@@ -2,6 +2,7 @@ import React from 'react';
 import FileUploader from '../../src/components/FileUploader';
 
 const props = {
+  id: 'someid',
   displayText: 'Upload your file (.csv)',
   handleClickToUpload: () => {},
   handleDrop: () => {},
@@ -15,6 +16,7 @@ describe('FileUploader', () => {
   it('should render the FileUploader component', () => {
     cy.mount(
       <FileUploader
+        id={props.id}
         displayText={props.displayText}
         handleClickToUpload={props.handleClickToUpload}
         handleDrop={props.handleDrop}
@@ -24,12 +26,13 @@ describe('FileUploader', () => {
         allowedFileType={props.allowedFileType}
       />
     );
-    cy.get('[data-cy="upload-area"]').should('be.visible');
-    cy.get('[data-cy="upload-area"]').should('contain', 'Upload your file (.csv)');
+    cy.get('[data-cy="someid-upload-area"]').should('be.visible');
+    cy.get('[data-cy="someid-upload-area"]').should('contain', 'Upload your file (.csv)');
   });
   it('checks that input element and the upload area are disabled', () => {
     cy.mount(
       <FileUploader
+        id={props.id}
         displayText={props.displayText}
         handleClickToUpload={props.handleClickToUpload}
         handleDrop={props.handleDrop}
@@ -40,7 +43,7 @@ describe('FileUploader', () => {
         disabled
       />
     );
-    cy.get('[data-cy="upload-area"] input').should('be.disabled');
-    cy.get('[data-cy="upload-area"]').should('have.css', 'cursor', 'not-allowed');
+    cy.get('[data-cy="someid-upload-area"] input').should('be.disabled');
+    cy.get('[data-cy="someid-upload-area"]').should('have.css', 'cursor', 'not-allowed');
   });
 });
