@@ -25,6 +25,7 @@ type DataStore = {
     standardizedVariable: StandardizedVarible | null
   ) => void;
   updateColumnLevelDescription: (columnId: string, value: string, description: string) => void;
+  updateColumnUnits: (columnId: string, unitsDescription: string | null) => void;
 
   uploadedDataDictionary: DataDictionary;
   uploadedDataDictionaryFileName: string | null;
@@ -148,6 +149,14 @@ const useDataStore = create<DataStore>()(
       }));
     },
 
+    updateColumnUnits: (columnId: string, unitsDescription: string | null) => {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          draft[columnId].units = unitsDescription;
+        }),
+      }));
+    },
+
     // Data dictionary
     setDataDictionary: (data: DataDictionary) => set({ uploadedDataDictionary: data }),
     setUploadedDataDictionaryFileName: (fileName: string | null) =>
@@ -184,6 +193,10 @@ const useDataStore = create<DataStore>()(
                         }),
                         {} as { [key: string]: { description: string } }
                       );
+                    }
+                    if (value.Units) {
+                      draft[columnId].dataType = 'Continuous';
+                      draft[columnId].units = value.Units;
                     }
                   });
                 }

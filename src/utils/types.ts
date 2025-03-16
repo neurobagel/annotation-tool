@@ -7,6 +7,7 @@ export type Column = {
   dataType?: 'Categorical' | 'Continuous' | null;
   standardizedVariable?: StandardizedVarible | null;
   levels?: { [key: string]: { description: string } } | null;
+  units?: string | null;
 };
 export type Columns = {
   [key: string]: Column;
@@ -15,6 +16,7 @@ export interface DataDictionary {
   [key: string]: {
     Description: string;
     Levels?: { [key: string]: string };
+    Units?: string;
     Annotations?: {
       IsAbout: {
         TermURL: string;
