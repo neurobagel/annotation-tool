@@ -121,8 +121,15 @@ const useDataStore = create<DataStore>()(
               }),
               {} as { [key: string]: { description: string } }
             );
+
+            delete draft[columnId].units;
+          } else if (dataType === 'Continuous') {
+            draft[columnId].units = '';
+
+            delete draft[columnId].levels;
           } else {
             delete draft[columnId].levels;
+            delete draft[columnId].units;
           }
         }),
       }));
