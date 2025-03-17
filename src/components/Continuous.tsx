@@ -9,7 +9,11 @@ interface ContinuousProps {
 
 function Continuous({ columnID, units, onUpdateUnits }: ContinuousProps) {
   return (
-    <Paper elevation={3} className="h-full items-center justify-center shadow-lg">
+    <Paper
+      elevation={3}
+      className="h-full items-center justify-center shadow-lg"
+      data-cy={`${columnID}-continuous`}
+    >
       <div className="p-6">
         <DescriptionEditor
           label="Units"
