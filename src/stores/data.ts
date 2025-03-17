@@ -156,7 +156,7 @@ const useDataStore = create<DataStore>()(
       }));
     },
 
-    updateColumnUnits: (columnId: string, unitsDescription: string | null) => {
+    updateColumnUnits: (columnId: string, unitsDescription: string) => {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
           draft[columnId].units = unitsDescription;
@@ -201,7 +201,7 @@ const useDataStore = create<DataStore>()(
                         {} as { [key: string]: { description: string } }
                       );
                     }
-                    if (value.Units) {
+                    if (value.Units !== undefined) {
                       draft[columnId].dataType = 'Continuous';
                       draft[columnId].units = value.Units;
                     }

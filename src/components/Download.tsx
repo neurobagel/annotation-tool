@@ -33,7 +33,7 @@ function Download() {
             Description: column.description || '',
           };
 
-          if (column.levels && column.dataType === 'Categorical') {
+          if (column.dataType === 'Categorical' && column.levels) {
             dictionaryEntry.Levels = Object.entries(column.levels).reduce(
               (levelsAcc, [levelKey, levelValue]) => ({
                 ...levelsAcc,
@@ -43,7 +43,7 @@ function Download() {
             );
           }
 
-          if (column.units && column.dataType === 'Continuous') {
+          if (column.dataType === 'Continuous' && column.units !== undefined) {
             dictionaryEntry.Units = column.units;
           }
 

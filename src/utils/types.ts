@@ -7,7 +7,7 @@ export type Column = {
   dataType?: 'Categorical' | 'Continuous' | null;
   standardizedVariable?: StandardizedVarible | null;
   levels?: { [key: string]: { description: string } } | null;
-  units?: string | null;
+  units?: string;
 };
 export type Columns = {
   [key: string]: Column;
