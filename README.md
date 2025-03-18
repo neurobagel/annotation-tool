@@ -51,8 +51,8 @@ $ npm run preview
 
 ## Testing
 
-The Annotation tool uses [Cypress](https://www.cypress.io/) for integration, component, and unit testing. See the [cypress folder](https://github.com/neurobagel/annotation_tool/tree/main/cypress) for tests, custom commands, and test data.
+The Annotation tool uses [Cypress](https://www.cypress.io/) for integration and component testing, and [Vitest](https://vitest.dev/) for unit testing.
 
 ## License
 
-The Neurobagel Annotation tool uses the [MIT License](https://github.com/neurobagel/annotation_tool/blob/main/LICENSE).
+The Neurobagel Annotation tool uses the [MIT License](https://github.com/neurobagel/annotation-tool/blob/main/LICENSE).
