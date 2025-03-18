@@ -88,6 +88,7 @@ describe('data store actions', () => {
     });
     expect(result.current.columns['1'].dataType).toEqual('Continuous');
     expect(result.current.columns['1'].levels).toBeUndefined();
+    expect(result.current.columns['1'].units).toEqual('');
     expect(result.current.columns['3'].dataType).toEqual('Categorical');
     expect(result.current.columns['3'].levels).toBeDefined();
     expect(result.current.columns['3'].levels).toEqual({
@@ -119,5 +120,13 @@ describe('data store actions', () => {
       F: { description: 'some description' },
       M: { description: '' },
     });
+  });
+  it('updates the units field of a column', () => {
+    const { result } = renderHook(() => useDataStore());
+    act(() => {
+      result.current.updateColumnDataType('1', 'Continuous');
+      result.current.updateColumnUnits('1', 'some units');
+    });
+    expect(result.current.columns['1'].units).toEqual('some units');
   });
 });
