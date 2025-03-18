@@ -5,7 +5,7 @@ const mockDataDictionaryFilePath = `cypress/fixtures/examples/${mockDataDictiona
 const mockPartiallyAnnotatedDataDictionaryFileName = 'mock_annotated.json';
 const mockPartiallyAnnotatedDataDictionaryFilePath = `cypress/downloads/${mockPartiallyAnnotatedDataDictionaryFileName}`;
 
-describe('Simple e2e test', () => {
+describe('Main user flow', () => {
   it('Steps through different app views and goes through the basic user flow', () => {
     cy.visit('http://localhost:5173');
     cy.contains('Welcome to the Neurobagel Annotation Tool');
