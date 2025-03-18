@@ -23,7 +23,7 @@
     "@fontsource/roboto": "^5.1.1",
     "@microlink/react-json-view": "^1.26.1",
     "@mui/icons-material": "^6.4.4",
-    "@mui/material": "^6.1.10",
+    "@mui/material": "^6.4.8",
     "@mui/system": "^6.4.3",
     "ajv": "^8.17.1",
     "immer": "^10.1.1",
