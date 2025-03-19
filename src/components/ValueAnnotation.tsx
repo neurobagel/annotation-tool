@@ -6,7 +6,7 @@ import Categorical from './Categorical';
 import Continuous from './Continuous';
 
 function ValueAnnotation() {
-  const { columns, dataTable, updateColumnLevelDescription } = useDataStore();
+  const { columns, dataTable, updateColumnLevelDescription, updateColumnUnits } = useDataStore();
   const [selectedColumnId, setSelectedColumnId] = useState<string | null>(null);
 
   const handleSelectColumn = (columnId: string | null) => {
@@ -15,6 +15,10 @@ function ValueAnnotation() {
 
   const handleUpdateDescription = (columnId: string, value: string, description: string) => {
     updateColumnLevelDescription(columnId, value, description);
+  };
+
+  const handleUpdateUnits = (columnId: string, units: string) => {
+    updateColumnUnits(columnId, units);
   };
 
   const renderContent = () => {
@@ -45,7 +49,13 @@ function ValueAnnotation() {
           />
         );
       case 'Continuous':
-        return <Continuous />;
+        return (
+          <Continuous
+            columnID={selectedColumnId}
+            units={selectedColumn.units || ''}
+            onUpdateUnits={handleUpdateUnits}
+          />
+        );
       default:
         return (
           <Paper

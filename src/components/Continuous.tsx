@@ -1,11 +1,29 @@
-import { Typography, Paper } from '@mui/material';
+import { Paper } from '@mui/material';
+import DescriptionEditor from './DescriptionEditor';
 
-function Continuous() {
+interface ContinuousProps {
+  columnID: string;
+  units: string;
+  onUpdateUnits: (columnId: string, units: string) => void;
+}
+
+function Continuous({ columnID, units, onUpdateUnits }: ContinuousProps) {
   return (
-    <Paper className="flex h-full items-center justify-center shadow-lg">
-      <Typography variant="h6" data-cy="continuous-placeholder">
-        Continuous Component
-      </Typography>
+    <Paper
+      elevation={3}
+      className="h-full items-center justify-center shadow-lg"
+      data-cy={`${columnID}-continuous`}
+    >
+      <div className="p-6">
+        <DescriptionEditor
+          label="Units"
+          columnID={columnID}
+          description={units}
+          onDescriptionChange={(id, newUnits) => {
+            onUpdateUnits(id, newUnits || '');
+          }}
+        />
+      </div>
     </Paper>
   );
 }

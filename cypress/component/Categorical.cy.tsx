@@ -30,4 +30,20 @@ describe('Categorical', () => {
     cy.get('[data-cy="3-F-edit-description-button"]').should('be.visible');
     cy.get('[data-cy="3-categorical-pagination"]').should('be.visible');
   });
+  it('fires the onUpdateDescription event handler with the appropriate payload when the description is changed', () => {
+    const spy = cy.spy().as('spy');
+    cy.mount(
+      <Categorical
+        columnID={props.columnID}
+        uniqueValues={props.uniqueValues}
+        levels={props.levels}
+        onUpdateDescription={spy}
+      />
+    );
+    cy.get('[data-cy="3-F-edit-description-button"]').click();
+    cy.get('[data-cy="3-F-description-input"]').clear();
+    cy.get('[data-cy="3-F-description-input"]').type('new description');
+    cy.get('[data-cy="3-F-save-description-button"]').click();
+    cy.get('@spy').should('have.been.calledWith', '3', 'F', 'new description');
+  });
 });
