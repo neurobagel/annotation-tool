@@ -6,7 +6,7 @@ const mockPartiallyAnnotatedDataDictionaryFileName = 'mock_annotated.json';
 const mockPartiallyAnnotatedDataDictionaryFilePath = `cypress/downloads/${mockPartiallyAnnotatedDataDictionaryFileName}`;
 
 describe('Main user flow', () => {
-  it('Steps through different app views and goes through the basic user flow', () => {
+  it('steps through different app views and goes through the basic user flow', () => {
     cy.visit('http://localhost:5173');
     cy.contains('Welcome to the Neurobagel Annotation Tool');
     cy.get('[data-cy="next-button"]').click();
@@ -140,7 +140,7 @@ describe('Main user flow', () => {
       'Sex'
     );
   });
-  it('Steps through the different app workflows with a partially annotated data dictionary', () => {
+  it('steps through the different app workflows with a partially annotated data dictionary', () => {
     cy.visit('http://localhost:5173');
     cy.get('[data-cy="next-button"]').click();
 
