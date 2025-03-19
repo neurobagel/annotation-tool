@@ -12,7 +12,7 @@ describe('ValueAnnotation', () => {
     cy.get('[data-cy="side-column-nav-bar-categorical-sex"]').click();
     cy.get('[data-cy="3-categorical"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-continuous-participant_id"]').click();
-    cy.get('[data-cy="continuous-placeholder"]').should('be.visible');
+    cy.get('[data-cy="1-continuous"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-other-age"]').click();
     cy.get('[data-cy="other-placeholder"]')
       .should('be.visible')
