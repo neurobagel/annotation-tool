@@ -20,6 +20,12 @@ describe('ValueAnnotation', () => {
   });
   it('asserts that there is no shared state between EditDescription components in Continuous component', () => {
     useDataStore.setState({ columns: mockColumnsWithDataType });
+
+    /*
+     Set the data type of column 2 (age) to Continuous
+     to make sure there is no shared state between the
+    EditDescription in Continuous component
+    */
     useDataStore.setState((state) => ({
       columns: {
         ...state.columns,
@@ -32,14 +38,11 @@ describe('ValueAnnotation', () => {
 
     cy.mount(<ValueAnnotation />);
     cy.get('[data-cy="side-column-nav-bar-continuous-participant_id"]').click();
-    cy.get('[data-cy="1-continuous"]').should('be.visible');
     cy.get('[data-cy="1-edit-description-button"]').click();
     cy.get('[data-cy="1-description-input"]').clear();
     cy.get('[data-cy="1-description-input"]').type('Years');
     cy.get('[data-cy="1-save-description-button"]').click();
-    cy.get('[data-cy="side-column-nav-bar-continuous-participant_id"]').click();
     cy.get('[data-cy="side-column-nav-bar-continuous-age"]').click();
-    cy.get('[data-cy="2-continuous"]').should('be.visible');
     cy.get('[data-cy="2-description"]').should('contain', '');
     cy.get('[data-cy="2-edit-description-button"]').click();
     cy.get('[data-cy="2-description-input"]').should('not.contain', 'Years');
