@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   Paper,
   Table,
@@ -11,10 +10,10 @@ import {
 } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
 import { DataTable, Columns, Column } from '../utils/types';
+import { useTablePagination } from '../hooks';
 
 function DataTablePreview({ dataTable, columns }: { dataTable: DataTable; columns: Columns }) {
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage } = useTablePagination(5);
 
   const headers = Object.values(columns).map((column: Column) => column.header);
 
@@ -27,15 +26,6 @@ function DataTablePreview({ dataTable, columns }: { dataTable: DataTable; column
       : [];
 
   const slicedRows = rowData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-
-  const handleChangePage = (_: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
 
   return (
     <div className="mt-6">
