@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   Paper,
   Table,
@@ -9,6 +8,7 @@ import {
   TableRow,
   TablePagination,
 } from '@mui/material';
+import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { DataTable, Columns, Column } from '../utils/types';
 

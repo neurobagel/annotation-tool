@@ -1,9 +1,9 @@
-import { useState } from 'react';
 import { Paper, Typography } from '@mui/material';
+import { useState } from 'react';
 import useDataStore from '../stores/data';
-import SideColumnNavBar from './SideColumnNavBar';
 import Categorical from './Categorical';
 import Continuous from './Continuous';
+import SideColumnNavBar from './SideColumnNavBar';
 
 function ValueAnnotation() {
   const { columns, dataTable, updateColumnLevelDescription, updateColumnUnits } = useDataStore();

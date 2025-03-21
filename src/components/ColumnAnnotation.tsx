@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
 import Pagination from '@mui/material/Pagination';
+import React, { useState } from 'react';
 import { StandardizedVarible } from '~/utils/types';
-import ColumnAnnotationCard from './ColumnAnnotationCard';
 import useDataStore from '../stores/data';
+import ColumnAnnotationCard from './ColumnAnnotationCard';
 
 function ColumnAnnotation() {
   const columns = useDataStore((state) => state.columns);

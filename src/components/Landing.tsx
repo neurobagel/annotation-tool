@@ -1,8 +1,8 @@
 import { Typography } from '@mui/material';
-import NavigationButton from './NavigationButton';
-import logo from '../assets/logo.svg';
 import landingEmoji from '../assets/landing-emoji.png';
+import logo from '../assets/logo.svg';
 import { View } from '../utils/types';
+import NavigationButton from './NavigationButton';
 
 function Landing() {
   return (

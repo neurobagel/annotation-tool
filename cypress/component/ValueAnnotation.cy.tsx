@@ -1,6 +1,6 @@
 import ValueAnnotation from '../../src/components/ValueAnnotation';
-import { mockColumnsWithDataType } from '../../src/utils/mocks';
 import useDataStore from '../../src/stores/data';
+import { mockColumnsWithDataType } from '../../src/utils/mocks';
 
 describe('ValueAnnotation', () => {
   it('renders the component correctly', () => {

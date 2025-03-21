@@ -12,12 +12,11 @@
 // You can read more here:
 // https://on.cypress.io/configuration
 // ***********************************************************
-
 // Import commands.js using ES2015 syntax:
-import './commands';
 // cypress/support/e2e.js
 // eslint-disable-next-line import/no-extraneous-dependencies
 import '@cypress/code-coverage/support';
+import './commands';
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')

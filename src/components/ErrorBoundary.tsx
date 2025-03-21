@@ -1,5 +1,5 @@
-import React from 'react';
 import { Typography, Button, Collapse } from '@mui/material';
+import React from 'react';
 import emoji from '../assets/errorboundary-emoji.png';
 
 type ErrorBoundaryProps = {
