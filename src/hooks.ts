@@ -1,5 +1,38 @@
 import { useState } from 'react';
-import { Columns } from './utils/types';
+import { Columns, StandardizedVarible } from './utils/types';
+import useDataStore from './stores/data';
+
+export const useColumnUpdates = () => {
+  const updateColumnDescription = useDataStore((state) => state.updateColumnDescription);
+  const updateColumnDataType = useDataStore((state) => state.updateColumnDataType);
+  const updateColumnStandardizedVariable = useDataStore(
+    (state) => state.updateColumnStandardizedVariable
+  );
+
+  const handleDescriptionChange = (columnId: string, newDescription: string | null) => {
+    updateColumnDescription(columnId, newDescription);
+  };
+
+  const handleDataTypeChange = (
+    columnId: string,
+    newDataType: 'Categorical' | 'Continuous' | null
+  ) => {
+    updateColumnDataType(columnId, newDataType);
+  };
+
+  const handleStandardizedVariableChange = (
+    columnId: string,
+    newStandardizedVariable: StandardizedVarible | null
+  ) => {
+    updateColumnStandardizedVariable(columnId, newStandardizedVariable);
+  };
+
+  return {
+    handleDescriptionChange,
+    handleDataTypeChange,
+    handleStandardizedVariableChange,
+  };
+};
 
 export const useTablePagination = (initialRowsPerPage: number) => {
   const [page, setPage] = useState(0);

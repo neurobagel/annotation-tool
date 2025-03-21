@@ -1,17 +1,14 @@
 import Pagination from '@mui/material/Pagination';
-import { StandardizedVarible } from '~/utils/types';
 import ColumnAnnotationCard from './ColumnAnnotationCard';
 import useDataStore from '../stores/data';
-import { usePagination } from '../hooks';
+import { useColumnUpdates, usePagination } from '../hooks';
 
 function ColumnAnnotation() {
   const columns = useDataStore((state) => state.columns);
   const standardizedVariableOptions = useDataStore((state) => state.standardizedVaribles);
-  const updateColumnDescription = useDataStore((state) => state.updateColumnDescription);
-  const updateColumnDataType = useDataStore((state) => state.updateColumnDataType);
-  const updateColumnStandardizedVariable = useDataStore(
-    (state) => state.updateColumnStandardizedVariable
-  );
+
+  const { handleDescriptionChange, handleDataTypeChange, handleStandardizedVariableChange } =
+    useColumnUpdates();
 
   const {
     currentPage,
@@ -19,24 +16,6 @@ function ColumnAnnotation() {
     totalPages,
     handlePaginationChange,
   } = usePagination(columns, 3);
-
-  const handleDescriptionChange = (columnId: string, newDescription: string | null) => {
-    updateColumnDescription(columnId, newDescription);
-  };
-
-  const handleDataTypeChange = (
-    columnId: string,
-    newDataType: 'Categorical' | 'Continuous' | null
-  ) => {
-    updateColumnDataType(columnId, newDataType);
-  };
-
-  const handleStandardizedVariableChange = (
-    columnId: string,
-    newStandardizedVariable: StandardizedVarible | null
-  ) => {
-    updateColumnStandardizedVariable(columnId, newStandardizedVariable);
-  };
 
   return (
     <div className="flex flex-col items-center gap-4">
