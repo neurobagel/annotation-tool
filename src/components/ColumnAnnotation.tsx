@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
 import Pagination from '@mui/material/Pagination';
 import { StandardizedVarible } from '~/utils/types';
 import ColumnAnnotationCard from './ColumnAnnotationCard';
 import useDataStore from '../stores/data';
+import { usePagination } from '../hooks';
 
 function ColumnAnnotation() {
   const columns = useDataStore((state) => state.columns);
@@ -13,19 +13,12 @@ function ColumnAnnotation() {
     (state) => state.updateColumnStandardizedVariable
   );
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const columnsPerPage = 3;
-
-  const columnEntries = Object.entries(columns);
-  const indexOfLastColumn = currentPage * columnsPerPage;
-  const indexOfFirstColumn = indexOfLastColumn - columnsPerPage;
-  const currentColumns = columnEntries.slice(indexOfFirstColumn, indexOfLastColumn);
-
-  const totalPages = Math.ceil(columnEntries.length / columnsPerPage);
-
-  const handlePaginationChange = (_: React.ChangeEvent<unknown>, page: number) => {
-    setCurrentPage(page);
-  };
+  const {
+    currentPage,
+    currentItems: currentColumns,
+    totalPages,
+    handlePaginationChange,
+  } = usePagination(columns, 3);
 
   const handleDescriptionChange = (columnId: string, newDescription: string | null) => {
     updateColumnDescription(columnId, newDescription);

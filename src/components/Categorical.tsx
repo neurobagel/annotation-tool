@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import {
   Paper,
   Table,
@@ -10,6 +10,7 @@ import {
   TablePagination,
 } from '@mui/material';
 import DescriptionEditor from './DescriptionEditor';
+import { useTablePagination } from '../hooks';
 
 interface CategoricalProps {
   columnID: string;
@@ -24,21 +25,12 @@ function Categorical({
   levels,
   onUpdateDescription,
 }: CategoricalProps) {
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const { page, setPage, rowsPerPage, handleChangePage, handleChangeRowsPerPage } =
+    useTablePagination(5);
 
   useEffect(() => {
     setPage(0);
-  }, [columnId]);
-
-  const handleChangePage = (_: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+  }, [columnId, setPage]);
 
   const slicedValues = uniqueValues.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
