@@ -16,6 +16,7 @@ function Continuous({ columnID, units, onUpdateUnits }: ContinuousProps) {
     >
       <div className="p-6">
         <DescriptionEditor
+          key={columnID}
           label="Units"
           columnID={columnID}
           description={units}
