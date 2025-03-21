@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { Typography, Paper, Collapse, Button, List, ListItemButton } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import { Typography, Paper, Collapse, Button, List, ListItemButton } from '@mui/material';
+import { useState } from 'react';
 import { Columns } from '../utils/types';
 
 interface ColumnTypeCollapseProps {

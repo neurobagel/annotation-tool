@@ -1,11 +1,11 @@
-import useViewStore, { getNavigationProps } from './stores/view';
-import Landing from './components/Landing';
-import Upload from './components/Upload';
 import ColumnAnnotation from './components/ColumnAnnotation';
-import ValueAnnotation from './components/ValueAnnotation';
 import Download from './components/Download';
-import NavigationButton from './components/NavigationButton';
+import Landing from './components/Landing';
 import NavStepper from './components/NavStepper';
+import NavigationButton from './components/NavigationButton';
+import Upload from './components/Upload';
+import ValueAnnotation from './components/ValueAnnotation';
+import useViewStore, { getNavigationProps } from './stores/view';
 import { View } from './utils/types';
 
 function App() {

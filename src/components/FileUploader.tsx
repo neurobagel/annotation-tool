@@ -1,5 +1,5 @@
-import { Card, Typography, useTheme, Tooltip } from '@mui/material';
 import { CloudUpload } from '@mui/icons-material';
+import { Card, Typography, useTheme, Tooltip } from '@mui/material';
 
 /*
 Explicitly define the default props since eslint doesn't recognize the default props

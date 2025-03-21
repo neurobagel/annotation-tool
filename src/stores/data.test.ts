@@ -1,11 +1,11 @@
 import { act, renderHook } from '@testing-library/react';
+import fs from 'fs';
+import { produce } from 'immer';
+import path from 'path';
 import { beforeEach, describe, it, expect } from 'vitest';
 import { mockDataTable, mockInitialColumns, mockColumnsWithDescription } from '~/utils/mocks';
-import fs from 'fs';
-import path from 'path';
-import { produce } from 'immer';
-import useDataStore from './data';
 import { Columns } from '../utils/types';
+import useDataStore from './data';
 
 describe('data store actions', () => {
   beforeEach(async () => {

@@ -1,7 +1,7 @@
-import UploadCard from './UploadCard';
-import DataTablePreview from './DataTablePreview';
 import useDataStore from '../stores/data';
 import DataDictionaryPreview from './DataDictionaryPreview';
+import DataTablePreview from './DataTablePreview';
+import UploadCard from './UploadCard';
 
 function Upload() {
   const processDataTableFile = useDataStore((state) => state.processDataTableFile);

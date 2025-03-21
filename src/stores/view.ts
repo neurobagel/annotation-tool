@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { View } from '../utils/types';
 import { steps } from '../utils/constants';
+import { View } from '../utils/types';
 
 type NavigationProps = {
   backView: View | undefined;
