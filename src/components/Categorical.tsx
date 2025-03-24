@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import {
   Paper,
   Table,
@@ -9,8 +8,9 @@ import {
   TableRow,
   TablePagination,
 } from '@mui/material';
-import DescriptionEditor from './DescriptionEditor';
+import { useEffect } from 'react';
 import { useTablePagination } from '../hooks';
+import DescriptionEditor from './DescriptionEditor';
 
 interface CategoricalProps {
   columnID: string;

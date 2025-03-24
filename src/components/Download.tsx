@@ -1,4 +1,3 @@
-import { useState, useMemo } from 'react';
 import {
   Button,
   Alert,
@@ -11,12 +10,13 @@ import {
   Link,
 } from '@mui/material';
 import Ajv from 'ajv';
-import NavigationButton from './NavigationButton';
-import DataDictionaryPreview from './DataDictionaryPreview';
-import useDataStore from '../stores/data';
-import schema from '../assets/neurobagel_data_dictionary.schema.json';
-import { DataDictionary, View } from '../utils/types';
+import { useState, useMemo } from 'react';
 import emoji from '../assets/download-emoji.png';
+import schema from '../assets/neurobagel_data_dictionary.schema.json';
+import useDataStore from '../stores/data';
+import { DataDictionary, View } from '../utils/types';
+import DataDictionaryPreview from './DataDictionaryPreview';
+import NavigationButton from './NavigationButton';
 
 function Download() {
   const [dictionaryCollapsed, setDictionaryCollapsed] = useState(false);

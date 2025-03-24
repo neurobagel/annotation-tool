@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react';
-import { Button, Card, CardHeader, CardContent, Typography, Collapse } from '@mui/material';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
+import { Button, Card, CardHeader, CardContent, Typography, Collapse } from '@mui/material';
+import { useRef, useState } from 'react';
 import FileUploader from './FileUploader';
 
 /*

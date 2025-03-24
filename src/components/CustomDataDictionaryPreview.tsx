@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import {
   Paper,
   List,
@@ -11,7 +11,7 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
-import { ExpandMore, ExpandLess } from '@mui/icons-material';
+import React, { useState } from 'react';
 import { DataDictionary } from '../utils/types';
 
 function CustomDataDictionaryPreview({ dataDictionary }: { dataDictionary: DataDictionary }) {

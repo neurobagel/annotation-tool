@@ -1,7 +1,7 @@
 import Pagination from '@mui/material/Pagination';
-import ColumnAnnotationCard from './ColumnAnnotationCard';
-import useDataStore from '../stores/data';
 import { useColumnUpdates, usePagination } from '../hooks';
+import useDataStore from '../stores/data';
+import ColumnAnnotationCard from './ColumnAnnotationCard';
 
 function ColumnAnnotation() {
   const columns = useDataStore((state) => state.columns);
