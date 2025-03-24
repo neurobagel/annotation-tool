@@ -1,49 +1,21 @@
 import Pagination from '@mui/material/Pagination';
-import React, { useState } from 'react';
-import { StandardizedVarible } from '~/utils/types';
+import { useColumnUpdates, usePagination } from '../hooks';
 import useDataStore from '../stores/data';
 import ColumnAnnotationCard from './ColumnAnnotationCard';
 
 function ColumnAnnotation() {
   const columns = useDataStore((state) => state.columns);
   const standardizedVariableOptions = useDataStore((state) => state.standardizedVaribles);
-  const updateColumnDescription = useDataStore((state) => state.updateColumnDescription);
-  const updateColumnDataType = useDataStore((state) => state.updateColumnDataType);
-  const updateColumnStandardizedVariable = useDataStore(
-    (state) => state.updateColumnStandardizedVariable
-  );
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const columnsPerPage = 3;
+  const { handleDescriptionChange, handleDataTypeChange, handleStandardizedVariableChange } =
+    useColumnUpdates();
 
-  const columnEntries = Object.entries(columns);
-  const indexOfLastColumn = currentPage * columnsPerPage;
-  const indexOfFirstColumn = indexOfLastColumn - columnsPerPage;
-  const currentColumns = columnEntries.slice(indexOfFirstColumn, indexOfLastColumn);
-
-  const totalPages = Math.ceil(columnEntries.length / columnsPerPage);
-
-  const handlePaginationChange = (_: React.ChangeEvent<unknown>, page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handleDescriptionChange = (columnId: string, newDescription: string | null) => {
-    updateColumnDescription(columnId, newDescription);
-  };
-
-  const handleDataTypeChange = (
-    columnId: string,
-    newDataType: 'Categorical' | 'Continuous' | null
-  ) => {
-    updateColumnDataType(columnId, newDataType);
-  };
-
-  const handleStandardizedVariableChange = (
-    columnId: string,
-    newStandardizedVariable: StandardizedVarible | null
-  ) => {
-    updateColumnStandardizedVariable(columnId, newStandardizedVariable);
-  };
+  const {
+    currentPage,
+    currentItems: currentColumns,
+    totalPages,
+    handlePaginationChange,
+  } = usePagination(columns, 3);
 
   return (
     <div className="flex flex-col items-center gap-4">
