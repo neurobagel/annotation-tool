@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import useDataStore from './stores/data';
-import { Columns, StandardizedVarible } from './utils/types';
+import { StandardizedVarible } from './utils/types';
 
 export const useColumnUpdates = () => {
   const updateColumnDescription = useDataStore((state) => state.updateColumnDescription);
@@ -56,15 +56,12 @@ export const useTablePagination = (initialRowsPerPage: number) => {
   };
 };
 
-export const usePagination = (items: Columns, itemsPerPage: number) => {
+export const usePagination = <T>(items: T[], itemsPerPage: number) => {
   const [currentPage, setCurrentPage] = useState(1);
-
-  const itemEntries = Object.entries(items);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = itemEntries.slice(indexOfFirstItem, indexOfLastItem);
-
-  const totalPages = Math.ceil(itemEntries.length / itemsPerPage);
+  const currentItems = items.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(items.length / itemsPerPage);
 
   const handlePaginationChange = (_: React.ChangeEvent<unknown>, page: number) => {
     setCurrentPage(page);
