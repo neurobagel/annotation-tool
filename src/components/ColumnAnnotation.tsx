@@ -6,7 +6,7 @@ import ColumnAnnotationCard from './ColumnAnnotationCard';
 
 function ColumnAnnotation() {
   const columns = useDataStore((state) => state.columns);
-  const standardizedVariableOptions = useDataStore((state) => state.standardizedVaribles);
+  const standardizedVariableOptions = useDataStore((state) => state.standardizedVariables);
 
   const { handleDescriptionChange, handleDataTypeChange, handleStandardizedVariableChange } =
     useColumnUpdates();

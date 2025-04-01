@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import useDataStore from './stores/data';
-import { StandardizedVarible } from './utils/types';
+import { StandardizedVariable } from './utils/types';
 
 export const useColumnUpdates = () => {
   const updateColumnDescription = useDataStore((state) => state.updateColumnDescription);
@@ -22,7 +22,7 @@ export const useColumnUpdates = () => {
 
   const handleStandardizedVariableChange = (
     columnId: string,
-    newStandardizedVariable: StandardizedVarible | null
+    newStandardizedVariable: StandardizedVariable | null
   ) => {
     updateColumnStandardizedVariable(columnId, newStandardizedVariable);
   };

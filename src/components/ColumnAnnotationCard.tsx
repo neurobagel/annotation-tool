@@ -8,7 +8,7 @@ import {
   ToggleButton,
   Autocomplete,
 } from '@mui/material';
-import { StandardizedVarible, StandardizedVaribleCollection } from '../utils/types';
+import { StandardizedVariable, StandardizedVaribleCollection } from '../utils/types';
 import DescriptionEditor from './DescriptionEditor';
 
 interface ColumnAnnotationCardProps {
@@ -16,13 +16,13 @@ interface ColumnAnnotationCardProps {
   header: string;
   description: string | null;
   dataType: 'Categorical' | 'Continuous' | null;
-  standardizedVariable: StandardizedVarible | null;
+  standardizedVariable: StandardizedVariable | null;
   standardizedVariableOptions: StandardizedVaribleCollection;
   onDescriptionChange: (columnId: string, newDescription: string | null) => void;
   onDataTypeChange: (columnId: string, newDataType: 'Categorical' | 'Continuous' | null) => void;
   onStandardizedVariableChange: (
     columnId: string,
-    newStandardizedVariable: StandardizedVarible | null
+    newStandardizedVariable: StandardizedVariable | null
   ) => void;
 }
 
