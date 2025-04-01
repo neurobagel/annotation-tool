@@ -12,7 +12,6 @@ import {
   IconButton,
   Typography,
   Pagination,
-  ListItem,
 } from '@mui/material';
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -23,6 +22,7 @@ import useDataStore from '../stores/data';
 interface Term {
   identifier: string;
   label: string;
+  disabled?: boolean;
 }
 
 interface TermCard {
@@ -49,6 +49,19 @@ function MultiColumnMeasures() {
   );
 
   const allMappedColumns = termCards.flatMap((card) => card.mappedColumns);
+
+  const getUsedTerms = (currentCardId?: string) =>
+    termCards
+      .filter((card) => card.term !== null && card.id !== currentCardId)
+      .map((card) => card.term?.identifier);
+
+  const getAvailableTerms = (currentCardId?: string) => {
+    const usedTerms = getUsedTerms(currentCardId);
+    return assessmentTerms.map((term) => ({
+      ...term,
+      disabled: usedTerms.includes(term.identifier),
+    }));
+  };
 
   const getColumnOptions = () => {
     const assessmentToolConfig = useDataStore.getState().standardizedVariables['Assessment Tool'];
@@ -156,8 +169,9 @@ function MultiColumnMeasures() {
                   </Typography>
                 ) : (
                   <Autocomplete
-                    options={assessmentTerms}
+                    options={getAvailableTerms(card.id)}
                     getOptionLabel={(option: Term) => option.label}
+                    getOptionDisabled={(option) => option.disabled}
                     onChange={(_, newValue: Term | null) => handleTermSelect(card.id, newValue)}
                     renderInput={(params) => (
                       <TextField
@@ -201,13 +215,6 @@ function MultiColumnMeasures() {
                           size="small"
                           fullWidth
                         />
-                      )}
-                      renderOption={(props, option) => (
-                        // eslint-disable-next-line react/jsx-props-no-spreading
-                        <ListItem {...props} style={{ opacity: option.disabled ? 0.5 : 1 }}>
-                          {option.label}
-                          {option.disabled}
-                        </ListItem>
                       )}
                     />
                   </div>
