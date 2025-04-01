@@ -5,7 +5,11 @@ export type Column = {
   header: string;
   description?: string | null;
   dataType?: 'Categorical' | 'Continuous' | null;
-  standardizedVariable?: StandardizedVarible | null;
+  standardizedVariable?: StandardizedVariable | null;
+  isPartOf?: {
+    termURL?: string;
+    label?: string;
+  };
   levels?: { [key: string]: { description: string } } | null;
   units?: string;
 };
@@ -41,19 +45,20 @@ export interface DataDictionary {
   };
 }
 
-export interface StandardizedVarible {
+export interface StandardizedVariable {
   identifier: string;
   label: string;
 }
 
 export interface StandardizedVaribleCollection {
-  [key: string]: StandardizedVarible;
+  [key: string]: StandardizedVariable;
 }
 
 export enum View {
   Landing = 'landing',
   Upload = 'upload',
   ColumnAnnotation = 'columnAnnotation',
+  MultiColumnMeasures = 'multiColumnMeasures',
   ValueAnnotation = 'valueAnnotation',
   Download = 'download',
 }

@@ -9,7 +9,6 @@ import {
   CardHeader,
   Divider,
   Chip,
-  Stack,
   IconButton,
   Typography,
   Pagination,
@@ -32,8 +31,9 @@ interface TermCard {
   mappedColumns: string[];
 }
 
-export function MultiColumnMeasures() {
+function MultiColumnMeasures() {
   const columns = useDataStore((state) => state.columns);
+  const updateColumnIsPartOf = useDataStore((state) => state.updateColumnIsPartOf);
   const [termCards, setTermCards] = useState<TermCard[]>(() => [
     {
       id: uuidv4(),
@@ -50,12 +50,19 @@ export function MultiColumnMeasures() {
 
   const allMappedColumns = termCards.flatMap((card) => card.mappedColumns);
 
-  const getColumnOptions = () =>
-    Object.entries(columns).map(([id, column]) => ({
-      id,
-      label: column.header,
-      disabled: allMappedColumns.includes(id),
-    }));
+  const getColumnOptions = () => {
+    const assessmentToolConfig = useDataStore.getState().standardizedVariables['Assessment Tool'];
+
+    return Object.entries(columns)
+      .filter(
+        ([_, column]) => column.standardizedVariable?.identifier === assessmentToolConfig.identifier
+      )
+      .map(([id, column]) => ({
+        id,
+        label: column.header,
+        disabled: allMappedColumns.includes(id),
+      }));
+  };
 
   const handleAddNewCard = () => {
     const newCard: TermCard = {
@@ -69,6 +76,13 @@ export function MultiColumnMeasures() {
 
   const handleTermSelect = (cardId: string, term: Term | null) => {
     setTermCards(termCards.map((card) => (card.id === cardId ? { ...card, term } : card)));
+
+    const foundCard = termCards.find((c) => c.id === cardId);
+    if (foundCard) {
+      foundCard.mappedColumns.forEach((columnId) => {
+        updateColumnIsPartOf(columnId, term);
+      });
+    }
   };
 
   const handleColumnSelect = (cardId: string, columnId: string | null) => {
@@ -82,6 +96,11 @@ export function MultiColumnMeasures() {
         return card;
       })
     );
+
+    const card = termCards.find((c) => c.id === cardId);
+    if (card?.term) {
+      updateColumnIsPartOf(columnId, card.term);
+    }
   };
 
   const removeColumnFromCard = (cardId: string, columnId: string) => {
@@ -92,10 +111,19 @@ export function MultiColumnMeasures() {
           : card
       )
     );
+
+    updateColumnIsPartOf(columnId, null);
   };
 
   const removeCard = (cardId: string) => {
-    const newCards = termCards.filter((card) => card.id !== cardId);
+    const card = termCards.find((c) => c.id === cardId);
+    if (card) {
+      card.mappedColumns.forEach((columnId) => {
+        updateColumnIsPartOf(columnId, null);
+      });
+    }
+
+    const newCards = termCards.filter((termCard) => termCard.id !== cardId);
     if (newCards.length === 0) {
       setTermCards([
         {
@@ -178,14 +206,12 @@ export function MultiColumnMeasures() {
                         // eslint-disable-next-line react/jsx-props-no-spreading
                         <ListItem {...props} style={{ opacity: option.disabled ? 0.5 : 1 }}>
                           {option.label}
-                          {option.disabled && (
-                            <span className="ml-2 text-gray-500 text-xs">(already mapped)</span>
-                          )}
+                          {option.disabled}
                         </ListItem>
                       )}
                     />
                   </div>
-                  <Stack spacing={1} className="mt-4">
+                  <div className="flex flex-wrap gap-2 mt-4">
                     {card.mappedColumns.map((columnId) => (
                       <Chip
                         key={columnId}
@@ -194,6 +220,7 @@ export function MultiColumnMeasures() {
                         color="primary"
                         variant="outlined"
                         sx={{
+                          width: 'fit-content',
                           maxWidth: '100%',
                           '& .MuiChip-label': {
                             overflow: 'hidden',
@@ -203,7 +230,7 @@ export function MultiColumnMeasures() {
                         }}
                       />
                     ))}
-                  </Stack>
+                  </div>
                 </CardContent>
               </>
             )}

@@ -7,7 +7,7 @@ import {
   Columns,
   DataDictionary,
   StandardizedVaribleCollection,
-  StandardizedVarible,
+  StandardizedVariable,
 } from '../utils/types';
 
 type DataStore = {
@@ -22,7 +22,11 @@ type DataStore = {
   updateColumnDataType: (columnId: string, dataType: 'Categorical' | 'Continuous' | null) => void;
   updateColumnStandardizedVariable: (
     columnId: string,
-    standardizedVariable: StandardizedVarible | null
+    standardizedVariable: StandardizedVariable | null
+  ) => void;
+  updateColumnIsPartOf: (
+    columnId: string,
+    term: { identifier: string; label: string } | null
   ) => void;
   updateColumnLevelDescription: (columnId: string, value: string, description: string) => void;
   updateColumnUnits: (columnId: string, unitsDescription: string | null) => void;
@@ -33,7 +37,8 @@ type DataStore = {
   setUploadedDataDictionaryFileName: (fileName: string | null) => void;
   processDataDictionaryFile: (file: File) => Promise<void>;
 
-  standardizedVaribles: StandardizedVaribleCollection;
+  standardizedVariables: StandardizedVaribleCollection;
+  hasMultiColumnMeasures: () => boolean;
 
   reset: () => void;
 };
@@ -44,7 +49,7 @@ const initialState = {
   uploadedDataTableFileName: null,
   uploadedDataDictionary: {},
   uploadedDataDictionaryFileName: null,
-  standardizedVaribles: defaultConfig.standardizedVariables,
+  standardizedVariables: defaultConfig.standardizedVariables,
 };
 
 const useDataStore = create<DataStore>()(
@@ -137,11 +142,41 @@ const useDataStore = create<DataStore>()(
 
     updateColumnStandardizedVariable: (
       columnId: string,
-      standardizedVariable: StandardizedVarible | null
+      standardizedVariable: StandardizedVariable | null
     ) => {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
+          const assessmentToolConfig = state.standardizedVariables['Assessment Tool'];
+
           draft[columnId].standardizedVariable = standardizedVariable;
+
+          if (standardizedVariable?.identifier === assessmentToolConfig.identifier) {
+            // When setting to Assessment Tool, initialize IsPartOf if it doesn't exist
+            if (!draft[columnId].isPartOf) {
+              draft[columnId].isPartOf = {};
+            }
+            // Remove isPartOf when changing from Assessment Tool to something else
+          } else if (draft[columnId].isPartOf) {
+            delete draft[columnId].isPartOf;
+          }
+        }),
+      }));
+    },
+
+    updateColumnIsPartOf: (
+      columnId: string,
+      term: { identifier: string; label: string } | null
+    ) => {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          if (term) {
+            draft[columnId].isPartOf = {
+              termURL: term.identifier,
+              label: term.label,
+            };
+          } else {
+            delete draft[columnId].isPartOf;
+          }
         }),
       }));
     },
@@ -230,6 +265,14 @@ const useDataStore = create<DataStore>()(
 
         reader.readAsText(file);
       }),
+
+    hasMultiColumnMeasures: () => {
+      const { columns } = get();
+      const assessmentToolConfig = get().standardizedVariables['Assessment Tool'];
+      return Object.values(columns).some(
+        (column) => column.standardizedVariable?.identifier === assessmentToolConfig.identifier
+      );
+    },
 
     reset: () => set(initialState),
   }))
