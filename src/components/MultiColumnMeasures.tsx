@@ -83,8 +83,15 @@ function MultiColumnMeasures() {
       term: null,
       mappedColumns: [],
     };
-    setTermCards([...termCards, newCard]);
-    handlePaginationChange({} as React.ChangeEvent<unknown>, 1);
+    const newTermCards = [...termCards, newCard];
+    setTermCards(newTermCards);
+
+    // Calculate if a new page was created
+    const newTotalPages = Math.ceil(newTermCards.length / itemsPerPage);
+    if (newTotalPages > totalPages) {
+      // Move to the new page if one was created
+      handlePaginationChange({} as React.ChangeEvent<unknown>, newTotalPages);
+    }
   };
 
   const handleTermSelect = (cardId: string, term: Term | null) => {
@@ -145,6 +152,7 @@ function MultiColumnMeasures() {
           mappedColumns: [],
         },
       ]);
+      handlePaginationChange({} as React.ChangeEvent<unknown>, 1);
     } else {
       setTermCards(newCards);
       if (currentPage > Math.ceil(newCards.length / itemsPerPage)) {
