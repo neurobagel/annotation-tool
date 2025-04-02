@@ -34,13 +34,42 @@ interface TermCard {
 function MultiColumnMeasures() {
   const columns = useDataStore((state) => state.columns);
   const updateColumnIsPartOf = useDataStore((state) => state.updateColumnIsPartOf);
-  const [termCards, setTermCards] = useState<TermCard[]>(() => [
-    {
-      id: uuidv4(),
-      term: null,
-      mappedColumns: [],
-    },
-  ]);
+
+  // Initialize term cards based on existing isPartOf relationships
+  const initializeTermCards = (): TermCard[] => {
+    const assessmentColumns = Object.entries(columns)
+      .filter(([_, column]) => column.isPartOf)
+      .reduce((acc, [columnId, column]) => {
+        if (!column.isPartOf) return acc;
+
+        const term = assessmentTerms.find((t) => t.identifier === column.isPartOf?.termURL);
+        if (!term) return acc;
+
+        // Find or create card for this term
+        let card = acc.find((c) => c.term?.identifier === term.identifier);
+        if (!card) {
+          card = {
+            id: uuidv4(),
+            term,
+            mappedColumns: [],
+          };
+          acc.push(card);
+        }
+
+        // Add column to mappedColumns if not already present
+        if (!card.mappedColumns.includes(columnId)) {
+          card.mappedColumns.push(columnId);
+        }
+
+        return acc;
+      }, [] as TermCard[]);
+
+    return assessmentColumns.length > 0
+      ? assessmentColumns
+      : [{ id: uuidv4(), term: null, mappedColumns: [] }];
+  };
+
+  const [termCards, setTermCards] = useState<TermCard[]>(initializeTermCards);
 
   const itemsPerPage = 3;
   const { currentPage, currentItems, totalPages, handlePaginationChange } = usePagination<TermCard>(

@@ -213,6 +213,8 @@ const useDataStore = create<DataStore>()(
             const dataDictionary: DataDictionary = JSON.parse(content);
 
             const currentColumns = get().columns;
+            const { standardizedVariables } = get();
+            const assessmentToolConfig = get().standardizedVariables['Assessment Tool'];
 
             const updatedColumns = Object.entries(dataDictionary).reduce(
               (acc, [key, value]) => {
@@ -222,9 +224,41 @@ const useDataStore = create<DataStore>()(
 
                 if (columnEntry) {
                   const [columnId] = columnEntry;
-                  // Use Immer's produce to update the nested column description and levels
+                  // Use Immer's produce to update the nested column properties
                   return produce(acc, (draft) => {
                     draft[columnId].description = value.Description;
+
+                    if (value.Annotations?.IsAbout) {
+                      const matchingVariable = Object.values(standardizedVariables).find(
+                        (variable) => variable.identifier === value.Annotations?.IsAbout?.TermURL
+                      );
+
+                      if (matchingVariable) {
+                        draft[columnId].standardizedVariable = {
+                          identifier: value.Annotations.IsAbout.TermURL,
+                          label: value.Annotations.IsAbout.Label,
+                        };
+                      }
+                    } else {
+                      // Question: here we are removing standardizedVariable if there is no match
+                      // do we want to handle this in another way?
+                      delete draft[columnId].standardizedVariable;
+                    }
+
+                    if (
+                      draft[columnId].standardizedVariable?.identifier ===
+                        assessmentToolConfig.identifier &&
+                      value.Annotations?.IsPartOf
+                    ) {
+                      draft[columnId].isPartOf = {
+                        termURL: value.Annotations.IsPartOf.TermURL,
+                        label: value.Annotations.IsPartOf.Label,
+                      };
+                    } else {
+                      // Question: here we are removing IsPartOf if there is no match
+                      // do we want to handle this in another way?
+                      delete draft[columnId].isPartOf;
+                    }
 
                     if (value.Levels) {
                       draft[columnId].dataType = 'Categorical';
