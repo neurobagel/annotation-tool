@@ -33,14 +33,26 @@ export const mockColumnsWithDescription = {
   1: {
     header: 'participant_id',
     description: 'A participant ID',
+    standardizedVariable: {
+      identifier: 'nb:ParticipantID',
+      label: 'Subject Unique Identifier',
+    },
   },
   2: {
     header: 'age',
     description: 'Age of the participant',
+    standardizedVariable: {
+      identifier: 'nb:Age',
+      label: 'Age',
+    },
   },
   3: {
     header: 'sex',
     description: 'Sex of the participant',
+    standardizedVariable: {
+      identifier: 'nb:Sex',
+      label: 'Sex',
+    },
   },
 };
 
