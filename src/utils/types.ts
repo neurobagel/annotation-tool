@@ -1,6 +1,7 @@
 export type DataTable = {
   [key: string]: string[];
 };
+
 export type Column = {
   header: string;
   description?: string | null;
@@ -13,16 +14,19 @@ export type Column = {
   levels?: { [key: string]: { description: string } } | null;
   units?: string;
 };
+
 export type Columns = {
   [key: string]: Column;
 };
+
 export interface DataDictionary {
   [key: string]: {
     Description: string;
     Levels?: { [key: string]: string };
     Units?: string;
     Annotations?: {
-      IsAbout: {
+      IsAbout?: {
+        // Made optional
         TermURL: string;
         Label: string;
       };
@@ -37,6 +41,7 @@ export interface DataDictionary {
         };
       };
       IsPartOf?: {
+        // Made optional
         TermURL: string;
         Label: string;
       };

@@ -33,6 +33,22 @@ function Download() {
             Description: column.description || '',
           };
 
+          if (column.standardizedVariable) {
+            dictionaryEntry.Annotations = {};
+
+            dictionaryEntry.Annotations.IsAbout = {
+              Label: column.standardizedVariable.label,
+              TermURL: column.standardizedVariable.identifier,
+            };
+
+            if (column.isPartOf) {
+              dictionaryEntry.Annotations.IsPartOf = {
+                Label: column.isPartOf?.label || '',
+                TermURL: column.isPartOf?.termURL || '',
+              };
+            }
+          }
+
           if (column.dataType === 'Categorical' && column.levels) {
             dictionaryEntry.Levels = Object.entries(column.levels).reduce(
               (levelsAcc, [levelKey, levelValue]) => ({
