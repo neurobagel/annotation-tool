@@ -1,35 +1,12 @@
 import AddIcon from '@mui/icons-material/Add';
-import CancelIcon from '@mui/icons-material/Cancel';
-import {
-  Fab,
-  Autocomplete,
-  TextField,
-  Card,
-  CardContent,
-  CardHeader,
-  Divider,
-  Chip,
-  IconButton,
-  Typography,
-  Pagination,
-} from '@mui/material';
+import { Fab, Pagination } from '@mui/material';
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import assessmentTerms from '../assets/assessmentTerms.json';
 import { usePagination } from '../hooks';
 import useDataStore from '../stores/data';
-
-interface Term {
-  identifier: string;
-  label: string;
-  disabled?: boolean;
-}
-
-interface TermCard {
-  id: string;
-  term: Term | null;
-  mappedColumns: string[];
-}
+import { Term, TermCard } from '../utils/types';
+import MultiColumMeasuresCard from './MultiColumMeasuresCard';
 
 function MultiColumnMeasures() {
   const columns = useDataStore((state) => state.columns);
@@ -94,7 +71,6 @@ function MultiColumnMeasures() {
 
   const getColumnOptions = () => {
     const assessmentToolConfig = useDataStore.getState().standardizedVariables['Assessment Tool'];
-
     return Object.entries(columns)
       .filter(
         ([_, column]) => column.standardizedVariable?.identifier === assessmentToolConfig.identifier
@@ -136,7 +112,6 @@ function MultiColumnMeasures() {
 
   const handleColumnSelect = (cardId: string, columnId: string | null) => {
     if (!columnId) return;
-
     setTermCards(
       termCards.map((card) => {
         if (card.id === cardId && !card.mappedColumns.includes(columnId)) {
@@ -160,7 +135,6 @@ function MultiColumnMeasures() {
           : card
       )
     );
-
     updateColumnIsPartOf(columnId, null);
   };
 
@@ -174,13 +148,7 @@ function MultiColumnMeasures() {
 
     const newCards = termCards.filter((termCard) => termCard.id !== cardId);
     if (newCards.length === 0) {
-      setTermCards([
-        {
-          id: uuidv4(),
-          term: null,
-          mappedColumns: [],
-        },
-      ]);
+      setTermCards([{ id: uuidv4(), term: null, mappedColumns: [] }]);
       handlePaginationChange({} as React.ChangeEvent<unknown>, 1);
     } else {
       setTermCards(newCards);
@@ -197,88 +165,17 @@ function MultiColumnMeasures() {
     <div className="p-4 flex flex-col items-center">
       <div className="w-full max-w-3xl flex flex-col gap-4 mb-4">
         {currentItems.map((card) => (
-          <Card key={card.id} elevation={3} className="w-full" data-cy={`term-card-${card.id}`}>
-            <CardHeader
-              title={
-                card.term ? (
-                  <Typography variant="h6" className="font-bold">
-                    {card.term.label}
-                  </Typography>
-                ) : (
-                  <Autocomplete
-                    options={getAvailableTerms(card.id)}
-                    getOptionLabel={(option: Term) => option.label}
-                    getOptionDisabled={(option) => option.disabled}
-                    onChange={(_, newValue: Term | null) => handleTermSelect(card.id, newValue)}
-                    renderInput={(params) => (
-                      <TextField
-                        // eslint-disable-next-line react/jsx-props-no-spreading
-                        {...params}
-                        label="Select assessment term"
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                      />
-                    )}
-                  />
-                )
-              }
-              action={
-                <IconButton onClick={() => removeCard(card.id)} data-cy={`remove-card-${card.id}`}>
-                  <CancelIcon color="error" />
-                </IconButton>
-              }
-              className="bg-gray-50"
-            />
-            {card.term && (
-              <>
-                <Divider />
-                <CardContent>
-                  <div className="mt-4">
-                    <Typography variant="subtitle1" className="mb-2 font-bold text-gray-700">
-                      Mapped Columns
-                    </Typography>
-                    <Autocomplete
-                      options={getColumnOptions()}
-                      getOptionLabel={(option) => option.label}
-                      getOptionDisabled={(option) => option.disabled}
-                      onChange={(_, newValue) => handleColumnSelect(card.id, newValue?.id || null)}
-                      renderInput={(params) => (
-                        <TextField
-                          // eslint-disable-next-line react/jsx-props-no-spreading
-                          {...params}
-                          label="Select column to map"
-                          variant="outlined"
-                          size="small"
-                          fullWidth
-                        />
-                      )}
-                    />
-                  </div>
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {card.mappedColumns.map((columnId) => (
-                      <Chip
-                        key={columnId}
-                        label={columns[columnId]?.header || `Column ${columnId}`}
-                        onDelete={() => removeColumnFromCard(card.id, columnId)}
-                        color="primary"
-                        variant="outlined"
-                        sx={{
-                          width: 'fit-content',
-                          maxWidth: '100%',
-                          '& .MuiChip-label': {
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          },
-                        }}
-                      />
-                    ))}
-                  </div>
-                </CardContent>
-              </>
-            )}
-          </Card>
+          <MultiColumMeasuresCard
+            key={card.id}
+            card={card}
+            columns={columns}
+            availableTerms={getAvailableTerms(card.id)}
+            columnOptions={getColumnOptions()}
+            onTermSelect={(term) => handleTermSelect(card.id, term)}
+            onColumnSelect={(columnId) => handleColumnSelect(card.id, columnId)}
+            onRemoveColumn={(columnId) => removeColumnFromCard(card.id, columnId)}
+            onRemoveCard={() => removeCard(card.id)}
+          />
         ))}
 
         {termCards.length > itemsPerPage && (

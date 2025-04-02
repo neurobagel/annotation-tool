@@ -59,6 +59,19 @@ export interface StandardizedVaribleCollection {
   [key: string]: StandardizedVariable;
 }
 
+// TODO: find a better name than Term
+export interface Term {
+  identifier: string;
+  label: string;
+  disabled?: boolean;
+}
+
+export interface TermCard {
+  id: string;
+  term: Term | null;
+  mappedColumns: string[];
+}
+
 export enum View {
   Landing = 'landing',
   Upload = 'upload',
