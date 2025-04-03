@@ -34,8 +34,9 @@ function MultiColumnMeasuresCard({
   onRemoveCard,
 }: TermCardProps) {
   return (
-    <Card elevation={3} className="w-full" data-cy={`term-card-${card.id}`}>
+    <Card elevation={3} className="w-full" data-cy={`multi-column-measure-card-${card.id}`}>
       <CardHeader
+        data-cy={`multi-column-measures-card-${card.id}`}
         title={
           card.term ? (
             <Typography variant="h6" className="font-bold">
@@ -43,6 +44,7 @@ function MultiColumnMeasuresCard({
             </Typography>
           ) : (
             <Autocomplete
+              data-cy={`multi-column-measures-card-${card.id}-title-dropdown`}
               options={availableTerms}
               getOptionLabel={(option: Term) => option.label}
               getOptionDisabled={(option) => option.disabled || false}
@@ -61,7 +63,7 @@ function MultiColumnMeasuresCard({
           )
         }
         action={
-          <IconButton onClick={onRemoveCard} data-cy={`remove-card-${card.id}`}>
+          <IconButton onClick={onRemoveCard} data-cy={`remove-card-${card.id}-button`}>
             <CancelIcon color="error" />
           </IconButton>
         }
@@ -72,10 +74,8 @@ function MultiColumnMeasuresCard({
           <Divider />
           <CardContent>
             <div className="mt-4">
-              <Typography variant="subtitle1" className="mb-2 font-bold text-gray-700">
-                Mapped Columns
-              </Typography>
               <Autocomplete
+                data-cy={`multi-column-measures-card-${card.id}-columns-dropdown`}
                 options={columnOptions}
                 getOptionLabel={(option) => option.label}
                 getOptionDisabled={(option) => option.disabled || false}
@@ -93,8 +93,12 @@ function MultiColumnMeasuresCard({
               />
             </div>
             <div className="flex flex-wrap gap-2 mt-4">
+              <Typography variant="subtitle1" className="mb-2 font-bold text-gray-700">
+                Mapped Columns:
+              </Typography>
               {card.mappedColumns.map((columnId) => (
                 <Chip
+                  data-cy={`mapped-column-${columnId}`}
                   key={columnId}
                   label={columns[columnId]?.header || `Column ${columnId}`}
                   onDelete={() => onRemoveColumn(columnId)}

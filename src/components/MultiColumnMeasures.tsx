@@ -6,7 +6,7 @@ import assessmentTerms from '../assets/assessmentTerms.json';
 import { usePagination } from '../hooks';
 import useDataStore from '../stores/data';
 import { Term, TermCard } from '../utils/types';
-import MultiColumMeasuresCard from './MultiColumMeasuresCard';
+import MultiColumMeasuresCard from './MultiColumnMeasuresCard';
 
 function MultiColumnMeasures() {
   const columns = useDataStore((state) => state.columns);
