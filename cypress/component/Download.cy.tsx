@@ -4,8 +4,8 @@ import useDataStore from '../../src/stores/data';
 import {
   mockColumnsWithDescription,
   mockInitialColumns,
-  mockDataDictionaryWithDescription,
   mockDataDictionaryWithNoDescription,
+  mockDataDictionaryWithAnnotations,
 } from '../../src/utils/mocks';
 
 interface ValidateFunction {
@@ -64,9 +64,11 @@ describe('Download', () => {
 
     cy.mount(<Download />);
 
+    // TODO: remove this once the logic for handling levels is implemented in value annotations
+    cy.get('[data-cy="force-download-switch"]').click();
     cy.get('[data-cy="download-datadictionary-button"]').click();
     cy.readFile('cypress/downloads/someFileName_annotated.json').then((fileContent) => {
-      expect(fileContent).to.deep.equal(mockDataDictionaryWithDescription);
+      expect(fileContent).to.deep.equal(mockDataDictionaryWithAnnotations);
     });
   });
 
