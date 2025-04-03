@@ -26,7 +26,7 @@ function Download() {
   const columns = useDataStore((state) => state.columns);
   const config = useDataStore((state) => state.standardizedVariables);
 
-  // TODO: Make sure Anontations includes hte levels with label and termURL
+  // TODO: Make sure Anontations includes the levels with label and termURL
   const dataDictionary = useMemo(
     () =>
       Object.entries(columns).reduce((acc, [_columnKey, column]) => {
