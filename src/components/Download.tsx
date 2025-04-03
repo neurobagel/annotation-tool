@@ -24,10 +24,15 @@ function Download() {
 
   const uploadedDataTableFileName = useDataStore((state) => state.uploadedDataTableFileName);
   const columns = useDataStore((state) => state.columns);
+  const config = useDataStore((state) => state.standardizedVariables);
 
+  // TODO: Make sure Anontations includes hte levels with label and termURL
   const dataDictionary = useMemo(
     () =>
       Object.entries(columns).reduce((acc, [_columnKey, column]) => {
+        const participantIDConfig = config['Subject ID'];
+        const sessionIDConfig = config['Session ID'];
+
         if (column.header) {
           const dictionaryEntry: DataDictionary[string] = {
             Description: column.description || '',
@@ -40,6 +45,12 @@ function Download() {
               Label: column.standardizedVariable.label,
               TermURL: column.standardizedVariable.identifier,
             };
+
+            if (column.standardizedVariable?.identifier === participantIDConfig.identifier) {
+              dictionaryEntry.Annotations.Identifies = 'participant';
+            } else if (column.standardizedVariable?.identifier === sessionIDConfig.identifier) {
+              dictionaryEntry.Annotations.Identifies = 'session';
+            }
 
             if (column.isPartOf) {
               dictionaryEntry.Annotations.IsPartOf = {
@@ -70,7 +81,7 @@ function Download() {
         }
         return acc;
       }, {} as DataDictionary),
-    [columns]
+    [columns, config]
   );
 
   const { isValid: schemaValid, errors: schemaErrors } = useMemo(() => {
