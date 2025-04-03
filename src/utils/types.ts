@@ -26,10 +26,10 @@ export interface DataDictionary {
     Units?: string;
     Annotations?: {
       IsAbout?: {
-        // Made optional
         TermURL: string;
         Label: string;
       };
+      Identifies?: string;
       Format?: {
         TermURL: string;
         Label: string;
@@ -41,7 +41,6 @@ export interface DataDictionary {
         };
       };
       IsPartOf?: {
-        // Made optional
         TermURL: string;
         Label: string;
       };
