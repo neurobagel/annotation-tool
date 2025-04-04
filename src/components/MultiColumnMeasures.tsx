@@ -26,11 +26,15 @@ function MultiColumnMeasures({
   const theme = useTheme();
   const columns = useDataStore((state) => state.columns);
   const updateColumnIsPartOf = useDataStore((state) => state.updateColumnIsPartOf);
+  const assessmentToolConfig = useDataStore.getState().standardizedVariables['Assessment Tool'];
 
   const assessmentToolColumns = Object.entries(columns)
-    .filter(([_, column]) => column.isPartOf)
+    .filter(
+      ([_, column]) => column.standardizedVariable?.identifier === assessmentToolConfig.identifier
+    )
     .map(([id, column]) => ({ id, header: column.header }));
 
+  // Initialize term cards based on existing isPartOf relationships
   const initializeTermCards = (): TermCard[] => {
     const assessmentColumns = assessmentToolColumns.reduce((acc, { id }) => {
       const column = columns[id];
@@ -39,6 +43,7 @@ function MultiColumnMeasures({
       const term = terms.find((t) => t.identifier === column.isPartOf?.termURL);
       if (!term) return acc;
 
+      // Find or create card for this term
       let card = acc.find((c) => c.term?.identifier === term.identifier);
       if (!card) {
         card = {
@@ -49,6 +54,7 @@ function MultiColumnMeasures({
         acc.push(card);
       }
 
+      // Add column to mappedColumns if not already present
       if (!card.mappedColumns.includes(id)) {
         card.mappedColumns.push(id);
       }
@@ -83,9 +89,8 @@ function MultiColumnMeasures({
     }));
   };
 
-  const getColumnOptions = () => {
-    const assessmentToolConfig = useDataStore.getState().standardizedVariables['Assessment Tool'];
-    return Object.entries(columns)
+  const getColumnOptions = () =>
+    Object.entries(columns)
       .filter(
         ([_, column]) => column.standardizedVariable?.identifier === assessmentToolConfig.identifier
       )
@@ -94,7 +99,6 @@ function MultiColumnMeasures({
         label: column.header,
         disabled: allMappedColumns.includes(id),
       }));
-  };
 
   const handleAddNewCard = () => {
     const newCard: TermCard = {
@@ -105,8 +109,10 @@ function MultiColumnMeasures({
     const newTermCards = [...termCards, newCard];
     setTermCards(newTermCards);
 
+    // Calculate if a new page was created
     const newTotalPages = Math.ceil(newTermCards.length / itemsPerPage);
     if (newTotalPages > totalPages) {
+      // Move to the new page if one was created
       handlePaginationChange({} as React.ChangeEvent<unknown>, newTotalPages);
     }
   };
@@ -215,9 +221,13 @@ function MultiColumnMeasures({
         </div>
 
         <div className="flex-shrink-0">
-          <Card data-cy="multi-column-measure-columns-card">
-            <CardHeader title="Assessment Tool Columns" />
-            <CardContent>
+          <Card
+            className="w-full shadow-lg"
+            elevation={3}
+            data-cy="multi-column-measures-columns-card"
+          >
+            <CardHeader className="bg-gray-50" title="Assessment: all columns" />
+            <CardContent className="text-center">
               <div className="max-h-[500px] overflow-auto">
                 {assessmentToolColumns.map(({ id, header }) => (
                   <div key={id} className="p-2 border-b">
@@ -233,7 +243,7 @@ function MultiColumnMeasures({
                   </div>
                 ))}
               </div>
-              <Typography variant="body2" className="mt-2 text-center">
+              <Typography variant="body2" className="mt-8">
                 {columnsAssigned()}
               </Typography>
             </CardContent>

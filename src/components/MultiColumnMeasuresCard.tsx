@@ -34,7 +34,11 @@ function MultiColumnMeasuresCard({
   onRemoveCard,
 }: TermCardProps) {
   return (
-    <Card elevation={3} className="w-full" data-cy={`multi-column-measure-card-${card.id}`}>
+    <Card
+      elevation={3}
+      className="w-full shadow-lg"
+      data-cy={`multi-column-measures-card-${card.id}`}
+    >
       <CardHeader
         data-cy={`multi-column-measures-card-${card.id}-header`}
         title={

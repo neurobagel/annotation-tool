@@ -46,7 +46,7 @@ describe('MultiColumnMeasuresCard', () => {
         onRemoveCard={props.onRemoveCard}
       />
     );
-    cy.get('[data-cy=multi-column-measure-card-1]').should('be.visible');
+    cy.get('[data-cy=multi-column-measures-card-1]').should('be.visible');
     cy.get('[data-cy=multi-column-measures-card-1]').should('be.visible').and('contain', 'cool');
     cy.get('[data-cy=multi-column-measures-card-1-columns-dropdown]').should('be.visible');
     cy.get('[data-cy=mapped-column-1]').should('be.visible').and('contain', 'participant_id');
