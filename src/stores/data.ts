@@ -174,8 +174,6 @@ const useDataStore = create<DataStore>()(
               termURL: term.identifier,
               label: term.label,
             };
-          } else {
-            delete draft[columnId].isPartOf;
           }
         }),
       }));
