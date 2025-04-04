@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add';
-import { Fab, Pagination } from '@mui/material';
+import { Fab } from '@mui/material';
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import assessmentTerms from '../assets/assessmentTerms.json';
@@ -8,7 +8,20 @@ import useDataStore from '../stores/data';
 import { Term, TermCard } from '../utils/types';
 import MultiColumMeasuresCard from './MultiColumnMeasuresCard';
 
-function MultiColumnMeasures() {
+interface MultiColumnMeasuresProps {
+  generateID?: () => string;
+  terms?: Term[];
+}
+
+const defaultProps = {
+  generateID: uuidv4,
+  terms: assessmentTerms,
+};
+
+function MultiColumnMeasures({
+  generateID = uuidv4,
+  terms = assessmentTerms,
+}: MultiColumnMeasuresProps) {
   const columns = useDataStore((state) => state.columns);
   const updateColumnIsPartOf = useDataStore((state) => state.updateColumnIsPartOf);
 
@@ -19,14 +32,14 @@ function MultiColumnMeasures() {
       .reduce((acc, [columnId, column]) => {
         if (!column.isPartOf) return acc;
 
-        const term = assessmentTerms.find((t) => t.identifier === column.isPartOf?.termURL);
+        const term = terms.find((t) => t.identifier === column.isPartOf?.termURL);
         if (!term) return acc;
 
         // Find or create card for this term
         let card = acc.find((c) => c.term?.identifier === term.identifier);
         if (!card) {
           card = {
-            id: uuidv4(),
+            id: generateID(),
             term,
             mappedColumns: [],
           };
@@ -43,7 +56,7 @@ function MultiColumnMeasures() {
 
     return assessmentColumns.length > 0
       ? assessmentColumns
-      : [{ id: uuidv4(), term: null, mappedColumns: [] }];
+      : [{ id: generateID(), term: null, mappedColumns: [] }];
   };
 
   const [termCards, setTermCards] = useState<TermCard[]>(initializeTermCards);
@@ -63,7 +76,7 @@ function MultiColumnMeasures() {
 
   const getAvailableTerms = (currentCardId?: string) => {
     const usedTerms = getUsedTerms(currentCardId);
-    return assessmentTerms.map((term) => ({
+    return terms.map((term) => ({
       ...term,
       disabled: usedTerms.includes(term.identifier),
     }));
@@ -84,7 +97,7 @@ function MultiColumnMeasures() {
 
   const handleAddNewCard = () => {
     const newCard: TermCard = {
-      id: uuidv4(),
+      id: generateID(),
       term: null,
       mappedColumns: [],
     };
@@ -148,7 +161,7 @@ function MultiColumnMeasures() {
 
     const newCards = termCards.filter((termCard) => termCard.id !== cardId);
     if (newCards.length === 0) {
-      setTermCards([{ id: uuidv4(), term: null, mappedColumns: [] }]);
+      setTermCards([{ id: generateID(), term: null, mappedColumns: [] }]);
       handlePaginationChange({} as React.ChangeEvent<unknown>, 1);
     } else {
       setTermCards(newCards);
@@ -177,20 +190,7 @@ function MultiColumnMeasures() {
             onRemoveCard={() => removeCard(card.id)}
           />
         ))}
-
-        {termCards.length > itemsPerPage && (
-          <div className="flex justify-center mt-4">
-            <Pagination
-              count={totalPages}
-              page={currentPage}
-              onChange={handlePaginationChange}
-              color="primary"
-              shape="rounded"
-            />
-          </div>
-        )}
       </div>
-
       <Fab
         color="primary"
         onClick={handleAddNewCard}
@@ -203,4 +203,5 @@ function MultiColumnMeasures() {
   );
 }
 
+MultiColumnMeasures.defaultProps = defaultProps;
 export default MultiColumnMeasures;

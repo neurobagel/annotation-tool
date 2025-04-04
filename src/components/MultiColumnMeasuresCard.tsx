@@ -36,7 +36,7 @@ function MultiColumnMeasuresCard({
   return (
     <Card elevation={3} className="w-full" data-cy={`multi-column-measure-card-${card.id}`}>
       <CardHeader
-        data-cy={`multi-column-measures-card-${card.id}`}
+        data-cy={`multi-column-measures-card-${card.id}-header`}
         title={
           card.term ? (
             <Typography variant="h6" className="font-bold">
