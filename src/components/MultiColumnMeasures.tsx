@@ -7,7 +7,7 @@ import assessmentTerms from '../assets/assessmentTerms.json';
 import { usePagination } from '../hooks';
 import useDataStore from '../stores/data';
 import { Term, TermCard } from '../utils/types';
-import MultiColumMeasuresCard from './MultiColumnMeasuresCard';
+import MultiColumnMeasuresCard from './MultiColumnMeasuresCard';
 
 interface MultiColumnMeasuresProps {
   generateID?: () => string;
@@ -196,7 +196,7 @@ function MultiColumnMeasures({
           <div className="flex flex-col items-center">
             <div className="w-full flex flex-col gap-4 mb-4">
               {currentItems.map((card) => (
-                <MultiColumMeasuresCard
+                <MultiColumnMeasuresCard
                   key={card.id}
                   card={card}
                   columns={columns}
