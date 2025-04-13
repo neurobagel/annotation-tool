@@ -18,6 +18,8 @@ type DataStore = {
   initializeColumns: (data: Columns) => void;
   setUploadedDataTableFileName: (fileName: string | null) => void;
   processDataTableFile: (file: File) => Promise<void>;
+  getAssessmentToolConfig: () => StandardizedVariable;
+  getAssessmentToolColumns: () => { id: string; header: string }[];
   updateColumnDescription: (columnId: string, description: string | null) => void;
   updateColumnDataType: (columnId: string, dataType: 'Categorical' | 'Continuous' | null) => void;
   updateColumnStandardizedVariable: (
@@ -102,6 +104,16 @@ const useDataStore = create<DataStore>()(
       }),
 
     // Column updates
+    getAssessmentToolConfig: () => get().standardizedVariables['Assessment Tool'],
+
+    getAssessmentToolColumns: () =>
+      Object.entries(get().columns)
+        .filter(
+          ([_, column]) =>
+            column.standardizedVariable?.identifier === get().getAssessmentToolConfig().identifier
+        )
+        .map(([id, column]) => ({ id, header: column.header })),
+
     updateColumnDescription: (columnId: string, description: string | null) => {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
@@ -146,11 +158,9 @@ const useDataStore = create<DataStore>()(
     ) => {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
-          const assessmentToolConfig = state.standardizedVariables['Assessment Tool'];
-
           draft[columnId].standardizedVariable = standardizedVariable;
 
-          if (standardizedVariable?.identifier === assessmentToolConfig.identifier) {
+          if (standardizedVariable?.identifier === get().getAssessmentToolConfig().identifier) {
             // When setting to Assessment Tool, initialize IsPartOf if it doesn't exist
             if (!draft[columnId].isPartOf) {
               draft[columnId].isPartOf = {};
@@ -212,7 +222,6 @@ const useDataStore = create<DataStore>()(
 
             const currentColumns = get().columns;
             const { standardizedVariables } = get();
-            const assessmentToolConfig = get().standardizedVariables['Assessment Tool'];
 
             const updatedColumns = Object.entries(dataDictionary).reduce(
               (acc, [key, value]) => {
@@ -245,7 +254,7 @@ const useDataStore = create<DataStore>()(
 
                     if (
                       draft[columnId].standardizedVariable?.identifier ===
-                        assessmentToolConfig.identifier &&
+                        get().getAssessmentToolConfig().identifier &&
                       value.Annotations?.IsPartOf
                     ) {
                       draft[columnId].isPartOf = {
@@ -300,9 +309,9 @@ const useDataStore = create<DataStore>()(
 
     hasMultiColumnMeasures: () => {
       const { columns } = get();
-      const assessmentToolConfig = get().standardizedVariables['Assessment Tool'];
       return Object.values(columns).some(
-        (column) => column.standardizedVariable?.identifier === assessmentToolConfig.identifier
+        (column) =>
+          column.standardizedVariable?.identifier === get().getAssessmentToolConfig().identifier
       );
     },
 

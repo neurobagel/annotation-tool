@@ -10,11 +10,11 @@ import {
   Autocomplete,
   TextField,
 } from '@mui/material';
-import { Term, TermCard, Columns } from '../utils/types';
+import { Term, TermCard } from '../utils/types';
 
 interface TermCardProps {
   card: TermCard;
-  columns: Columns;
+  mappedColumnHeaders: { [columnId: string]: string };
   availableTerms: Term[];
   columnOptions: Array<{ id: string; label: string; disabled: boolean }>;
   onTermSelect: (term: Term | null) => void;
@@ -25,7 +25,7 @@ interface TermCardProps {
 
 function MultiColumnMeasuresCard({
   card,
-  columns,
+  mappedColumnHeaders,
   availableTerms,
   columnOptions,
   onTermSelect,
@@ -104,7 +104,7 @@ function MultiColumnMeasuresCard({
                 <Chip
                   data-cy={`mapped-column-${columnId}`}
                   key={columnId}
-                  label={columns[columnId]?.header || `Column ${columnId}`}
+                  label={mappedColumnHeaders[columnId] || `Column ${columnId}`}
                   onDelete={() => onRemoveColumn(columnId)}
                   color="primary"
                   variant="outlined"

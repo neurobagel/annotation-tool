@@ -27,7 +27,6 @@ const useViewStore = create<ViewStore>()(
 export const getNavigationProps = (currentView: View): NavigationProps => {
   const hasMultiColumnMeasures = useDataStore.getState().hasMultiColumnMeasures();
 
-  // Define the complete navigation flow
   const navigationFlow = [
     View.Landing,
     View.Upload,
@@ -39,7 +38,6 @@ export const getNavigationProps = (currentView: View): NavigationProps => {
 
   const currentIndex = navigationFlow.indexOf(currentView);
 
-  // If we're on MultiColumnMeasures but shouldn't be, redirect
   if (currentView === View.ColumnAnnotation && hasMultiColumnMeasures) {
     return {
       backView: View.Upload,
@@ -56,16 +54,6 @@ export const getNavigationProps = (currentView: View): NavigationProps => {
       nextView: View.Download,
       backLabel: 'Back to Multi-Column Measures',
       nextLabel: 'Next: Download',
-      className: 'p-4',
-    };
-  }
-
-  if (currentView === View.MultiColumnMeasures && !hasMultiColumnMeasures) {
-    return {
-      backView: View.ColumnAnnotation,
-      nextView: View.ValueAnnotation,
-      backLabel: 'Back to Column Annotation',
-      nextLabel: 'Next: Value Annotation',
       className: 'p-4',
     };
   }

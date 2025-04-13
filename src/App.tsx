@@ -14,15 +14,15 @@ import { View } from './utils/types';
 function App() {
   const currentView = useViewStore((state) => state.currentView);
   const setCurrentView = useViewStore((state) => state.setCurrentView);
-  const hasMeasures = useDataStore((state) => state.hasMultiColumnMeasures());
+  const hasMultiColumnMeasures = useDataStore((state) => state.hasMultiColumnMeasures());
 
   const { backView, nextView, backLabel, nextLabel, className } = getNavigationProps(currentView);
 
   useEffect(() => {
-    if (currentView === View.MultiColumnMeasures && !hasMeasures) {
+    if (currentView === View.MultiColumnMeasures && !hasMultiColumnMeasures) {
       setCurrentView(View.ColumnAnnotation);
     }
-  }, [currentView, hasMeasures, setCurrentView]);
+  }, [currentView, hasMultiColumnMeasures, setCurrentView]);
 
   const determineView = () => {
     switch (currentView) {

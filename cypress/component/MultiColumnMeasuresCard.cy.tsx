@@ -1,4 +1,3 @@
-import { mockColumnsWithDescription } from '~/utils/mocks';
 import MultiColumnMeasuresCard from '../../src/components/MultiColumnMeasuresCard';
 
 const props = {
@@ -10,7 +9,11 @@ const props = {
     },
     mappedColumns: ['1'],
   },
-  columns: mockColumnsWithDescription,
+  mappedColumnHeaders: {
+    '1': 'participant_id',
+    '2': 'age',
+    '3': 'sex',
+  },
   availableTerms: [
     {
       identifier: 'nb:someIdentifier',
@@ -37,7 +40,7 @@ describe('MultiColumnMeasuresCard', () => {
     cy.mount(
       <MultiColumnMeasuresCard
         card={props.card}
-        columns={props.columns}
+        mappedColumnHeaders={props.mappedColumnHeaders}
         availableTerms={props.availableTerms}
         columnOptions={props.columnOptions}
         onTermSelect={props.onTermSelect}
@@ -56,7 +59,7 @@ describe('MultiColumnMeasuresCard', () => {
     cy.mount(
       <MultiColumnMeasuresCard
         card={props.card}
-        columns={props.columns}
+        mappedColumnHeaders={props.mappedColumnHeaders}
         availableTerms={props.availableTerms}
         columnOptions={props.columnOptions}
         onTermSelect={props.onTermSelect}
@@ -73,7 +76,7 @@ describe('MultiColumnMeasuresCard', () => {
     cy.mount(
       <MultiColumnMeasuresCard
         card={props.card}
-        columns={props.columns}
+        mappedColumnHeaders={props.mappedColumnHeaders}
         availableTerms={props.availableTerms}
         columnOptions={props.columnOptions}
         onTermSelect={props.onTermSelect}
@@ -92,7 +95,7 @@ describe('MultiColumnMeasuresCard', () => {
     cy.mount(
       <MultiColumnMeasuresCard
         card={props.card}
-        columns={props.columns}
+        mappedColumnHeaders={props.mappedColumnHeaders}
         availableTerms={props.availableTerms}
         columnOptions={props.columnOptions}
         onTermSelect={props.onTermSelect}

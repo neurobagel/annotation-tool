@@ -7,6 +7,13 @@ import assessmentTerms from '../assets/assessmentTerms.json';
 import { usePagination } from '../hooks';
 import useDataStore from '../stores/data';
 import { Term, TermCard } from '../utils/types';
+import {
+  initializeTermCards,
+  getAvailableTerms,
+  getColumnOptions,
+  getAllMappedColumns,
+  getAssignedTermIdentifiers,
+} from '../utils/util';
 import MultiColumnMeasuresCard from './MultiColumnMeasuresCard';
 
 interface MultiColumnMeasuresProps {
@@ -26,79 +33,29 @@ function MultiColumnMeasures({
   const theme = useTheme();
   const columns = useDataStore((state) => state.columns);
   const updateColumnIsPartOf = useDataStore((state) => state.updateColumnIsPartOf);
-  const assessmentToolConfig = useDataStore.getState().standardizedVariables['Assessment Tool'];
 
-  const assessmentToolColumns = Object.entries(columns)
-    .filter(
-      ([_, column]) => column.standardizedVariable?.identifier === assessmentToolConfig.identifier
-    )
-    .map(([id, column]) => ({ id, header: column.header }));
+  const assessmentToolConfigIdentifier = useDataStore
+    .getState()
+    .getAssessmentToolConfig().identifier;
 
-  // Initialize term cards based on existing isPartOf relationships
-  const initializeTermCards = (): TermCard[] => {
-    const assessmentColumns = assessmentToolColumns.reduce((acc, { id }) => {
-      const column = columns[id];
-      if (!column.isPartOf) return acc;
+  const assessmentToolColumns = useDataStore.getState().getAssessmentToolColumns();
 
-      const term = terms.find((t) => t.identifier === column.isPartOf?.termURL);
-      if (!term) return acc;
+  const [termCards, setTermCards] = useState<TermCard[]>(
+    initializeTermCards({
+      columns,
+      terms,
+      assessmentToolColumns,
+      generateID,
+    })
+  );
 
-      // Find or create card for this term
-      let card = acc.find((c) => c.term?.identifier === term.identifier);
-      if (!card) {
-        card = {
-          id: generateID(),
-          term,
-          mappedColumns: [],
-        };
-        acc.push(card);
-      }
-
-      // Add column to mappedColumns if not already present
-      if (!card.mappedColumns.includes(id)) {
-        card.mappedColumns.push(id);
-      }
-
-      return acc;
-    }, [] as TermCard[]);
-
-    return assessmentColumns.length > 0
-      ? assessmentColumns
-      : [{ id: generateID(), term: null, mappedColumns: [] }];
-  };
-
-  const [termCards, setTermCards] = useState<TermCard[]>(initializeTermCards);
   const itemsPerPage = 3;
   const { currentPage, currentItems, totalPages, handlePaginationChange } = usePagination<TermCard>(
     termCards,
     itemsPerPage
   );
 
-  const allMappedColumns = termCards.flatMap((card) => card.mappedColumns);
-
-  const getUsedTerms = (currentCardId?: string) =>
-    termCards
-      .filter((card) => card.term !== null && card.id !== currentCardId)
-      .map((card) => card.term?.identifier);
-
-  const getAvailableTerms = (currentCardId?: string) => {
-    const usedTerms = getUsedTerms(currentCardId);
-    return terms.map((term) => ({
-      ...term,
-      disabled: usedTerms.includes(term.identifier),
-    }));
-  };
-
-  const getColumnOptions = () =>
-    Object.entries(columns)
-      .filter(
-        ([_, column]) => column.standardizedVariable?.identifier === assessmentToolConfig.identifier
-      )
-      .map(([id, column]) => ({
-        id,
-        label: column.header,
-        disabled: allMappedColumns.includes(id),
-      }));
+  const allMappedColumns = getAllMappedColumns(termCards);
 
   const handleAddNewCard = () => {
     const newCard: TermCard = {
@@ -109,47 +66,44 @@ function MultiColumnMeasures({
     const newTermCards = [...termCards, newCard];
     setTermCards(newTermCards);
 
-    // Calculate if a new page was created
     const newTotalPages = Math.ceil(newTermCards.length / itemsPerPage);
     if (newTotalPages > totalPages) {
-      // Move to the new page if one was created
       handlePaginationChange({} as React.ChangeEvent<unknown>, newTotalPages);
     }
   };
 
   const handleTermSelect = (cardId: string, term: Term | null) => {
-    setTermCards(termCards.map((card) => (card.id === cardId ? { ...card, term } : card)));
-
-    const foundCard = termCards.find((c) => c.id === cardId);
-    if (foundCard) {
-      foundCard.mappedColumns.forEach((columnId) => {
-        updateColumnIsPartOf(columnId, term);
-      });
-    }
+    setTermCards((prev) => prev.map((card) => (card.id === cardId ? { ...card, term } : card)));
   };
 
   const handleColumnSelect = (cardId: string, columnId: string | null) => {
     if (!columnId) return;
-    setTermCards(
-      termCards.map((card) => {
-        if (card.id === cardId && !card.mappedColumns.includes(columnId)) {
-          return { ...card, mappedColumns: [...card.mappedColumns, columnId] };
-        }
-        return card;
-      })
+
+    setTermCards((prev) =>
+      prev.map((card) =>
+        card.id === cardId && !card.mappedColumns.includes(columnId)
+          ? { ...card, mappedColumns: [...card.mappedColumns, columnId] }
+          : card
+      )
     );
 
     const card = termCards.find((c) => c.id === cardId);
     if (card?.term) {
-      updateColumnIsPartOf(columnId, card.term);
+      updateColumnIsPartOf(columnId, {
+        identifier: card.term.identifier,
+        label: card.term.label,
+      });
     }
   };
 
   const removeColumnFromCard = (cardId: string, columnId: string) => {
-    setTermCards(
-      termCards.map((card) =>
+    setTermCards((prev) =>
+      prev.map((card) =>
         card.id === cardId
-          ? { ...card, mappedColumns: card.mappedColumns.filter((id) => id !== columnId) }
+          ? {
+              ...card,
+              mappedColumns: card.mappedColumns.filter((id) => id !== columnId),
+            }
           : card
       )
     );
@@ -170,22 +124,16 @@ function MultiColumnMeasures({
       handlePaginationChange({} as React.ChangeEvent<unknown>, 1);
     } else {
       setTermCards(newCards);
-      if (currentPage > Math.ceil(newCards.length / itemsPerPage)) {
-        handlePaginationChange(
-          {} as React.ChangeEvent<unknown>,
-          Math.ceil(newCards.length / itemsPerPage)
-        );
+      const newTotalPages = Math.ceil(newCards.length / itemsPerPage);
+      if (currentPage > newTotalPages) {
+        handlePaginationChange({} as React.ChangeEvent<unknown>, newTotalPages);
       }
     }
   };
 
   const columnsAssigned = () => {
-    if (allMappedColumns.length === 0) {
-      return 'No columns assigned';
-    }
-    if (allMappedColumns.length === 1) {
-      return '1 column assigned';
-    }
+    if (allMappedColumns.length === 0) return 'No columns assigned';
+    if (allMappedColumns.length === 1) return '1 column assigned';
     return `${allMappedColumns.length} columns assigned`;
   };
 
@@ -199,9 +147,18 @@ function MultiColumnMeasures({
                 <MultiColumnMeasuresCard
                   key={card.id}
                   card={card}
-                  columns={columns}
-                  availableTerms={getAvailableTerms(card.id)}
-                  columnOptions={getColumnOptions()}
+                  mappedColumnHeaders={Object.fromEntries(
+                    card.mappedColumns.map((id) => [id, columns[id]?.header || `Column ${id}`])
+                  )}
+                  availableTerms={getAvailableTerms(
+                    terms,
+                    getAssignedTermIdentifiers(termCards, card.id)
+                  )}
+                  columnOptions={getColumnOptions(
+                    columns,
+                    assessmentToolConfigIdentifier,
+                    allMappedColumns
+                  )}
                   onTermSelect={(term) => handleTermSelect(card.id, term)}
                   onColumnSelect={(columnId) => handleColumnSelect(card.id, columnId)}
                   onRemoveColumn={(columnId) => removeColumnFromCard(card.id, columnId)}
@@ -209,6 +166,7 @@ function MultiColumnMeasures({
                 />
               ))}
             </div>
+
             <Fab
               color="primary"
               onClick={handleAddNewCard}

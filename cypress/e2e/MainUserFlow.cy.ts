@@ -96,7 +96,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="Download-step"]').within(() => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
     });
-    // TODO: remove this once the logic for handling levels is implemented in value annotations
+    // TODO: uncomment this once the logic for handling levels is implemented in value annotations
     // cy.get('[data-cy="complete-annotations-alert"]').should('be.visible');
     cy.get('[data-cy="datadictionary-preview"]')
       .should('be.visible')
