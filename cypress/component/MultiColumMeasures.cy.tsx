@@ -2,8 +2,6 @@ import MultiColumnMeasures from '../../src/components/MultiColumnMeasures';
 import useDataStore from '../../src/stores/data';
 
 describe('MultiColumnMeasures', () => {
-  let updateColumnIsPartOfSpy: sinon.SinonSpy;
-
   beforeEach(() => {
     // Mock the generateID function to return a predictable value for testing
     let counter = 0;
@@ -27,7 +25,7 @@ describe('MultiColumnMeasures', () => {
       },
     ];
 
-    updateColumnIsPartOfSpy = cy.spy().as('updateColumnIsPartOfSpy');
+    const updateColumnIsPartOfSpy = cy.spy().as('updateColumnIsPartOfSpy');
 
     useDataStore.setState({
       updateColumnIsPartOf: updateColumnIsPartOfSpy,
