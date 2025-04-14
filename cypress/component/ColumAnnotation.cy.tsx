@@ -18,7 +18,7 @@ describe('ColumnAnnotation', () => {
           standardizedVariable: null,
         },
       },
-      standardizedVaribles: {
+      standardizedVariables: {
         var1: {
           identifier: 'somevar',
           label: 'some variable',

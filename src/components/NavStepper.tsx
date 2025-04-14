@@ -8,7 +8,10 @@ import { View } from '../utils/types';
 
 function NavStepper({ currentView }: { currentView: View }) {
   const theme = useTheme();
-  const activeStep = steps.findIndex((step) => step.view === currentView);
+  let activeStep = steps.findIndex((step) => step.view === currentView);
+  if (currentView === View.MultiColumnMeasures) {
+    activeStep = steps.findIndex((step) => step.view === View.ColumnAnnotation);
+  }
 
   return (
     <div className="w-full p-4">
