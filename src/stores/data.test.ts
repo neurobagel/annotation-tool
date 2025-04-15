@@ -110,6 +110,37 @@ describe('data store actions', () => {
       label: 'Some',
     });
   });
+  it('sets the standardizedVariable field of a column to Assessment Tool', () => {
+    const { result } = renderHook(() => useDataStore());
+    act(() => {
+      result.current.updateColumnStandardizedVariable('1', {
+        identifier: 'nb:AssessmentTool',
+        label: 'Assessment Tool',
+      });
+    });
+    expect(result.current.columns['1'].standardizedVariable).toEqual({
+      identifier: 'nb:AssessmentTool',
+      label: 'Assessment Tool',
+    });
+    expect(result.current.columns['1'].isPartOf).toEqual({});
+  });
+  it('updates the isPartOf field of a column', () => {
+    const { result } = renderHook(() => useDataStore());
+    act(() => {
+      result.current.updateColumnStandardizedVariable('1', {
+        identifier: 'nb:AssessmentTool',
+        label: 'Assessment Tool',
+      });
+      result.current.updateColumnIsPartOf('1', {
+        identifier: 'some identifier',
+        label: 'some label',
+      });
+    });
+    expect(result.current.columns['1'].isPartOf).toEqual({
+      termURL: 'some identifier',
+      label: 'some label',
+    });
+  });
   it('updates the description for a level of a categorical column', () => {
     const { result } = renderHook(() => useDataStore());
     act(() => {
