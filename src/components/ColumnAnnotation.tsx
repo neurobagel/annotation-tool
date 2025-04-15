@@ -1,21 +1,24 @@
 import Pagination from '@mui/material/Pagination';
 import { useColumnUpdates, usePagination } from '../hooks';
 import useDataStore from '../stores/data';
+import { Column } from '../utils/types';
 import ColumnAnnotationCard from './ColumnAnnotationCard';
 
 function ColumnAnnotation() {
   const columns = useDataStore((state) => state.columns);
-  const standardizedVariableOptions = useDataStore((state) => state.standardizedVaribles);
+  const standardizedVariableOptions = useDataStore((state) => state.standardizedVariables);
 
   const { handleDescriptionChange, handleDataTypeChange, handleStandardizedVariableChange } =
     useColumnUpdates();
+
+  const columnsArray = Object.entries(columns);
 
   const {
     currentPage,
     currentItems: currentColumns,
     totalPages,
     handlePaginationChange,
-  } = usePagination(columns, 3);
+  } = usePagination<[string, Column]>(columnsArray, 3);
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -46,5 +49,4 @@ function ColumnAnnotation() {
     </div>
   );
 }
-
 export default ColumnAnnotation;

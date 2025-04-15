@@ -24,14 +24,41 @@ function Download() {
 
   const uploadedDataTableFileName = useDataStore((state) => state.uploadedDataTableFileName);
   const columns = useDataStore((state) => state.columns);
+  const config = useDataStore((state) => state.standardizedVariables);
 
+  // TODO: Make sure Anontations includes the levels with label and termURL
   const dataDictionary = useMemo(
     () =>
       Object.entries(columns).reduce((acc, [_columnKey, column]) => {
+        const participantIDConfig = config['Subject ID'];
+        const sessionIDConfig = config['Session ID'];
+
         if (column.header) {
           const dictionaryEntry: DataDictionary[string] = {
             Description: column.description || '',
           };
+
+          if (column.standardizedVariable) {
+            dictionaryEntry.Annotations = {};
+
+            dictionaryEntry.Annotations.IsAbout = {
+              Label: column.standardizedVariable.label,
+              TermURL: column.standardizedVariable.identifier,
+            };
+
+            if (column.standardizedVariable?.identifier === participantIDConfig.identifier) {
+              dictionaryEntry.Annotations.Identifies = 'participant';
+            } else if (column.standardizedVariable?.identifier === sessionIDConfig.identifier) {
+              dictionaryEntry.Annotations.Identifies = 'session';
+            }
+
+            if (column.isPartOf) {
+              dictionaryEntry.Annotations.IsPartOf = {
+                Label: column.isPartOf?.label || '',
+                TermURL: column.isPartOf?.termURL || '',
+              };
+            }
+          }
 
           if (column.dataType === 'Categorical' && column.levels) {
             dictionaryEntry.Levels = Object.entries(column.levels).reduce(
@@ -54,7 +81,7 @@ function Download() {
         }
         return acc;
       }, {} as DataDictionary),
-    [columns]
+    [columns, config]
   );
 
   const { isValid: schemaValid, errors: schemaErrors } = useMemo(() => {
