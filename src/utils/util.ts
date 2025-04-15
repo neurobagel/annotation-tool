@@ -1,4 +1,4 @@
-import { Term, TermCard, Columns } from './types';
+import { Term, TermCard, Columns, StandardizedVariable } from './types';
 
 // Utility functions for MultiColumnMeasures component
 
@@ -75,4 +75,20 @@ export function getColumnOptions(
       label: column.header,
       disabled: allMappedColumns.includes(id),
     }));
+}
+
+// Utility functions for SideColumnNavbar component
+export function getMappedStandardizedVariables(columns: Columns): StandardizedVariable[] {
+  const seenIdentifiers = new Set<string>();
+  const uniqueVariables: StandardizedVariable[] = [];
+
+  Object.values(columns).forEach((column) => {
+    const variable = column.standardizedVariable;
+    if (variable && !seenIdentifiers.has(variable.identifier)) {
+      seenIdentifiers.add(variable.identifier);
+      uniqueVariables.push(variable);
+    }
+  });
+
+  return uniqueVariables;
 }
