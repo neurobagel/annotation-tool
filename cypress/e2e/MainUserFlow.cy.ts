@@ -12,6 +12,8 @@ describe('Main user flow', () => {
     cy.get('[data-cy="next-button"]').click();
 
     // Upload view
+    cy.get('[data-cy="back-button"]').should('contain', 'Landing');
+    cy.get('[data-cy="next-button"]').should('contain', 'Column Annotation');
     cy.get('[data-cy="nav-stepper"]').should('be.visible');
     cy.get('[data-cy="Upload-step"]').within(() => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
@@ -43,6 +45,8 @@ describe('Main user flow', () => {
     cy.get('[data-cy="next-button"]').click();
 
     // Column Annotation view
+    cy.get('[data-cy="back-button"]').should('contain', 'Upload');
+    cy.get('[data-cy="next-button"]').should('contain', 'Value Annotation');
     cy.get('[data-cy="nav-stepper"]').should('be.visible');
     cy.get('[data-cy="Column Annotation-step"]').within(() => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
@@ -74,6 +78,8 @@ describe('Main user flow', () => {
     cy.get('[data-cy="next-button"]').click();
 
     // Value Annotation view
+    cy.get('[data-cy="back-button"]').should('contain', 'Column Annotation');
+    cy.get('[data-cy="next-button"]').should('contain', 'Download');
     cy.contains('Value Annotation');
     cy.get('[data-cy="Value Annotation-step"]').within(() => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
@@ -92,6 +98,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="next-button"]').click();
 
     // Download view
+    cy.get('[data-cy="back-button"]').should('contain', 'Value Annotation');
     cy.contains('Download');
     cy.get('[data-cy="Download-step"]').within(() => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
