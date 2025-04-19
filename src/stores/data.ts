@@ -8,6 +8,8 @@ import {
   DataDictionary,
   StandardizedVaribleCollection,
   StandardizedVariable,
+  StandardizedVariableConfig,
+  StandardizedVariableConfigCollection,
 } from '../utils/types';
 
 type DataStore = {
@@ -18,7 +20,8 @@ type DataStore = {
   initializeColumns: (data: Columns) => void;
   setUploadedDataTableFileName: (fileName: string | null) => void;
   processDataTableFile: (file: File) => Promise<void>;
-  getAssessmentToolConfig: () => StandardizedVariable;
+  getStandardizedVariables: () => StandardizedVaribleCollection;
+  getAssessmentToolConfig: () => StandardizedVariableConfig;
   getAssessmentToolColumns: () => { id: string; header: string }[];
   updateColumnDescription: (columnId: string, description: string | null) => void;
   updateColumnDataType: (columnId: string, dataType: 'Categorical' | 'Continuous' | null) => void;
@@ -39,7 +42,7 @@ type DataStore = {
   setUploadedDataDictionaryFileName: (fileName: string | null) => void;
   processDataDictionaryFile: (file: File) => Promise<void>;
 
-  standardizedVariables: StandardizedVaribleCollection;
+  config: StandardizedVariableConfigCollection;
   hasMultiColumnMeasures: () => boolean;
 
   reset: () => void;
@@ -51,7 +54,7 @@ const initialState = {
   uploadedDataTableFileName: null,
   uploadedDataDictionary: {},
   uploadedDataDictionaryFileName: null,
-  standardizedVariables: defaultConfig.standardizedVariables,
+  config: defaultConfig.standardizedVariables as StandardizedVariableConfigCollection,
 };
 
 const useDataStore = create<DataStore>()(
@@ -104,8 +107,16 @@ const useDataStore = create<DataStore>()(
       }),
 
     // Column updates
-    getAssessmentToolConfig: () => get().standardizedVariables['Assessment Tool'],
-
+    getStandardizedVariables: () => {
+      const configs = get().config;
+      return Object.fromEntries(
+        Object.entries(configs).map(([key, config]) => [
+          key,
+          { identifier: config.identifier, label: config.label },
+        ])
+      );
+    },
+    getAssessmentToolConfig: () => get().config['Assessment Tool'],
     getAssessmentToolColumns: () =>
       Object.entries(get().columns)
         .filter(
@@ -171,6 +182,17 @@ const useDataStore = create<DataStore>()(
           }
         }),
       }));
+
+      let dataType: 'Categorical' | 'Continuous' | null = null;
+      if (standardizedVariable) {
+        const configEntry = Object.values(get().config).find(
+          (config) => config.identifier === standardizedVariable.identifier
+        );
+        dataType = configEntry?.data_type || null;
+      }
+
+      // Call updateColumnDataType with the found data_type
+      get().updateColumnDataType(columnId, dataType);
     },
 
     updateColumnIsPartOf: (
@@ -221,77 +243,94 @@ const useDataStore = create<DataStore>()(
             const dataDictionary: DataDictionary = JSON.parse(content);
 
             const currentColumns = get().columns;
-            const { standardizedVariables } = get();
+            const { config: storeConfig } = get();
 
-            const updatedColumns = Object.entries(dataDictionary).reduce(
-              (acc, [key, value]) => {
-                const columnEntry = Object.entries(currentColumns).find(
-                  ([_, column]) => column.header === key
-                );
+            const initialUpdates = {
+              columns: { ...currentColumns },
+              dataTypeUpdates: [] as Array<{
+                columnId: string;
+                dataType: 'Categorical' | 'Continuous' | null;
+              }>,
+            };
 
-                if (columnEntry) {
-                  const [columnId] = columnEntry;
-                  // Use Immer's produce to update the nested column properties
-                  return produce(acc, (draft) => {
-                    draft[columnId].description = value.Description;
+            const updates = Object.entries(dataDictionary).reduce((accumulator, [key, value]) => {
+              const columnEntry = Object.entries(currentColumns).find(
+                ([_, column]) => column.header === key
+              );
 
-                    if (value.Annotations?.IsAbout) {
-                      const matchingVariable = Object.values(standardizedVariables).find(
-                        (variable) => variable.identifier === value.Annotations?.IsAbout?.TermURL
-                      );
+              if (!columnEntry) return accumulator;
 
-                      if (matchingVariable) {
-                        draft[columnId].standardizedVariable = {
-                          identifier: value.Annotations.IsAbout.TermURL,
-                          label: value.Annotations.IsAbout.Label,
-                        };
-                      }
-                    } else {
-                      // Question: here we are removing standardizedVariable if there is no match
-                      // do we want to handle this in another way?
-                      delete draft[columnId].standardizedVariable;
-                    }
+              const [columnId] = columnEntry;
+              let dataType: 'Categorical' | 'Continuous' | null = null;
 
-                    if (
-                      draft[columnId].standardizedVariable?.identifier ===
-                        get().getAssessmentToolConfig().identifier &&
-                      value.Annotations?.IsPartOf
-                    ) {
-                      draft[columnId].isPartOf = {
-                        termURL: value.Annotations.IsPartOf.TermURL,
-                        label: value.Annotations.IsPartOf.Label,
-                      };
-                    } else {
-                      // Question: here we are removing IsPartOf if there is no match
-                      // do we want to handle this in another way?
-                      delete draft[columnId].isPartOf;
-                    }
+              const newColumns = produce(accumulator.columns, (draft) => {
+                draft[columnId].description = value.Description;
 
-                    if (value.Levels) {
-                      draft[columnId].dataType = 'Categorical';
-                      draft[columnId].levels = Object.entries(value.Levels).reduce(
-                        (levelsAcc, [levelKey, levelValue]) => ({
-                          ...levelsAcc,
-                          [levelKey]: { description: levelValue },
-                        }),
-                        {} as { [key: string]: { description: string } }
-                      );
-                    }
-                    if (value.Units !== undefined) {
-                      draft[columnId].dataType = 'Continuous';
-                      draft[columnId].units = value.Units;
-                    }
-                  });
+                if (value.Annotations?.IsAbout) {
+                  const matchingConfig = Object.values(storeConfig).find(
+                    (config) => config.identifier === value.Annotations?.IsAbout?.TermURL
+                  );
+
+                  if (matchingConfig) {
+                    /* 
+                            NOTE: Here we read the standardized variable from the config
+                             and essentially use the config identifier and label internally for the 
+                            standardized variable
+                            This causes a mismatch between what the user uploaded and what we store
+                            and they will eventually receive at the end i.e., we're overwriting their 
+                            dictionary according to our config
+                            */
+                    draft[columnId].standardizedVariable = {
+                      identifier: matchingConfig.identifier,
+                      label: matchingConfig.label,
+                    };
+                    dataType = matchingConfig.data_type ?? null;
+                  }
+                } else {
+                  // Question: here we are removing standardizedVariable if there is no match
+                  // do we want to handle this in another way?
+                  delete draft[columnId].standardizedVariable;
                 }
-                return acc;
-              },
-              { ...currentColumns }
-            );
+
+                if (
+                  draft[columnId].standardizedVariable?.identifier ===
+                    get().getAssessmentToolConfig().identifier &&
+                  value.Annotations?.IsPartOf
+                ) {
+                  draft[columnId].isPartOf = {
+                    termURL: value.Annotations.IsPartOf.TermURL,
+                    label: value.Annotations.IsPartOf.Label,
+                  };
+                } else {
+                  // Question: here we are removing IsPartOf if there is no match
+                  // do we want to handle this in another way?
+                  delete draft[columnId].isPartOf;
+                }
+              });
+
+              // Fallback to dictionary's Levels/Units if data type wasn't set by config
+              if (dataType === null) {
+                if (value.Levels) {
+                  dataType = 'Categorical';
+                } else if (value.Units !== undefined) {
+                  dataType = 'Continuous';
+                }
+              }
+
+              return {
+                columns: newColumns,
+                dataTypeUpdates: [...accumulator.dataTypeUpdates, { columnId, dataType }],
+              };
+            }, initialUpdates);
 
             set({
               uploadedDataDictionary: dataDictionary,
-              columns: updatedColumns,
+              columns: updates.columns,
               uploadedDataDictionaryFileName: file.name,
+            });
+
+            updates.dataTypeUpdates.forEach(({ columnId, dataType }) => {
+              get().updateColumnDataType(columnId, dataType);
             });
 
             resolve();

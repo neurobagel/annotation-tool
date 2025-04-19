@@ -3,7 +3,7 @@ import fs from 'fs';
 import { produce } from 'immer';
 import path from 'path';
 import { beforeEach, describe, it, expect } from 'vitest';
-import { mockDataTable, mockInitialColumns, mockColumnsWithDescription } from '~/utils/mocks';
+import { mockDataTable, mockInitialColumns, mockColumns } from '~/utils/mocks';
 import { Columns } from '../utils/types';
 import useDataStore from './data';
 
@@ -52,7 +52,7 @@ describe('data store actions', () => {
       await result.current.processDataDictionaryFile(dataDictionaryFile);
     });
 
-    expect(result.current.columns).toEqual(mockColumnsWithDescription);
+    expect(result.current.columns).toEqual(mockColumns);
     expect(result.current.uploadedDataDictionaryFileName).toEqual('mock.json');
 
     act(() => {
@@ -67,7 +67,7 @@ describe('data store actions', () => {
     await act(async () => {
       await result.current.processDataDictionaryFile(dataDictionaryFile);
     });
-    expect(result.current.columns).toEqual(mockColumnsWithDescription);
+    expect(result.current.columns).toEqual(mockColumns);
     expect(result.current.uploadedDataDictionaryFileName).toEqual('mock.json');
   });
 
@@ -109,6 +109,34 @@ describe('data store actions', () => {
       identifier: 'nb:Some',
       label: 'Some',
     });
+  });
+  it("sets the standardizedVariable field of a column and consequently modifies the column's dataType field", () => {
+    const { result } = renderHook(() => useDataStore());
+    act(() => {
+      result.current.updateColumnStandardizedVariable('1', {
+        identifier: 'nb:AssessmentTool',
+        label: 'Assessment Tool',
+      });
+    });
+    expect(result.current.columns['1'].standardizedVariable).toEqual({
+      identifier: 'nb:AssessmentTool',
+      label: 'Assessment Tool',
+    });
+    expect(result.current.columns['1'].dataType).toEqual('Categorical');
+    expect(result.current.columns['1'].levels).toBeDefined();
+    act(() => {
+      result.current.updateColumnStandardizedVariable('1', {
+        identifier: 'nb:Age',
+        label: 'Age',
+      });
+    });
+    expect(result.current.columns['1'].standardizedVariable).toEqual({
+      identifier: 'nb:Age',
+      label: 'Age',
+    });
+    expect(result.current.columns['1'].dataType).toEqual('Continuous');
+    expect(result.current.columns['1'].levels).toBeUndefined();
+    expect(result.current.columns['1'].units).toEqual('');
   });
   it('sets the standardizedVariable field of a column to Assessment Tool', () => {
     const { result } = renderHook(() => useDataStore());

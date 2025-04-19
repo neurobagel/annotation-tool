@@ -24,7 +24,7 @@ function Download() {
 
   const uploadedDataTableFileName = useDataStore((state) => state.uploadedDataTableFileName);
   const columns = useDataStore((state) => state.columns);
-  const config = useDataStore((state) => state.standardizedVariables);
+  const config = useDataStore((state) => state.config);
 
   // TODO: Make sure Anontations includes the levels with label and termURL
   const dataDictionary = useMemo(

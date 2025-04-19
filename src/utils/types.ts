@@ -54,8 +54,17 @@ export interface StandardizedVariable {
   label: string;
 }
 
+export interface StandardizedVariableConfig extends StandardizedVariable {
+  data_type?: 'Categorical' | 'Continuous' | null;
+  is_multi_column_measurement?: boolean;
+}
+
 export interface StandardizedVaribleCollection {
   [key: string]: StandardizedVariable;
+}
+
+export interface StandardizedVariableConfigCollection {
+  [key: string]: StandardizedVariableConfig;
 }
 
 // TODO: find a better name than Term

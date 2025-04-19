@@ -29,7 +29,7 @@ export const mockInitialColumns = {
   },
 };
 
-export const mockColumnsWithDescription = {
+export const mockColumns = {
   1: {
     header: 'participant_id',
     description: 'A participant ID',
@@ -37,6 +37,7 @@ export const mockColumnsWithDescription = {
       identifier: 'nb:ParticipantID',
       label: 'Subject Unique Identifier',
     },
+    dataType: null as 'Categorical' | 'Continuous' | null,
   },
   2: {
     header: 'age',
@@ -45,6 +46,8 @@ export const mockColumnsWithDescription = {
       identifier: 'nb:Age',
       label: 'Age',
     },
+    dataType: 'Continuous' as 'Categorical' | 'Continuous' | null,
+    units: '',
   },
   3: {
     header: 'sex',
@@ -52,6 +55,11 @@ export const mockColumnsWithDescription = {
     standardizedVariable: {
       identifier: 'nb:Sex',
       label: 'Sex',
+    },
+    dataType: 'Categorical' as 'Categorical' | 'Continuous' | null,
+    levels: {
+      F: { description: '' },
+      M: { description: '' },
     },
   },
 };
@@ -113,6 +121,7 @@ export const mockDataDictionaryWithAnnotations = {
         Label: 'Age',
       },
     },
+    Units: '',
   },
   sex: {
     Description: 'Sex of the participant',
@@ -121,6 +130,10 @@ export const mockDataDictionaryWithAnnotations = {
         TermURL: 'nb:Sex',
         Label: 'Sex',
       },
+    },
+    Levels: {
+      F: '',
+      M: '',
     },
   },
 };
