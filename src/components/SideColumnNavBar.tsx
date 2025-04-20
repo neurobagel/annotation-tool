@@ -1,6 +1,6 @@
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-import { Typography, Paper, Collapse, Button, List, ListItem, ListItemButton } from '@mui/material';
+import { Typography, Paper, Collapse, Button, List, ListItemButton } from '@mui/material';
 import { useState } from 'react';
 import { Columns, StandardizedVariable } from '../utils/types';
 import { getMappedStandardizedVariables } from '../utils/util';
