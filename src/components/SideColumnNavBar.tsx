@@ -39,7 +39,10 @@ interface ColumnTypeCollapseProps {
   dataType?: 'Categorical' | 'Continuous' | null;
   standardizedVariable?: StandardizedVariable | null;
   columns: Columns;
-  onSelectColumn: (columnId: string, columnDataType: 'Categorical' | 'Continuous' | null) => void;
+  onSelect: (params: {
+    columnIds: string[];
+    dataType?: 'Categorical' | 'Continuous' | null;
+  }) => void;
   selectedColumnId: string | null;
 }
 
@@ -52,7 +55,7 @@ function ColumnTypeCollapse({
   dataType = null,
   standardizedVariable = null,
   columns,
-  onSelectColumn,
+  onSelect,
   selectedColumnId,
 }: ColumnTypeCollapseProps) {
   const [showColumns, setShowColumns] = useState<boolean>(false);
@@ -73,15 +76,19 @@ function ColumnTypeCollapse({
             (column.standardizedVariable === null || column.standardizedVariable === undefined) &&
             column.dataType === dataType
         : ([_, column]) =>
-            (column.standardizedVariable === null || column.standardizedVariable === undefined) &&
-            column.dataType === undefined
+            ((column.standardizedVariable === null || column.standardizedVariable === undefined) &&
+              column.dataType === undefined) ||
+            column.dataType === null
     );
     labelToDisplay = dataType ? dataType.toLocaleLowerCase() : 'other';
   }
 
   const handleSelect = () => {
     if (columnsToDisplay.length > 0) {
-      onSelectColumn(columnsToDisplay[0][0], dataType);
+      onSelect({
+        columnIds: columnsToDisplay.map(([id]) => id),
+        dataType,
+      });
     }
   };
 
@@ -141,16 +148,18 @@ function ColumnTypeCollapse({
     </div>
   );
 }
-
 ColumnTypeCollapse.defaultProps = ColumnTypeCollapseDefaultProps;
 
 interface SideColumnNavBarProps {
   columns: Columns;
-  onSelectColumn: (columnId: string, columnDataType: 'Categorical' | 'Continuous' | null) => void;
+  onSelect: (params: {
+    columnIds: string[];
+    dataType?: 'Categorical' | 'Continuous' | null;
+  }) => void;
   selectedColumnId: string | null;
 }
 
-function SideColumnNavBar({ columns, onSelectColumn, selectedColumnId }: SideColumnNavBarProps) {
+function SideColumnNavBar({ columns, onSelect, selectedColumnId }: SideColumnNavBarProps) {
   const mappedStandardizedVariables = getMappedStandardizedVariables(columns);
 
   return (
@@ -158,12 +167,12 @@ function SideColumnNavBar({ columns, onSelectColumn, selectedColumnId }: SideCol
       <ExpandableSection title="Annotated">
         <List>
           {mappedStandardizedVariables.map((standardizedVariable) => (
-            <ListItemButton sx={{ paddingLeft: 2 }}>
+            <ListItemButton sx={{ paddingLeft: 2 }} key={standardizedVariable.identifier}>
               <ColumnTypeCollapse
                 dataType={null}
                 standardizedVariable={standardizedVariable}
                 columns={columns}
-                onSelectColumn={onSelectColumn}
+                onSelect={onSelect}
                 selectedColumnId={selectedColumnId}
               />
             </ListItemButton>
@@ -178,7 +187,7 @@ function SideColumnNavBar({ columns, onSelectColumn, selectedColumnId }: SideCol
               <ColumnTypeCollapse
                 dataType={dataType as 'Categorical' | 'Continuous' | null}
                 columns={columns}
-                onSelectColumn={onSelectColumn}
+                onSelect={onSelect}
                 selectedColumnId={selectedColumnId}
               />
             </ListItemButton>
