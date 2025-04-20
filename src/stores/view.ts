@@ -19,7 +19,7 @@ type ViewStore = {
 
 const useViewStore = create<ViewStore>()(
   devtools((set) => ({
-    currentView: 'landing',
+    currentView: View.Landing,
     setCurrentView: (view: View) => set({ currentView: view }),
   }))
 );
@@ -72,11 +72,27 @@ export const getNavigationProps = (currentView: View): NavigationProps => {
   const nextView =
     currentIndex < navigationFlow.length - 1 ? navigationFlow[currentIndex + 1] : undefined;
 
+  let backLabel;
+  if (backView) {
+    if (backView === View.Landing) {
+      backLabel = 'Back to Landing';
+    } else {
+      const step = steps.find((s) => s.view === backView);
+      backLabel = step ? `Back to ${step.label}` : undefined;
+    }
+  }
+
+  let nextLabel;
+  if (nextView) {
+    const step = steps.find((s) => s.view === nextView);
+    nextLabel = step ? `Next: ${step.label}` : undefined;
+  }
+
   return {
     backView,
     nextView,
-    backLabel: backView ? `Back to ${steps.find((s) => s.view === backView)?.label}` : undefined,
-    nextLabel: nextView ? `Next: ${steps.find((s) => s.view === nextView)?.label}` : undefined,
+    backLabel,
+    nextLabel,
     className: 'p-4',
   };
 };
