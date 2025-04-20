@@ -1,9 +1,39 @@
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-import { Typography, Paper, Collapse, Button, List, ListItemButton } from '@mui/material';
+import { Typography, Paper, Collapse, Button, List, ListItem, ListItemButton } from '@mui/material';
 import { useState } from 'react';
 import { Columns, StandardizedVariable } from '../utils/types';
 import { getMappedStandardizedVariables } from '../utils/util';
+
+interface ExpandableSectionProps {
+  title: string;
+  children: React.ReactNode;
+  defaultExpanded?: boolean;
+}
+
+const ExpandableSectionDefaultProps = {
+  defaultExpanded: true,
+};
+
+function ExpandableSection({ title, children, defaultExpanded = true }: ExpandableSectionProps) {
+  const [expanded, setExpanded] = useState<boolean>(defaultExpanded);
+
+  return (
+    <>
+      <Button
+        className="justify-start"
+        fullWidth
+        onClick={() => setExpanded(!expanded)}
+        endIcon={expanded ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+      >
+        <Typography>{title}</Typography>
+      </Button>
+      <Collapse in={expanded}>{children}</Collapse>
+    </>
+  );
+}
+
+ExpandableSection.defaultProps = ExpandableSectionDefaultProps;
 
 interface ColumnTypeCollapseProps {
   dataType?: 'Categorical' | 'Continuous' | null;
@@ -13,6 +43,11 @@ interface ColumnTypeCollapseProps {
   selectedColumnId: string | null;
 }
 
+const ColumnTypeCollapseDefaultProps = {
+  dataType: null,
+  standardizedVariable: null,
+};
+
 function ColumnTypeCollapse({
   dataType = null,
   standardizedVariable = null,
@@ -20,14 +55,12 @@ function ColumnTypeCollapse({
   onSelectColumn,
   selectedColumnId,
 }: ColumnTypeCollapseProps) {
-  const [expanded, setExpanded] = useState<boolean>(true);
+  const [showColumns, setShowColumns] = useState<boolean>(false);
 
-  function toggleExpansion() {
-    setExpanded((prev) => !prev);
-  }
   let columnsToDisplay;
   // TODO: find a better name for the below variable
   let labelToDisplay;
+
   if (standardizedVariable) {
     columnsToDisplay = Object.entries(columns).filter(
       ([_, column]) => column.standardizedVariable?.identifier === standardizedVariable.identifier
@@ -36,55 +69,80 @@ function ColumnTypeCollapse({
   } else {
     columnsToDisplay = Object.entries(columns).filter(
       dataType
-        ? ([_, column]) => column.standardizedVariable === null && column.dataType === dataType
+        ? ([_, column]) =>
+            (column.standardizedVariable === null || column.standardizedVariable === undefined) &&
+            column.dataType === dataType
         : ([_, column]) =>
-            (column.standardizedVariable === null && !column.dataType) || column.dataType === null
+            (column.standardizedVariable === null || column.standardizedVariable === undefined) &&
+            column.dataType === undefined
     );
     labelToDisplay = dataType ? dataType.toLocaleLowerCase() : 'other';
   }
 
+  const handleSelect = () => {
+    if (columnsToDisplay.length > 0) {
+      onSelectColumn(columnsToDisplay[0][0], dataType);
+    }
+  };
+
   return (
     <div data-cy={`side-column-nav-bar-${labelToDisplay}`}>
-      <Button
-        data-cy={`side-column-nav-bar-${labelToDisplay}-toggle-button`}
-        className="justify-start"
-        fullWidth
-        onClick={() => toggleExpansion()}
-        endIcon={expanded ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
-      >
-        <Typography
+      <div className="flex flex-col">
+        <Button
+          data-cy={`side-column-nav-bar-${labelToDisplay}-select-button`}
+          onClick={handleSelect}
           sx={{
-            fontWeight:
-              selectedColumnId && columnsToDisplay.some(([id]) => id === selectedColumnId)
-                ? 'bold'
-                : 'normal',
+            flexGrow: 1,
+            justifyContent: 'flex-start',
+            textTransform: 'none',
+            color: 'text.primary',
+          }}
+          variant="text"
+        >
+          <Typography
+            sx={{
+              fontWeight:
+                selectedColumnId && columnsToDisplay.some(([id]) => id === selectedColumnId)
+                  ? 'bold'
+                  : 'normal',
+            }}
+          >
+            {labelToDisplay.charAt(0).toUpperCase() + labelToDisplay.slice(1)}
+          </Typography>
+        </Button>
+        <Button
+          className="justify-start"
+          variant="text"
+          onClick={() => setShowColumns(!showColumns)}
+          sx={{
+            fontSize: '12px',
+            color: 'primary',
           }}
         >
-          {labelToDisplay.charAt(0).toUpperCase() + labelToDisplay.slice(1)}
-        </Typography>
-      </Button>
-      <Collapse in={expanded}>
+          {showColumns ? 'hide columns' : 'show columns'}
+          {showColumns ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+        </Button>
+      </div>
+      <Collapse in={showColumns}>
         <List>
           {columnsToDisplay.map(([columnId, column]) => (
-            <ListItemButton
+            <ListItem
               data-cy={`side-column-nav-bar-${labelToDisplay}-${column.header}`}
               key={columnId}
-              selected={selectedColumnId === columnId}
-              onClick={() => onSelectColumn(columnId, dataType)}
               sx={{
-                '&:hover': {
-                  backgroundColor: 'action.hover',
-                },
+                color: 'grey.600',
               }}
             >
               <Typography>{column.header}</Typography>
-            </ListItemButton>
+            </ListItem>
           ))}
         </List>
       </Collapse>
     </div>
   );
 }
+
+ColumnTypeCollapse.defaultProps = ColumnTypeCollapseDefaultProps;
 
 interface SideColumnNavBarProps {
   columns: Columns;
@@ -94,28 +152,13 @@ interface SideColumnNavBarProps {
 
 function SideColumnNavBar({ columns, onSelectColumn, selectedColumnId }: SideColumnNavBarProps) {
   const mappedStandardizedVariables = getMappedStandardizedVariables(columns);
-  const [expanded, setExpanded] = useState<boolean>(true);
-  function toggleExpansion() {
-    setExpanded((prev) => !prev);
-  }
-  /* 
-  TODO: once configuration is in and we have a way to designate certain columns
-  like participant_id and session_id as "doesn't need value annotation", we can filter them out here
-  */
+
   return (
-    <Paper className="w-full max-w-64 p-4" elevation={3} data-cy="side-column-nav-bar">
-      <Button
-        className="justify-start"
-        fullWidth
-        onClick={() => toggleExpansion()}
-        endIcon={expanded ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
-      >
-        <Typography>Annotated</Typography>
-      </Button>
-      <Collapse in={expanded}>
+    <Paper className="w-full max-w-80 p-4" elevation={3} data-cy="side-column-nav-bar">
+      <ExpandableSection title="Annotated">
         <List>
           {mappedStandardizedVariables.map((standardizedVariable) => (
-            <ListItemButton>
+            <ListItemButton sx={{ paddingLeft: 2 }}>
               <ColumnTypeCollapse
                 dataType={null}
                 standardizedVariable={standardizedVariable}
@@ -126,19 +169,12 @@ function SideColumnNavBar({ columns, onSelectColumn, selectedColumnId }: SideCol
             </ListItemButton>
           ))}
         </List>
-      </Collapse>
-      <Button
-        className="justify-start"
-        fullWidth
-        onClick={() => toggleExpansion()}
-        endIcon={expanded ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
-      >
-        <Typography>Unannotated</Typography>
-      </Button>
-      <Collapse in={expanded}>
+      </ExpandableSection>
+
+      <ExpandableSection title="Unannotated">
         <List>
           {['Categorical', 'Continuous', null].map((dataType) => (
-            <ListItemButton>
+            <ListItemButton key={`unannotated-${dataType || 'other'}`} sx={{ paddingLeft: 2 }}>
               <ColumnTypeCollapse
                 dataType={dataType as 'Categorical' | 'Continuous' | null}
                 columns={columns}
@@ -148,7 +184,7 @@ function SideColumnNavBar({ columns, onSelectColumn, selectedColumnId }: SideCol
             </ListItemButton>
           ))}
         </List>
-      </Collapse>
+      </ExpandableSection>
     </Paper>
   );
 }
