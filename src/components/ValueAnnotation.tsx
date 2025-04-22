@@ -1,4 +1,4 @@
-import { Paper, Typography } from '@mui/material';
+import { Paper, Typography, List, ListItem } from '@mui/material';
 import { useState } from 'react';
 import useDataStore from '../stores/data';
 import { Columns } from '../utils/types';
@@ -42,13 +42,13 @@ function ValueAnnotation() {
       );
     }
 
-    const hasUnknownDataType = selectedColumnIds.some(
+    const unknownDataTypeColumns = selectedColumnIds.filter(
       (id) =>
         filteredColumns[id].dataType !== 'Categorical' &&
         filteredColumns[id].dataType !== 'Continuous'
     );
 
-    if (hasUnknownDataType) {
+    if (unknownDataTypeColumns.length !== 0) {
       return (
         <Paper
           data-cy="other-placeholder"
@@ -56,7 +56,14 @@ function ValueAnnotation() {
           className="flex h-full items-center justify-center shadow-lg"
         >
           <Typography variant="h6">
-            Please select the appropriate data type for this column.
+            {`Please select the appropriate data type for the following column${unknownDataTypeColumns.length > 1 ? 's' : ''}:`}
+            <List>
+              {unknownDataTypeColumns.map((columnId) => (
+                <ListItem key={columnId}>
+                  <Typography>{filteredColumns[columnId].header}</Typography>
+                </ListItem>
+              ))}
+            </List>
           </Typography>
         </Paper>
       );
