@@ -156,6 +156,7 @@ const useDataStore = create<DataStore>()(
 
             delete draft[columnId].levels;
           } else {
+            delete draft[columnId].dataType;
             delete draft[columnId].levels;
             delete draft[columnId].units;
           }

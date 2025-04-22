@@ -77,8 +77,7 @@ function ColumnTypeCollapse({
             column.dataType === dataType
         : ([_, column]) =>
             ((column.standardizedVariable === null || column.standardizedVariable === undefined) &&
-              column.dataType === undefined) ||
-            column.dataType === null
+              (column.dataType === undefined))
     );
     labelToDisplay = dataType ? dataType.toLocaleLowerCase() : 'other';
   }

@@ -42,6 +42,26 @@ function ValueAnnotation() {
       );
     }
 
+    const hasUnknownDataType = selectedColumnIds.some(
+      (id) =>
+        filteredColumns[id].dataType !== 'Categorical' &&
+        filteredColumns[id].dataType !== 'Continuous'
+    );
+
+    if (hasUnknownDataType) {
+      return (
+        <Paper
+          data-cy="other-placeholder"
+          elevation={3}
+          className="flex h-full items-center justify-center shadow-lg"
+        >
+          <Typography variant="h6">
+            Please select the appropriate data type for this column.
+          </Typography>
+        </Paper>
+      );
+    }
+
     return (
       <ValueAnnotationTabs
         columns={filteredColumns}
