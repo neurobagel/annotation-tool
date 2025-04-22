@@ -2,6 +2,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { Typography, Paper, Collapse, Button, List, ListItem, ListItemButton } from '@mui/material';
 import { useState } from 'react';
+import useDataStore from '~/stores/data';
 import { Columns, StandardizedVariable } from '../utils/types';
 import { getMappedStandardizedVariables } from '../utils/util';
 
@@ -59,6 +60,7 @@ function ColumnTypeCollapse({
   selectedColumnId,
 }: ColumnTypeCollapseProps) {
   const [showColumns, setShowColumns] = useState<boolean>(false);
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
 
   let columnsToDisplay;
   // TODO: find a better name for the below variable
@@ -76,8 +78,8 @@ function ColumnTypeCollapse({
             (column.standardizedVariable === null || column.standardizedVariable === undefined) &&
             column.dataType === dataType
         : ([_, column]) =>
-            ((column.standardizedVariable === null || column.standardizedVariable === undefined) &&
-              (column.dataType === undefined))
+            (column.standardizedVariable === null || column.standardizedVariable === undefined) &&
+            column.dataType === undefined
     );
     labelToDisplay = dataType ? dataType.toLocaleLowerCase() : 'other';
   }
@@ -90,6 +92,101 @@ function ColumnTypeCollapse({
       });
     }
   };
+
+  if (
+    standardizedVariable?.identifier ===
+    useDataStore.getState().getAssessmentToolConfig().identifier
+  ) {
+    const groupedColumns: Record<string, Array<[string, any]>> = {};
+
+    columnsToDisplay.forEach(([columnId, column]) => {
+      const groupKey = column.isPartOf?.label || 'Ungrouped';
+      if (!groupedColumns[groupKey]) {
+        groupedColumns[groupKey] = [];
+      }
+      groupedColumns[groupKey].push([columnId, column]);
+    });
+
+    return (
+      <div data-cy={`side-column-nav-bar-${labelToDisplay}`}>
+        <div className="flex flex-col">
+          <Button
+            data-cy={`side-column-nav-bar-${labelToDisplay}-select-button`}
+            onClick={handleSelect}
+            sx={{
+              flexGrow: 1,
+              justifyContent: 'flex-start',
+              textTransform: 'none',
+              color: 'text.primary',
+            }}
+            variant="text"
+          >
+            <Typography
+              sx={{
+                fontWeight:
+                  selectedColumnId && columnsToDisplay.some(([id]) => id === selectedColumnId)
+                    ? 'bold'
+                    : 'normal',
+              }}
+            >
+              {labelToDisplay.charAt(0).toUpperCase() + labelToDisplay.slice(1)}
+            </Typography>
+          </Button>
+          <Button
+            className="justify-start"
+            variant="text"
+            onClick={() => setShowColumns(!showColumns)}
+            sx={{
+              fontSize: '12px',
+              color: 'primary',
+            }}
+          >
+            {showColumns ? 'hide groups' : 'show groups'}
+            {showColumns ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+          </Button>
+        </div>
+        <Collapse in={showColumns}>
+          <List>
+            {Object.entries(groupedColumns).map(([groupName, groupColumns]) => {
+              const isGroupExpanded = expandedGroups[groupName] || false;
+
+              return (
+                <div key={groupName}>
+                  <ListItemButton
+                    onClick={() =>
+                      setExpandedGroups((prev) => ({
+                        ...prev,
+                        [groupName]: !isGroupExpanded,
+                      }))
+                    }
+                    sx={{ pl: 4 }}
+                  >
+                    <Typography>{groupName}</Typography>
+                    {isGroupExpanded ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+                  </ListItemButton>
+                  <Collapse in={isGroupExpanded}>
+                    <List sx={{ pl: 6 }}>
+                      {groupColumns.map(([columnId, column]) => (
+                        <ListItem
+                          data-cy={`side-column-nav-bar-${labelToDisplay}-${column.header}`}
+                          key={columnId}
+                          sx={{
+                            color: 'grey.600',
+                          }}
+                        >
+                          <Typography>{column.header}</Typography>
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Collapse>
+                </div>
+              );
+            })}
+          </List>
+        </Collapse>
+      </div>
+    );
+  }
 
   return (
     <div data-cy={`side-column-nav-bar-${labelToDisplay}`}>
