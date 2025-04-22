@@ -79,7 +79,7 @@ function ColumnTypeCollapse({
             column.dataType === dataType
         : ([_, column]) =>
             (column.standardizedVariable === null || column.standardizedVariable === undefined) &&
-            column.dataType === undefined
+            (column.dataType === undefined || column.dataType === null)
     );
     labelToDisplay = dataType ? dataType.toLocaleLowerCase() : 'other';
   }
@@ -91,6 +91,13 @@ function ColumnTypeCollapse({
         dataType,
       });
     }
+  };
+
+  const handleGroupSelect = (groupColumns: Array<[string, any]>) => {
+    onSelect({
+      columnIds: groupColumns.map(([id]) => id),
+      dataType,
+    });
   };
 
   if (
@@ -149,17 +156,22 @@ function ColumnTypeCollapse({
           <List>
             {Object.entries(groupedColumns).map(([groupName, groupColumns]) => {
               const isGroupExpanded = expandedGroups[groupName] || false;
+              const isGroupSelected = groupColumns.some(([id]) => id === selectedColumnId);
 
               return (
                 <div key={groupName}>
                   <ListItemButton
-                    onClick={() =>
+                    onClick={() => {
                       setExpandedGroups((prev) => ({
                         ...prev,
                         [groupName]: !isGroupExpanded,
-                      }))
-                    }
-                    sx={{ pl: 4 }}
+                      }));
+                      handleGroupSelect(groupColumns);
+                    }}
+                    sx={{
+                      pl: 4,
+                      fontWeight: isGroupSelected ? 'bold' : 'normal',
+                    }}
                   >
                     <Typography>{groupName}</Typography>
                     {isGroupExpanded ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
@@ -172,6 +184,7 @@ function ColumnTypeCollapse({
                           key={columnId}
                           sx={{
                             color: 'grey.600',
+                            fontWeight: columnId === selectedColumnId ? 'bold' : 'normal',
                           }}
                         >
                           <Typography>{column.header}</Typography>
@@ -234,6 +247,7 @@ function ColumnTypeCollapse({
               key={columnId}
               sx={{
                 color: 'grey.600',
+                fontWeight: columnId === selectedColumnId ? 'bold' : 'normal',
               }}
             >
               <Typography>{column.header}</Typography>
