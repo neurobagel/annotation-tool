@@ -142,18 +142,21 @@ const useDataStore = create<DataStore>()(
             const columnData = state.dataTable[columnId];
             const uniqueValues = Array.from(new Set(columnData));
 
-            draft[columnId].levels = uniqueValues.reduce(
-              (acc, value) => ({
-                ...acc,
-                [value]: { description: '' },
-              }),
-              {} as { [key: string]: { description: string } }
-            );
+            if (!draft[columnId].levels) {
+              draft[columnId].levels = uniqueValues.reduce(
+                (acc, value) => ({
+                  ...acc,
+                  [value]: { description: '' },
+                }),
+                {} as { [key: string]: { description: string } }
+              );
 
-            delete draft[columnId].units;
+              delete draft[columnId].units;
+            }
           } else if (dataType === 'Continuous') {
-            draft[columnId].units = '';
-
+            if (draft[columnId].units === undefined) {
+              draft[columnId].units = '';
+            }
             delete draft[columnId].levels;
           } else {
             delete draft[columnId].levels;
@@ -307,6 +310,21 @@ const useDataStore = create<DataStore>()(
                   // Question: here we are removing IsPartOf if there is no match
                   // do we want to handle this in another way?
                   delete draft[columnId].isPartOf;
+                }
+
+                if (value.Levels) {
+                  draft[columnId].dataType = 'Categorical';
+                  draft[columnId].levels = Object.entries(value.Levels).reduce(
+                    (levelsAcc, [levelKey, levelValue]) => ({
+                      ...levelsAcc,
+                      [levelKey]: { description: levelValue },
+                    }),
+                    {} as { [key: string]: { description: string } }
+                  );
+                }
+                if (value.Units !== undefined) {
+                  draft[columnId].dataType = 'Continuous';
+                  draft[columnId].units = value.Units;
                 }
               });
 
