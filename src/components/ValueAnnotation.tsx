@@ -54,7 +54,7 @@ function ValueAnnotation() {
     if (unknownDataTypeColumns.length !== 0) {
       return (
         <Paper
-          data-cy="other-placeholder"
+          data-cy="other"
           elevation={3}
           className="flex h-full items-center justify-center shadow-lg"
         >

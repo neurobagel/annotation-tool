@@ -5,6 +5,8 @@ const mockDataDictionaryFilePath = `cypress/fixtures/examples/${mockDataDictiona
 const mockPartiallyAnnotatedDataDictionaryFileName = 'mock_annotated.json';
 const mockPartiallyAnnotatedDataDictionaryFilePath = `cypress/downloads/${mockPartiallyAnnotatedDataDictionaryFileName}`;
 
+// TODO: add tests for columns without standardized variables annotation
+
 describe('Main user flow', () => {
   it('steps through different app views and goes through the basic user flow', () => {
     cy.visit('http://localhost:5173');

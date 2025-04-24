@@ -66,7 +66,7 @@ export const mockColumns = {
 
 export const mockColumnsWithDataType = {
   1: {
-    header: 'participant_id',
+    header: 'some_continuous_column',
     dataType: 'Continuous' as 'Categorical' | 'Continuous' | null,
   },
   2: {
