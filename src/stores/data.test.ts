@@ -168,6 +168,10 @@ describe('data store actions', () => {
       termURL: 'some identifier',
       label: 'some label',
     });
+    act(() => {
+      result.current.updateColumnIsPartOf('1', null);
+    });
+    expect(result.current.columns['1'].isPartOf).toEqual({});
   });
   it('updates the description for a level of a categorical column', () => {
     const { result } = renderHook(() => useDataStore());

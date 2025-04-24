@@ -156,7 +156,6 @@ const useDataStore = create<DataStore>()(
 
             delete draft[columnId].levels;
           } else {
-            delete draft[columnId].dataType;
             delete draft[columnId].levels;
             delete draft[columnId].units;
           }
@@ -207,6 +206,8 @@ const useDataStore = create<DataStore>()(
               termURL: term.identifier,
               label: term.label,
             };
+          } else {
+            draft[columnId].isPartOf = {};
           }
         }),
       }));
