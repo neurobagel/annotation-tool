@@ -105,23 +105,18 @@ function ColumnAnnotationCard({
                 <Typography variant="body1">
                   {dataType || 'Not applicable'}{' '}
                   <Tooltip
-                    placement="top"
+                    sx={{ fontSize: '1.2rem' }}
+                    placement="right"
                     title={
                       'Data type is automatically determined by standardized variable selection \n' +
                       ' To change the data type manually, remove the standardized variable'
                     }
                   >
-                    <HelpIcon className="m-1" fontSize="small" color="primary" />
+                    <HelpIcon fontSize="small" color="primary" />
                   </Tooltip>
                 </Typography>
               )}
             </div>
-
-            {isDataTypeDisabled && (
-              <Typography variant="caption" color="textSecondary" className="mt-1">
-                Data type determined by standardized variable selection
-              </Typography>
-            )}
           </div>
 
           <div className="flex flex-1 flex-col">
