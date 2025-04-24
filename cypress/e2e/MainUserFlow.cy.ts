@@ -64,8 +64,6 @@ describe('Main user flow', () => {
     cy.get('[data-cy="2-description-input"]').type('some cool new description');
     cy.get('[data-cy="2-save-description-button"]').click();
     cy.get('[data-cy="2-description"]').should('contain', 'some cool new description');
-    cy.get('[data-cy="2-column-annotation-card-data-type-continuous-button"]').click();
-    cy.get('[data-cy="3-column-annotation-card-data-type-categorical-button"]').click();
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
       'participant{downArrow}{enter}'
     );
@@ -84,17 +82,18 @@ describe('Main user flow', () => {
     cy.get('[data-cy="Value Annotation-step"]').within(() => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
     });
-    cy.get('[data-cy="side-column-nav-bar-categorical"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-annotated"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-unannotated"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-continuous"]').should('be.visible');
-    cy.get('[data-cy="side-column-nav-bar-continuous-age"]').should('be.visible');
-    cy.get('[data-cy="side-column-nav-bar-categorical-sex"]').should('be.visible');
-    cy.get('[data-cy="side-column-nav-bar-categorical-sex"]').click();
+    cy.get('[data-cy="side-column-nav-bar-categorical"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-sex-sex"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-sex-select-button"]').click();
     cy.get('[data-cy="3-categorical"]')
       .should('be.visible')
       .and('contain', 'M')
       .and('contain', 'F');
     cy.get('[data-cy="side-column-nav-bar-other"]').should('be.visible');
-    cy.get('[data-cy="side-column-nav-bar-other-participant_id"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-age-age"]').should('be.visible');
     cy.get('[data-cy="next-button"]').click();
 
     // Download view
@@ -121,34 +120,6 @@ describe('Main user flow', () => {
       expect(fileContentString).to.not.contain('Age of the participant');
       expect(fileContentString).to.contain('some cool new description');
     });
-
-    // TODO: Remove once the logic is there to check these in the output
-    cy.get('[data-cy="back-button"]').click();
-    cy.get('[data-cy="back-button"]').click();
-    cy.get('[data-cy="1-column-annotation-card-data-type-continuous-button"').should(
-      'not.have.class',
-      'Mui-selected'
-    );
-    cy.get('[data-cy="2-column-annotation-card-data-type-continuous-button"').should(
-      'have.class',
-      'Mui-selected'
-    );
-    cy.get('[data-cy="3-column-annotation-card-data-type-categorical-button"').should(
-      'have.class',
-      'Mui-selected'
-    );
-    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"] input').should(
-      'have.value',
-      'Participant ID'
-    );
-    cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"] input').should(
-      'have.value',
-      'Age'
-    );
-    cy.get('[data-cy="3-column-annotation-card-standardized-variable-dropdown"] input').should(
-      'have.value',
-      'Sex'
-    );
   });
   it('steps through the different app workflows with a partially annotated data dictionary', () => {
     cy.visit('http://localhost:5173');
@@ -184,26 +155,20 @@ describe('Main user flow', () => {
     cy.get('[data-cy="2-description-input"]').type('Age of the participant');
     cy.get('[data-cy="2-save-description-button"]').click();
     cy.get('[data-cy="2-description"]').should('contain', 'Age of the participant');
-    cy.get('[data-cy="2-column-annotation-card-data-type-continuous-button"').should(
-      'have.class',
-      'Mui-selected'
-    );
-    cy.get('[data-cy="3-column-annotation-card-data-type-categorical-button"').should(
-      'have.class',
-      'Mui-selected'
-    );
+    cy.get('[data-cy="2-column-annotation-card-data-type"').should('contain', 'Continuous');
+    cy.get('[data-cy="3-column-annotation-card-data-type"').should('contain', 'Categorical');
     cy.get('[data-cy="next-button"]').click();
 
     // Value Annotation view
-    cy.get('[data-cy="side-column-nav-bar-continuous-age"]').should('be.visible');
-    cy.get('[data-cy="side-column-nav-bar-continuous-age"]').click();
+    cy.get('[data-cy="side-column-nav-bar-age-age"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-age-select-button"]').click();
     cy.get('[data-cy="2-edit-description-button"]').click();
     cy.get('[data-cy="2-description-input"]').clear();
     cy.get('[data-cy="2-description-input"]').type('Years');
     cy.get('[data-cy="2-save-description-button"]').click();
 
-    cy.get('[data-cy="side-column-nav-bar-categorical-sex"]').should('be.visible');
-    cy.get('[data-cy="side-column-nav-bar-categorical-sex"]').click();
+    cy.get('[data-cy="side-column-nav-bar-sex-sex"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-sex-select-button"]').click();
     cy.get('[data-cy="3-M-edit-description-button"]').click();
     cy.get('[data-cy="3-M-description-input"]').clear();
     cy.get('[data-cy="3-M-description-input"]').type('Male');
@@ -253,22 +218,16 @@ describe('Main user flow', () => {
 
     // Column Annotation view
     cy.get('[data-cy="2-description"]').should('contain', 'Age of the participant');
-    cy.get('[data-cy="2-column-annotation-card-data-type-continuous-button"').should(
-      'have.class',
-      'Mui-selected'
-    );
-    cy.get('[data-cy="3-column-annotation-card-data-type-categorical-button"').should(
-      'have.class',
-      'Mui-selected'
-    );
+    cy.get('[data-cy="2-column-annotation-card-data-type"').should('contain', 'Continuous');
+    cy.get('[data-cy="3-column-annotation-card-data-type"]').should('contain', 'Categorical');
     cy.get('[data-cy="next-button"]').click();
 
     // Value Annotation view
-    cy.get('[data-cy="side-column-nav-bar-continuous-age"]').should('be.visible');
-    cy.get('[data-cy="side-column-nav-bar-continuous-age"]').click();
+    cy.get('[data-cy="side-column-nav-bar-age-age"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-age-select-button"]').click();
     cy.get('[data-cy="2-description"]').should('contain', 'Years');
-    cy.get('[data-cy="side-column-nav-bar-categorical-sex"]').should('be.visible');
-    cy.get('[data-cy="side-column-nav-bar-categorical-sex"]').click();
+    cy.get('[data-cy="side-column-nav-bar-sex-sex"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-sex-select-button"]').click();
     cy.get('[data-cy="3-M-description"]').should('contain', 'Male');
     cy.get('[data-cy="3-F-description"]').should('contain', 'Female');
   });

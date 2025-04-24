@@ -25,12 +25,15 @@ export function ExpandableSection({
   return (
     <>
       <Button
+        data-cy={`side-column-nav-bar-${title}-toggle-button`}
         className="justify-start pl-0"
         fullWidth
         onClick={() => setExpanded(!expanded)}
         startIcon={expanded ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
       >
-        <Typography>{title}</Typography>
+        <Typography data-cy={`side-column-nav-bar-${title}`}>
+          {title.charAt(0).toUpperCase() + title.slice(1)}
+        </Typography>
       </Button>
       <Collapse in={expanded}>{children}</Collapse>
     </>
@@ -62,7 +65,7 @@ export function ColumnTypeCollapse({
   onSelect,
   selectedColumnId,
 }: ColumnTypeCollapseProps) {
-  const [showColumns, setShowColumns] = useState<boolean>(false);
+  const [showColumns, setShowColumns] = useState<boolean>(true);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
 
   let columnsToDisplay;
@@ -73,7 +76,7 @@ export function ColumnTypeCollapse({
     columnsToDisplay = Object.entries(columns).filter(
       ([_, column]) => column.standardizedVariable?.identifier === standardizedVariable.identifier
     );
-    labelToDisplay = standardizedVariable.label;
+    labelToDisplay = standardizedVariable.label.toLocaleLowerCase();
   } else {
     columnsToDisplay = Object.entries(columns).filter(
       dataType
@@ -128,6 +131,7 @@ export function ColumnTypeCollapse({
       <div data-cy={`side-column-nav-bar-${labelToDisplay}`}>
         <div className="flex">
           <Button
+            data-cy={`side-column-nav-bar-${labelToDisplay}-toggle-button`}
             variant="text"
             onClick={() => setShowColumns(!showColumns)}
             sx={{

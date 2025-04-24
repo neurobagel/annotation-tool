@@ -102,7 +102,7 @@ function ColumnAnnotationCard({
                   </ToggleButton>
                 </ToggleButtonGroup>
               ) : (
-                <Typography variant="body1">
+                <Typography variant="body1" data-cy={`${id}-column-annotation-card-data-type`}>
                   {dataType || 'Not applicable'}{' '}
                   <Tooltip
                     sx={{ fontSize: '1.2rem' }}

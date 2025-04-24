@@ -17,7 +17,7 @@ function SideColumnNavBar({ columns, onSelect, selectedColumnId }: SideColumnNav
 
   return (
     <Paper className="w-full max-w-80 p-4" elevation={3} data-cy="side-column-nav-bar">
-      <ExpandableSection title="Annotated">
+      <ExpandableSection title="annotated">
         <List>
           {mappedStandardizedVariables.map((standardizedVariable) => (
             <ListItemButton sx={{ paddingLeft: 2 }} key={standardizedVariable.identifier}>
@@ -33,7 +33,7 @@ function SideColumnNavBar({ columns, onSelect, selectedColumnId }: SideColumnNav
         </List>
       </ExpandableSection>
 
-      <ExpandableSection title="Unannotated">
+      <ExpandableSection title="unannotated">
         <List>
           {['Categorical', 'Continuous', null].map((dataType) => (
             <ListItemButton key={`unannotated-${dataType || 'other'}`} sx={{ paddingLeft: 2 }}>
