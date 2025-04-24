@@ -2,7 +2,7 @@ import ValueAnnotation from '../../src/components/ValueAnnotation';
 import useDataStore from '../../src/stores/data';
 import { mockColumnsWithDataType } from '../../src/utils/mocks';
 
-// TODO: add a test for the case with annotated columns
+// TODO: add a test for the case with annotated columns especially with assessment tool
 
 describe('ValueAnnotation', () => {
   it('renders the component correctly', () => {

@@ -6,7 +6,7 @@ import { ColumnTypeCollapse, ExpandableSection } from './ColumnTypeCollapse';
 interface SideColumnNavBarProps {
   columns: Columns;
   onSelect: (params: {
-    columnIds: string[];
+    columnIDs: string[];
     dataType?: 'Categorical' | 'Continuous' | null;
   }) => void;
   selectedColumnId: string | null;

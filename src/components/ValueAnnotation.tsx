@@ -10,10 +10,10 @@ function ValueAnnotation() {
   const [selectedColumnIds, setSelectedColumnIds] = useState<string[]>([]);
 
   const handleSelect = (params: {
-    columnIds: string[];
+    columnIDs: string[];
     dataType?: 'Categorical' | 'Continuous' | null;
   }) => {
-    setSelectedColumnIds(params.columnIds);
+    setSelectedColumnIds(params.columnIDs);
   };
 
   const filteredColumns = selectedColumnIds.reduce(

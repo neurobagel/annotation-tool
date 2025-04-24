@@ -47,7 +47,7 @@ interface ColumnTypeCollapseProps {
   standardizedVariable?: StandardizedVariable | null;
   columns: Columns;
   onSelect: (params: {
-    columnIds: string[];
+    columnIDs: string[];
     dataType?: 'Categorical' | 'Continuous' | null;
   }) => void;
   selectedColumnId: string | null;
@@ -93,7 +93,7 @@ export function ColumnTypeCollapse({
   const handleSelect = () => {
     if (columnsToDisplay.length > 0) {
       onSelect({
-        columnIds: columnsToDisplay.map(([id]) => id),
+        columnIDs: columnsToDisplay.map(([id]) => id),
         dataType,
       });
     }
@@ -101,7 +101,7 @@ export function ColumnTypeCollapse({
 
   const handleGroupSelect = (groupColumns: ColumnEntry[]) => {
     onSelect({
-      columnIds: groupColumns.map(([id]) => id),
+      columnIDs: groupColumns.map(([id]) => id),
       dataType,
     });
   };
@@ -236,6 +236,7 @@ export function ColumnTypeCollapse({
     <div data-cy={`side-column-nav-bar-${labelToDisplay}`}>
       <div className="flex">
         <Button
+          data-cy={`side-column-nav-bar-${labelToDisplay}-toggle-button`}
           variant="text"
           onClick={() => setShowColumns(!showColumns)}
           sx={{
