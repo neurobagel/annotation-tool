@@ -1,5 +1,5 @@
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { Typography, Paper, Collapse, Button, List, ListItem, ListItemButton } from '@mui/material';
 import { useState } from 'react';
 import useDataStore from '~/stores/data';
@@ -25,7 +25,7 @@ function ExpandableSection({ title, children, defaultExpanded = true }: Expandab
         className="justify-start"
         fullWidth
         onClick={() => setExpanded(!expanded)}
-        endIcon={expanded ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+        startIcon={expanded ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
       >
         <Typography>{title}</Typography>
       </Button>
@@ -100,6 +100,13 @@ function ColumnTypeCollapse({
     });
   };
 
+  const handleGroupToggle = (groupName: string) => {
+    setExpandedGroups((prev) => ({
+      ...prev,
+      [groupName]: !prev[groupName],
+    }));
+  };
+
   if (
     standardizedVariable?.identifier ===
     useDataStore.getState().getAssessmentToolConfig().identifier
@@ -116,7 +123,17 @@ function ColumnTypeCollapse({
 
     return (
       <div data-cy={`side-column-nav-bar-${labelToDisplay}`}>
-        <div className="flex flex-col">
+        <div className="flex">
+          <Button
+            variant="text"
+            onClick={() => setShowColumns(!showColumns)}
+            sx={{
+              fontSize: '12px',
+              color: 'primary',
+            }}
+          >
+            {showColumns ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+          </Button>
           <Button
             data-cy={`side-column-nav-bar-${labelToDisplay}-select-button`}
             onClick={handleSelect}
@@ -139,45 +156,35 @@ function ColumnTypeCollapse({
               {labelToDisplay.charAt(0).toUpperCase() + labelToDisplay.slice(1)}
             </Typography>
           </Button>
-          <Button
-            className="justify-start"
-            variant="text"
-            onClick={() => setShowColumns(!showColumns)}
-            sx={{
-              fontSize: '12px',
-              color: 'primary',
-            }}
-          >
-            {showColumns ? 'hide groups' : 'show groups'}
-            {showColumns ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
-          </Button>
         </div>
         <Collapse in={showColumns}>
-          <List>
+          <List className="pl-2">
             {Object.entries(groupedColumns).map(([groupName, groupColumns]) => {
               const isGroupExpanded = expandedGroups[groupName] || false;
               const isGroupSelected = groupColumns.some(([id]) => id === selectedColumnId);
 
               return (
                 <div key={groupName}>
-                  <ListItemButton
-                    onClick={() => {
-                      setExpandedGroups((prev) => ({
-                        ...prev,
-                        [groupName]: !isGroupExpanded,
-                      }));
-                      handleGroupSelect(groupColumns);
-                    }}
-                    sx={{
-                      pl: 4,
-                      fontWeight: isGroupSelected ? 'bold' : 'normal',
-                    }}
-                  >
-                    <Typography>{groupName}</Typography>
-                    {isGroupExpanded ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
-                  </ListItemButton>
+                  <div className="flex">
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleGroupToggle(groupName);
+                      }}
+                    >
+                      {isGroupExpanded ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+                    </Button>
+                    <ListItemButton
+                      onClick={() => handleGroupSelect(groupColumns)}
+                      sx={{
+                        fontWeight: isGroupSelected ? 'bold' : 'normal',
+                      }}
+                    >
+                      <Typography>{groupName}</Typography>
+                    </ListItemButton>
+                  </div>
                   <Collapse in={isGroupExpanded}>
-                    <List sx={{ pl: 6 }}>
+                    <List className="pl-24">
                       {groupColumns.map(([columnId, column]) => (
                         <ListItem
                           data-cy={`side-column-nav-bar-${labelToDisplay}-${column.header}`}
@@ -203,13 +210,20 @@ function ColumnTypeCollapse({
 
   return (
     <div data-cy={`side-column-nav-bar-${labelToDisplay}`}>
-      <div className="flex flex-col">
+      <div className="flex ">
+        <Button
+          variant="text"
+          onClick={() => setShowColumns(!showColumns)}
+          sx={{
+            color: 'primary',
+          }}
+        >
+          {showColumns ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+        </Button>
         <Button
           data-cy={`side-column-nav-bar-${labelToDisplay}-select-button`}
           onClick={handleSelect}
           sx={{
-            flexGrow: 1,
-            justifyContent: 'flex-start',
             textTransform: 'none',
             color: 'text.primary',
           }}
@@ -226,21 +240,9 @@ function ColumnTypeCollapse({
             {labelToDisplay.charAt(0).toUpperCase() + labelToDisplay.slice(1)}
           </Typography>
         </Button>
-        <Button
-          className="justify-start"
-          variant="text"
-          onClick={() => setShowColumns(!showColumns)}
-          sx={{
-            fontSize: '12px',
-            color: 'primary',
-          }}
-        >
-          {showColumns ? 'hide columns' : 'show columns'}
-          {showColumns ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
-        </Button>
       </div>
       <Collapse in={showColumns}>
-        <List>
+        <List className="pl-20">
           {columnsToDisplay.map(([columnId, column]) => (
             <ListItem
               data-cy={`side-column-nav-bar-${labelToDisplay}-${column.header}`}
