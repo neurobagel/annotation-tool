@@ -12,7 +12,7 @@ describe('SideColumnNavBar', () => {
     cy.mount(
       <SideColumnNavBar
         columns={props.columns}
-        onSelectColumn={props.onSelectColumn}
+        onSelect={props.onSelectColumn}
         selectedColumnId={props.selectedColumnId}
       />
     );
@@ -40,7 +40,7 @@ describe('SideColumnNavBar', () => {
     cy.mount(
       <SideColumnNavBar
         columns={props.columns}
-        onSelectColumn={spy}
+        onSelect={spy}
         selectedColumnId={props.selectedColumnId}
       />
     );

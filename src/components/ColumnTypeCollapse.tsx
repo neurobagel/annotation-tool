@@ -3,7 +3,7 @@ import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { Typography, Collapse, Button, List, ListItem, ListItemButton } from '@mui/material';
 import { useState } from 'react';
 import useDataStore from '~/stores/data';
-import { Columns, StandardizedVariable } from '../utils/types';
+import { ColumnEntry, Columns, StandardizedVariable } from '../utils/types';
 
 interface ExpandableSectionProps {
   title: string;
@@ -96,7 +96,7 @@ export function ColumnTypeCollapse({
     }
   };
 
-  const handleGroupSelect = (groupColumns: Array<[string, any]>) => {
+  const handleGroupSelect = (groupColumns: ColumnEntry[]) => {
     onSelect({
       columnIds: groupColumns.map(([id]) => id),
       dataType,
@@ -114,7 +114,7 @@ export function ColumnTypeCollapse({
     standardizedVariable?.identifier ===
     useDataStore.getState().getAssessmentToolConfig().identifier
   ) {
-    const groupedColumns: Record<string, Array<[string, any]>> = {};
+    const groupedColumns: Record<string, ColumnEntry[]> = {};
 
     columnsToDisplay.forEach(([columnId, column]) => {
       const groupKey = column.isPartOf?.label || 'Ungrouped';

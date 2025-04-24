@@ -16,16 +16,19 @@ function ValueAnnotation() {
     setSelectedColumnIds(params.columnIds);
   };
 
-  const filteredColumns = selectedColumnIds.reduce((acc, columnId) => {
-    acc[columnId] = columns[columnId];
-    return acc;
-  }, {} as Columns);
+  const filteredColumns = selectedColumnIds.reduce(
+    (acc, columnId) => ({
+      ...acc,
+      [columnId]: columns[columnId],
+    }),
+    {} as Columns
+  );
 
   const filteredDataTable = selectedColumnIds.reduce(
-    (acc, columnId) => {
-      acc[columnId] = dataTable[columnId];
-      return acc;
-    },
+    (acc, columnId) => ({
+      ...acc,
+      [columnId]: dataTable[columnId],
+    }),
     {} as Record<string, string[]>
   );
 

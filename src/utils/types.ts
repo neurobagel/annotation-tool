@@ -19,6 +19,8 @@ export type Columns = {
   [key: string]: Column;
 };
 
+export type ColumnEntry = [string, Column];
+
 export interface DataDictionary {
   [key: string]: {
     Description: string;

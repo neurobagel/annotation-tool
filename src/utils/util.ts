@@ -80,7 +80,7 @@ export function getColumnOptions(
 
 // Utility functions for SideColumnNavbar component
 export function getMappedStandardizedVariables(columns: Columns): StandardizedVariable[] {
-  const config = useDataStore.getState().config;
+  const { config } = useDataStore.getState();
   const seenIdentifiers = new Set<string>();
   const uniqueVariables: StandardizedVariable[] = [];
 
