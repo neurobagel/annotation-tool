@@ -22,7 +22,7 @@ function ExpandableSection({ title, children, defaultExpanded = true }: Expandab
   return (
     <>
       <Button
-        className="justify-start"
+        className="justify-start pl-0"
         fullWidth
         onClick={() => setExpanded(!expanded)}
         startIcon={expanded ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
@@ -128,11 +128,16 @@ function ColumnTypeCollapse({
             variant="text"
             onClick={() => setShowColumns(!showColumns)}
             sx={{
-              fontSize: '12px',
+              minWidth: '24px',
+              padding: '6px',
               color: 'primary',
             }}
           >
-            {showColumns ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+            {showColumns ? (
+              <ArrowDropDownIcon fontSize="small" />
+            ) : (
+              <ArrowRightIcon fontSize="small" />
+            )}
           </Button>
           <Button
             data-cy={`side-column-nav-bar-${labelToDisplay}-select-button`}
@@ -142,6 +147,7 @@ function ColumnTypeCollapse({
               justifyContent: 'flex-start',
               textTransform: 'none',
               color: 'text.primary',
+              paddingLeft: '4px',
             }}
             variant="text"
           >
@@ -171,20 +177,30 @@ function ColumnTypeCollapse({
                         e.stopPropagation();
                         handleGroupToggle(groupName);
                       }}
+                      sx={{
+                        minWidth: '24px',
+                        padding: '6px',
+                      }}
                     >
-                      {isGroupExpanded ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+                      {isGroupExpanded ? (
+                        <ArrowDropDownIcon fontSize="small" />
+                      ) : (
+                        <ArrowRightIcon fontSize="small" />
+                      )}
                     </Button>
                     <ListItemButton
                       onClick={() => handleGroupSelect(groupColumns)}
                       sx={{
                         fontWeight: isGroupSelected ? 'bold' : 'normal',
+                        paddingLeft: '4px',
+                        minWidth: 0,
                       }}
                     >
                       <Typography>{groupName}</Typography>
                     </ListItemButton>
                   </div>
                   <Collapse in={isGroupExpanded}>
-                    <List className="pl-24">
+                    <List className="pl-6">
                       {groupColumns.map(([columnId, column]) => (
                         <ListItem
                           data-cy={`side-column-nav-bar-${labelToDisplay}-${column.header}`}
@@ -192,6 +208,7 @@ function ColumnTypeCollapse({
                           sx={{
                             color: 'grey.600',
                             fontWeight: columnId === selectedColumnId ? 'bold' : 'normal',
+                            paddingLeft: '32px',
                           }}
                         >
                           <Typography>{column.header}</Typography>
@@ -210,15 +227,21 @@ function ColumnTypeCollapse({
 
   return (
     <div data-cy={`side-column-nav-bar-${labelToDisplay}`}>
-      <div className="flex ">
+      <div className="flex">
         <Button
           variant="text"
           onClick={() => setShowColumns(!showColumns)}
           sx={{
+            minWidth: '24px',
+            padding: '6px',
             color: 'primary',
           }}
         >
-          {showColumns ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+          {showColumns ? (
+            <ArrowDropDownIcon fontSize="small" />
+          ) : (
+            <ArrowRightIcon fontSize="small" />
+          )}
         </Button>
         <Button
           data-cy={`side-column-nav-bar-${labelToDisplay}-select-button`}
@@ -226,6 +249,8 @@ function ColumnTypeCollapse({
           sx={{
             textTransform: 'none',
             color: 'text.primary',
+            paddingLeft: '4px',
+            minWidth: 0,
           }}
           variant="text"
         >
@@ -242,7 +267,7 @@ function ColumnTypeCollapse({
         </Button>
       </div>
       <Collapse in={showColumns}>
-        <List className="pl-20">
+        <List className="pl-6">
           {columnsToDisplay.map(([columnId, column]) => (
             <ListItem
               data-cy={`side-column-nav-bar-${labelToDisplay}-${column.header}`}
@@ -250,6 +275,7 @@ function ColumnTypeCollapse({
               sx={{
                 color: 'grey.600',
                 fontWeight: columnId === selectedColumnId ? 'bold' : 'normal',
+                paddingLeft: '32px',
               }}
             >
               <Typography>{column.header}</Typography>
