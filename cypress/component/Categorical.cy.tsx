@@ -3,11 +3,13 @@ import Categorical from '../../src/components/Categorical';
 const props = {
   columnID: '3',
   uniqueValues: ['F', 'M'],
+  missingValues: [],
   levels: {
     F: { description: 'Female' },
     M: { description: 'Male' },
   },
   onUpdateDescription: () => {},
+  onToggleMissingValue: () => {},
 };
 
 describe('Categorical', () => {
@@ -16,8 +18,10 @@ describe('Categorical', () => {
       <Categorical
         columnID={props.columnID}
         uniqueValues={props.uniqueValues}
+        missingValues={props.missingValues}
         levels={props.levels}
         onUpdateDescription={props.onUpdateDescription}
+        onToggleMissingValue={props.onToggleMissingValue}
       />
     );
     cy.get('[data-cy="3-categorical"]').should('be.visible');
@@ -36,8 +40,10 @@ describe('Categorical', () => {
       <Categorical
         columnID={props.columnID}
         uniqueValues={props.uniqueValues}
+        missingValues={props.missingValues}
         levels={props.levels}
         onUpdateDescription={spy}
+        onToggleMissingValue={props.onToggleMissingValue}
       />
     );
     cy.get('[data-cy="3-F-edit-description-button"]').click();

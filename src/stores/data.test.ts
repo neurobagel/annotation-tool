@@ -192,4 +192,15 @@ describe('data store actions', () => {
     });
     expect(result.current.columns['1'].units).toEqual('some units');
   });
+  it('updates the missingValues field of a column', () => {
+    const { result } = renderHook(() => useDataStore());
+    act(() => {
+      result.current.updateColumnMissingValues('1', 'some value', true);
+    });
+    expect(result.current.columns['1'].missingValues).toEqual(['some value']);
+    act(() => {
+      result.current.updateColumnMissingValues('1', 'some value', false);
+    });
+    expect(result.current.columns['1'].missingValues).toEqual([]);
+  });
 });

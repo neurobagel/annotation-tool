@@ -9,6 +9,7 @@ interface ValueAnnotationTabsProps {
   dataTable: Record<string, string[]>;
   onUpdateDescription: (columnId: string, value: string, description: string) => void;
   onUpdateUnits: (columnId: string, units: string) => void;
+  onToggleMissingValue: (columnId: string, value: string, isMissing: boolean) => void;
 }
 
 function ValueAnnotationTabs({
@@ -16,6 +17,7 @@ function ValueAnnotationTabs({
   dataTable,
   onUpdateDescription,
   onUpdateUnits,
+  onToggleMissingValue,
 }: ValueAnnotationTabsProps) {
   const [activeTab, setActiveTab] = useState(0);
   const columnEntries = Object.entries(columns);
@@ -40,13 +42,18 @@ function ValueAnnotationTabs({
             columnID={columnId}
             uniqueValues={uniqueValues}
             levels={column.levels || {}}
+            missingValues={column.missingValues || []}
             onUpdateDescription={onUpdateDescription}
+            onToggleMissingValue={onToggleMissingValue}
           />
         ) : (
           <Continuous
             columnID={columnId}
             units={column.units || ''}
+            missingValues={column.missingValues || []}
+            columnValues={dataTable[columnId] || []}
             onUpdateUnits={onUpdateUnits}
+            onToggleMissingValue={onToggleMissingValue}
           />
         )}
       </div>
@@ -83,13 +90,18 @@ function ValueAnnotationTabs({
                       columnID={columnId}
                       uniqueValues={uniqueValues}
                       levels={column.levels || {}}
+                      missingValues={column.missingValues || []}
                       onUpdateDescription={onUpdateDescription}
+                      onToggleMissingValue={onToggleMissingValue}
                     />
                   ) : (
                     <Continuous
                       columnID={columnId}
                       units={column.units || ''}
+                      missingValues={column.missingValues || []}
+                      columnValues={dataTable[columnId] || []}
                       onUpdateUnits={onUpdateUnits}
+                      onToggleMissingValue={onToggleMissingValue}
                     />
                   )}
                 </div>

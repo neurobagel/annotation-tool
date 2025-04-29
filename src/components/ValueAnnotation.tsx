@@ -6,7 +6,13 @@ import SideColumnNavBar from './SideColumnNavBar';
 import ValueAnnotationTabs from './ValueAnnotationTabs';
 
 function ValueAnnotation() {
-  const { columns, dataTable, updateColumnLevelDescription, updateColumnUnits } = useDataStore();
+  const {
+    columns,
+    dataTable,
+    updateColumnLevelDescription,
+    updateColumnUnits,
+    updateColumnMissingValues,
+  } = useDataStore();
   const [selectedColumnIds, setSelectedColumnIds] = useState<string[]>([]);
 
   const handleSelect = (params: {
@@ -14,6 +20,10 @@ function ValueAnnotation() {
     dataType?: 'Categorical' | 'Continuous' | null;
   }) => {
     setSelectedColumnIds(params.columnIDs);
+  };
+
+  const handleToggleMissingValue = (columnId: string, value: string, isMissing: boolean) => {
+    updateColumnMissingValues(columnId, value, isMissing);
   };
 
   const filteredColumns = selectedColumnIds.reduce(
@@ -78,6 +88,7 @@ function ValueAnnotation() {
         dataTable={filteredDataTable}
         onUpdateDescription={updateColumnLevelDescription}
         onUpdateUnits={updateColumnUnits}
+        onToggleMissingValue={handleToggleMissingValue}
       />
     );
   };

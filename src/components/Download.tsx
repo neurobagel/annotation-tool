@@ -58,6 +58,10 @@ function Download() {
                 TermURL: column.isPartOf?.termURL || '',
               };
             }
+
+            if (column.missingValues && column.dataType !== null) {
+              dictionaryEntry.Annotations.MissingValues = column.missingValues;
+            }
           }
 
           if (column.dataType === 'Categorical' && column.levels) {

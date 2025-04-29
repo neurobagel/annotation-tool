@@ -35,6 +35,7 @@ type DataStore = {
   ) => void;
   updateColumnLevelDescription: (columnId: string, value: string, description: string) => void;
   updateColumnUnits: (columnId: string, unitsDescription: string | null) => void;
+  updateColumnMissingValues: (columnId: string, value: string, isMissing: boolean) => void;
 
   uploadedDataDictionary: DataDictionary;
   uploadedDataDictionaryFileName: string | null;
@@ -234,6 +235,28 @@ const useDataStore = create<DataStore>()(
       }));
     },
 
+    updateColumnMissingValues: (columnId: string, value: string, isMissing: boolean) => {
+      set((state) => {
+        const column = state.columns[columnId];
+        if (!column) return state;
+
+        const missingValues = column.missingValues || [];
+        const newMissingValues = isMissing
+          ? [...missingValues, value]
+          : missingValues.filter((v) => v !== value);
+
+        return {
+          columns: {
+            ...state.columns,
+            [columnId]: {
+              ...column,
+              missingValues: newMissingValues.length > 0 ? newMissingValues : [],
+            },
+          },
+        };
+      });
+    },
+
     // Data dictionary
     setDataDictionary: (data: DataDictionary) => set({ uploadedDataDictionary: data }),
     setUploadedDataDictionaryFileName: (fileName: string | null) =>
@@ -325,6 +348,10 @@ const useDataStore = create<DataStore>()(
                 if (value.Units !== undefined) {
                   draft[columnId].dataType = 'Continuous';
                   draft[columnId].units = value.Units;
+                }
+
+                if (value.Annotations?.MissingValues) {
+                  draft[columnId].missingValues = value.Annotations.MissingValues;
                 }
               });
 

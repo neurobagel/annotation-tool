@@ -13,6 +13,7 @@ export type Column = {
   };
   levels?: { [key: string]: { description: string } } | null;
   units?: string;
+  missingValues?: string[];
 };
 
 export type Columns = {
