@@ -62,6 +62,13 @@ function Download() {
             if (column.missingValues && column.dataType !== null) {
               dictionaryEntry.Annotations.MissingValues = column.missingValues;
             }
+
+            if (column.format) {
+              dictionaryEntry.Annotations.Format = {
+                Label: column.format?.label || '',
+                TermURL: column.format?.termURL || '',
+              };
+            }
           }
 
           if (column.dataType === 'Categorical' && column.levels) {

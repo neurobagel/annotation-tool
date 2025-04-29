@@ -70,11 +70,15 @@ function Categorical({
           </TableRow>
         </TableHead>
         <TableBody>
-          {slicedValues.map((value) => (
-            <TableRow key={value} data-cy={`${columnID}-${value}`}>
+          {slicedValues.map((value, index) => (
+            <TableRow
+              key={`${columnID}-${value}-${index}`}
+              data-cy={`${columnID}-${value}-${index}`}
+            >
               <TableCell align="left">{value}</TableCell>
               <TableCell align="left">
                 <DescriptionEditor
+                  key={`${columnID}-${value}-${index}-description`}
                   columnID={columnID}
                   levelValue={value}
                   description={levels[value]?.description || ''}
@@ -85,6 +89,7 @@ function Categorical({
               </TableCell>
               <TableCell align="left">
                 <MissingValueButton
+                  key={`${columnID}-${value}-${index}-missingButton`}
                   value={value}
                   columnId={columnID}
                   missingValues={missingValues}

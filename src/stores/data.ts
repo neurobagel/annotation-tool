@@ -36,6 +36,7 @@ type DataStore = {
   updateColumnLevelDescription: (columnId: string, value: string, description: string) => void;
   updateColumnUnits: (columnId: string, unitsDescription: string | null) => void;
   updateColumnMissingValues: (columnId: string, value: string, isMissing: boolean) => void;
+  updateColumnFormat: (columnId: string, format: { termURL: string; label: string } | null) => void;
 
   uploadedDataDictionary: DataDictionary;
   uploadedDataDictionaryFileName: string | null;
@@ -256,6 +257,21 @@ const useDataStore = create<DataStore>()(
         };
       });
     },
+    updateColumnFormat: (columnId: string, format: { termURL: string; label: string } | null) => {
+      console.log('updateColumnFormat', columnId, format);
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          if (format) {
+            draft[columnId].format = {
+              termURL: format.termURL,
+              label: format.label,
+            };
+          } else {
+            delete draft[columnId].format;
+          }
+        }),
+      }));
+    },
 
     // Data dictionary
     setDataDictionary: (data: DataDictionary) => set({ uploadedDataDictionary: data }),
@@ -352,6 +368,13 @@ const useDataStore = create<DataStore>()(
 
                 if (value.Annotations?.MissingValues) {
                   draft[columnId].missingValues = value.Annotations.MissingValues;
+                }
+
+                if (value.Annotations?.Format) {
+                  draft[columnId].format = {
+                    termURL: value.Annotations.Format.TermURL,
+                    label: value.Annotations.Format.Label,
+                  };
                 }
               });
 

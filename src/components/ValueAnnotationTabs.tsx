@@ -10,6 +10,7 @@ interface ValueAnnotationTabsProps {
   onUpdateDescription: (columnId: string, value: string, description: string) => void;
   onUpdateUnits: (columnId: string, units: string) => void;
   onToggleMissingValue: (columnId: string, value: string, isMissing: boolean) => void;
+  onUpdateFormat: (columnId: string, format: { termURL: string; label: string } | null) => void;
 }
 
 function ValueAnnotationTabs({
@@ -18,6 +19,7 @@ function ValueAnnotationTabs({
   onUpdateDescription,
   onUpdateUnits,
   onToggleMissingValue,
+  onUpdateFormat,
 }: ValueAnnotationTabsProps) {
   const [activeTab, setActiveTab] = useState(0);
   const columnEntries = Object.entries(columns);
@@ -52,8 +54,10 @@ function ValueAnnotationTabs({
             units={column.units || ''}
             missingValues={column.missingValues || []}
             columnValues={dataTable[columnId] || []}
+            format={column.format}
             onUpdateUnits={onUpdateUnits}
             onToggleMissingValue={onToggleMissingValue}
+            onUpdateFormat={onUpdateFormat}
           />
         )}
       </div>
@@ -100,8 +104,10 @@ function ValueAnnotationTabs({
                       units={column.units || ''}
                       missingValues={column.missingValues || []}
                       columnValues={dataTable[columnId] || []}
+                      format={column.format}
                       onUpdateUnits={onUpdateUnits}
                       onToggleMissingValue={onToggleMissingValue}
+                      onUpdateFormat={onUpdateFormat}
                     />
                   )}
                 </div>

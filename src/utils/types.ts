@@ -14,6 +14,10 @@ export type Column = {
   levels?: { [key: string]: { description: string } } | null;
   units?: string;
   missingValues?: string[];
+  format?: {
+    termURL?: string;
+    label?: string;
+  };
 };
 
 export type Columns = {
