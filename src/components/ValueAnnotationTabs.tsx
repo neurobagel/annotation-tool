@@ -7,10 +7,15 @@ import Continuous from './Continuous';
 interface ValueAnnotationTabsProps {
   columns: Columns;
   dataTable: Record<string, string[]>;
-  onUpdateDescription: (columnId: string, value: string, description: string) => void;
-  onUpdateUnits: (columnId: string, units: string) => void;
-  onToggleMissingValue: (columnId: string, value: string, isMissing: boolean) => void;
-  onUpdateFormat: (columnId: string, format: { termURL: string; label: string } | null) => void;
+  onUpdateDescription: (columnID: string, value: string, description: string) => void;
+  onUpdateUnits: (columnID: string, units: string) => void;
+  onToggleMissingValue: (columnID: string, value: string, isMissing: boolean) => void;
+  onUpdateFormat: (columnID: string, format: { termURL: string; label: string } | null) => void;
+  onUpdateLevelTerm: (
+    columnID: string,
+    value: string,
+    term: { identifier: string; label: string } | null
+  ) => void;
 }
 
 function ValueAnnotationTabs({
@@ -20,6 +25,7 @@ function ValueAnnotationTabs({
   onUpdateUnits,
   onToggleMissingValue,
   onUpdateFormat,
+  onUpdateLevelTerm,
 }: ValueAnnotationTabsProps) {
   const [activeTab, setActiveTab] = useState(0);
   const columnEntries = Object.entries(columns);
@@ -45,8 +51,10 @@ function ValueAnnotationTabs({
             uniqueValues={uniqueValues}
             levels={column.levels || {}}
             missingValues={column.missingValues || []}
+            standardizedVariable={column.standardizedVariable}
             onUpdateDescription={onUpdateDescription}
             onToggleMissingValue={onToggleMissingValue}
+            onUpdateLevelTerm={onUpdateLevelTerm}
           />
         ) : (
           <Continuous
@@ -54,6 +62,7 @@ function ValueAnnotationTabs({
             units={column.units || ''}
             missingValues={column.missingValues || []}
             columnValues={dataTable[columnId] || []}
+            standardizedVariable={column.standardizedVariable}
             format={column.format}
             onUpdateUnits={onUpdateUnits}
             onToggleMissingValue={onToggleMissingValue}
@@ -97,6 +106,7 @@ function ValueAnnotationTabs({
                       missingValues={column.missingValues || []}
                       onUpdateDescription={onUpdateDescription}
                       onToggleMissingValue={onToggleMissingValue}
+                      onUpdateLevelTerm={onUpdateLevelTerm}
                     />
                   ) : (
                     <Continuous

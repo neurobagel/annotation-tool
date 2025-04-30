@@ -7,28 +7,50 @@ import {
   TableHead,
   TableRow,
   TablePagination,
+  Autocomplete,
+  TextField,
 } from '@mui/material';
 import { useEffect } from 'react';
+import diagnosisTerms from '../assets/diagnosisTerms.json';
 import { useTablePagination } from '../hooks';
+import { StandardizedVariable } from '../utils/types';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueButton from './MissingValueButton';
+
+const sexTerms = [
+  { label: 'Male', identifier: 'snomed:248153007' },
+  { label: 'Female', identifier: 'snomed:248152002' },
+  { label: 'Other', identifier: 'snomed:32570681000036106' },
+];
 
 interface CategoricalProps {
   columnID: string;
   uniqueValues: string[];
-  levels: { [key: string]: { description: string } };
+  levels: { [key: string]: { description: string; label?: string; termURL?: string } };
   missingValues: string[];
-  onUpdateDescription: (columnID: string, value: string, description: string) => void;
-  onToggleMissingValue: (columnID: string, value: string, isMissing: boolean) => void;
+  standardizedVariable?: StandardizedVariable | null;
+  onUpdateDescription: (columnId: string, value: string, description: string) => void;
+  onToggleMissingValue: (columnId: string, value: string, isMissing: boolean) => void;
+  onUpdateLevelTerm: (
+    columnId: string,
+    value: string,
+    term: { identifier: string; label: string } | null
+  ) => void;
 }
+
+const defaultProps = {
+  standardizedVariable: null,
+};
 
 function Categorical({
   columnID,
   uniqueValues,
   levels,
   missingValues,
+  standardizedVariable,
   onUpdateDescription,
   onToggleMissingValue,
+  onUpdateLevelTerm,
 }: CategoricalProps) {
   const { page, setPage, rowsPerPage, handleChangePage, handleChangeRowsPerPage } =
     useTablePagination(5);
@@ -38,6 +60,18 @@ function Categorical({
   }, [columnID, setPage]);
 
   const slicedValues = uniqueValues.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+
+  const getTermOptions = () => {
+    if (standardizedVariable?.identifier === 'nb:Diagnosis') {
+      return diagnosisTerms;
+    }
+    if (standardizedVariable?.identifier === 'nb:Sex') {
+      return sexTerms;
+    }
+    return [];
+  };
+
+  const termOptions = getTermOptions();
 
   return (
     <TableContainer
@@ -49,36 +83,30 @@ function Categorical({
       <Table className="min-w-[768px]">
         <TableHead data-cy={`${columnID}-categorical-table-head`}>
           <TableRow className="bg-blue-50">
-            <TableCell
-              align="left"
-              sx={{ fontWeight: 'bold', color: 'primary.main', width: '15%' }}
-            >
+            <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
               Value
             </TableCell>
-            <TableCell
-              align="left"
-              sx={{ fontWeight: 'bold', color: 'primary.main', width: '60%' }}
-            >
+            <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
               Description
             </TableCell>
-            <TableCell
-              align="left"
-              sx={{ fontWeight: 'bold', color: 'primary.main', width: '25%' }}
-            >
-              Status
-            </TableCell>
+            {standardizedVariable && (
+              <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                Standardized Term
+              </TableCell>
+            )}
+            {standardizedVariable && (
+              <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                Missing Value
+              </TableCell>
+            )}
           </TableRow>
         </TableHead>
         <TableBody>
-          {slicedValues.map((value, index) => (
-            <TableRow
-              key={`${columnID}-${value}-${index}`}
-              data-cy={`${columnID}-${value}-${index}`}
-            >
+          {slicedValues.map((value) => (
+            <TableRow key={`${columnID}-${value}`} data-cy={`${columnID}-${value}`}>
               <TableCell align="left">{value}</TableCell>
               <TableCell align="left">
                 <DescriptionEditor
-                  key={`${columnID}-${value}-${index}-description`}
                   columnID={columnID}
                   levelValue={value}
                   description={levels[value]?.description || ''}
@@ -87,33 +115,52 @@ function Categorical({
                   }}
                 />
               </TableCell>
-              <TableCell align="left">
-                <MissingValueButton
-                  key={`${columnID}-${value}-${index}-missingButton`}
-                  value={value}
-                  columnId={columnID}
-                  missingValues={missingValues}
-                  onToggleMissingValue={onToggleMissingValue}
-                />
-              </TableCell>
+              {standardizedVariable && (
+                <TableCell align="left">
+                  <Autocomplete
+                    options={termOptions}
+                    getOptionLabel={(option) => option.label}
+                    value={
+                      termOptions.find((opt) => opt.identifier === levels[value]?.termURL) || null
+                    }
+                    onChange={(_, newValue) => {
+                      onUpdateLevelTerm(columnID, value, newValue);
+                    }}
+                    renderInput={(params) => (
+                      // eslint-disable-next-line react/jsx-props-no-spreading
+                      <TextField {...params} variant="standard" size="small" fullWidth />
+                    )}
+                  />
+                </TableCell>
+              )}
+              {standardizedVariable && (
+                <TableCell align="left">
+                  <MissingValueButton
+                    value={value}
+                    columnId={columnID}
+                    missingValues={missingValues}
+                    onToggleMissingValue={onToggleMissingValue}
+                  />
+                </TableCell>
+              )}
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      <div className="flex justify-center">
-        <TablePagination
-          data-cy={`${columnID}-categorical-pagination`}
-          rowsPerPageOptions={[5, 10, 25, 50, 100]}
-          component="div"
-          count={uniqueValues.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </div>
+      <TablePagination
+        data-cy={`${columnID}-categorical-pagination`}
+        rowsPerPageOptions={[5, 10, 25, 50, 100]}
+        component="div"
+        count={uniqueValues.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
     </TableContainer>
   );
 }
+
+Categorical.defaultProps = defaultProps;
 
 export default Categorical;

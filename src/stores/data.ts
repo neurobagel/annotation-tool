@@ -34,6 +34,11 @@ type DataStore = {
     term: { identifier: string; label: string } | null
   ) => void;
   updateColumnLevelDescription: (columnId: string, value: string, description: string) => void;
+  updateColumnLevelTerm: (
+    columnId: string,
+    value: string,
+    term: { identifier: string; label: string } | null
+  ) => void;
   updateColumnUnits: (columnId: string, unitsDescription: string | null) => void;
   updateColumnMissingValues: (columnId: string, value: string, isMissing: boolean) => void;
   updateColumnFormat: (columnId: string, format: { termURL: string; label: string } | null) => void;
@@ -73,7 +78,11 @@ const useDataStore = create<DataStore>()(
 
         reader.onload = (e) => {
           const content = e.target?.result as string;
-          const rows = content.split('\n').map((row) => row.split('\t'));
+          const rows = content
+            .split('\n')
+            .map((row) => row.trim())
+            .filter((row) => row !== '')
+            .map((row) => row.split('\t'));
           const headers = rows[0];
           const data = rows.slice(1);
 
@@ -228,6 +237,29 @@ const useDataStore = create<DataStore>()(
       }));
     },
 
+    updateColumnLevelTerm: (
+      columnId: string,
+      value: string,
+      term: { identifier: string; label: string } | null
+    ) => {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          if (draft[columnId].levels && draft[columnId].levels[value]) {
+            if (term) {
+              draft[columnId].levels[value] = {
+                ...draft[columnId].levels[value],
+                termURL: term.identifier,
+                label: term.label,
+              };
+            } else {
+              const { termURL, label, ...rest } = draft[columnId].levels[value];
+              draft[columnId].levels[value] = rest;
+            }
+          }
+        }),
+      }));
+    },
+
     updateColumnUnits: (columnId: string, unitsDescription: string) => {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
@@ -258,7 +290,6 @@ const useDataStore = create<DataStore>()(
       });
     },
     updateColumnFormat: (columnId: string, format: { termURL: string; label: string } | null) => {
-      console.log('updateColumnFormat', columnId, format);
       set((state) => ({
         columns: produce(state.columns, (draft) => {
           if (format) {
@@ -351,16 +382,37 @@ const useDataStore = create<DataStore>()(
                   delete draft[columnId].isPartOf;
                 }
 
+                // Handle levels from both root Levels and Annotations.Levels
                 if (value.Levels) {
                   draft[columnId].dataType = 'Categorical';
                   draft[columnId].levels = Object.entries(value.Levels).reduce(
-                    (levelsAcc, [levelKey, levelValue]) => ({
-                      ...levelsAcc,
-                      [levelKey]: { description: levelValue },
-                    }),
-                    {} as { [key: string]: { description: string } }
+                    (levelsAcc, [levelKey, levelValue]) => {
+                      const levelObj: {
+                        description: string;
+                        termURL?: string;
+                        label?: string;
+                      } = {
+                        description: levelValue.Description || '',
+                      };
+
+                      // Get term info from Annotations.Levels if available
+                      const annotationLevel = value.Annotations?.Levels?.[levelKey];
+                      if (annotationLevel) {
+                        levelObj.termURL = annotationLevel.TermURL;
+                        levelObj.label = annotationLevel.Label;
+                      }
+
+                      return {
+                        ...levelsAcc,
+                        [levelKey]: levelObj,
+                      };
+                    },
+                    {} as {
+                      [key: string]: { description: string; termURL?: string; label?: string };
+                    }
                   );
                 }
+
                 if (value.Units !== undefined) {
                   draft[columnId].dataType = 'Continuous';
                   draft[columnId].units = value.Units;

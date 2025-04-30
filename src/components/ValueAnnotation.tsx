@@ -13,6 +13,7 @@ function ValueAnnotation() {
     updateColumnUnits,
     updateColumnMissingValues,
     updateColumnFormat,
+    updateColumnLevelTerm,
   } = useDataStore();
   const [selectedColumnIds, setSelectedColumnIds] = useState<string[]>([]);
 
@@ -21,17 +22,6 @@ function ValueAnnotation() {
     dataType?: 'Categorical' | 'Continuous' | null;
   }) => {
     setSelectedColumnIds(params.columnIDs);
-  };
-
-  const handleToggleMissingValue = (columnId: string, value: string, isMissing: boolean) => {
-    updateColumnMissingValues(columnId, value, isMissing);
-  };
-
-  const handleUpdateFormat = (
-    columnId: string,
-    format: { termURL: string; label: string } | null
-  ) => {
-    updateColumnFormat(columnId, format);
   };
 
   const filteredColumns = selectedColumnIds.reduce(
@@ -96,8 +86,9 @@ function ValueAnnotation() {
         dataTable={filteredDataTable}
         onUpdateDescription={updateColumnLevelDescription}
         onUpdateUnits={updateColumnUnits}
-        onToggleMissingValue={handleToggleMissingValue}
-        onUpdateFormat={handleUpdateFormat}
+        onToggleMissingValue={updateColumnMissingValues}
+        onUpdateFormat={updateColumnFormat}
+        onUpdateLevelTerm={updateColumnLevelTerm}
       />
     );
   };

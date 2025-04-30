@@ -11,6 +11,7 @@ import {
   TextField,
 } from '@mui/material';
 import { useEffect } from 'react';
+import { StandardizedVariable } from '~/utils/types';
 import { useTablePagination } from '../hooks';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueButton from './MissingValueButton';
@@ -24,10 +25,16 @@ interface ContinuousProps {
     termURL?: string;
     label?: string;
   };
+  standardizedVariable?: StandardizedVariable | null;
   onUpdateUnits: (columnID: string, units: string) => void;
   onToggleMissingValue: (columnID: string, value: string, isMissing: boolean) => void;
   onUpdateFormat: (columnID: string, format: { termURL: string; label: string } | null) => void;
 }
+
+const defaultProps = {
+  standardizedVariable: null,
+  format: null,
+};
 
 const formatOptions = [
   { label: 'bounded', value: 'nb:FromBounded' },
@@ -43,6 +50,7 @@ function Continuous({
   columnValues,
   missingValues,
   format,
+  standardizedVariable,
   onUpdateUnits,
   onToggleMissingValue,
   onUpdateFormat,
@@ -67,31 +75,41 @@ function Continuous({
                 <TableRow className="bg-blue-50">
                   <TableCell
                     align="left"
-                    sx={{ fontWeight: 'bold', color: 'primary.main', width: '70%' }}
+                    sx={{
+                      fontWeight: 'bold',
+                      color: 'primary.main',
+                      width: standardizedVariable ? '70%' : '',
+                    }}
                   >
                     Value
                   </TableCell>
-                  <TableCell
-                    align="left"
-                    sx={{ fontWeight: 'bold', color: 'primary.main', width: '30%' }}
-                  >
-                    Status
-                  </TableCell>
+                  {standardizedVariable && (
+                    <TableCell
+                      align="left"
+                      sx={{ fontWeight: 'bold', color: 'primary.main', width: '30%' }}
+                    >
+                      Status
+                    </TableCell>
+                  )}
                 </TableRow>
               </TableHead>
               <TableBody>
                 {slicedValues.map((value, index) => (
+                  // eslint-disable-next-line react/no-array-index-key
                   <TableRow key={`${columnID}-${value}-${index}`}>
                     <TableCell align="left">{value}</TableCell>
-                    <TableCell align="left">
-                      <MissingValueButton
-                        key={`${columnID}-${value}-${index}-missingButton`}
-                        value={value}
-                        columnId={columnID}
-                        missingValues={missingValues}
-                        onToggleMissingValue={onToggleMissingValue}
-                      />
-                    </TableCell>
+                    {standardizedVariable && (
+                      <TableCell align="left">
+                        <MissingValueButton
+                          // eslint-disable-next-line react/no-array-index-key
+                          key={`${columnID}-${value}-${index}-missingButton`}
+                          value={value}
+                          columnId={columnID}
+                          missingValues={missingValues}
+                          onToggleMissingValue={onToggleMissingValue}
+                        />
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>
@@ -121,29 +139,34 @@ function Continuous({
             }}
           />
 
-          <Autocomplete
-            options={formatOptions}
-            getOptionLabel={(option) => option.label}
-            value={formatOptions.find((opt) => opt.value === format?.termURL) || null}
-            onChange={(_, newValue) => {
-              onUpdateFormat(
-                columnID,
-                newValue
-                  ? {
-                      termURL: newValue.value,
-                      label: newValue.label,
-                    }
-                  : null
-              );
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="Format" variant="outlined" fullWidth />
-            )}
-          />
+          {standardizedVariable && (
+            <Autocomplete
+              options={formatOptions}
+              getOptionLabel={(option) => option.label}
+              value={formatOptions.find((opt) => opt.value === format?.termURL) || null}
+              onChange={(_, newValue) => {
+                onUpdateFormat(
+                  columnID,
+                  newValue
+                    ? {
+                        termURL: newValue.value,
+                        label: newValue.label,
+                      }
+                    : null
+                );
+              }}
+              renderInput={(params) => (
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                <TextField {...params} label="Format" variant="outlined" fullWidth />
+              )}
+            />
+          )}
         </div>
       </div>
     </Paper>
   );
 }
+
+Continuous.defaultProps = defaultProps;
 
 export default Continuous;

@@ -188,8 +188,8 @@ describe('Main user flow', () => {
       .should('be.visible')
       .and('contain', 'Description:"Age of the participant"')
       .and('contain', 'Units:"Years"')
-      .and('contain', 'M:"Male"')
-      .and('contain', 'F:"Female"');
+      .and('contain', 'Description:"Male"')
+      .and('contain', 'Description:"Female"');
     cy.get('[data-cy="datadictionary-toggle-preview-button"]').click();
     cy.get('[data-cy="force-download-switch"]').click();
     cy.get('[data-cy="download-datadictionary-button"]').click();
@@ -201,8 +201,8 @@ describe('Main user flow', () => {
       expect(fileContentString).to.not.contain('some cool new description');
       expect(fileContentString).to.contain('Age of the participant');
       expect(fileContentString).to.contain('"Units":"Years"');
-      expect(fileContentString).to.contain('"M":"Male"');
-      expect(fileContentString).to.contain('"F":"Female"');
+      expect(fileContentString).to.contain('"Description":"Male"');
+      expect(fileContentString).to.contain('"Description":"Female"');
     });
 
     cy.visit('http://localhost:5173');

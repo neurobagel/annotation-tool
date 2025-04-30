@@ -11,7 +11,7 @@ export type Column = {
     termURL?: string;
     label?: string;
   };
-  levels?: { [key: string]: { description: string } } | null;
+  levels?: { [key: string]: { description: string; label?: string; termURL?: string } } | null;
   units?: string;
   missingValues?: string[];
   format?: {
@@ -29,7 +29,7 @@ export type ColumnEntry = [string, Column];
 export interface DataDictionary {
   [key: string]: {
     Description: string;
-    Levels?: { [key: string]: string };
+    Levels?: { [key: string]: { Description: string; TermURL?: string } };
     Units?: string;
     Annotations?: {
       IsAbout?: {

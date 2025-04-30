@@ -26,10 +26,9 @@ function Download() {
   const columns = useDataStore((state) => state.columns);
   const config = useDataStore((state) => state.config);
 
-  // TODO: Make sure Anontations includes the levels with label and termURL
   const dataDictionary = useMemo(
     () =>
-      Object.entries(columns).reduce((acc, [_columnKey, column]) => {
+      Object.entries(columns).reduce((dictAcc, [_columnKey, column]) => {
         const participantIDConfig = config['Subject ID'];
         const sessionIDConfig = config['Session ID'];
 
@@ -38,46 +37,16 @@ function Download() {
             Description: column.description || '',
           };
 
-          if (column.standardizedVariable) {
-            dictionaryEntry.Annotations = {};
-
-            dictionaryEntry.Annotations.IsAbout = {
-              Label: column.standardizedVariable.label,
-              TermURL: column.standardizedVariable.identifier,
-            };
-
-            if (column.standardizedVariable?.identifier === participantIDConfig.identifier) {
-              dictionaryEntry.Annotations.Identifies = 'participant';
-            } else if (column.standardizedVariable?.identifier === sessionIDConfig.identifier) {
-              dictionaryEntry.Annotations.Identifies = 'session';
-            }
-
-            if (column.isPartOf) {
-              dictionaryEntry.Annotations.IsPartOf = {
-                Label: column.isPartOf?.label || '',
-                TermURL: column.isPartOf?.termURL || '',
-              };
-            }
-
-            if (column.missingValues && column.dataType !== null) {
-              dictionaryEntry.Annotations.MissingValues = column.missingValues;
-            }
-
-            if (column.format) {
-              dictionaryEntry.Annotations.Format = {
-                Label: column.format?.label || '',
-                TermURL: column.format?.termURL || '',
-              };
-            }
-          }
-
+          // Description of levels always included for the BIDS section
           if (column.dataType === 'Categorical' && column.levels) {
             dictionaryEntry.Levels = Object.entries(column.levels).reduce(
-              (levelsAcc, [levelKey, levelValue]) => ({
-                ...levelsAcc,
-                [levelKey]: levelValue.description,
+              (levelsObj, [levelKey, levelValue]) => ({
+                ...levelsObj,
+                [levelKey]: {
+                  Description: levelValue.description || '',
+                },
               }),
-              {} as { [key: string]: string }
+              {} as { [key: string]: { Description: string } }
             );
           }
 
@@ -85,12 +54,78 @@ function Download() {
             dictionaryEntry.Units = column.units;
           }
 
+          if (column.standardizedVariable) {
+            dictionaryEntry.Annotations = {
+              IsAbout: {
+                TermURL: column.standardizedVariable.identifier,
+                Label: column.standardizedVariable.label,
+              },
+            };
+
+            // Handle level terms only for standardized columns
+            if (column.dataType === 'Categorical' && column.levels) {
+              // Add TermURL to root Levels if present
+              dictionaryEntry.Levels = Object.entries(column.levels).reduce(
+                (updatedLevels, [levelKey, levelValue]) => ({
+                  ...updatedLevels,
+                  [levelKey]: {
+                    ...updatedLevels[levelKey],
+                    ...(levelValue.termURL ? { TermURL: levelValue.termURL } : {}),
+                  },
+                }),
+                dictionaryEntry.Levels || {}
+              );
+
+              // Create Annotations.Levels for terms with both termURL and label
+              const levelsWithTerms = Object.entries(column.levels).filter(
+                ([_, levelValue]) => levelValue.termURL && levelValue.label
+              );
+
+              if (levelsWithTerms.length > 0) {
+                dictionaryEntry.Annotations.Levels = levelsWithTerms.reduce(
+                  (termsObj, [levelKey, levelValue]) => ({
+                    ...termsObj,
+                    [levelKey]: {
+                      TermURL: levelValue.termURL!,
+                      Label: levelValue.label!,
+                    },
+                  }),
+                  {} as { [key: string]: { TermURL: string; Label: string } }
+                );
+              }
+            }
+
+            if (column.standardizedVariable?.identifier === participantIDConfig.identifier) {
+              dictionaryEntry.Annotations.Identifies = 'participant';
+            } else if (column.standardizedVariable?.identifier === sessionIDConfig.identifier) {
+              dictionaryEntry.Annotations.Identifies = 'session';
+            }
+
+            if (column.isPartOf?.termURL && column.isPartOf?.label) {
+              dictionaryEntry.Annotations.IsPartOf = {
+                TermURL: column.isPartOf.termURL,
+                Label: column.isPartOf.label,
+              };
+            }
+
+            if (column.missingValues && column.dataType !== null) {
+              dictionaryEntry.Annotations.MissingValues = column.missingValues;
+            }
+
+            if (column.dataType === 'Continuous' && column.format) {
+              dictionaryEntry.Annotations.Format = {
+                TermURL: column.format?.termURL || '',
+                Label: column.format?.label || '',
+              };
+            }
+          }
+
           return {
-            ...acc,
+            ...dictAcc,
             [column.header]: dictionaryEntry,
           };
         }
-        return acc;
+        return dictAcc;
       }, {} as DataDictionary),
     [columns, config]
   );
