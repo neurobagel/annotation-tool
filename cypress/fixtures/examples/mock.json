@@ -15,6 +15,10 @@
       "IsAbout": {
         "TermURL": "nb:Age",
         "Label": "Age"
+      },
+      "Format": {
+        "TermURL": "nb:FromFloat",
+        "Label": "Float"
       }
     }
   },
