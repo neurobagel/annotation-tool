@@ -31,7 +31,7 @@ function MissingValueButton({
       `}
       size="small"
       onClick={handleClick}
-      data-cy={`missing-value-button-${columnId}-${value}`}
+      data-cy={`${columnId}-${value}-missing-value-button`}
     >
       {isMissing ? 'Mark as not missing' : 'Mark as missing'}
     </Button>

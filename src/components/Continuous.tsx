@@ -37,8 +37,8 @@ const defaultProps = {
 };
 
 const formatOptions = [
-  { label: 'bounded', value: 'nb:FromBounded' },
   { label: 'euro', value: 'nb:FromEuro' },
+  { label: 'bounded', value: 'nb:FromBounded' },
   { label: 'float', value: 'nb:FromFloat' },
   { label: 'iso8601', value: 'nb:FromISO8601' },
   { label: 'range', value: 'nb:FromRange' },
@@ -69,7 +69,7 @@ function Continuous({
     <Paper elevation={3} className="h-full shadow-lg" data-cy={`${columnID}-continuous`}>
       <div className="flex h-full">
         <div className="w-3/5 flex flex-col">
-          <TableContainer className="flex-1">
+          <TableContainer className="flex-1" data-cy={`${columnID}-continuous-table`}>
             <Table stickyHeader>
               <TableHead>
                 <TableRow className="bg-blue-50">
@@ -97,12 +97,14 @@ function Continuous({
                 {slicedValues.map((value, index) => (
                   // eslint-disable-next-line react/no-array-index-key
                   <TableRow key={`${columnID}-${value}-${index}`}>
-                    <TableCell align="left">{value}</TableCell>
+                    <TableCell align="left" data-cy={`${columnID}-${value}-${index}-value`}>
+                      {value}
+                    </TableCell>
                     {standardizedVariable && (
                       <TableCell align="left">
                         <MissingValueButton
                           // eslint-disable-next-line react/no-array-index-key
-                          key={`${columnID}-${value}-${index}-missingButton`}
+                          key={`${columnID}-${value}-${index}-missingbutton`}
                           value={value}
                           columnId={columnID}
                           missingValues={missingValues}
@@ -141,6 +143,7 @@ function Continuous({
 
           {standardizedVariable && (
             <Autocomplete
+              data-cy={`${columnID}-format-dropdown`}
               options={formatOptions}
               getOptionLabel={(option) => option.label}
               value={formatOptions.find((opt) => opt.value === format?.termURL) || null}
