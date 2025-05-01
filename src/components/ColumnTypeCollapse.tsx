@@ -92,6 +92,31 @@ export function ColumnTypeCollapse({
 
   const handleSelect = () => {
     if (columnsToDisplay.length > 0) {
+      // For assessment tool, find the first group and select it
+      if (
+        standardizedVariable?.identifier ===
+        useDataStore.getState().getAssessmentToolConfig().identifier
+      ) {
+        const groupedColumns: Record<string, ColumnEntry[]> = {};
+
+        columnsToDisplay.forEach(([columnId, column]) => {
+          const groupKey = column.isPartOf?.label || 'Ungrouped';
+          if (!groupedColumns[groupKey]) {
+            groupedColumns[groupKey] = [];
+          }
+          groupedColumns[groupKey].push([columnId, column]);
+        });
+
+        const firstGroupColumns = Object.values(groupedColumns)[0];
+        if (firstGroupColumns) {
+          onSelect({
+            columnIDs: firstGroupColumns.map(([id]) => id),
+            dataType,
+          });
+          return;
+        }
+      }
+
       onSelect({
         columnIDs: columnsToDisplay.map(([id]) => id),
         dataType,
