@@ -39,7 +39,6 @@ describe('Categorical', () => {
     cy.get('[data-cy="3-F"]').should('be.visible').and('contain', 'F');
     cy.get('[data-cy="3-F-description"]').should('be.visible').and('contain', 'Female');
     cy.get('[data-cy="3-F-edit-description-button"]').should('be.visible');
-    cy.get('[data-cy="3-categorical-pagination"]').should('be.visible');
   });
   it('fires the onUpdateDescription event handler with the appropriate payload when the description is changed', () => {
     const spy = cy.spy().as('spy');

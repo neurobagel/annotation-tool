@@ -69,6 +69,7 @@ function ValueAnnotationTabs({
                       columnID={columnId}
                       uniqueValues={uniqueValues}
                       levels={column.levels || {}}
+                      standardizedVariable={column.standardizedVariable}
                       missingValues={column.missingValues || []}
                       onUpdateDescription={onUpdateDescription}
                       onToggleMissingValue={onToggleMissingValue}
@@ -81,6 +82,7 @@ function ValueAnnotationTabs({
                       missingValues={column.missingValues || []}
                       columnValues={dataTable[columnId] || []}
                       format={column.format}
+                      standardizedVariable={column.standardizedVariable}
                       onUpdateUnits={onUpdateUnits}
                       onToggleMissingValue={onToggleMissingValue}
                       onUpdateFormat={onUpdateFormat}

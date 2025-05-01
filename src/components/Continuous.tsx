@@ -6,13 +6,11 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TablePagination,
   Autocomplete,
   TextField,
 } from '@mui/material';
 import { useEffect } from 'react';
 import { StandardizedVariable } from '~/utils/types';
-import { useTablePagination } from '../hooks';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueButton from './MissingValueButton';
 
@@ -55,21 +53,26 @@ function Continuous({
   onToggleMissingValue,
   onUpdateFormat,
 }: ContinuousProps) {
-  const { page, setPage, rowsPerPage, handleChangePage, handleChangeRowsPerPage } =
-    useTablePagination(5);
-
   const uniqueValues = Array.from(new Set(columnValues));
-  const slicedValues = uniqueValues.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   useEffect(() => {
-    setPage(0);
-  }, [columnID, setPage]);
+    // Reset scroll position when column changes
+    const tableContainer = document.getElementById(`${columnID}-table-container`);
+    if (tableContainer) {
+      tableContainer.scrollTop = 0;
+    }
+  }, [columnID]);
 
   return (
     <Paper elevation={3} className="h-full shadow-lg" data-cy={`${columnID}-continuous`}>
       <div className="flex h-full">
         <div className="w-3/5 flex flex-col">
-          <TableContainer className="flex-1" data-cy={`${columnID}-continuous-table`}>
+          <TableContainer
+            id={`${columnID}-table-container`}
+            className="flex-1 overflow-auto"
+            style={{ maxHeight: '500px' }}
+            data-cy={`${columnID}-continuous-table`}
+          >
             <Table stickyHeader>
               <TableHead>
                 <TableRow className="bg-blue-50">
@@ -94,7 +97,7 @@ function Continuous({
                 </TableRow>
               </TableHead>
               <TableBody>
-                {slicedValues.map((value, index) => (
+                {uniqueValues.map((value, index) => (
                   // eslint-disable-next-line react/no-array-index-key
                   <TableRow key={`${columnID}-${value}-${index}`}>
                     <TableCell align="left" data-cy={`${columnID}-${value}-${index}-value`}>
@@ -117,17 +120,6 @@ function Continuous({
               </TableBody>
             </Table>
           </TableContainer>
-          <TablePagination
-            className="flex justify-center"
-            data-cy={`${columnID}-continuous-pagination`}
-            rowsPerPageOptions={[5, 10, 25, 50, 100]}
-            component="div"
-            count={uniqueValues.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
         </div>
 
         <div className="w-2/5 p-4 space-y-4">

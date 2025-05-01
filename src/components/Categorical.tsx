@@ -6,13 +6,11 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TablePagination,
   Autocomplete,
   TextField,
 } from '@mui/material';
 import { useEffect } from 'react';
 import diagnosisTerms from '../assets/diagnosisTerms.json';
-import { useTablePagination } from '../hooks';
 import { StandardizedVariable } from '../utils/types';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueButton from './MissingValueButton';
@@ -52,14 +50,13 @@ function Categorical({
   onToggleMissingValue,
   onUpdateLevelTerm,
 }: CategoricalProps) {
-  const { page, setPage, rowsPerPage, handleChangePage, handleChangeRowsPerPage } =
-    useTablePagination(5);
-
   useEffect(() => {
-    setPage(0);
-  }, [columnID, setPage]);
-
-  const slicedValues = uniqueValues.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    // Reset scroll position when column changes
+    const tableContainer = document.getElementById(`${columnID}-table-container`);
+    if (tableContainer) {
+      tableContainer.scrollTop = 0;
+    }
+  }, [columnID]);
 
   const getTermOptions = () => {
     if (standardizedVariable?.identifier === 'nb:Diagnosis') {
@@ -75,12 +72,14 @@ function Categorical({
 
   return (
     <TableContainer
-      data-cy={`${columnID}-categorical`}
+      id={`${columnID}-table-container`}
       component={Paper}
       elevation={3}
-      className="h-full shadow-lg"
+      className="h-full shadow-lg overflow-auto"
+      style={{ maxHeight: '500px' }}
+      data-cy={`${columnID}-categorical`}
     >
-      <Table className="min-w-[768px]">
+      <Table stickyHeader className="min-w-[768px]">
         <TableHead data-cy={`${columnID}-categorical-table-head`}>
           <TableRow className="bg-blue-50">
             <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
@@ -102,7 +101,7 @@ function Categorical({
           </TableRow>
         </TableHead>
         <TableBody>
-          {slicedValues.map((value) => (
+          {uniqueValues.map((value) => (
             <TableRow key={`${columnID}-${value}`} data-cy={`${columnID}-${value}`}>
               <TableCell align="left">{value}</TableCell>
               <TableCell align="left">
@@ -147,16 +146,6 @@ function Categorical({
           ))}
         </TableBody>
       </Table>
-      <TablePagination
-        data-cy={`${columnID}-categorical-pagination`}
-        rowsPerPageOptions={[5, 10, 25, 50, 100]}
-        component="div"
-        count={uniqueValues.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
     </TableContainer>
   );
 }

@@ -58,7 +58,6 @@ describe('Continuous', () => {
     cy.get('[data-cy="1-3-missing-value-button"]').should('not.exist');
     cy.get('[data-cy="1-format-dropdown"]').should('not.exist');
     cy.get('[data-cy="1-continuous-table"]').should('be.visible');
-    cy.get('[data-cy="1-continuous-pagination"]').should('be.visible');
   });
   it('fires the onUpdateUnits event handler with the appropriate payload when the description is changed', () => {
     const spy = cy.spy().as('spy');
