@@ -67,7 +67,7 @@ function ValueAnnotation() {
           className="flex h-full items-center justify-center shadow-lg"
         >
           <Typography variant="h6">
-            {`Please select the appropriate data type for the following column${unknownDataTypeColumns.length > 1 ? 's' : ''}:`}
+            {`The following column${unknownDataTypeColumns.length > 1 ? 's' : ''} do not have an assigned data type:`}
             <List>
               {unknownDataTypeColumns.map((columnId) => (
                 <ListItem key={columnId}>
