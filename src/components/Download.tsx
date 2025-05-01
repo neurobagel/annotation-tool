@@ -140,8 +140,15 @@ function Download() {
       Since Ajv uses JSON Pointer format for instance path
       we need to slice the leading slash off of the instance path
       */
-      const errors = validate.errors?.map((error) => error.instancePath.slice(1)) || [];
-      return { isValid: false, errors };
+      const errors =
+        validate.errors?.map((error) => {
+          const pathSegments = error.instancePath.slice(1).split('/');
+          return pathSegments[0];
+        }) || [];
+
+      const uniqueErrors = Array.from(new Set(errors));
+
+      return { isValid: false, errors: uniqueErrors };
     }
 
     return { isValid: true, errors: [] };
@@ -247,7 +254,7 @@ function Download() {
           <DataDictionaryPreview dataDictionary={dataDictionary} />
         </Collapse>
 
-        <Typography variant="h6" className="font-bold">
+        <Typography variant="h6" className="font-bold mt-4">
           Here are some next steps:
         </Typography>
         <List className="list-disc pl-6" data-cy="datadictionary-next-steps-list">
