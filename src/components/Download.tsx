@@ -14,9 +14,9 @@ import { useState, useMemo } from 'react';
 import emoji from '../assets/download-emoji.png';
 import schema from '../assets/neurobagel_data_dictionary.schema.json';
 import useDataStore from '../stores/data';
+import useViewStore from '../stores/view';
 import { DataDictionary, View } from '../utils/types';
 import DataDictionaryPreview from './DataDictionaryPreview';
-import NavigationButton from './NavigationButton';
 
 function Download() {
   const [dictionaryCollapsed, setDictionaryCollapsed] = useState(false);
@@ -25,6 +25,9 @@ function Download() {
   const uploadedDataTableFileName = useDataStore((state) => state.uploadedDataTableFileName);
   const columns = useDataStore((state) => state.columns);
   const config = useDataStore((state) => state.config);
+  const reset = useDataStore((state) => state.reset);
+
+  const setCurrentView = useViewStore((state) => state.setCurrentView);
 
   const dataDictionary = useMemo(
     () =>
@@ -167,6 +170,11 @@ function Download() {
     a.click();
     URL.revokeObjectURL(url);
     document.body.removeChild(a);
+  };
+
+  const handleAnnotatingNewDataset = () => {
+    reset();
+    setCurrentView(View.Upload);
   };
 
   return (
@@ -320,11 +328,14 @@ function Download() {
         </Button>
       </div>
 
-      <NavigationButton
-        backView={View.ValueAnnotation}
-        nextView={undefined}
-        backLabel="Back to Value Annotations"
-      />
+      <Button
+        variant="contained"
+        color="info"
+        onClick={handleAnnotatingNewDataset}
+        className="mt-4"
+      >
+        Annotate a new dataset
+      </Button>
     </div>
   );
 }

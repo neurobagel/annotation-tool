@@ -52,7 +52,7 @@ function App() {
 
       {content}
 
-      {currentView !== View.Landing && currentView !== View.Download && (
+      {currentView !== View.Landing && (
         <div className="mt-auto">
           <NavigationButton
             backView={backView}
