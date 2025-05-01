@@ -39,40 +39,6 @@ function ValueAnnotationTabs({
     return <Paper elevation={3}>No columns to display</Paper>;
   }
 
-  if (columnIds.length === 1) {
-    const [columnId, column] = columnEntries[0];
-    const uniqueValues = dataTable[columnId] ? Array.from(new Set(dataTable[columnId])) : [];
-
-    return (
-      <div className="h-full">
-        {column.dataType === 'Categorical' ? (
-          <Categorical
-            columnID={columnId}
-            uniqueValues={uniqueValues}
-            levels={column.levels || {}}
-            missingValues={column.missingValues || []}
-            standardizedVariable={column.standardizedVariable}
-            onUpdateDescription={onUpdateDescription}
-            onToggleMissingValue={onToggleMissingValue}
-            onUpdateLevelTerm={onUpdateLevelTerm}
-          />
-        ) : (
-          <Continuous
-            columnID={columnId}
-            units={column.units || ''}
-            missingValues={column.missingValues || []}
-            columnValues={dataTable[columnId] || []}
-            standardizedVariable={column.standardizedVariable}
-            format={column.format}
-            onUpdateUnits={onUpdateUnits}
-            onToggleMissingValue={onToggleMissingValue}
-            onUpdateFormat={onUpdateFormat}
-          />
-        )}
-      </div>
-    );
-  }
-
   return (
     <Paper elevation={3} className="h-full flex flex-col">
       <Tabs value={activeTab} onChange={handleTabChange} variant="scrollable" scrollButtons="auto">

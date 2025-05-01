@@ -1,6 +1,6 @@
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import { Typography, Collapse, Button, List, ListItem, ListItemButton } from '@mui/material';
+import { Typography, Collapse, Button, List, ListItem, IconButton } from '@mui/material';
 import { useState } from 'react';
 import useDataStore from '~/stores/data';
 import { ColumnEntry, Columns, StandardizedVariable } from '../utils/types';
@@ -129,93 +129,86 @@ export function ColumnTypeCollapse({
 
     return (
       <div data-cy={`side-column-nav-bar-${labelToDisplay}`}>
-        <div className="flex">
-          <Button
+        <div className="flex items-center">
+          <IconButton
             data-cy={`side-column-nav-bar-${labelToDisplay}-toggle-button`}
-            variant="text"
+            size="small"
             onClick={() => setShowColumns(!showColumns)}
             sx={{
-              minWidth: '24px',
-              padding: '6px',
-              color: 'primary',
+              marginRight: '4px',
+              color: 'primary.main',
             }}
           >
-            {showColumns ? (
-              <ArrowDropDownIcon fontSize="small" />
-            ) : (
-              <ArrowRightIcon fontSize="small" />
-            )}
-          </Button>
-          <Button
+            {showColumns ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+          </IconButton>
+          <Typography
             data-cy={`side-column-nav-bar-${labelToDisplay}-select-button`}
             onClick={handleSelect}
             sx={{
               flexGrow: 1,
-              justifyContent: 'flex-start',
-              textTransform: 'none',
-              color: 'text.primary',
-              paddingLeft: '4px',
+              cursor: 'pointer',
+              fontWeight:
+                selectedColumnId && columnsToDisplay.some(([id]) => id === selectedColumnId)
+                  ? 'bold'
+                  : 'normal',
+              color:
+                selectedColumnId && columnsToDisplay.some(([id]) => id === selectedColumnId)
+                  ? 'primary.main'
+                  : '',
+              '&:hover': {
+                color: 'primary.main',
+              },
             }}
-            variant="text"
           >
-            <Typography
-              sx={{
-                fontWeight:
-                  selectedColumnId && columnsToDisplay.some(([id]) => id === selectedColumnId)
-                    ? 'bold'
-                    : 'normal',
-              }}
-            >
-              {labelToDisplay.charAt(0).toUpperCase() + labelToDisplay.slice(1)}
-            </Typography>
-          </Button>
+            {labelToDisplay.charAt(0).toUpperCase() + labelToDisplay.slice(1)}
+          </Typography>
         </div>
         <Collapse in={showColumns}>
-          <List className="pl-2">
+          <List sx={{ pl: 2 }} className="space-y-3">
             {Object.entries(groupedColumns).map(([groupName, groupColumns]) => {
               const isGroupExpanded = expandedGroups[groupName] || false;
               const isGroupSelected = groupColumns.some(([id]) => id === selectedColumnId);
 
               return (
                 <div key={groupName}>
-                  <div className="flex">
-                    <Button
+                  <div className="flex items-center">
+                    <IconButton
+                      size="small"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleGroupToggle(groupName);
                       }}
                       sx={{
-                        minWidth: '24px',
-                        padding: '6px',
+                        marginRight: '4px',
                       }}
                     >
-                      {isGroupExpanded ? (
-                        <ArrowDropDownIcon fontSize="small" />
-                      ) : (
-                        <ArrowRightIcon fontSize="small" />
-                      )}
-                    </Button>
-                    <ListItemButton
+                      {isGroupExpanded ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+                    </IconButton>
+                    <Typography
                       onClick={() => handleGroupSelect(groupColumns)}
                       sx={{
+                        cursor: 'pointer',
                         fontWeight: isGroupSelected ? 'bold' : 'normal',
-                        paddingLeft: '4px',
-                        minWidth: 0,
+                        color: isGroupSelected ? 'primary.main' : '',
+                        '&:hover': {
+                          color: 'primary.main',
+                        },
                       }}
                     >
-                      <Typography>{groupName}</Typography>
-                    </ListItemButton>
+                      {groupName}
+                    </Typography>
                   </div>
                   <Collapse in={isGroupExpanded}>
-                    <List className="pl-6">
+                    <List sx={{ pl: 4 }}>
                       {groupColumns.map(([columnId, column]) => (
                         <ListItem
                           data-cy={`side-column-nav-bar-${labelToDisplay}-${column.header}`}
                           key={columnId}
                           sx={{
-                            color: 'grey.600',
+                            pl: 4,
+                            py: 0,
+                            color: 'text.secondary',
                             fontWeight: columnId === selectedColumnId ? 'bold' : 'normal',
-                            paddingLeft: '32px',
                           }}
                         >
                           <Typography>{column.header}</Typography>
@@ -234,56 +227,51 @@ export function ColumnTypeCollapse({
 
   return (
     <div data-cy={`side-column-nav-bar-${labelToDisplay}`}>
-      <div className="flex">
-        <Button
+      <div className="flex items-center">
+        <IconButton
           data-cy={`side-column-nav-bar-${labelToDisplay}-toggle-button`}
-          variant="text"
+          size="small"
           onClick={() => setShowColumns(!showColumns)}
           sx={{
-            minWidth: '24px',
-            padding: '6px',
-            color: 'primary',
+            marginRight: '4px',
+            color: 'primary.main',
           }}
         >
-          {showColumns ? (
-            <ArrowDropDownIcon fontSize="small" />
-          ) : (
-            <ArrowRightIcon fontSize="small" />
-          )}
-        </Button>
-        <Button
+          {showColumns ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+        </IconButton>
+        <Typography
           data-cy={`side-column-nav-bar-${labelToDisplay}-select-button`}
           onClick={handleSelect}
           sx={{
-            textTransform: 'none',
-            color: 'text.primary',
-            paddingLeft: '4px',
-            minWidth: 0,
+            flexGrow: 1,
+            cursor: 'pointer',
+            fontWeight:
+              selectedColumnId && columnsToDisplay.some(([id]) => id === selectedColumnId)
+                ? 'bold'
+                : 'normal',
+            color:
+              selectedColumnId && columnsToDisplay.some(([id]) => id === selectedColumnId)
+                ? 'primary.main'
+                : '',
+            '&:hover': {
+              color: 'primary.main',
+            },
           }}
-          variant="text"
         >
-          <Typography
-            sx={{
-              fontWeight:
-                selectedColumnId && columnsToDisplay.some(([id]) => id === selectedColumnId)
-                  ? 'bold'
-                  : 'normal',
-            }}
-          >
-            {labelToDisplay.charAt(0).toUpperCase() + labelToDisplay.slice(1)}
-          </Typography>
-        </Button>
+          {labelToDisplay.charAt(0).toUpperCase() + labelToDisplay.slice(1)}
+        </Typography>
       </div>
       <Collapse in={showColumns}>
-        <List className="pl-6">
+        <List sx={{ pl: 4 }}>
           {columnsToDisplay.map(([columnId, column]) => (
             <ListItem
               data-cy={`side-column-nav-bar-${labelToDisplay}-${column.header}`}
               key={columnId}
               sx={{
-                color: 'grey.600',
+                pl: 4,
+                py: 0,
+                color: 'text.secondary',
                 fontWeight: columnId === selectedColumnId ? 'bold' : 'normal',
-                paddingLeft: '32px',
               }}
             >
               <Typography>{column.header}</Typography>

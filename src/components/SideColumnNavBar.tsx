@@ -1,4 +1,4 @@
-import { List, Paper, ListItemButton } from '@mui/material';
+import { List, Paper, ListItem } from '@mui/material';
 import { Columns } from '../utils/types';
 import { getMappedStandardizedVariables } from '../utils/util';
 import { ColumnTypeCollapse, ExpandableSection } from './ColumnTypeCollapse';
@@ -20,7 +20,7 @@ function SideColumnNavBar({ columns, onSelect, selectedColumnId }: SideColumnNav
       <ExpandableSection title="annotated">
         <List>
           {mappedStandardizedVariables.map((standardizedVariable) => (
-            <ListItemButton sx={{ paddingLeft: 2 }} key={standardizedVariable.identifier}>
+            <ListItem key={standardizedVariable.identifier} sx={{ paddingLeft: 2 }}>
               <ColumnTypeCollapse
                 dataType={null}
                 standardizedVariable={standardizedVariable}
@@ -28,7 +28,7 @@ function SideColumnNavBar({ columns, onSelect, selectedColumnId }: SideColumnNav
                 onSelect={onSelect}
                 selectedColumnId={selectedColumnId}
               />
-            </ListItemButton>
+            </ListItem>
           ))}
         </List>
       </ExpandableSection>
@@ -36,14 +36,14 @@ function SideColumnNavBar({ columns, onSelect, selectedColumnId }: SideColumnNav
       <ExpandableSection title="unannotated">
         <List>
           {['Categorical', 'Continuous', null].map((dataType) => (
-            <ListItemButton key={`unannotated-${dataType || 'other'}`} sx={{ paddingLeft: 2 }}>
+            <ListItem key={`unannotated-${dataType || 'other'}`} sx={{ paddingLeft: 2 }}>
               <ColumnTypeCollapse
                 dataType={dataType as 'Categorical' | 'Continuous' | null}
                 columns={columns}
                 onSelect={onSelect}
                 selectedColumnId={selectedColumnId}
               />
-            </ListItemButton>
+            </ListItem>
           ))}
         </List>
       </ExpandableSection>
