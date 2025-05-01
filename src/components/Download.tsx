@@ -210,7 +210,7 @@ function Download() {
             back and complete these annotations before you download the .json data dictionary.
           </Typography>
           <Typography variant="body1" className="mb-2">
-            The following columns have incomplete annotations:
+            The following columns have incomplete value annotations:
           </Typography>
           <List className="list-disc pl-6" data-cy="incomplete-annotations-list">
             {schemaErrors.map((column) => (
