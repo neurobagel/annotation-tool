@@ -8,7 +8,10 @@ const props = {
     M: { description: 'Male' },
   },
   missingValues: [],
-  standardizedVariable: null,
+  standardizedVariable: {
+    identifier: 'nb:Diagnosis',
+    label: 'Diagnosis',
+  },
   onUpdateDescription: () => {},
   onToggleMissingValue: () => {},
   onUpdateLevelTerm: () => {},
