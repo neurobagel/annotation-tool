@@ -10,6 +10,7 @@ import {
   TextField,
 } from '@mui/material';
 import { useEffect } from 'react';
+import useDataStore from '~/stores/data';
 import diagnosisTerms from '../assets/diagnosisTerms.json';
 import { StandardizedVariable } from '../utils/types';
 import DescriptionEditor from './DescriptionEditor';
@@ -58,6 +59,12 @@ function Categorical({
     }
   }, [columnID]);
 
+  const { getAssessmentToolConfig } = useDataStore();
+
+  const showStandardizedTerm =
+    (standardizedVariable !== null || standardizedVariable !== undefined) &&
+    standardizedVariable?.identifier !== getAssessmentToolConfig().identifier;
+
   const getTermOptions = () => {
     if (standardizedVariable?.identifier === 'nb:Diagnosis') {
       return diagnosisTerms;
@@ -88,7 +95,7 @@ function Categorical({
             <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
               Description
             </TableCell>
-            {standardizedVariable && (
+            {showStandardizedTerm && (
               <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
                 Standardized Term
               </TableCell>
@@ -114,7 +121,7 @@ function Categorical({
                   }}
                 />
               </TableCell>
-              {standardizedVariable && (
+              {showStandardizedTerm && (
                 <TableCell align="left">
                   <Autocomplete
                     options={termOptions}

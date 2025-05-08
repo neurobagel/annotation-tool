@@ -29,7 +29,7 @@ export function ExpandableSection({
         className="justify-start pl-0"
         fullWidth
         onClick={() => setExpanded(!expanded)}
-        startIcon={expanded ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+        startIcon={expanded ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
       >
         <Typography data-cy={`side-column-nav-bar-${title}`}>
           {title.charAt(0).toUpperCase() + title.slice(1)}
