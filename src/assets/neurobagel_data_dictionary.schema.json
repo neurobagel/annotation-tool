@@ -80,9 +80,9 @@
             "type": "string"
           }
         },
-        "Transformation": {
-          "title": "Transformation",
-          "description": "For continuous columns this field can be used to describea transformation that can be applied to the values in thiscolumn in order to match the desired format of a standardizeddata element referenced in the IsAbout attribute.",
+        "Format": {
+          "title": "Format",
+          "description": "For continuous columns this field can be used to describes the format that can be applied to the values in this column in order to match the desired format of a standardized data element referenced in the IsAbout attribute.",
           "allOf": [
             {
               "$ref": "#/definitions/Identifier"
@@ -90,7 +90,7 @@
           ]
         }
       },
-      "required": ["IsAbout", "Transformation"],
+      "required": ["IsAbout", "Format"],
       "additionalProperties": false
     },
     "IdentifierNeurobagel": {

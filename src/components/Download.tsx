@@ -14,9 +14,9 @@ import { useState, useMemo } from 'react';
 import emoji from '../assets/download-emoji.png';
 import schema from '../assets/neurobagel_data_dictionary.schema.json';
 import useDataStore from '../stores/data';
+import useViewStore from '../stores/view';
 import { DataDictionary, View } from '../utils/types';
 import DataDictionaryPreview from './DataDictionaryPreview';
-import NavigationButton from './NavigationButton';
 
 function Download() {
   const [dictionaryCollapsed, setDictionaryCollapsed] = useState(false);
@@ -24,12 +24,14 @@ function Download() {
 
   const uploadedDataTableFileName = useDataStore((state) => state.uploadedDataTableFileName);
   const columns = useDataStore((state) => state.columns);
-  const config = useDataStore((state) => state.standardizedVariables);
+  const config = useDataStore((state) => state.config);
+  const reset = useDataStore((state) => state.reset);
 
-  // TODO: Make sure Anontations includes the levels with label and termURL
+  const setCurrentView = useViewStore((state) => state.setCurrentView);
+
   const dataDictionary = useMemo(
     () =>
-      Object.entries(columns).reduce((acc, [_columnKey, column]) => {
+      Object.entries(columns).reduce((dictAcc, [_columnKey, column]) => {
         const participantIDConfig = config['Subject ID'];
         const sessionIDConfig = config['Session ID'];
 
@@ -38,35 +40,16 @@ function Download() {
             Description: column.description || '',
           };
 
-          if (column.standardizedVariable) {
-            dictionaryEntry.Annotations = {};
-
-            dictionaryEntry.Annotations.IsAbout = {
-              Label: column.standardizedVariable.label,
-              TermURL: column.standardizedVariable.identifier,
-            };
-
-            if (column.standardizedVariable?.identifier === participantIDConfig.identifier) {
-              dictionaryEntry.Annotations.Identifies = 'participant';
-            } else if (column.standardizedVariable?.identifier === sessionIDConfig.identifier) {
-              dictionaryEntry.Annotations.Identifies = 'session';
-            }
-
-            if (column.isPartOf) {
-              dictionaryEntry.Annotations.IsPartOf = {
-                Label: column.isPartOf?.label || '',
-                TermURL: column.isPartOf?.termURL || '',
-              };
-            }
-          }
-
+          // Description of levels always included for the BIDS section
           if (column.dataType === 'Categorical' && column.levels) {
             dictionaryEntry.Levels = Object.entries(column.levels).reduce(
-              (levelsAcc, [levelKey, levelValue]) => ({
-                ...levelsAcc,
-                [levelKey]: levelValue.description,
+              (levelsObj, [levelKey, levelValue]) => ({
+                ...levelsObj,
+                [levelKey]: {
+                  Description: levelValue.description || '',
+                },
               }),
-              {} as { [key: string]: string }
+              {} as { [key: string]: { Description: string } }
             );
           }
 
@@ -74,12 +57,78 @@ function Download() {
             dictionaryEntry.Units = column.units;
           }
 
+          if (column.standardizedVariable) {
+            dictionaryEntry.Annotations = {
+              IsAbout: {
+                TermURL: column.standardizedVariable.identifier,
+                Label: column.standardizedVariable.label,
+              },
+            };
+
+            // Handle level terms only for standardized columns
+            if (column.dataType === 'Categorical' && column.levels) {
+              // Add TermURL to root Levels if present
+              dictionaryEntry.Levels = Object.entries(column.levels).reduce(
+                (updatedLevels, [levelKey, levelValue]) => ({
+                  ...updatedLevels,
+                  [levelKey]: {
+                    ...updatedLevels[levelKey],
+                    ...(levelValue.termURL ? { TermURL: levelValue.termURL } : {}),
+                  },
+                }),
+                dictionaryEntry.Levels || {}
+              );
+
+              // Create Annotations.Levels for terms with both termURL and label
+              const levelsWithTerms = Object.entries(column.levels).filter(
+                ([_, levelValue]) => levelValue.termURL && levelValue.label
+              );
+
+              if (levelsWithTerms.length > 0) {
+                dictionaryEntry.Annotations.Levels = levelsWithTerms.reduce(
+                  (termsObj, [levelKey, levelValue]) => ({
+                    ...termsObj,
+                    [levelKey]: {
+                      TermURL: levelValue.termURL!,
+                      Label: levelValue.label!,
+                    },
+                  }),
+                  {} as { [key: string]: { TermURL: string; Label: string } }
+                );
+              }
+            }
+
+            if (column.standardizedVariable?.identifier === participantIDConfig.identifier) {
+              dictionaryEntry.Annotations.Identifies = 'participant';
+            } else if (column.standardizedVariable?.identifier === sessionIDConfig.identifier) {
+              dictionaryEntry.Annotations.Identifies = 'session';
+            }
+
+            if (column.isPartOf?.termURL && column.isPartOf?.label) {
+              dictionaryEntry.Annotations.IsPartOf = {
+                TermURL: column.isPartOf.termURL,
+                Label: column.isPartOf.label,
+              };
+            }
+
+            if (column.missingValues && column.dataType !== null) {
+              dictionaryEntry.Annotations.MissingValues = column.missingValues;
+            }
+
+            if (column.dataType === 'Continuous' && column.format) {
+              dictionaryEntry.Annotations.Format = {
+                TermURL: column.format?.termURL || '',
+                Label: column.format?.label || '',
+              };
+            }
+          }
+
           return {
-            ...acc,
+            ...dictAcc,
             [column.header]: dictionaryEntry,
           };
         }
-        return acc;
+        return dictAcc;
       }, {} as DataDictionary),
     [columns, config]
   );
@@ -94,8 +143,15 @@ function Download() {
       Since Ajv uses JSON Pointer format for instance path
       we need to slice the leading slash off of the instance path
       */
-      const errors = validate.errors?.map((error) => error.instancePath.slice(1)) || [];
-      return { isValid: false, errors };
+      const errors =
+        validate.errors?.map((error) => {
+          const pathSegments = error.instancePath.slice(1).split('/');
+          return pathSegments[0];
+        }) || [];
+
+      const uniqueErrors = Array.from(new Set(errors));
+
+      return { isValid: false, errors: uniqueErrors };
     }
 
     return { isValid: true, errors: [] };
@@ -114,6 +170,11 @@ function Download() {
     a.click();
     URL.revokeObjectURL(url);
     document.body.removeChild(a);
+  };
+
+  const handleAnnotatingNewDataset = () => {
+    reset();
+    setCurrentView(View.Upload);
   };
 
   return (
@@ -157,7 +218,7 @@ function Download() {
             back and complete these annotations before you download the .json data dictionary.
           </Typography>
           <Typography variant="body1" className="mb-2">
-            The following columns have incomplete annotations:
+            The following columns have incomplete value annotations:
           </Typography>
           <List className="list-disc pl-6" data-cy="incomplete-annotations-list">
             {schemaErrors.map((column) => (
@@ -201,7 +262,7 @@ function Download() {
           <DataDictionaryPreview dataDictionary={dataDictionary} />
         </Collapse>
 
-        <Typography variant="h6" className="font-bold">
+        <Typography variant="h6" className="font-bold mt-4">
           Here are some next steps:
         </Typography>
         <List className="list-disc pl-6" data-cy="datadictionary-next-steps-list">
@@ -267,11 +328,14 @@ function Download() {
         </Button>
       </div>
 
-      <NavigationButton
-        backView={View.ValueAnnotation}
-        nextView={undefined}
-        backLabel="Back to Value Annotations"
-      />
+      <Button
+        variant="contained"
+        color="info"
+        onClick={handleAnnotatingNewDataset}
+        className="mt-4"
+      >
+        Annotate a new dataset
+      </Button>
     </div>
   );
 }

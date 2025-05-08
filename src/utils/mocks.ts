@@ -29,7 +29,7 @@ export const mockInitialColumns = {
   },
 };
 
-export const mockColumnsWithDescription = {
+export const mockColumns = {
   1: {
     header: 'participant_id',
     description: 'A participant ID',
@@ -37,6 +37,7 @@ export const mockColumnsWithDescription = {
       identifier: 'nb:ParticipantID',
       label: 'Subject Unique Identifier',
     },
+    dataType: null as 'Categorical' | 'Continuous' | null,
   },
   2: {
     header: 'age',
@@ -45,6 +46,12 @@ export const mockColumnsWithDescription = {
       identifier: 'nb:Age',
       label: 'Age',
     },
+    dataType: 'Continuous' as 'Categorical' | 'Continuous' | null,
+    format: {
+      termURL: 'nb:FromFloat',
+      label: 'Float',
+    },
+    units: '',
   },
   3: {
     header: 'sex',
@@ -53,12 +60,17 @@ export const mockColumnsWithDescription = {
       identifier: 'nb:Sex',
       label: 'Sex',
     },
+    dataType: 'Categorical' as 'Categorical' | 'Continuous' | null,
+    levels: {
+      F: { description: '' },
+      M: { description: '' },
+    },
   },
 };
 
 export const mockColumnsWithDataType = {
   1: {
-    header: 'participant_id',
+    header: 'some_continuous_column',
     dataType: 'Continuous' as 'Categorical' | 'Continuous' | null,
   },
   2: {
@@ -112,10 +124,23 @@ export const mockDataDictionaryWithAnnotations = {
         TermURL: 'nb:Age',
         Label: 'Age',
       },
+      Format: {
+        TermURL: 'nb:FromFloat',
+        Label: 'Float',
+      },
     },
+    Units: '',
   },
   sex: {
     Description: 'Sex of the participant',
+    Levels: {
+      F: {
+        Description: '',
+      },
+      M: {
+        Description: '',
+      },
+    },
     Annotations: {
       IsAbout: {
         TermURL: 'nb:Sex',

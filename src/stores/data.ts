@@ -8,6 +8,8 @@ import {
   DataDictionary,
   StandardizedVaribleCollection,
   StandardizedVariable,
+  StandardizedVariableConfig,
+  StandardizedVariableConfigCollection,
 } from '../utils/types';
 
 type DataStore = {
@@ -18,7 +20,8 @@ type DataStore = {
   initializeColumns: (data: Columns) => void;
   setUploadedDataTableFileName: (fileName: string | null) => void;
   processDataTableFile: (file: File) => Promise<void>;
-  getAssessmentToolConfig: () => StandardizedVariable;
+  getStandardizedVariables: () => StandardizedVaribleCollection;
+  getAssessmentToolConfig: () => StandardizedVariableConfig;
   getAssessmentToolColumns: () => { id: string; header: string }[];
   updateColumnDescription: (columnId: string, description: string | null) => void;
   updateColumnDataType: (columnId: string, dataType: 'Categorical' | 'Continuous' | null) => void;
@@ -31,7 +34,14 @@ type DataStore = {
     term: { identifier: string; label: string } | null
   ) => void;
   updateColumnLevelDescription: (columnId: string, value: string, description: string) => void;
+  updateColumnLevelTerm: (
+    columnId: string,
+    value: string,
+    term: { identifier: string; label: string } | null
+  ) => void;
   updateColumnUnits: (columnId: string, unitsDescription: string | null) => void;
+  updateColumnMissingValues: (columnId: string, value: string, isMissing: boolean) => void;
+  updateColumnFormat: (columnId: string, format: { termURL: string; label: string } | null) => void;
 
   uploadedDataDictionary: DataDictionary;
   uploadedDataDictionaryFileName: string | null;
@@ -39,7 +49,7 @@ type DataStore = {
   setUploadedDataDictionaryFileName: (fileName: string | null) => void;
   processDataDictionaryFile: (file: File) => Promise<void>;
 
-  standardizedVariables: StandardizedVaribleCollection;
+  config: StandardizedVariableConfigCollection;
   hasMultiColumnMeasures: () => boolean;
 
   reset: () => void;
@@ -51,7 +61,7 @@ const initialState = {
   uploadedDataTableFileName: null,
   uploadedDataDictionary: {},
   uploadedDataDictionaryFileName: null,
-  standardizedVariables: defaultConfig.standardizedVariables,
+  config: defaultConfig.standardizedVariables as StandardizedVariableConfigCollection,
 };
 
 const useDataStore = create<DataStore>()(
@@ -68,7 +78,11 @@ const useDataStore = create<DataStore>()(
 
         reader.onload = (e) => {
           const content = e.target?.result as string;
-          const rows = content.split('\n').map((row) => row.split('\t'));
+          const rows = content
+            .split('\n')
+            .map((row) => row.trim())
+            .filter((row) => row !== '')
+            .map((row) => row.split('\t'));
           const headers = rows[0];
           const data = rows.slice(1);
 
@@ -104,8 +118,16 @@ const useDataStore = create<DataStore>()(
       }),
 
     // Column updates
-    getAssessmentToolConfig: () => get().standardizedVariables['Assessment Tool'],
-
+    getStandardizedVariables: () => {
+      const configs = get().config;
+      return Object.fromEntries(
+        Object.entries(configs).map(([key, config]) => [
+          key,
+          { identifier: config.identifier, label: config.label },
+        ])
+      );
+    },
+    getAssessmentToolConfig: () => get().config['Assessment Tool'],
     getAssessmentToolColumns: () =>
       Object.entries(get().columns)
         .filter(
@@ -131,18 +153,21 @@ const useDataStore = create<DataStore>()(
             const columnData = state.dataTable[columnId];
             const uniqueValues = Array.from(new Set(columnData));
 
-            draft[columnId].levels = uniqueValues.reduce(
-              (acc, value) => ({
-                ...acc,
-                [value]: { description: '' },
-              }),
-              {} as { [key: string]: { description: string } }
-            );
+            if (!draft[columnId].levels) {
+              draft[columnId].levels = uniqueValues.reduce(
+                (acc, value) => ({
+                  ...acc,
+                  [value]: { description: '' },
+                }),
+                {} as { [key: string]: { description: string } }
+              );
 
-            delete draft[columnId].units;
+              delete draft[columnId].units;
+            }
           } else if (dataType === 'Continuous') {
-            draft[columnId].units = '';
-
+            if (draft[columnId].units === undefined) {
+              draft[columnId].units = '';
+            }
             delete draft[columnId].levels;
           } else {
             delete draft[columnId].levels;
@@ -171,6 +196,17 @@ const useDataStore = create<DataStore>()(
           }
         }),
       }));
+
+      let dataType: 'Categorical' | 'Continuous' | null = null;
+      if (standardizedVariable) {
+        const configEntry = Object.values(get().config).find(
+          (config) => config.identifier === standardizedVariable.identifier
+        );
+        dataType = configEntry?.data_type || null;
+      }
+
+      // Call updateColumnDataType with the found data_type
+      get().updateColumnDataType(columnId, dataType);
     },
 
     updateColumnIsPartOf: (
@@ -184,6 +220,8 @@ const useDataStore = create<DataStore>()(
               termURL: term.identifier,
               label: term.label,
             };
+          } else {
+            draft[columnId].isPartOf = {};
           }
         }),
       }));
@@ -199,10 +237,69 @@ const useDataStore = create<DataStore>()(
       }));
     },
 
+    updateColumnLevelTerm: (
+      columnId: string,
+      value: string,
+      term: { identifier: string; label: string } | null
+    ) => {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          if (draft[columnId].levels && draft[columnId].levels[value]) {
+            if (term) {
+              draft[columnId].levels[value] = {
+                ...draft[columnId].levels[value],
+                termURL: term.identifier,
+                label: term.label,
+              };
+            } else {
+              const { termURL, label, ...rest } = draft[columnId].levels[value];
+              draft[columnId].levels[value] = rest;
+            }
+          }
+        }),
+      }));
+    },
+
     updateColumnUnits: (columnId: string, unitsDescription: string) => {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
           draft[columnId].units = unitsDescription;
+        }),
+      }));
+    },
+
+    updateColumnMissingValues: (columnId: string, value: string, isMissing: boolean) => {
+      set((state) => {
+        const column = state.columns[columnId];
+        if (!column) return state;
+
+        const missingValues = column.missingValues || [];
+        const newMissingValues = isMissing
+          ? [...missingValues, value]
+          : missingValues.filter((v) => v !== value);
+
+        return {
+          columns: {
+            ...state.columns,
+            [columnId]: {
+              ...column,
+              missingValues: newMissingValues.length > 0 ? newMissingValues : [],
+            },
+          },
+        };
+      });
+    },
+    updateColumnFormat: (columnId: string, format: { termURL: string; label: string } | null) => {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          if (format) {
+            draft[columnId].format = {
+              termURL: format.termURL,
+              label: format.label,
+            };
+          } else {
+            delete draft[columnId].format;
+          }
         }),
       }));
     },
@@ -221,77 +318,141 @@ const useDataStore = create<DataStore>()(
             const dataDictionary: DataDictionary = JSON.parse(content);
 
             const currentColumns = get().columns;
-            const { standardizedVariables } = get();
+            const { config: storeConfig } = get();
 
-            const updatedColumns = Object.entries(dataDictionary).reduce(
-              (acc, [key, value]) => {
-                const columnEntry = Object.entries(currentColumns).find(
-                  ([_, column]) => column.header === key
-                );
+            const initialUpdates = {
+              columns: { ...currentColumns },
+              dataTypeUpdates: [] as Array<{
+                columnId: string;
+                dataType: 'Categorical' | 'Continuous' | null;
+              }>,
+            };
 
-                if (columnEntry) {
-                  const [columnId] = columnEntry;
-                  // Use Immer's produce to update the nested column properties
-                  return produce(acc, (draft) => {
-                    draft[columnId].description = value.Description;
+            const updates = Object.entries(dataDictionary).reduce((accumulator, [key, value]) => {
+              const columnEntry = Object.entries(currentColumns).find(
+                ([_, column]) => column.header === key
+              );
 
-                    if (value.Annotations?.IsAbout) {
-                      const matchingVariable = Object.values(standardizedVariables).find(
-                        (variable) => variable.identifier === value.Annotations?.IsAbout?.TermURL
-                      );
+              if (!columnEntry) return accumulator;
 
-                      if (matchingVariable) {
-                        draft[columnId].standardizedVariable = {
-                          identifier: value.Annotations.IsAbout.TermURL,
-                          label: value.Annotations.IsAbout.Label,
-                        };
-                      }
-                    } else {
-                      // Question: here we are removing standardizedVariable if there is no match
-                      // do we want to handle this in another way?
-                      delete draft[columnId].standardizedVariable;
-                    }
+              const [columnId] = columnEntry;
+              let dataType: 'Categorical' | 'Continuous' | null = null;
 
-                    if (
-                      draft[columnId].standardizedVariable?.identifier ===
-                        get().getAssessmentToolConfig().identifier &&
-                      value.Annotations?.IsPartOf
-                    ) {
-                      draft[columnId].isPartOf = {
-                        termURL: value.Annotations.IsPartOf.TermURL,
-                        label: value.Annotations.IsPartOf.Label,
-                      };
-                    } else {
-                      // Question: here we are removing IsPartOf if there is no match
-                      // do we want to handle this in another way?
-                      delete draft[columnId].isPartOf;
-                    }
+              const newColumns = produce(accumulator.columns, (draft) => {
+                draft[columnId].description = value.Description;
 
-                    if (value.Levels) {
-                      draft[columnId].dataType = 'Categorical';
-                      draft[columnId].levels = Object.entries(value.Levels).reduce(
-                        (levelsAcc, [levelKey, levelValue]) => ({
-                          ...levelsAcc,
-                          [levelKey]: { description: levelValue },
-                        }),
-                        {} as { [key: string]: { description: string } }
-                      );
-                    }
-                    if (value.Units !== undefined) {
-                      draft[columnId].dataType = 'Continuous';
-                      draft[columnId].units = value.Units;
-                    }
-                  });
+                if (value.Annotations?.IsAbout) {
+                  const matchingConfig = Object.values(storeConfig).find(
+                    (config) => config.identifier === value.Annotations?.IsAbout?.TermURL
+                  );
+
+                  if (matchingConfig) {
+                    /* 
+                            NOTE: Here we read the standardized variable from the config
+                             and essentially use the config identifier and label internally for the 
+                            standardized variable
+                            This causes a mismatch between what the user uploaded and what we store
+                            and they will eventually receive at the end i.e., we're overwriting their 
+                            dictionary according to our config
+                            */
+                    draft[columnId].standardizedVariable = {
+                      identifier: matchingConfig.identifier,
+                      label: matchingConfig.label,
+                    };
+                    dataType = matchingConfig.data_type ?? null;
+                  }
+                } else {
+                  // Question: here we are removing standardizedVariable if there is no match
+                  // do we want to handle this in another way?
+                  delete draft[columnId].standardizedVariable;
                 }
-                return acc;
-              },
-              { ...currentColumns }
-            );
+
+                if (
+                  draft[columnId].standardizedVariable?.identifier ===
+                    get().getAssessmentToolConfig().identifier &&
+                  value.Annotations?.IsPartOf
+                ) {
+                  draft[columnId].isPartOf = {
+                    termURL: value.Annotations.IsPartOf.TermURL,
+                    label: value.Annotations.IsPartOf.Label,
+                  };
+                } else {
+                  // Question: here we are removing IsPartOf if there is no match
+                  // do we want to handle this in another way?
+                  delete draft[columnId].isPartOf;
+                }
+
+                // Handle levels from both root Levels and Annotations.Levels
+                if (value.Levels) {
+                  draft[columnId].dataType = 'Categorical';
+                  draft[columnId].levels = Object.entries(value.Levels).reduce(
+                    (levelsAcc, [levelKey, levelValue]) => {
+                      const levelObj: {
+                        description: string;
+                        termURL?: string;
+                        label?: string;
+                      } = {
+                        description: levelValue.Description || '',
+                      };
+
+                      // Get term info from Annotations.Levels if available
+                      const annotationLevel = value.Annotations?.Levels?.[levelKey];
+                      if (annotationLevel) {
+                        levelObj.termURL = annotationLevel.TermURL;
+                        levelObj.label = annotationLevel.Label;
+                      }
+
+                      return {
+                        ...levelsAcc,
+                        [levelKey]: levelObj,
+                      };
+                    },
+                    {} as {
+                      [key: string]: { description: string; termURL?: string; label?: string };
+                    }
+                  );
+                }
+
+                if (value.Units !== undefined) {
+                  draft[columnId].dataType = 'Continuous';
+                  draft[columnId].units = value.Units;
+                }
+
+                if (value.Annotations?.MissingValues) {
+                  draft[columnId].missingValues = value.Annotations.MissingValues;
+                }
+
+                if (value.Annotations?.Format) {
+                  draft[columnId].format = {
+                    termURL: value.Annotations.Format.TermURL,
+                    label: value.Annotations.Format.Label,
+                  };
+                }
+              });
+
+              // Fallback to dictionary's Levels/Units if data type wasn't set by config
+              if (dataType === null) {
+                if (value.Levels) {
+                  dataType = 'Categorical';
+                } else if (value.Units !== undefined) {
+                  dataType = 'Continuous';
+                }
+              }
+
+              return {
+                columns: newColumns,
+                dataTypeUpdates: [...accumulator.dataTypeUpdates, { columnId, dataType }],
+              };
+            }, initialUpdates);
 
             set({
               uploadedDataDictionary: dataDictionary,
-              columns: updatedColumns,
+              columns: updates.columns,
               uploadedDataDictionaryFileName: file.name,
+            });
+
+            updates.dataTypeUpdates.forEach(({ columnId, dataType }) => {
+              get().updateColumnDataType(columnId, dataType);
             });
 
             resolve();

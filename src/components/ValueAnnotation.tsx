@@ -1,28 +1,47 @@
-import { Paper, Typography } from '@mui/material';
+import { Paper, Typography, List, ListItem } from '@mui/material';
 import { useState } from 'react';
 import useDataStore from '../stores/data';
-import Categorical from './Categorical';
-import Continuous from './Continuous';
+import { Columns } from '../utils/types';
 import SideColumnNavBar from './SideColumnNavBar';
+import ValueAnnotationTabs from './ValueAnnotationTabs';
 
 function ValueAnnotation() {
-  const { columns, dataTable, updateColumnLevelDescription, updateColumnUnits } = useDataStore();
-  const [selectedColumnId, setSelectedColumnId] = useState<string | null>(null);
+  const {
+    columns,
+    dataTable,
+    updateColumnLevelDescription,
+    updateColumnUnits,
+    updateColumnMissingValues,
+    updateColumnFormat,
+    updateColumnLevelTerm,
+  } = useDataStore();
+  const [selectedColumnIds, setSelectedColumnIds] = useState<string[]>([]);
 
-  const handleSelectColumn = (columnId: string | null) => {
-    setSelectedColumnId(columnId);
+  const handleSelect = (params: {
+    columnIDs: string[];
+    dataType?: 'Categorical' | 'Continuous' | null;
+  }) => {
+    setSelectedColumnIds(params.columnIDs);
   };
 
-  const handleUpdateDescription = (columnId: string, value: string, description: string) => {
-    updateColumnLevelDescription(columnId, value, description);
-  };
+  const filteredColumns = selectedColumnIds.reduce(
+    (acc, columnId) => ({
+      ...acc,
+      [columnId]: columns[columnId],
+    }),
+    {} as Columns
+  );
 
-  const handleUpdateUnits = (columnId: string, units: string) => {
-    updateColumnUnits(columnId, units);
-  };
+  const filteredDataTable = selectedColumnIds.reduce(
+    (acc, columnId) => ({
+      ...acc,
+      [columnId]: dataTable[columnId],
+    }),
+    {} as Record<string, string[]>
+  );
 
   const renderContent = () => {
-    if (!selectedColumnId) {
+    if (selectedColumnIds.length === 0) {
       return (
         <Paper
           data-cy="no-column-selected"
@@ -34,49 +53,52 @@ function ValueAnnotation() {
       );
     }
 
-    const selectedColumn = columns[selectedColumnId];
-    const columnData = dataTable[selectedColumnId];
-    const uniqueValues = columnData ? Array.from(new Set(columnData)) : [];
+    const unknownDataTypeColumns = selectedColumnIds.filter(
+      (id) =>
+        filteredColumns[id].dataType !== 'Categorical' &&
+        filteredColumns[id].dataType !== 'Continuous'
+    );
 
-    switch (selectedColumn.dataType) {
-      case 'Categorical':
-        return (
-          <Categorical
-            columnID={selectedColumnId}
-            uniqueValues={uniqueValues}
-            levels={selectedColumn.levels || {}}
-            onUpdateDescription={handleUpdateDescription}
-          />
-        );
-      case 'Continuous':
-        return (
-          <Continuous
-            columnID={selectedColumnId}
-            units={selectedColumn.units || ''}
-            onUpdateUnits={handleUpdateUnits}
-          />
-        );
-      default:
-        return (
-          <Paper
-            data-cy="other-placeholder"
-            elevation={3}
-            className="flex h-full items-center justify-center shadow-lg"
-          >
-            <Typography variant="h6">
-              Please select the appropriate data type for this column.
-            </Typography>
-          </Paper>
-        );
+    if (unknownDataTypeColumns.length !== 0) {
+      return (
+        <Paper
+          data-cy="other"
+          elevation={3}
+          className="flex h-full items-center justify-center shadow-lg"
+        >
+          <Typography variant="h6">
+            {`The following column${unknownDataTypeColumns.length > 1 ? 's' : ''} do not have an assigned data type:`}
+            <List>
+              {unknownDataTypeColumns.map((columnId) => (
+                <ListItem key={columnId}>
+                  <Typography>{filteredColumns[columnId].header}</Typography>
+                </ListItem>
+              ))}
+            </List>
+          </Typography>
+        </Paper>
+      );
     }
+
+    return (
+      <ValueAnnotationTabs
+        columns={filteredColumns}
+        dataTable={filteredDataTable}
+        onUpdateDescription={updateColumnLevelDescription}
+        onUpdateUnits={updateColumnUnits}
+        onToggleMissingValue={updateColumnMissingValues}
+        onUpdateFormat={updateColumnFormat}
+        onUpdateLevelTerm={updateColumnLevelTerm}
+      />
+    );
   };
 
   return (
     <div className="mx-auto flex w-full max-w-7xl space-x-4 p-4">
       <SideColumnNavBar
         columns={columns}
-        onSelectColumn={handleSelectColumn}
-        selectedColumnId={selectedColumnId}
+        onSelect={handleSelect}
+        selectedColumnId={selectedColumnIds[0] || null}
       />
       <div className="flex-1">{renderContent()}</div>
     </div>
