@@ -7,6 +7,8 @@ import { mockDataTable, mockInitialColumns, mockColumns } from '~/utils/mocks';
 import { Columns } from '../utils/types';
 import useDataStore from './data';
 
+// TODO: add a test for processDataTableFile with a file containing empty lines
+
 describe('data store actions', () => {
   beforeEach(async () => {
     const { result } = renderHook(() => useDataStore());
@@ -151,6 +153,11 @@ describe('data store actions', () => {
       label: 'Assessment Tool',
     });
     expect(result.current.columns['1'].isPartOf).toEqual({});
+    act(() => {
+      result.current.updateColumnStandardizedVariable('1', null);
+    });
+    expect(result.current.columns['1'].standardizedVariable).toBeNull();
+    expect(result.current.columns['1'].isPartOf).toBeUndefined();
   });
   it('updates the isPartOf field of a column', () => {
     const { result } = renderHook(() => useDataStore());

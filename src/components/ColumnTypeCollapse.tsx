@@ -58,6 +58,16 @@ const ColumnTypeCollapseDefaultProps = {
   standardizedVariable: null,
 };
 
+/*
+ A collapsible component that displays and organizes columns by their data type or standardized variable.
+  
+ Component provides:
+   - A toggleable header showing either a data type ('Categorical', 'Continuous') or standardized variable label
+   - Expandable/collapsible list of columns belonging to the category
+   - Special handling for assessment tool columns (grouping them by their 'isPartOf' relationship)
+   - Visual indication of selected columns (bold and primary color)
+   - Ability to select individual columns or entire groups (for assessment tools)
+ */
 export function ColumnTypeCollapse({
   dataType = null,
   standardizedVariable = null,

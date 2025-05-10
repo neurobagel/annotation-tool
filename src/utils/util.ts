@@ -78,7 +78,7 @@ export function getColumnOptions(
     }));
 }
 
-// Utility functions for SideColumnNavbar component
+// Utility functions for the SideColumnNavbar component on the value annotation view
 export function getMappedStandardizedVariables(columns: Columns): StandardizedVariable[] {
   const { config } = useDataStore.getState();
   const seenIdentifiers = new Set<string>();

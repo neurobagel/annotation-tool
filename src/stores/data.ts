@@ -23,25 +23,25 @@ type DataStore = {
   getStandardizedVariables: () => StandardizedVaribleCollection;
   getAssessmentToolConfig: () => StandardizedVariableConfig;
   getAssessmentToolColumns: () => { id: string; header: string }[];
-  updateColumnDescription: (columnId: string, description: string | null) => void;
-  updateColumnDataType: (columnId: string, dataType: 'Categorical' | 'Continuous' | null) => void;
+  updateColumnDescription: (columnID: string, description: string | null) => void;
+  updateColumnDataType: (columnID: string, dataType: 'Categorical' | 'Continuous' | null) => void;
   updateColumnStandardizedVariable: (
-    columnId: string,
+    columnID: string,
     standardizedVariable: StandardizedVariable | null
   ) => void;
   updateColumnIsPartOf: (
-    columnId: string,
+    columnID: string,
     term: { identifier: string; label: string } | null
   ) => void;
-  updateColumnLevelDescription: (columnId: string, value: string, description: string) => void;
+  updateColumnLevelDescription: (columnID: string, value: string, description: string) => void;
   updateColumnLevelTerm: (
-    columnId: string,
+    columnID: string,
     value: string,
     term: { identifier: string; label: string } | null
   ) => void;
-  updateColumnUnits: (columnId: string, unitsDescription: string | null) => void;
-  updateColumnMissingValues: (columnId: string, value: string, isMissing: boolean) => void;
-  updateColumnFormat: (columnId: string, format: { termURL: string; label: string } | null) => void;
+  updateColumnUnits: (columnID: string, unitsDescription: string | null) => void;
+  updateColumnMissingValues: (columnID: string, value: string, isMissing: boolean) => void;
+  updateColumnFormat: (columnID: string, format: { termURL: string; label: string } | null) => void;
 
   uploadedDataDictionary: DataDictionary;
   uploadedDataDictionaryFileName: string | null;
@@ -119,10 +119,10 @@ const useDataStore = create<DataStore>()(
 
     // Column updates
     getStandardizedVariables: () => {
-      const configs = get().config;
+      const standardizedVariableConfigs = get().config;
       return Object.fromEntries(
-        Object.entries(configs).map(([key, config]) => [
-          key,
+        Object.entries(standardizedVariableConfigs).map(([standardizedVariableName, config]) => [
+          standardizedVariableName,
           { identifier: config.identifier, label: config.label },
         ])
       );
@@ -136,25 +136,25 @@ const useDataStore = create<DataStore>()(
         )
         .map(([id, column]) => ({ id, header: column.header })),
 
-    updateColumnDescription: (columnId: string, description: string | null) => {
+    updateColumnDescription: (columnID: string, description: string | null) => {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
-          draft[columnId].description = description;
+          draft[columnID].description = description;
         }),
       }));
     },
 
-    updateColumnDataType: (columnId: string, dataType: 'Categorical' | 'Continuous' | null) => {
+    updateColumnDataType: (columnID: string, dataType: 'Categorical' | 'Continuous' | null) => {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
-          draft[columnId].dataType = dataType;
+          draft[columnID].dataType = dataType;
 
           if (dataType === 'Categorical') {
-            const columnData = state.dataTable[columnId];
+            const columnData = state.dataTable[columnID];
             const uniqueValues = Array.from(new Set(columnData));
 
-            if (!draft[columnId].levels) {
-              draft[columnId].levels = uniqueValues.reduce(
+            if (!draft[columnID].levels) {
+              draft[columnID].levels = uniqueValues.reduce(
                 (acc, value) => ({
                   ...acc,
                   [value]: { description: '' },
@@ -162,37 +162,38 @@ const useDataStore = create<DataStore>()(
                 {} as { [key: string]: { description: string } }
               );
 
-              delete draft[columnId].units;
+              delete draft[columnID].units;
             }
           } else if (dataType === 'Continuous') {
-            if (draft[columnId].units === undefined) {
-              draft[columnId].units = '';
+            if (draft[columnID].units === undefined) {
+              draft[columnID].units = '';
             }
-            delete draft[columnId].levels;
+            delete draft[columnID].levels;
           } else {
-            delete draft[columnId].levels;
-            delete draft[columnId].units;
+            delete draft[columnID].levels;
+            delete draft[columnID].units;
           }
         }),
       }));
     },
 
+    // This function is used to set the data type of a column that has been mapped to a standardized column
     updateColumnStandardizedVariable: (
-      columnId: string,
+      columnID: string,
       standardizedVariable: StandardizedVariable | null
     ) => {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
-          draft[columnId].standardizedVariable = standardizedVariable;
+          draft[columnID].standardizedVariable = standardizedVariable;
 
           if (standardizedVariable?.identifier === get().getAssessmentToolConfig().identifier) {
             // When setting to Assessment Tool, initialize IsPartOf if it doesn't exist
-            if (!draft[columnId].isPartOf) {
-              draft[columnId].isPartOf = {};
+            if (!draft[columnID].isPartOf) {
+              draft[columnID].isPartOf = {};
             }
             // Remove isPartOf when changing from Assessment Tool to something else
-          } else if (draft[columnId].isPartOf) {
-            delete draft[columnId].isPartOf;
+          } else if (draft[columnID].isPartOf) {
+            delete draft[columnID].isPartOf;
           }
         }),
       }));
@@ -206,37 +207,38 @@ const useDataStore = create<DataStore>()(
       }
 
       // Call updateColumnDataType with the found data_type
-      get().updateColumnDataType(columnId, dataType);
+      get().updateColumnDataType(columnID, dataType);
     },
 
     updateColumnIsPartOf: (
-      columnId: string,
+      columnID: string,
       term: { identifier: string; label: string } | null
     ) => {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
           if (term) {
-            draft[columnId].isPartOf = {
+            draft[columnID].isPartOf = {
               termURL: term.identifier,
               label: term.label,
             };
           } else {
-            draft[columnId].isPartOf = {};
+            draft[columnID].isPartOf = {};
           }
         }),
       }));
     },
 
-    updateColumnLevelDescription: (columnId: string, value: string, description: string) => {
+    updateColumnLevelDescription: (columnID: string, value: string, description: string) => {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
-          if (draft[columnId].levels) {
-            draft[columnId].levels[value].description = description;
+          if (draft[columnID].levels) {
+            draft[columnID].levels[value].description = description;
           }
         }),
       }));
     },
 
+    // This function is used to set the standardized term for a level of a categorical column
     updateColumnLevelTerm: (
       columnId: string,
       value: string,
@@ -260,17 +262,17 @@ const useDataStore = create<DataStore>()(
       }));
     },
 
-    updateColumnUnits: (columnId: string, unitsDescription: string) => {
+    updateColumnUnits: (columnID: string, unitsDescription: string) => {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
-          draft[columnId].units = unitsDescription;
+          draft[columnID].units = unitsDescription;
         }),
       }));
     },
 
-    updateColumnMissingValues: (columnId: string, value: string, isMissing: boolean) => {
+    updateColumnMissingValues: (columnID: string, value: string, isMissing: boolean) => {
       set((state) => {
-        const column = state.columns[columnId];
+        const column = state.columns[columnID];
         if (!column) return state;
 
         const missingValues = column.missingValues || [];
@@ -281,7 +283,7 @@ const useDataStore = create<DataStore>()(
         return {
           columns: {
             ...state.columns,
-            [columnId]: {
+            [columnID]: {
               ...column,
               missingValues: newMissingValues.length > 0 ? newMissingValues : [],
             },
@@ -289,16 +291,16 @@ const useDataStore = create<DataStore>()(
         };
       });
     },
-    updateColumnFormat: (columnId: string, format: { termURL: string; label: string } | null) => {
+    updateColumnFormat: (columnID: string, format: { termURL: string; label: string } | null) => {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
           if (format) {
-            draft[columnId].format = {
+            draft[columnID].format = {
               termURL: format.termURL,
               label: format.label,
             };
           } else {
-            delete draft[columnId].format;
+            delete draft[columnID].format;
           }
         }),
       }));
@@ -328,26 +330,27 @@ const useDataStore = create<DataStore>()(
               }>,
             };
 
-            const updates = Object.entries(dataDictionary).reduce((accumulator, [key, value]) => {
-              const columnEntry = Object.entries(currentColumns).find(
-                ([_, column]) => column.header === key
-              );
+            const updates = Object.entries(dataDictionary).reduce(
+              (accumulator, [dataDictColumnName, columnData]) => {
+                const matchingColumn = Object.entries(currentColumns).find(
+                  ([_, column]) => column.header === dataDictColumnName
+                );
 
-              if (!columnEntry) return accumulator;
+                if (!matchingColumn) return accumulator;
 
-              const [columnId] = columnEntry;
-              let dataType: 'Categorical' | 'Continuous' | null = null;
+                const [internalColumnID] = matchingColumn;
+                let dataType: 'Categorical' | 'Continuous' | null = null;
 
-              const newColumns = produce(accumulator.columns, (draft) => {
-                draft[columnId].description = value.Description;
+                const newColumns = produce(accumulator.columns, (draft) => {
+                  draft[internalColumnID].description = columnData.Description;
 
-                if (value.Annotations?.IsAbout) {
-                  const matchingConfig = Object.values(storeConfig).find(
-                    (config) => config.identifier === value.Annotations?.IsAbout?.TermURL
-                  );
+                  if (columnData.Annotations?.IsAbout) {
+                    const matchingConfig = Object.values(storeConfig).find(
+                      (config) => config.identifier === columnData.Annotations?.IsAbout?.TermURL
+                    );
 
-                  if (matchingConfig) {
-                    /* 
+                    if (matchingConfig) {
+                      /* 
                             NOTE: Here we read the standardized variable from the config
                              and essentially use the config identifier and label internally for the 
                             standardized variable
@@ -355,95 +358,91 @@ const useDataStore = create<DataStore>()(
                             and they will eventually receive at the end i.e., we're overwriting their 
                             dictionary according to our config
                             */
-                    draft[columnId].standardizedVariable = {
-                      identifier: matchingConfig.identifier,
-                      label: matchingConfig.label,
-                    };
-                    dataType = matchingConfig.data_type ?? null;
-                  }
-                } else {
-                  // Question: here we are removing standardizedVariable if there is no match
-                  // do we want to handle this in another way?
-                  delete draft[columnId].standardizedVariable;
-                }
-
-                if (
-                  draft[columnId].standardizedVariable?.identifier ===
-                    get().getAssessmentToolConfig().identifier &&
-                  value.Annotations?.IsPartOf
-                ) {
-                  draft[columnId].isPartOf = {
-                    termURL: value.Annotations.IsPartOf.TermURL,
-                    label: value.Annotations.IsPartOf.Label,
-                  };
-                } else {
-                  // Question: here we are removing IsPartOf if there is no match
-                  // do we want to handle this in another way?
-                  delete draft[columnId].isPartOf;
-                }
-
-                // Handle levels from both root Levels and Annotations.Levels
-                if (value.Levels) {
-                  draft[columnId].dataType = 'Categorical';
-                  draft[columnId].levels = Object.entries(value.Levels).reduce(
-                    (levelsAcc, [levelKey, levelValue]) => {
-                      const levelObj: {
-                        description: string;
-                        termURL?: string;
-                        label?: string;
-                      } = {
-                        description: levelValue.Description || '',
+                      draft[internalColumnID].standardizedVariable = {
+                        identifier: matchingConfig.identifier,
+                        label: matchingConfig.label,
                       };
-
-                      // Get term info from Annotations.Levels if available
-                      const annotationLevel = value.Annotations?.Levels?.[levelKey];
-                      if (annotationLevel) {
-                        levelObj.termURL = annotationLevel.TermURL;
-                        levelObj.label = annotationLevel.Label;
-                      }
-
-                      return {
-                        ...levelsAcc,
-                        [levelKey]: levelObj,
-                      };
-                    },
-                    {} as {
-                      [key: string]: { description: string; termURL?: string; label?: string };
+                      dataType = matchingConfig.data_type ?? null;
                     }
-                  );
-                }
+                  } else {
+                    // Question: here we are removing standardizedVariable if there is no match
+                    // do we want to handle this in another way?
+                    delete draft[internalColumnID].standardizedVariable;
+                  }
 
-                if (value.Units !== undefined) {
-                  draft[columnId].dataType = 'Continuous';
-                  draft[columnId].units = value.Units;
-                }
+                  if (
+                    draft[internalColumnID].standardizedVariable?.identifier ===
+                      get().getAssessmentToolConfig().identifier &&
+                    columnData.Annotations?.IsPartOf
+                  ) {
+                    draft[internalColumnID].isPartOf = {
+                      termURL: columnData.Annotations.IsPartOf.TermURL,
+                      label: columnData.Annotations.IsPartOf.Label,
+                    };
+                  } else {
+                    // Question: here we are removing IsPartOf if there is no match
+                    // do we want to handle this in another way?
+                    delete draft[internalColumnID].isPartOf;
+                  }
 
-                if (value.Annotations?.MissingValues) {
-                  draft[columnId].missingValues = value.Annotations.MissingValues;
-                }
+                  // Get term info from Annotations.Levels if available and merge it with the info from the root Levels
+                  if (columnData.Levels) {
+                    draft[internalColumnID].dataType = 'Categorical';
+                    draft[internalColumnID].levels = Object.entries(columnData.Levels).reduce(
+                      (levelsAcc, [levelKey, levelValue]) => {
+                        const levelObj: {
+                          description: string;
+                          termURL?: string;
+                          label?: string;
+                        } = {
+                          description: levelValue.Description || '',
+                        };
 
-                if (value.Annotations?.Format) {
-                  draft[columnId].format = {
-                    termURL: value.Annotations.Format.TermURL,
-                    label: value.Annotations.Format.Label,
-                  };
-                }
-              });
+                        // Get term info from Annotations.Levels if available
+                        const annotationLevel = columnData.Annotations?.Levels?.[levelKey];
+                        if (annotationLevel) {
+                          levelObj.termURL = annotationLevel.TermURL;
+                          levelObj.label = annotationLevel.Label;
+                        }
 
-              // Fallback to dictionary's Levels/Units if data type wasn't set by config
-              if (dataType === null) {
-                if (value.Levels) {
-                  dataType = 'Categorical';
-                } else if (value.Units !== undefined) {
-                  dataType = 'Continuous';
-                }
-              }
+                        return {
+                          ...levelsAcc,
+                          [levelKey]: levelObj,
+                        };
+                      },
+                      {} as {
+                        [key: string]: { description: string; termURL?: string; label?: string };
+                      }
+                    );
+                  }
 
-              return {
-                columns: newColumns,
-                dataTypeUpdates: [...accumulator.dataTypeUpdates, { columnId, dataType }],
-              };
-            }, initialUpdates);
+                  if (columnData.Units !== undefined) {
+                    draft[internalColumnID].dataType = 'Continuous';
+                    draft[internalColumnID].units = columnData.Units;
+                  }
+
+                  if (columnData.Annotations?.MissingValues) {
+                    draft[internalColumnID].missingValues = columnData.Annotations.MissingValues;
+                  }
+
+                  if (columnData.Annotations?.Format) {
+                    draft[internalColumnID].format = {
+                      termURL: columnData.Annotations.Format.TermURL,
+                      label: columnData.Annotations.Format.Label,
+                    };
+                  }
+                });
+
+                return {
+                  columns: newColumns,
+                  dataTypeUpdates: [
+                    ...accumulator.dataTypeUpdates,
+                    { columnId: internalColumnID, dataType },
+                  ],
+                };
+              },
+              initialUpdates
+            );
 
             set({
               uploadedDataDictionary: dataDictionary,

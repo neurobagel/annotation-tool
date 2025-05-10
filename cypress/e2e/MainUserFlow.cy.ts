@@ -225,6 +225,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="next-button"]').click();
 
     // Value Annotation view
+    // TODO: expand the logic used here to the download page for a valid annotation
     cy.get('[data-cy="side-column-nav-bar-age-age"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-age-select-button"]').click();
     cy.get('[data-cy="2-description"]').should('contain', 'Years');

@@ -17,7 +17,7 @@ import MissingValueButton from './MissingValueButton';
 interface ContinuousProps {
   columnID: string;
   units: string;
-  columnValues: string[];
+  uniqueValues: string[];
   missingValues: string[];
   format?: {
     termURL?: string;
@@ -45,7 +45,7 @@ const formatOptions = [
 function Continuous({
   columnID,
   units,
-  columnValues,
+  uniqueValues,
   missingValues,
   format,
   standardizedVariable,
@@ -53,8 +53,6 @@ function Continuous({
   onToggleMissingValue,
   onUpdateFormat,
 }: ContinuousProps) {
-  const uniqueValues = Array.from(new Set(columnValues));
-
   useEffect(() => {
     // Reset scroll position when column changes
     const tableContainer = document.getElementById(`${columnID}-table-container`);

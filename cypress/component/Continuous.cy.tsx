@@ -3,7 +3,7 @@ import Continuous from '../../src/components/Continuous';
 const props = {
   columnID: '1',
   units: 'some units',
-  columnValues: ['1', '2', '3', '4', '5'],
+  uniqueValues: ['1', '2', '3', '4', '5'],
   missingValues: [],
   format: {
     termURL: 'nb:FromBounded',
@@ -24,7 +24,7 @@ describe('Continuous', () => {
       <Continuous
         columnID={props.columnID}
         units={props.units}
-        columnValues={props.columnValues}
+        uniqueValues={props.uniqueValues}
         missingValues={props.missingValues}
         format={props.format}
         standardizedVariable={props.standardizedVariable}
@@ -45,7 +45,7 @@ describe('Continuous', () => {
       <Continuous
         columnID={props.columnID}
         units={props.units}
-        columnValues={props.columnValues}
+        uniqueValues={props.uniqueValues}
         missingValues={props.missingValues}
         format={props.format}
         standardizedVariable={null}
@@ -65,7 +65,7 @@ describe('Continuous', () => {
       <Continuous
         columnID={props.columnID}
         units={props.units}
-        columnValues={props.columnValues}
+        uniqueValues={props.uniqueValues}
         missingValues={props.missingValues}
         format={props.format}
         onUpdateUnits={spy}
@@ -85,7 +85,7 @@ describe('Continuous', () => {
       <Continuous
         columnID={props.columnID}
         units={props.units}
-        columnValues={props.columnValues}
+        uniqueValues={props.uniqueValues}
         missingValues={props.missingValues}
         format={props.format}
         standardizedVariable={props.standardizedVariable}
@@ -103,7 +103,7 @@ describe('Continuous', () => {
       <Continuous
         columnID={props.columnID}
         units={props.units}
-        columnValues={props.columnValues}
+        uniqueValues={props.uniqueValues}
         missingValues={props.missingValues}
         format={props.format}
         standardizedVariable={props.standardizedVariable}

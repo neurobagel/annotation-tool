@@ -80,7 +80,7 @@ function ValueAnnotationTabs({
                       columnID={columnId}
                       units={column.units || ''}
                       missingValues={column.missingValues || []}
-                      columnValues={dataTable[columnId] || []}
+                      uniqueValues={uniqueValues}
                       format={column.format}
                       standardizedVariable={column.standardizedVariable}
                       onUpdateUnits={onUpdateUnits}
