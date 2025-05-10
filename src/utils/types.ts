@@ -70,7 +70,7 @@ export interface StandardizedVaribleCollection {
   [key: string]: StandardizedVariable;
 }
 
-// TODO: reduce teh depth and try to have a single object for all configuration
+// TODO: reduce the depth and try to have a single object for all configuration
 export interface StandardizedVariableConfigCollection {
   [key: string]: StandardizedVariableConfig;
 }
