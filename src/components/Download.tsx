@@ -134,7 +134,7 @@ function Download() {
   );
 
   const { isValid: schemaValid, errors: schemaErrors } = useMemo(() => {
-    const ajv = new Ajv();
+    const ajv = new Ajv({ allErrors: true });
     const validate = ajv.compile(schema);
     const isValid = validate(dataDictionary);
 
