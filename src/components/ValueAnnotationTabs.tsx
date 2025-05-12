@@ -27,17 +27,25 @@ function ValueAnnotationTabs({
   onUpdateFormat,
   onUpdateLevelTerm,
 }: ValueAnnotationTabsProps) {
-  const [activeTab, setActiveTab] = useState(0);
+  const [selectedColumnId, setSelectedColumnId] = useState<string | null>(null);
   const columnEntries = Object.entries(columns);
   const columnIds = Object.keys(columns);
 
-  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
-  };
+  useEffect(() => {
+    if (columnIds.length > 0 && !selectedColumnId) {
+      setSelectedColumnId(columnIds[0]);
+    }
+  }, [columnIds, selectedColumnId]);
 
   useEffect(() => {
-    setActiveTab(0);
-  }, [columns]);
+    if (selectedColumnId && !columnIds.includes(selectedColumnId)) {
+      setSelectedColumnId(columnIds[0] || null);
+    }
+  }, [columnIds, selectedColumnId]);
+
+  const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
+    setSelectedColumnId(newValue);
+  };
 
   if (columnIds.length === 0) {
     return <Paper elevation={3}>No columns to display</Paper>;
@@ -45,28 +53,34 @@ function ValueAnnotationTabs({
 
   return (
     <Paper elevation={3} className="h-full flex flex-col">
-      <Tabs value={activeTab} onChange={handleTabChange} variant="scrollable" scrollButtons="auto">
+      <Tabs
+        value={selectedColumnId || false}
+        onChange={handleTabChange}
+        variant="scrollable"
+        scrollButtons="auto"
+      >
         {columnIds.map((columnId) => (
           <Tab
             key={columnId}
+            value={columnId}
             label={columns[columnId].header || columnId}
             data-cy={`${columnId}-tab`}
           />
         ))}
       </Tabs>
       <div className="flex-1 overflow-auto p-2">
-        {columnEntries.map(([columnId, column], index) => {
+        {columnEntries.map(([columnId, column]) => {
           const uniqueValues = dataTable[columnId] ? Array.from(new Set(dataTable[columnId])) : [];
 
           return (
             <div
               key={columnId}
               role="tabpanel"
-              hidden={activeTab !== index}
+              hidden={selectedColumnId !== columnId}
               id={`tabpanel-${columnId}`}
               aria-labelledby={`tab-${columnId}`}
             >
-              {activeTab === index && (
+              {selectedColumnId === columnId && (
                 <div className="h-full">
                   {column.dataType === 'Categorical' ? (
                     <Categorical
