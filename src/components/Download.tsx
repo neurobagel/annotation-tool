@@ -79,23 +79,18 @@ function Download() {
                 dictionaryEntry.Levels || {}
               );
 
-              // Create Annotations.Levels for terms with both termURL and label
-              const levelsWithTerms = Object.entries(column.levels).filter(
-                ([_, levelValue]) => levelValue.termURL && levelValue.label
-              );
+              // Create Annotations.Levels for terms
 
-              if (levelsWithTerms.length > 0) {
-                dictionaryEntry.Annotations.Levels = levelsWithTerms.reduce(
-                  (termsObj, [levelKey, levelValue]) => ({
-                    ...termsObj,
-                    [levelKey]: {
-                      TermURL: levelValue.termURL!,
-                      Label: levelValue.label!,
-                    },
-                  }),
-                  {} as { [key: string]: { TermURL: string; Label: string } }
-                );
-              }
+              dictionaryEntry.Annotations.Levels = Object.entries(column.levels).reduce(
+                (termsObj, [levelKey, levelValue]) => ({
+                  ...termsObj,
+                  [levelKey]: {
+                    TermURL: levelValue.termURL || '',
+                    Label: levelValue.label || '',
+                  },
+                }),
+                {} as { [key: string]: { TermURL: string; Label: string } }
+              );
             }
 
             if (column.standardizedVariable?.identifier === participantIDConfig.identifier) {
