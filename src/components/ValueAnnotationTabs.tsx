@@ -1,5 +1,5 @@
 import { Paper, Tab, Tabs } from '@mui/material';
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Columns } from '../utils/types';
 import Categorical from './Categorical';
 import Continuous from './Continuous';
@@ -34,6 +34,10 @@ function ValueAnnotationTabs({
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
+
+  useEffect(() => {
+    setActiveTab(0);
+  }, [columns]);
 
   if (columnIds.length === 0) {
     return <Paper elevation={3}>No columns to display</Paper>;
