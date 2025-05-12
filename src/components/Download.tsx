@@ -229,13 +229,9 @@ function Download() {
           </List>
           <Typography variant="body1" className="mb-2">
             <b>NOTE</b>: If you download the .json data dictionary without completing the
-            annotations, the data dictionary will not work with subsequent neurobagel steps.
-          </Typography>
-          <Typography variant="body1" className="mb-2">
-            <b>
-              You will not be able to load the data dictionary into the annotation tool to change
-              mistakes later.
-            </b>
+            annotations, the data dictionary will not work as-is with other Neurobagel tools.
+            However, you can download and re-upload the partially annotation .json to complete
+            annotations later, if desired.
           </Typography>
         </Alert>
       )}
