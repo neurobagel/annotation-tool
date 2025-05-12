@@ -124,8 +124,8 @@ describe('data store actions', () => {
       identifier: 'nb:AssessmentTool',
       label: 'Assessment Tool',
     });
-    expect(result.current.columns['1'].dataType).toEqual('Categorical');
-    expect(result.current.columns['1'].levels).toBeDefined();
+    expect(result.current.columns['1'].dataType).toEqual('Continuous');
+    expect(result.current.columns['1'].units).toBeDefined();
     act(() => {
       result.current.updateColumnStandardizedVariable('1', {
         identifier: 'nb:Age',
