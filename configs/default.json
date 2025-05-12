@@ -28,7 +28,7 @@
     "Assessment Tool": {
       "identifier": "nb:AssessmentTool",
       "label": "Assessment Tool",
-      "data_type": "Categorical",
+      "data_type": "Continuous",
       "is_multi_column_measurement": true
     }
   }

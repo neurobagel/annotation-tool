@@ -65,8 +65,7 @@ function Categorical({
   const { getAssessmentToolConfig } = useDataStore();
 
   const showStandardizedTerm =
-    standardizedVariable !== null &&
-    standardizedVariable !== undefined &&
+    standardizedVariable &&
     standardizedVariable?.identifier !== getAssessmentToolConfig().identifier;
 
   const getTermOptions = () => {

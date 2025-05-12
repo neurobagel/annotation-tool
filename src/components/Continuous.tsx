@@ -10,6 +10,7 @@ import {
   TextField,
 } from '@mui/material';
 import { useEffect } from 'react';
+import useDataStore from '~/stores/data';
 import { StandardizedVariable } from '~/utils/types';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueButton from './MissingValueButton';
@@ -60,6 +61,13 @@ function Continuous({
       tableContainer.scrollTop = 0;
     }
   }, [columnID]);
+
+  const { getAssessmentToolConfig } = useDataStore();
+
+  const showUnit = standardizedVariable?.identifier !== getAssessmentToolConfig().identifier;
+  const showFormat =
+    standardizedVariable &&
+    standardizedVariable?.identifier !== getAssessmentToolConfig().identifier;
 
   return (
     <Paper elevation={3} className="h-full shadow-lg" data-cy={`${columnID}-continuous`}>
@@ -121,17 +129,19 @@ function Continuous({
         </div>
 
         <div className="w-2/5 p-4 space-y-4">
-          <DescriptionEditor
-            key={`${columnID}-units`}
-            label="Units"
-            columnID={columnID}
-            description={units}
-            onDescriptionChange={(id, newUnits) => {
-              onUpdateUnits(id, newUnits || '');
-            }}
-          />
+          {showUnit && (
+            <DescriptionEditor
+              key={`${columnID}-units`}
+              label="Units"
+              columnID={columnID}
+              description={units}
+              onDescriptionChange={(id, newUnits) => {
+                onUpdateUnits(id, newUnits || '');
+              }}
+            />
+          )}
 
-          {standardizedVariable && (
+          {showFormat && (
             <Autocomplete
               data-cy={`${columnID}-format-dropdown`}
               options={formatOptions}
