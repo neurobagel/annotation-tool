@@ -22,6 +22,9 @@ const sexTerms = [
   { label: 'Other', identifier: 'snomed:32570681000036106' },
 ];
 
+// Manually add the healthy control term
+diagnosisTerms.push({ label: 'Healthy Control', identifier: 'ncit:C94342' });
+
 interface CategoricalProps {
   columnID: string;
   uniqueValues: string[];
