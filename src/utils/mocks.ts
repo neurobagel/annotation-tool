@@ -146,6 +146,16 @@ export const mockDataDictionaryWithAnnotations = {
         TermURL: 'nb:Sex',
         Label: 'Sex',
       },
+      Levels: {
+        F: {
+          TermURL: '',
+          Label: '',
+        },
+        M: {
+          TermURL: '',
+          Label: '',
+        },
+      },
     },
   },
 };

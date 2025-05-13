@@ -104,15 +104,12 @@ describe('Main user flow', () => {
     cy.get('[data-cy="Download-step"]').within(() => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
     });
-    // TODO: uncomment this once the logic for handling levels is implemented in value annotations
-    // cy.get('[data-cy="complete-annotations-alert"]').should('be.visible');
+    cy.get('[data-cy="complete-annotations-alert"]').should('be.visible');
     cy.get('[data-cy="datadictionary-preview"]')
       .should('be.visible')
       .should('contain', 'Description:"some cool new description"');
     cy.get('[data-cy="datadictionary-toggle-preview-button"]').click();
     cy.get('[data-cy="datadictionary-preview"]').should('not.be.visible');
-    // TODO: remove this once the logic for handling levels is implemented in value annotations
-    cy.get('[data-cy="force-download-switch"]').click();
     cy.get('[data-cy="download-datadictionary-button"]').click();
 
     const outputFileName = `${mockDataDictionaryFileName.split('.')[0]}_annotated.json`;
@@ -191,7 +188,6 @@ describe('Main user flow', () => {
       .and('contain', 'Description:"Male"')
       .and('contain', 'Description:"Female"');
     cy.get('[data-cy="datadictionary-toggle-preview-button"]').click();
-    cy.get('[data-cy="force-download-switch"]').click();
     cy.get('[data-cy="download-datadictionary-button"]').click();
 
     const outputFileName = `${mockDataDictionaryFileName.split('.')[0]}_annotated.json`;
