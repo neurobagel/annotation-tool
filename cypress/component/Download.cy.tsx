@@ -2,7 +2,7 @@ import Ajv from 'ajv';
 import Download from '../../src/components/Download';
 import useDataStore from '../../src/stores/data';
 import {
-  mockColumnsWithDescription,
+  mockColumns,
   mockInitialColumns,
   mockDataDictionaryWithNoDescription,
   mockDataDictionaryWithAnnotations,
@@ -59,17 +59,10 @@ describe('Download', () => {
   });
 
   it('generates valid data dictionary with descriptions provided by user', () => {
-    useDataStore.setState({ columns: mockColumnsWithDescription });
+    useDataStore.setState({ columns: mockColumns });
     useDataStore.setState({ uploadedDataTableFileName: 'someFileName.tsv' });
 
     cy.mount(<Download />);
-
-    /* 
-    Until the logic for handling levels is implemented in value annotations, the data dictionary will be invalid
-    and we will need to force the download to ignore the validation error
-    TODO: remove this once the data dictionary is expected to be valid (i.e. logic is implemented)
-    */
-    cy.get('[data-cy="force-download-switch"]').click();
     cy.get('[data-cy="download-datadictionary-button"]').click();
     cy.readFile('cypress/downloads/someFileName_annotated.json').then((fileContent) => {
       expect(fileContent).to.deep.equal(mockDataDictionaryWithAnnotations);

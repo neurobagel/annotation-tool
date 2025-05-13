@@ -88,7 +88,7 @@ function MultiColumnMeasuresCard({
                   <TextField
                     // eslint-disable-next-line react/jsx-props-no-spreading
                     {...params}
-                    label="Select column to map"
+                    label="Select column(s) to map"
                     variant="outlined"
                     size="small"
                     fullWidth

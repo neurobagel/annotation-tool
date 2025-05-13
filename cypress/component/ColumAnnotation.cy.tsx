@@ -18,16 +18,6 @@ describe('ColumnAnnotation', () => {
           standardizedVariable: null,
         },
       },
-      standardizedVariables: {
-        var1: {
-          identifier: 'somevar',
-          label: 'some variable',
-        },
-        var2: {
-          identifier: 'anothervar',
-          label: 'another variable',
-        },
-      },
     });
   });
 

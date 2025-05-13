@@ -7,7 +7,14 @@ const props = {
     F: { description: 'Female' },
     M: { description: 'Male' },
   },
+  missingValues: [],
+  standardizedVariable: {
+    identifier: 'nb:Diagnosis',
+    label: 'Diagnosis',
+  },
   onUpdateDescription: () => {},
+  onToggleMissingValue: () => {},
+  onUpdateLevelTerm: () => {},
 };
 
 describe('Categorical', () => {
@@ -16,8 +23,12 @@ describe('Categorical', () => {
       <Categorical
         columnID={props.columnID}
         uniqueValues={props.uniqueValues}
+        missingValues={props.missingValues}
+        standardizedVariable={props.standardizedVariable}
         levels={props.levels}
         onUpdateDescription={props.onUpdateDescription}
+        onToggleMissingValue={props.onToggleMissingValue}
+        onUpdateLevelTerm={props.onUpdateLevelTerm}
       />
     );
     cy.get('[data-cy="3-categorical"]').should('be.visible');
@@ -28,7 +39,6 @@ describe('Categorical', () => {
     cy.get('[data-cy="3-F"]').should('be.visible').and('contain', 'F');
     cy.get('[data-cy="3-F-description"]').should('be.visible').and('contain', 'Female');
     cy.get('[data-cy="3-F-edit-description-button"]').should('be.visible');
-    cy.get('[data-cy="3-categorical-pagination"]').should('be.visible');
   });
   it('fires the onUpdateDescription event handler with the appropriate payload when the description is changed', () => {
     const spy = cy.spy().as('spy');
@@ -36,8 +46,12 @@ describe('Categorical', () => {
       <Categorical
         columnID={props.columnID}
         uniqueValues={props.uniqueValues}
+        missingValues={props.missingValues}
+        standardizedVariable={props.standardizedVariable}
         levels={props.levels}
         onUpdateDescription={spy}
+        onToggleMissingValue={props.onToggleMissingValue}
+        onUpdateLevelTerm={props.onUpdateLevelTerm}
       />
     );
     cy.get('[data-cy="3-F-edit-description-button"]').click();
