@@ -9,13 +9,13 @@ import {
   Autocomplete,
   TextField,
 } from '@mui/material';
-import { useEffect } from 'react';
 import useDataStore from '~/stores/data';
 import diagnosisTerms from '../assets/diagnosisTerms.json';
 import { StandardizedVariable } from '../utils/types';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueButton from './MissingValueButton';
 
+// TODO: Remove this when the terms are fetched from the config
 const sexTerms = [
   { label: 'Male', identifier: 'snomed:248153007' },
   { label: 'Female', identifier: 'snomed:248152002' },
@@ -54,14 +54,6 @@ function Categorical({
   onToggleMissingValue,
   onUpdateLevelTerm,
 }: CategoricalProps) {
-  useEffect(() => {
-    // Reset scroll position when column changes
-    const tableContainer = document.getElementById(`${columnID}-table-container`);
-    if (tableContainer) {
-      tableContainer.scrollTop = 0;
-    }
-  }, [columnID]);
-
   const { getAssessmentToolConfig } = useDataStore();
 
   const showStandardizedTerm =

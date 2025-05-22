@@ -61,6 +61,7 @@ const initialState = {
   uploadedDataTableFileName: null,
   uploadedDataDictionary: {},
   uploadedDataDictionaryFileName: null,
+  // TODO this is temporary to access the config in the store for now and should be removed after configuration functionality implementation
   config: defaultConfig.standardizedVariables as StandardizedVariableConfigCollection,
 };
 

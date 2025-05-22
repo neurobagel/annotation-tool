@@ -2,7 +2,7 @@
   "standardizedVariables": {
     "Subject ID": {
       "identifier": "nb:ParticipantID",
-      "label": "Subject Unique Identifier",
+      "label": "Subject ID",
       "data_type": null
     },
     "Session ID": {

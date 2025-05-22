@@ -1,6 +1,7 @@
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { Typography, Collapse, Button, List, ListItem, IconButton } from '@mui/material';
+import { capitalize } from 'lodash';
 import { useState } from 'react';
 import useDataStore from '~/stores/data';
 import { ColumnEntry, Columns, StandardizedVariable } from '../utils/types';
@@ -31,9 +32,7 @@ export function ExpandableSection({
         onClick={() => setExpanded(!expanded)}
         startIcon={expanded ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
       >
-        <Typography data-cy={`side-column-nav-bar-${title}`}>
-          {title.charAt(0).toUpperCase() + title.slice(1)}
-        </Typography>
+        <Typography data-cy={`side-column-nav-bar-${title}`}>{capitalize(title)}</Typography>
       </Button>
       <Collapse in={expanded}>{children}</Collapse>
     </>
@@ -77,6 +76,9 @@ export function ColumnTypeCollapse({
 }: ColumnTypeCollapseProps) {
   const [showColumns, setShowColumns] = useState<boolean>(true);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+  const columnIsAssessmentTool =
+    standardizedVariable?.identifier ===
+    useDataStore.getState().getAssessmentToolConfig().identifier;
 
   let columnsToDisplay;
   // TODO: find a better name for the below variable
@@ -103,10 +105,7 @@ export function ColumnTypeCollapse({
   const handleSelect = () => {
     if (columnsToDisplay.length > 0) {
       // For assessment tool, find the first group and select it
-      if (
-        standardizedVariable?.identifier ===
-        useDataStore.getState().getAssessmentToolConfig().identifier
-      ) {
+      if (columnIsAssessmentTool) {
         const groupedColumns: Record<string, ColumnEntry[]> = {};
 
         columnsToDisplay.forEach(([columnId, column]) => {
@@ -148,10 +147,7 @@ export function ColumnTypeCollapse({
     }));
   };
 
-  if (
-    standardizedVariable?.identifier ===
-    useDataStore.getState().getAssessmentToolConfig().identifier
-  ) {
+  if (columnIsAssessmentTool) {
     const groupedColumns: Record<string, ColumnEntry[]> = {};
 
     columnsToDisplay.forEach(([columnId, column]) => {
@@ -195,7 +191,7 @@ export function ColumnTypeCollapse({
               },
             }}
           >
-            {labelToDisplay.charAt(0).toUpperCase() + labelToDisplay.slice(1)}
+            {capitalize(labelToDisplay)}
           </Typography>
         </div>
         <Collapse in={showColumns}>
@@ -293,7 +289,7 @@ export function ColumnTypeCollapse({
             },
           }}
         >
-          {labelToDisplay.charAt(0).toUpperCase() + labelToDisplay.slice(1)}
+          {capitalize(labelToDisplay)}
         </Typography>
       </div>
       <Collapse in={showColumns}>

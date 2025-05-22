@@ -30,16 +30,9 @@ function ValueAnnotationTabs({
   const [selectedColumnId, setSelectedColumnId] = useState<string | null>(null);
   const columnEntries = Object.entries(columns);
   const columnIds = Object.keys(columns);
-
   useEffect(() => {
-    if (columnIds.length > 0 && !selectedColumnId) {
+    if (columnIds.length > 0 && (!selectedColumnId || !columnIds.includes(selectedColumnId))) {
       setSelectedColumnId(columnIds[0]);
-    }
-  }, [columnIds, selectedColumnId]);
-
-  useEffect(() => {
-    if (selectedColumnId && !columnIds.includes(selectedColumnId)) {
-      setSelectedColumnId(columnIds[0] || null);
     }
   }, [columnIds, selectedColumnId]);
 

@@ -25,7 +25,6 @@ function MissingValueButton({
       className={`
         min-w-[170px]
         whitespace-nowrap
-        min-w-fit
         px-4
         ${isMissing ? 'bg-gray-500 hover:bg-gray-600' : 'bg-error-main hover:bg-error-dark'}
       `}

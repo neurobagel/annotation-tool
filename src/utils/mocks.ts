@@ -35,7 +35,7 @@ export const mockColumns = {
     description: 'A participant ID',
     standardizedVariable: {
       identifier: 'nb:ParticipantID',
-      label: 'Subject Unique Identifier',
+      label: 'Subject ID',
     },
     dataType: null as 'Categorical' | 'Continuous' | null,
   },
@@ -112,7 +112,7 @@ export const mockDataDictionaryWithAnnotations = {
     Annotations: {
       IsAbout: {
         TermURL: 'nb:ParticipantID',
-        Label: 'Subject Unique Identifier',
+        Label: 'Subject ID',
       },
       Identifies: 'participant',
     },

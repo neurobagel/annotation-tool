@@ -57,7 +57,7 @@ function ColumnAnnotationCard({
     onStandardizedVariableChange(id, newStandardizedVariable);
   };
 
-  const isDataTypeDisabled =
+  const isDataTypePredefined =
     !!standardizedVariable &&
     Object.values(standardizedVariableOptions).some(
       (option) => option.identifier === standardizedVariable.identifier
@@ -80,7 +80,7 @@ function ColumnAnnotationCard({
               Data type
             </Typography>
             <div>
-              {!isDataTypeDisabled ? (
+              {!isDataTypePredefined ? (
                 <ToggleButtonGroup
                   data-cy={`${id}-column-annotation-card-data-type`}
                   value={dataType}

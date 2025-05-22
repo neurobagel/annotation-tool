@@ -9,7 +9,6 @@ import {
   Autocomplete,
   TextField,
 } from '@mui/material';
-import { useEffect } from 'react';
 import useDataStore from '~/stores/data';
 import { StandardizedVariable } from '~/utils/types';
 import DescriptionEditor from './DescriptionEditor';
@@ -35,6 +34,7 @@ const defaultProps = {
   format: null,
 };
 
+// TODO: Remove this when the terms are fetched from the config
 const formatOptions = [
   { label: 'euro', value: 'nb:FromEuro' },
   { label: 'bounded', value: 'nb:FromBounded' },
@@ -54,16 +54,9 @@ function Continuous({
   onToggleMissingValue,
   onUpdateFormat,
 }: ContinuousProps) {
-  useEffect(() => {
-    // Reset scroll position when column changes
-    const tableContainer = document.getElementById(`${columnID}-table-container`);
-    if (tableContainer) {
-      tableContainer.scrollTop = 0;
-    }
-  }, [columnID]);
-
   const { getAssessmentToolConfig } = useDataStore();
 
+  // Remove/refactor the conditional logic once we decided how to handle the data type for multi column measure standardized variables
   const showUnit = standardizedVariable?.identifier !== getAssessmentToolConfig().identifier;
   const showFormat =
     standardizedVariable &&
