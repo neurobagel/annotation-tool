@@ -3,9 +3,11 @@ import fs from 'fs';
 import { produce } from 'immer';
 import path from 'path';
 import { beforeEach, describe, it, expect } from 'vitest';
-import { mockDataTable, mockInitialColumns, mockColumnsWithDescription } from '~/utils/mocks';
+import { mockDataTable, mockInitialColumns, mockColumns } from '~/utils/mocks';
 import { Columns } from '../utils/types';
 import useDataStore from './data';
+
+// TODO: add a test for processDataTableFile with a file containing empty lines
 
 describe('data store actions', () => {
   beforeEach(async () => {
@@ -52,7 +54,7 @@ describe('data store actions', () => {
       await result.current.processDataDictionaryFile(dataDictionaryFile);
     });
 
-    expect(result.current.columns).toEqual(mockColumnsWithDescription);
+    expect(result.current.columns).toEqual(mockColumns);
     expect(result.current.uploadedDataDictionaryFileName).toEqual('mock.json');
 
     act(() => {
@@ -67,7 +69,7 @@ describe('data store actions', () => {
     await act(async () => {
       await result.current.processDataDictionaryFile(dataDictionaryFile);
     });
-    expect(result.current.columns).toEqual(mockColumnsWithDescription);
+    expect(result.current.columns).toEqual(mockColumns);
     expect(result.current.uploadedDataDictionaryFileName).toEqual('mock.json');
   });
 
@@ -110,6 +112,34 @@ describe('data store actions', () => {
       label: 'Some',
     });
   });
+  it("sets the standardizedVariable field of a column and consequently modifies the column's dataType field", () => {
+    const { result } = renderHook(() => useDataStore());
+    act(() => {
+      result.current.updateColumnStandardizedVariable('1', {
+        identifier: 'nb:AssessmentTool',
+        label: 'Assessment Tool',
+      });
+    });
+    expect(result.current.columns['1'].standardizedVariable).toEqual({
+      identifier: 'nb:AssessmentTool',
+      label: 'Assessment Tool',
+    });
+    expect(result.current.columns['1'].dataType).toEqual('Continuous');
+    expect(result.current.columns['1'].units).toBeDefined();
+    act(() => {
+      result.current.updateColumnStandardizedVariable('1', {
+        identifier: 'nb:Age',
+        label: 'Age',
+      });
+    });
+    expect(result.current.columns['1'].standardizedVariable).toEqual({
+      identifier: 'nb:Age',
+      label: 'Age',
+    });
+    expect(result.current.columns['1'].dataType).toEqual('Continuous');
+    expect(result.current.columns['1'].levels).toBeUndefined();
+    expect(result.current.columns['1'].units).toEqual('');
+  });
   it('sets the standardizedVariable field of a column to Assessment Tool', () => {
     const { result } = renderHook(() => useDataStore());
     act(() => {
@@ -123,6 +153,11 @@ describe('data store actions', () => {
       label: 'Assessment Tool',
     });
     expect(result.current.columns['1'].isPartOf).toEqual({});
+    act(() => {
+      result.current.updateColumnStandardizedVariable('1', null);
+    });
+    expect(result.current.columns['1'].standardizedVariable).toBeNull();
+    expect(result.current.columns['1'].isPartOf).toBeUndefined();
   });
   it('updates the isPartOf field of a column', () => {
     const { result } = renderHook(() => useDataStore());
@@ -140,6 +175,10 @@ describe('data store actions', () => {
       termURL: 'some identifier',
       label: 'some label',
     });
+    act(() => {
+      result.current.updateColumnIsPartOf('1', null);
+    });
+    expect(result.current.columns['1'].isPartOf).toEqual({});
   });
   it('updates the description for a level of a categorical column', () => {
     const { result } = renderHook(() => useDataStore());
@@ -159,5 +198,16 @@ describe('data store actions', () => {
       result.current.updateColumnUnits('1', 'some units');
     });
     expect(result.current.columns['1'].units).toEqual('some units');
+  });
+  it('updates the missingValues field of a column', () => {
+    const { result } = renderHook(() => useDataStore());
+    act(() => {
+      result.current.updateColumnMissingValues('1', 'some value', true);
+    });
+    expect(result.current.columns['1'].missingValues).toEqual(['some value']);
+    act(() => {
+      result.current.updateColumnMissingValues('1', 'some value', false);
+    });
+    expect(result.current.columns['1'].missingValues).toEqual([]);
   });
 });

@@ -11,18 +11,25 @@ export type Column = {
     termURL?: string;
     label?: string;
   };
-  levels?: { [key: string]: { description: string } } | null;
+  levels?: { [key: string]: { description: string; label?: string; termURL?: string } } | null;
   units?: string;
+  missingValues?: string[];
+  format?: {
+    termURL?: string;
+    label?: string;
+  };
 };
 
 export type Columns = {
   [key: string]: Column;
 };
 
+export type ColumnEntry = [string, Column];
+
 export interface DataDictionary {
   [key: string]: {
     Description: string;
-    Levels?: { [key: string]: string };
+    Levels?: { [key: string]: { Description: string; TermURL?: string } };
     Units?: string;
     Annotations?: {
       IsAbout?: {
@@ -54,8 +61,18 @@ export interface StandardizedVariable {
   label: string;
 }
 
+export interface StandardizedVariableConfig extends StandardizedVariable {
+  data_type?: 'Categorical' | 'Continuous' | null;
+  is_multi_column_measurement?: boolean;
+}
+
 export interface StandardizedVaribleCollection {
   [key: string]: StandardizedVariable;
+}
+
+// TODO: reduce the depth and try to have a single object for all configuration
+export interface StandardizedVariableConfigCollection {
+  [key: string]: StandardizedVariableConfig;
 }
 
 // TODO: find a better name than Term

@@ -54,9 +54,10 @@ function DescriptionEditor({
         color="secondary"
         onClick={handleSaveDescription}
         size="small"
+        sx={{ width: '36px', height: '36px' }}
         className="mt-4 md:mt-0"
       >
-        <SaveIcon />
+        <SaveIcon fontSize="small" />
       </Fab>
     </div>
   ) : (
@@ -77,9 +78,10 @@ function DescriptionEditor({
         color="primary"
         onClick={handleEditDescription}
         size="small"
+        sx={{ width: '36px', height: '36px' }}
         className="mt-4 md:mt-0"
       >
-        <EditIcon />
+        <EditIcon fontSize="small" />
       </Fab>
     </div>
   );

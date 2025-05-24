@@ -1,3 +1,4 @@
+import HelpIcon from '@mui/icons-material/Help';
 import {
   Card,
   CardHeader,
@@ -7,8 +8,9 @@ import {
   ToggleButtonGroup,
   ToggleButton,
   Autocomplete,
+  Tooltip,
 } from '@mui/material';
-import { StandardizedVariable, StandardizedVaribleCollection } from '../utils/types';
+import { StandardizedVariable, StandardizedVariableConfigCollection } from '../utils/types';
 import DescriptionEditor from './DescriptionEditor';
 
 interface ColumnAnnotationCardProps {
@@ -17,7 +19,7 @@ interface ColumnAnnotationCardProps {
   description: string | null;
   dataType: 'Categorical' | 'Continuous' | null;
   standardizedVariable: StandardizedVariable | null;
-  standardizedVariableOptions: StandardizedVaribleCollection;
+  standardizedVariableOptions: StandardizedVariableConfigCollection;
   onDescriptionChange: (columnId: string, newDescription: string | null) => void;
   onDataTypeChange: (columnId: string, newDataType: 'Categorical' | 'Continuous' | null) => void;
   onStandardizedVariableChange: (
@@ -55,6 +57,12 @@ function ColumnAnnotationCard({
     onStandardizedVariableChange(id, newStandardizedVariable);
   };
 
+  const isDataTypePredefined =
+    !!standardizedVariable &&
+    Object.values(standardizedVariableOptions).some(
+      (option) => option.identifier === standardizedVariable.identifier
+    );
+
   return (
     <Card data-cy={`${id}-column-annotation-card`} className="mx-auto w-full max-w-5xl shadow-lg">
       <CardHeader title={header} className="bg-gray-50" />
@@ -69,39 +77,57 @@ function ColumnAnnotationCard({
         <div className="mt-4 flex flex-col items-center gap-4 md:flex-row">
           <div className="flex flex-1 flex-col">
             <Typography variant="subtitle1" className="mb-2 font-bold text-gray-700">
-              Data Type
+              Data type
             </Typography>
-            <ToggleButtonGroup
-              data-cy={`${id}-column-annotation-card-data-type`}
-              value={dataType}
-              onChange={handleDataTypeChange}
-              exclusive
-              color="primary"
-            >
-              <ToggleButton
-                data-cy={`${id}-column-annotation-card-data-type-categorical-button`}
-                value="Categorical"
-              >
-                Categorical
-              </ToggleButton>
-              <ToggleButton
-                data-cy={`${id}-column-annotation-card-data-type-continuous-button`}
-                value="Continuous"
-              >
-                Continuous
-              </ToggleButton>
-            </ToggleButtonGroup>
+            <div>
+              {!isDataTypePredefined ? (
+                <ToggleButtonGroup
+                  data-cy={`${id}-column-annotation-card-data-type`}
+                  value={dataType}
+                  onChange={handleDataTypeChange}
+                  exclusive
+                  color="primary"
+                >
+                  <ToggleButton
+                    data-cy={`${id}-column-annotation-card-data-type-categorical-button`}
+                    value="Categorical"
+                  >
+                    Categorical
+                  </ToggleButton>
+                  <ToggleButton
+                    data-cy={`${id}-column-annotation-card-data-type-continuous-button`}
+                    value="Continuous"
+                  >
+                    Continuous
+                  </ToggleButton>
+                </ToggleButtonGroup>
+              ) : (
+                <Typography variant="body1" data-cy={`${id}-column-annotation-card-data-type`}>
+                  {dataType || 'Not applicable'}{' '}
+                  <Tooltip
+                    sx={{ fontSize: '1.2rem' }}
+                    placement="right"
+                    title={
+                      'Data type is automatically determined by standardized variable selection \n' +
+                      ' To change the data type manually, remove the standardized variable'
+                    }
+                  >
+                    <HelpIcon fontSize="small" color="primary" />
+                  </Tooltip>
+                </Typography>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-1 flex-col">
             <Typography variant="subtitle1" className="mb-2 font-bold text-gray-700">
-              Standardized Variable
+              Standardized variable
             </Typography>
             <Autocomplete
               data-cy={`${id}-column-annotation-card-standardized-variable-dropdown`}
               value={standardizedVariable?.label || ''}
               onChange={handleStandardizedVariableChange}
-              options={Object.entries(standardizedVariableOptions).map(([_, value]) => value.label)}
+              options={Object.values(standardizedVariableOptions).map((value) => value.label)}
               renderInput={(params) => (
                 <TextField
                   // eslint-disable-next-line react/jsx-props-no-spreading
