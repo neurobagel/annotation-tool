@@ -65,9 +65,8 @@ function Download() {
               },
             };
 
-            // Handle level terms only for standardized columns
+            // Add term url to Levels under BIDS section only for a categorical column with a standardized variable
             if (column.dataType === 'Categorical' && column.levels) {
-              // Add TermURL to root Levels if present
               dictionaryEntry.Levels = Object.entries(column.levels).reduce(
                 (updatedLevels, [levelKey, levelValue]) => ({
                   ...updatedLevels,
@@ -78,8 +77,6 @@ function Download() {
                 }),
                 dictionaryEntry.Levels || {}
               );
-
-              // Create Annotations.Levels for terms
 
               dictionaryEntry.Annotations.Levels = Object.entries(column.levels).reduce(
                 (termsObj, [levelKey, levelValue]) => ({

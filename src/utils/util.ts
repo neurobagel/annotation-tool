@@ -1,5 +1,4 @@
-import useDataStore from '~/stores/data';
-import { Term, TermCard, Columns, StandardizedVariable } from './types';
+import { Term, TermCard, Columns } from './types';
 
 // Utility functions for MultiColumnMeasures component
 
@@ -76,27 +75,4 @@ export function getColumnOptions(
       label: column.header,
       disabled: allMappedColumns.includes(id),
     }));
-}
-
-// Utility functions for the SideColumnNavbar component on the value annotation view
-export function getMappedStandardizedVariables(columns: Columns): StandardizedVariable[] {
-  const { config } = useDataStore.getState();
-  const seenIdentifiers = new Set<string>();
-  const uniqueVariables: StandardizedVariable[] = [];
-
-  Object.values(columns).forEach((column) => {
-    const variable = column.standardizedVariable;
-    if (variable && !seenIdentifiers.has(variable.identifier)) {
-      const configEntry = Object.values(config).find(
-        (configItem) => configItem.identifier === variable.identifier
-      );
-      // Filter out variables with null data_type e.g., Subject ID, Session ID
-      if (configEntry?.data_type !== null) {
-        seenIdentifiers.add(variable.identifier);
-        uniqueVariables.push(variable);
-      }
-    }
-  });
-
-  return uniqueVariables;
 }

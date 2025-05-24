@@ -1,6 +1,6 @@
 import { List, Paper, ListItem } from '@mui/material';
+import useDataStore from '~/stores/data';
 import { Columns } from '../utils/types';
-import { getMappedStandardizedVariables } from '../utils/util';
 import { ColumnTypeCollapse, ExpandableSection } from './ColumnTypeCollapse';
 
 interface SideColumnNavBarProps {
@@ -13,7 +13,7 @@ interface SideColumnNavBarProps {
 }
 
 function SideColumnNavBar({ columns, onSelect, selectedColumnId }: SideColumnNavBarProps) {
-  const mappedStandardizedVariables = getMappedStandardizedVariables(columns);
+  const mappedStandardizedVariables = useDataStore.getState().getMappedStandardizedVariables();
 
   return (
     <Paper className="w-full max-w-80 p-4" elevation={3} data-cy="side-column-nav-bar">

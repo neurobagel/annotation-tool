@@ -23,6 +23,7 @@ type DataStore = {
   getStandardizedVariables: () => StandardizedVaribleCollection;
   getAssessmentToolConfig: () => StandardizedVariableConfig;
   getAssessmentToolColumns: () => { id: string; header: string }[];
+  getMappedStandardizedVariables: () => StandardizedVariable[];
   updateColumnDescription: (columnID: string, description: string | null) => void;
   updateColumnDataType: (columnID: string, dataType: 'Categorical' | 'Continuous' | null) => void;
   updateColumnStandardizedVariable: (
@@ -136,6 +137,29 @@ const useDataStore = create<DataStore>()(
             column.standardizedVariable?.identifier === get().getAssessmentToolConfig().identifier
         )
         .map(([id, column]) => ({ id, header: column.header })),
+
+    getMappedStandardizedVariables: () => {
+      const { config } = get();
+      const { columns } = get();
+      const seenIdentifiers = new Set<string>();
+      const uniqueVariables: StandardizedVariable[] = [];
+
+      Object.values(columns).forEach((column) => {
+        const variable = column.standardizedVariable;
+        if (variable && !seenIdentifiers.has(variable.identifier)) {
+          const configEntry = Object.values(config).find(
+            (configItem) => configItem.identifier === variable.identifier
+          );
+          // Filter out variables with null data_type e.g., Subject ID, Session ID
+          if (configEntry?.data_type !== null) {
+            seenIdentifiers.add(variable.identifier);
+            uniqueVariables.push(variable);
+          }
+        }
+      });
+
+      return uniqueVariables;
+    },
 
     updateColumnDescription: (columnID: string, description: string | null) => {
       set((state) => ({

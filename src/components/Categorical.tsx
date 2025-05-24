@@ -72,6 +72,12 @@ function Categorical({
 
   const termOptions = getTermOptions();
 
+  // TODO: Move this function to the store once the config functionality is implemented
+  const getTermByURL = (termURL: string | undefined) => {
+    if (!termURL) return null;
+    return termOptions.find((opt) => opt.identifier === termURL) || null;
+  };
+
   return (
     <TableContainer
       id={`${columnID}-table-container`}
@@ -121,9 +127,7 @@ function Categorical({
                   <Autocomplete
                     options={termOptions}
                     getOptionLabel={(option) => option.label}
-                    value={
-                      termOptions.find((opt) => opt.identifier === levels[value]?.termURL) || null
-                    }
+                    value={getTermByURL(levels[value]?.termURL)}
                     onChange={(_, newValue) => {
                       onUpdateLevelTerm(columnID, value, newValue);
                     }}
