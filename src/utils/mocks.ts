@@ -15,6 +15,8 @@ export const mockDataTable = {
   ],
   2: ['28.4', '24.6', '43.6', '28.4', '72.1', '56.2', '23', '22', '21', '45', '34', '65'],
   3: ['M', 'F', 'M', 'F', 'M', 'M', 'M', 'F', 'M', 'F', 'M', 'M'],
+  4: ['HC', 'HC', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'HC', 'PD'],
+  5: ['80', '90', '100', '110', '65', '87', '94', '90', '81', '66', '67', '83'],
 };
 
 export const mockInitialColumns = {
@@ -26,6 +28,12 @@ export const mockInitialColumns = {
   },
   3: {
     header: 'sex',
+  },
+  4: {
+    header: 'group_dx',
+  },
+  5: {
+    header: 'iq',
   },
 };
 
@@ -68,20 +76,24 @@ export const mockColumns = {
   },
   4: {
     header: 'group_dx',
-    description: 'diagnosis of the participant',
+    description: 'Diagnosis of the participant',
     standardizedVariable: {
       identifier: 'nb:Diagnosis',
       label: 'Diagnosis',
     },
     dataType: 'Categorical' as 'Categorical' | 'Continuous' | null,
     levels: {
-      HC: { description: '' },
-      PD: { description: '' },
+      HC: { description: 'Healthy Control', label: 'Healthy Control', termURL: 'ncit:C94342' },
+      PD: {
+        description: 'Parkinsons',
+        label: 'Parkinsonism caused by methanol',
+        termURL: 'snomed:870288002',
+      },
     },
   },
   5: {
     header: 'iq',
-    description: 'IQ test score of the participant',
+    description: 'iq test score of the participant',
     standardizedVariable: {
       identifier: 'nb:AssessmentTool',
       label: 'Assessment Tool',
@@ -91,6 +103,7 @@ export const mockColumns = {
       termURL: 'snomed:273712001',
       label: 'Previous IQ assessment by pronunciation',
     },
+    units: '',
   },
 };
 

@@ -7,8 +7,6 @@ import { mockDataTable, mockInitialColumns, mockColumns } from '~/utils/mocks';
 import { Columns } from '../utils/types';
 import useDataStore from './data';
 
-// TODO: add a test for processDataTableFile with a file containing empty lines
-
 describe('data store actions', () => {
   beforeEach(async () => {
     const { result } = renderHook(() => useDataStore());
@@ -24,6 +22,29 @@ describe('data store actions', () => {
     await act(async () => {
       await result.current.processDataTableFile(dataTableFile);
     });
+  });
+  it('processes a data table file with empty lines', async () => {
+    const { result } = renderHook(() => useDataStore());
+
+    // Override the beforeEach setup for this test
+    result.current.reset();
+
+    const dataTableFilePath = path.resolve(
+      __dirname,
+      '../../cypress/fixtures/examples/mock_with_empty_line.tsv'
+    );
+    const dataTableFileContent = fs.readFileSync(dataTableFilePath, 'utf-8');
+    const dataTableFile = new File([dataTableFileContent], 'mock_with_empty_line.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    await act(async () => {
+      await result.current.processDataTableFile(dataTableFile);
+    });
+
+    expect(result.current.dataTable).toEqual(mockDataTable);
+    expect(result.current.columns).toEqual(mockInitialColumns);
+    expect(result.current.uploadedDataTableFileName).toEqual('mock_with_empty_line.tsv');
   });
   it('processes a data table file and update dataTable, columns, and uploadedDataTableFileName', async () => {
     const { result } = renderHook(() => useDataStore());
@@ -209,5 +230,29 @@ describe('data store actions', () => {
       result.current.updateColumnMissingValues('1', 'some value', false);
     });
     expect(result.current.columns['1'].missingValues).toEqual([]);
+  });
+  it('retrieves the mapped standardized variables for columns', () => {
+    const { result } = renderHook(() => useDataStore());
+    act(() => {
+      result.current.columns = mockColumns;
+    });
+    expect(result.current.getMappedStandardizedVariables()).toEqual([
+      {
+        identifier: 'nb:Age',
+        label: 'Age',
+      },
+      {
+        identifier: 'nb:Sex',
+        label: 'Sex',
+      },
+      {
+        identifier: 'nb:Diagnosis',
+        label: 'Diagnosis',
+      },
+      {
+        identifier: 'nb:AssessmentTool',
+        label: 'Assessment Tool',
+      },
+    ]);
   });
 });
