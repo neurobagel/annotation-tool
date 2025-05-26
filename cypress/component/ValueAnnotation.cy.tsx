@@ -1,16 +1,22 @@
 import ValueAnnotation from '../../src/components/ValueAnnotation';
 import useDataStore from '../../src/stores/data';
-import { mockColumnsWithDataType } from '../../src/utils/mocks';
-
-// TODO: add a test for the case with annotated columns especially with assessment tool
+import { mockColumnsWithDataType, mockColumns } from '../../src/utils/mocks';
 
 describe('ValueAnnotation', () => {
+  beforeEach(() => {
+    useDataStore.setState({
+      columns: { ...mockColumns, ...mockColumnsWithDataType },
+    });
+  });
   it('renders the component correctly', () => {
-    useDataStore.setState({ columns: mockColumnsWithDataType });
     cy.mount(<ValueAnnotation />);
     cy.get('[data-cy="no-column-selected"]')
       .should('be.visible')
       .and('contain', 'Please select a column to annotate values.');
+    cy.get('[data-cy="side-column-nav-bar-diagnosis-select-button"]').click();
+    cy.get('[data-cy="4-categorical"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-assessment tool-select-button"]').click();
+    cy.get('[data-cy="5-continuous"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-categorical-select-button"]').click();
     cy.get('[data-cy="3-categorical"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-continuous-select-button"]').click();
@@ -18,12 +24,10 @@ describe('ValueAnnotation', () => {
     cy.get('[data-cy="side-column-nav-bar-other-select-button"]').click();
     cy.get('[data-cy="other"]')
       .should('be.visible')
-      .and('contain', 'Please select the appropriate data type for the following')
+      .and('contain', 'The following column do not have an assigned data type')
       .and('contain', 'age');
   });
-  it.only('asserts that there is no shared state between EditDescription components in Continuous component', () => {
-    useDataStore.setState({ columns: mockColumnsWithDataType });
-
+  it('asserts that there is no shared state between EditDescription components in Continuous component', () => {
     /*
      Set the data type of column 2 (age) to Continuous
      to make sure there is no shared state between the
