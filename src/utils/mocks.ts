@@ -66,6 +66,32 @@ export const mockColumns = {
       M: { description: '' },
     },
   },
+  4: {
+    header: 'group_dx',
+    description: 'diagnosis of the participant',
+    standardizedVariable: {
+      identifier: 'nb:Diagnosis',
+      label: 'Diagnosis',
+    },
+    dataType: 'Categorical' as 'Categorical' | 'Continuous' | null,
+    levels: {
+      HC: { description: '' },
+      PD: { description: '' },
+    },
+  },
+  5: {
+    header: 'iq',
+    description: 'IQ test score of the participant',
+    standardizedVariable: {
+      identifier: 'nb:AssessmentTool',
+      label: 'Assessment Tool',
+    },
+    dataType: 'Continuous' as 'Categorical' | 'Continuous' | null,
+    isPartOf: {
+      termURL: 'snomed:273712001',
+      label: 'Previous IQ assessment by pronunciation',
+    },
+  },
 };
 
 export const mockColumnsWithDataType = {

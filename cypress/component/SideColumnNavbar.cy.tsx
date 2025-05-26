@@ -1,15 +1,19 @@
 import SideColumnNavBar from '../../src/components/SideColumnNavBar';
-import { mockColumnsWithDataType } from '../../src/utils/mocks';
-
-// TODO: add a test for the case with annotated columns especially with assessment tool
+import useDataStore from '../../src/stores/data';
+import { mockColumnsWithDataType, mockColumns } from '../../src/utils/mocks';
 
 const props = {
-  columns: mockColumnsWithDataType,
+  columns: { ...mockColumns, ...mockColumnsWithDataType },
   onSelect: () => {},
   selectedColumnId: '1',
 };
 
 describe('SideColumnNavBar', () => {
+  beforeEach(() => {
+    useDataStore.setState({
+      columns: props.columns,
+    });
+  });
   it('renders the component correctly', () => {
     cy.mount(
       <SideColumnNavBar
@@ -18,6 +22,15 @@ describe('SideColumnNavBar', () => {
         selectedColumnId={props.selectedColumnId}
       />
     );
+    cy.get('[data-cy="side-column-nav-bar-diagnosis"]')
+      .should('be.visible')
+      .and('contain', 'group_dx');
+    cy.get('[data-cy="side-column-nav-bar-assessment tool"]')
+      .should('be.visible')
+      .and('contain', 'Previous IQ assessment by pronunciation');
+    cy.get('[data-cy="side-column-nav-bar-annotated-toggle-button"]').click();
+    cy.get('[data-cy="side-column-nav-bar-diagnosis"]').should('not.be.visible');
+    cy.get('[data-cy="side-column-nav-bar-assessment tool"]').should('not.be.visible');
     cy.get('[data-cy="side-column-nav-bar-categorical"]')
       .should('be.visible')
       .and('contain', 'sex');
