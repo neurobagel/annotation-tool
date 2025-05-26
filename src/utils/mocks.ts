@@ -143,6 +143,12 @@ export const mockDataDictionaryWithNoDescription = {
   sex: {
     Description: '',
   },
+  group_dx: {
+    Description: '',
+  },
+  iq: {
+    Description: '',
+  },
 };
 
 export const mockDataDictionaryWithAnnotations = {
@@ -194,6 +200,49 @@ export const mockDataDictionaryWithAnnotations = {
           TermURL: '',
           Label: '',
         },
+      },
+    },
+  },
+  group_dx: {
+    Description: 'Diagnosis of the participant',
+    Levels: {
+      HC: {
+        Description: 'Healthy Control',
+        TermURL: 'ncit:C94342',
+      },
+      PD: {
+        Description: 'Parkinsons',
+        TermURL: 'snomed:870288002',
+      },
+    },
+    Annotations: {
+      IsAbout: {
+        TermURL: 'nb:Diagnosis',
+        Label: 'Diagnosis',
+      },
+      Levels: {
+        HC: {
+          TermURL: 'ncit:C94342',
+          Label: 'Healthy Control',
+        },
+        PD: {
+          TermURL: 'snomed:870288002',
+          Label: 'Parkinsonism caused by methanol',
+        },
+      },
+    },
+  },
+  iq: {
+    Description: 'iq test score of the participant',
+    Units: '',
+    Annotations: {
+      IsAbout: {
+        TermURL: 'nb:AssessmentTool',
+        Label: 'Assessment Tool',
+      },
+      IsPartOf: {
+        TermURL: 'snomed:273712001',
+        Label: 'Previous IQ assessment by pronunciation',
       },
     },
   },
