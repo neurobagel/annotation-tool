@@ -7,8 +7,6 @@ import { mockDataTable, mockInitialColumns, mockColumns } from '~/utils/mocks';
 import { Columns } from '../utils/types';
 import useDataStore from './data';
 
-// TODO: Add test for missing values
-
 describe('data store actions', () => {
   beforeEach(async () => {
     const { result } = renderHook(() => useDataStore());
@@ -225,13 +223,32 @@ describe('data store actions', () => {
   it('updates the missingValues field of a column', () => {
     const { result } = renderHook(() => useDataStore());
     act(() => {
+      // Set 3rd column as categorical to test that setting a value as missing updates the levels
+      result.current.updateColumnDataType('3', 'Categorical');
       result.current.updateColumnMissingValues('1', 'some value', true);
+    });
+    expect(result.current.columns['3'].levels).toEqual({
+      F: { description: '' },
+      M: { description: '' },
     });
     expect(result.current.columns['1'].missingValues).toEqual(['some value']);
     act(() => {
+      result.current.updateColumnMissingValues('3', 'M', true);
       result.current.updateColumnMissingValues('1', 'some value', false);
     });
+    expect(result.current.columns['3'].levels).toEqual({
+      F: { description: '' },
+    });
+    expect(result.current.columns['3'].missingValues).toEqual(['M']);
     expect(result.current.columns['1'].missingValues).toEqual([]);
+    act(() => {
+      result.current.updateColumnMissingValues('3', 'M', false);
+    });
+    expect(result.current.columns['3'].levels).toEqual({
+      F: { description: '' },
+      M: { description: '' },
+    });
+    expect(result.current.columns['3'].missingValues).toEqual([]);
   });
   it('retrieves the mapped standardized variables for columns', () => {
     const { result } = renderHook(() => useDataStore());

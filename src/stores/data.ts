@@ -300,20 +300,29 @@ const useDataStore = create<DataStore>()(
         const column = state.columns[columnID];
         if (!column) return state;
 
-        const missingValues = column.missingValues || [];
-        const newMissingValues = isMissing
-          ? [...missingValues, value]
-          : missingValues.filter((v) => v !== value);
+        return produce(state, (draft) => {
+          const missingValues = column.missingValues || [];
+          const newMissingValues = isMissing
+            ? [...missingValues, value]
+            : missingValues.filter((v) => v !== value);
 
-        return {
-          columns: {
-            ...state.columns,
-            [columnID]: {
-              ...column,
-              missingValues: newMissingValues.length > 0 ? newMissingValues : [],
-            },
-          },
-        };
+          draft.columns[columnID].missingValues =
+            newMissingValues.length > 0 ? newMissingValues : [];
+
+          if (column.dataType === 'Categorical' && column.levels) {
+            if (isMissing) {
+              // Remove from levels when marking as missing
+              const { [value]: removedLevel, ...remainingLevels } = column.levels;
+              draft.columns[columnID].levels = remainingLevels;
+            } else if (!column.levels[value]) {
+              // Add back to levels when unmarking as missing
+              draft.columns[columnID].levels = {
+                ...column.levels,
+                [value]: { description: '' },
+              };
+            }
+          }
+        });
       });
     },
     updateColumnFormat: (columnID: string, format: { termURL: string; label: string } | null) => {
