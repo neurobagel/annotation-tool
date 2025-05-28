@@ -1,6 +1,21 @@
+import seedrandom from 'seedrandom';
+import { v4 as uuidv4 } from 'uuid';
 import { Term, TermCard, Columns } from './types';
 
 // Utility functions for MultiColumnMeasures component
+
+// Generate a UUID using a seeded random number generator
+export function createSeededUuidGenerator(seed: string) {
+  const rng = seedrandom(seed);
+  const buffer = new Uint8Array(16);
+
+  return () => {
+    for (let i = 0; i < 16; i += 1) {
+      buffer[i] = Math.floor(rng.quick() * 256);
+    }
+    return uuidv4({ rng: () => buffer });
+  };
+}
 
 // Initialize term cards based on existing isPartOf relationships
 export function initializeTermCards({

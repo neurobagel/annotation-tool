@@ -2,12 +2,12 @@ import AddIcon from '@mui/icons-material/Add';
 import { Fab, Card, CardContent, CardHeader, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import assessmentTerms from '../assets/assessmentTerms.json';
 import { usePagination } from '../hooks';
 import useDataStore from '../stores/data';
 import { Term, TermCard } from '../utils/types';
 import {
+  createSeededUuidGenerator,
   initializeTermCards,
   getAvailableTerms,
   getColumnOptions,
@@ -22,12 +22,12 @@ interface MultiColumnMeasuresProps {
 }
 
 const defaultProps = {
-  generateID: uuidv4,
+  generateID: createSeededUuidGenerator('seed'),
   terms: assessmentTerms,
 };
 
 function MultiColumnMeasures({
-  generateID = uuidv4,
+  generateID = createSeededUuidGenerator('seed'),
   terms = assessmentTerms,
 }: MultiColumnMeasuresProps) {
   const theme = useTheme();
@@ -138,7 +138,7 @@ function MultiColumnMeasures({
   };
 
   return (
-    <div className="flex justify-center p-4">
+    <div className="flex justify-center p-4" data-cy="multi-column-measures">
       <div className="flex flex-row gap-6 max-w-[1200px] w-full">
         <div className="flex-1 min-w-0">
           <div className="flex flex-col items-center">
