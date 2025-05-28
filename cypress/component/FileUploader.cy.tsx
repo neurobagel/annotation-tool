@@ -13,7 +13,7 @@ const props = {
 };
 
 describe('FileUploader', () => {
-  it('should render the FileUploader component', () => {
+  it('renders the component correctly', () => {
     cy.mount(
       <FileUploader
         id={props.id}
