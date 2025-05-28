@@ -117,6 +117,7 @@ describe('data store actions', () => {
     expect(result.current.columns['3'].levels).toEqual({
       F: { description: '' },
       M: { description: '' },
+      'N/A': { description: '' },
     });
   });
 
@@ -210,6 +211,7 @@ describe('data store actions', () => {
     expect(result.current.columns['3'].levels).toEqual({
       F: { description: 'some description' },
       M: { description: '' },
+      'N/A': { description: '' },
     });
   });
   it('updates the units field of a column', () => {
@@ -230,23 +232,26 @@ describe('data store actions', () => {
     expect(result.current.columns['3'].levels).toEqual({
       F: { description: '' },
       M: { description: '' },
+      'N/A': { description: '' },
     });
     expect(result.current.columns['1'].missingValues).toEqual(['some value']);
     act(() => {
-      result.current.updateColumnMissingValues('3', 'M', true);
+      result.current.updateColumnMissingValues('3', 'N/A', true);
       result.current.updateColumnMissingValues('1', 'some value', false);
     });
     expect(result.current.columns['3'].levels).toEqual({
       F: { description: '' },
+      M: { description: '' },
     });
-    expect(result.current.columns['3'].missingValues).toEqual(['M']);
+    expect(result.current.columns['3'].missingValues).toEqual(['N/A']);
     expect(result.current.columns['1'].missingValues).toEqual([]);
     act(() => {
-      result.current.updateColumnMissingValues('3', 'M', false);
+      result.current.updateColumnMissingValues('3', 'N/A', false);
     });
     expect(result.current.columns['3'].levels).toEqual({
       F: { description: '' },
       M: { description: '' },
+      'N/A': { description: '' },
     });
     expect(result.current.columns['3'].missingValues).toEqual([]);
   });
