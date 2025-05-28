@@ -186,6 +186,9 @@ export const mockDataDictionaryWithAnnotations = {
       M: {
         Description: '',
       },
+      'N/A': {
+        Description: '',
+      },
     },
     Annotations: {
       IsAbout: {
@@ -198,6 +201,10 @@ export const mockDataDictionaryWithAnnotations = {
           Label: '',
         },
         M: {
+          TermURL: '',
+          Label: '',
+        },
+        'N/A': {
           TermURL: '',
           Label: '',
         },
