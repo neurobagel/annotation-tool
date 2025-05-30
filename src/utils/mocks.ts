@@ -182,7 +182,7 @@ export const mockStandardizedVariables = {
     label: 'Diagnosis',
   },
   'Assessment Tool': {
-    identifier: 'nb:AssessmentTool',
+    identifier: 'nb:Assessment',
     label: 'Assessment Tool',
   },
 };
