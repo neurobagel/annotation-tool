@@ -21,17 +21,41 @@ describe('MissingValueButton', () => {
       .should('be.visible')
       .and('contain', 'Mark as missing');
   });
-  it('fires onToggleMissingValue with the appropriate payload when the missing value button is clicked', () => {
-    const spy = cy.spy().as('spy');
-    cy.mount(
-      <MissingValueButton
-        value={props.value}
-        columnId={props.columnId}
-        missingValues={props.missingValues}
-        onToggleMissingValue={spy}
-      />
-    );
-    cy.get('[data-cy="1-some value-missing-value-button"]').click();
-    cy.get('@spy').should('have.been.calledWith', '1', 'some value', true);
+
+  describe('onToggleMissingValue behavior', () => {
+    const testCases = [
+      {
+        description: 'when value is not marked as missing',
+        missingValues: [''],
+        expectedButtonText: 'Mark as missing',
+        expectedCallArgs: ['1', 'some value', true],
+      },
+      {
+        description: 'when value is already marked as missing',
+        missingValues: ['some value'],
+        expectedButtonText: 'Mark as not missing',
+        expectedCallArgs: ['1', 'some value', false],
+      },
+    ];
+
+    testCases.forEach(({ description, missingValues, expectedButtonText, expectedCallArgs }) => {
+      it(`fires correct payload ${description}`, () => {
+        const spy = cy.spy().as('spy');
+        cy.mount(
+          <MissingValueButton
+            value={props.value}
+            columnId={props.columnId}
+            missingValues={missingValues}
+            onToggleMissingValue={spy}
+          />
+        );
+
+        cy.get('[data-cy="1-some value-missing-value-button"]')
+          .should('contain.text', expectedButtonText, { matchCase: false })
+          .click();
+
+        cy.get('@spy').should('have.been.calledWith', ...expectedCallArgs);
+      });
+    });
   });
 });

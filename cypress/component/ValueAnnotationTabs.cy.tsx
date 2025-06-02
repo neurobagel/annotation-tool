@@ -51,7 +51,7 @@ describe('ValueAnnotationTabs', () => {
     cy.get('[data-cy="3-M-save-description-button"]').click();
     cy.get('@spy').should('have.been.calledWith', '3', 'M', 'new units');
   });
-  it('fires onUpdateUnits with the appropriate payload when the units is updated', () => {
+  it('fires onUpdateUnits with the appropriate payload when the units field is updated', () => {
     const spy = cy.spy().as('spy');
     cy.mount(
       <ValueAnnotationTabs
@@ -87,7 +87,7 @@ describe('ValueAnnotationTabs', () => {
     cy.get('[data-cy="2-23-missing-value-button"]').click();
     cy.get('@spy').should('have.been.calledWith', '2', '23', true);
   });
-  it('fires onUpdateFormat with the appropriate payload when the format is updated', () => {
+  it('fires onUpdateFormat with the appropriate payload when the format field is updated', () => {
     const spy = cy.spy().as('spy');
     cy.mount(
       <ValueAnnotationTabs

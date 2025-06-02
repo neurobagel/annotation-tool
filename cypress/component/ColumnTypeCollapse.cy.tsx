@@ -13,46 +13,73 @@ const props = {
 };
 
 describe('ColumnTypeCollapse', () => {
-  it('renders the component correctly', () => {
-    cy.mount(
-      <ColumnTypeCollapse
-        dataType={props.dataType}
-        standardizedVariable={props.standardizedVariable}
-        columns={props.columns}
-        onSelect={props.onSelect}
-        selectedColumnId={props.selectedColumnId}
-      />
-    );
-    cy.get('[data-cy="side-column-nav-bar-subject id"]').should('be.visible');
-    cy.get('[data-cy="side-column-nav-bar-subject id-toggle-button"]').should('be.visible');
-    cy.get('[data-cy="side-column-nav-bar-subject id-participant_id"]').should('be.visible');
-    cy.get('[data-cy="side-column-nav-bar-subject id-select-button"]').should('be.visible');
-    cy.get('[data-cy="side-column-nav-bar-subject id-toggle-button"]').click();
-    cy.get('[data-cy="side-column-nav-bar-subject id-participant_id"]').should('not.be.visible');
-    cy.mount(
-      <ColumnTypeCollapse
-        dataType={props.dataType}
-        standardizedVariable={null}
-        columns={props.columns}
-        onSelect={props.onSelect}
-        selectedColumnId={props.selectedColumnId}
-      />
-    );
-    cy.get('[data-cy="side-column-nav-bar-continuous"]').should('be.visible');
-    cy.get('[data-cy="side-column-nav-bar-continuous-toggle-button"]').should('be.visible');
-    cy.get('[data-cy="side-column-nav-bar-continuous-select-button"]').should('be.visible');
-    cy.mount(
-      <ColumnTypeCollapse
-        dataType={'Categorical' as 'Categorical' | 'Continuous' | null}
-        standardizedVariable={null}
-        columns={props.columns}
-        onSelect={props.onSelect}
-        selectedColumnId={props.selectedColumnId}
-      />
-    );
-    cy.get('[data-cy="side-column-nav-bar-categorical"]').should('be.visible');
-    cy.get('[data-cy="side-column-nav-bar-categorical-toggle-button"]').should('be.visible');
-    cy.get('[data-cy="side-column-nav-bar-categorical-select-button"]').should('be.visible');
+  interface TestCase {
+    name: string;
+    componentProps: {
+      dataType: 'Categorical' | 'Continuous' | null;
+      standardizedVariable: { identifier: string; label: string } | null;
+    };
+    expectedDataCy: string;
+    additionalTests?: (dataCy: string) => void;
+  }
+
+  const testCases: TestCase[] = [
+    {
+      name: 'Column with standardized variable',
+      componentProps: {
+        dataType: props.dataType,
+        standardizedVariable: props.standardizedVariable,
+      },
+      expectedDataCy: 'side-column-nav-bar-subject id',
+      additionalTests: (dataCy: string) => {
+        it('toggles column visibility when the toggle button is clicked', () => {
+          cy.get(`[data-cy="${dataCy}-toggle-button"]`).click();
+          cy.get(`[data-cy="${dataCy}-participant_id"]`).should('not.be.visible');
+        });
+      },
+    },
+    {
+      name: 'Continuous column with no standardized variable',
+      componentProps: {
+        dataType: props.dataType,
+        standardizedVariable: null,
+      },
+      expectedDataCy: 'side-column-nav-bar-continuous',
+    },
+    {
+      name: 'Categorical column with no standardized variable',
+      componentProps: {
+        dataType: 'Categorical',
+        standardizedVariable: null,
+      },
+      expectedDataCy: 'side-column-nav-bar-categorical',
+    },
+  ];
+
+  testCases.forEach(({ name, componentProps, expectedDataCy, additionalTests }) => {
+    describe(name, () => {
+      beforeEach(() => {
+        cy.mount(
+          <ColumnTypeCollapse
+            dataType={componentProps.dataType}
+            standardizedVariable={componentProps.standardizedVariable}
+            columns={props.columns}
+            onSelect={props.onSelect}
+            selectedColumnId={props.selectedColumnId}
+          />
+        );
+      });
+
+      it('renders the component correctly', () => {
+        cy.get(`[data-cy="${expectedDataCy}"]`).should('be.visible');
+        cy.get(`[data-cy="${expectedDataCy}-toggle-button"]`).should('be.visible');
+        cy.get(`[data-cy="${expectedDataCy}-select-button"]`).should('be.visible');
+      });
+
+      if (additionalTests) {
+        additionalTests(expectedDataCy);
+      }
+    });
   });
   it('fires onSelect with the appropriate payload when a column is selected', () => {
     const spy = cy.spy().as('onSelect');
