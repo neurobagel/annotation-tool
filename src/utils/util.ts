@@ -4,7 +4,11 @@ import { Term, TermCard, Columns } from './types';
 
 // Utility functions for MultiColumnMeasures component
 
-// Generate a UUID using a seeded random number generator
+/*
+Generate a UUID using a seeded random number generator
+so we can reliably prouduce consistent UUIDs for testing.
+*/
+
 export function createSeededUuidGenerator(seed: string) {
   const rng = seedrandom(seed);
   const buffer = new Uint8Array(16);
