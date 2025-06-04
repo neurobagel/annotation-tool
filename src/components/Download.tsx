@@ -317,6 +317,7 @@ function Download() {
       </div>
 
       <Button
+        data-cy="annotate-new-dataset-button"
         variant="contained"
         color="info"
         onClick={handleAnnotatingNewDataset}

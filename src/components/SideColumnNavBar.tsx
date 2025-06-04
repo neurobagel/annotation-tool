@@ -1,7 +1,8 @@
 import { List, Paper, ListItem } from '@mui/material';
 import useDataStore from '~/stores/data';
 import { Columns } from '../utils/types';
-import { ColumnTypeCollapse, ExpandableSection } from './ColumnTypeCollapse';
+import ColumnTypeCollapse from './ColumnTypeCollapse';
+import ExpandableSection from './ExpandableSection';
 
 interface SideColumnNavBarProps {
   columns: Columns;

@@ -125,6 +125,7 @@ function Categorical({
               {showStandardizedTerm && (
                 <TableCell align="left">
                   <Autocomplete
+                    data-cy={`${columnID}-${value}-term-dropdown`}
                     options={termOptions}
                     getOptionLabel={(option) => option.label}
                     value={getTermByURL(levels[value]?.termURL)}

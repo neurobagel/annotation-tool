@@ -5,8 +5,6 @@ const mockDataDictionaryFilePath = `cypress/fixtures/examples/${mockDataDictiona
 const mockPartiallyAnnotatedDataDictionaryFileName = 'mock_annotated.json';
 const mockPartiallyAnnotatedDataDictionaryFilePath = `cypress/downloads/${mockPartiallyAnnotatedDataDictionaryFileName}`;
 
-// TODO: add tests for columns without standardized variables annotation
-
 describe('Main user flow', () => {
   it('steps through different app views and goes through the basic user flow', () => {
     cy.visit('http://localhost:5173');
@@ -32,18 +30,6 @@ describe('Main user flow', () => {
     cy.get('[data-cy="datatable-toggle-preview-button"]').click();
 
     cy.get('[data-cy="datadictionary-upload-input"]').should('not.be.disabled');
-    cy.get('[data-cy="datadictionary-upload-input"]').selectFile(mockDataDictionaryFilePath, {
-      force: true,
-    });
-    cy.get('[data-cy="datadictionary-uploaded-file-name"]').should(
-      'contain',
-      mockDataDictionaryFileName
-    );
-    cy.get('[data-cy="datadictionary-toggle-preview-button"]').click();
-    cy.get('[data-cy="datadictionary-preview"]')
-      .should('be.visible')
-      .and('contain', 'Description:"Age of the participant"');
-    cy.get('[data-cy="datadictionary-toggle-preview-button"]').click();
     cy.get('[data-cy="next-button"]').click();
 
     // Column Annotation view
@@ -57,12 +43,14 @@ describe('Main user flow', () => {
     cy.get('[data-cy="2-column-annotation-card"]').should('be.visible');
     cy.get('[data-cy="3-column-annotation-card"]').should('be.visible');
     cy.get('[data-cy="column-annotation-pagination"]').should('be.visible');
-    cy.get('[data-cy="2-description"]').should('contain', 'Age of the participant');
+    cy.get('[data-cy="1-column-annotation-card-data-type-continuous-button"]').click();
+    cy.get('[data-cy="1-description"]').should('contain', '');
+    cy.get('[data-cy="1-edit-description-button"]').click();
+    cy.get('[data-cy="1-description-input"]').should('be.visible');
+    cy.get('[data-cy="1-description-input"]').type('A participant ID');
+    cy.get('[data-cy="1-save-description-button"]').click();
+    cy.get('[data-cy="2-description"]').should('contain', '');
     cy.get('[data-cy="2-edit-description-button"]').click();
-    cy.get('[data-cy="2-description-input"]')
-      .should('be.visible')
-      .and('contain', 'Age of the participant');
-    cy.get('[data-cy="2-description-input"]').clear();
     cy.get('[data-cy="2-description-input"]').type('some cool new description');
     cy.get('[data-cy="2-save-description-button"]').click();
     cy.get('[data-cy="2-description"]').should('contain', 'some cool new description');
@@ -75,6 +63,9 @@ describe('Main user flow', () => {
     cy.get('[data-cy="3-column-annotation-card-standardized-variable-dropdown"]').type(
       'sex{downArrow}{enter}'
     );
+    // Move to the next page of columns using the pagination
+    cy.get(':nth-child(3) > .MuiButtonBase-root').click();
+    cy.get('[data-cy="4-column-annotation-card-data-type-categorical-button"]').click();
     cy.get('[data-cy="next-button"]').click();
 
     // Value Annotation view
@@ -87,8 +78,26 @@ describe('Main user flow', () => {
     cy.get('[data-cy="side-column-nav-bar-annotated"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-unannotated"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-continuous"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-continuous-participant_id"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-continuous-select-button"]').click();
+    cy.get('[data-cy="1-continuous"]').should('be.visible');
+    cy.get('[data-cy="1-continuous-table"]').should('be.visible').and('contain.text', 'sub-718211');
+    cy.get('[data-cy="1-description"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-categorical"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-categorical-group_dx"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-categorical-select-button"]').click();
+    cy.get('[data-cy="4-categorical"]')
+      .should('be.visible')
+      .and('contain', 'HC')
+      .and('contain', 'PD');
     cy.get('[data-cy="side-column-nav-bar-sex-sex"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-age-select-button"]').click();
+    cy.get('[data-cy="2-continuous"]').should('be.visible');
+    cy.get('[data-cy="2-format-dropdown"]').type('float{downArrow}{enter}');
+    cy.get('[data-cy="2-description"]').should('contain', '');
+    cy.get('[data-cy="2-edit-description-button"]').click();
+    cy.get('[data-cy="2-description-input"]').type('some cool unit');
+    cy.get('[data-cy="2-save-description-button"]').click();
     cy.get('[data-cy="side-column-nav-bar-sex-select-button"]').click();
     cy.get('[data-cy="3-categorical"]')
       .should('be.visible')
@@ -118,6 +127,7 @@ describe('Main user flow', () => {
       // Check that the old description has been replaced with the new one
       expect(fileContentString).to.not.contain('Age of the participant');
       expect(fileContentString).to.contain('some cool new description');
+      expect(fileContentString).to.contain('"Units":"some cool unit"');
     });
   });
   it('steps through the different app workflows with a partially annotated data dictionary', () => {
@@ -149,6 +159,9 @@ describe('Main user flow', () => {
     cy.get('[data-cy="next-button"]').click();
 
     // Column Annotation view
+    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
+      'subject ID{downArrow}{enter}'
+    );
     cy.get('[data-cy="2-edit-description-button"]').click();
     cy.get('[data-cy="2-description-input"]').clear();
     cy.get('[data-cy="2-description-input"]').type('Age of the participant');
@@ -156,6 +169,39 @@ describe('Main user flow', () => {
     cy.get('[data-cy="2-description"]').should('contain', 'Age of the participant');
     cy.get('[data-cy="2-column-annotation-card-data-type"').should('contain', 'Continuous');
     cy.get('[data-cy="3-column-annotation-card-data-type"').should('contain', 'Categorical');
+    // Move to the next page of columns using the pagination
+    cy.get(':nth-child(3) > .MuiButtonBase-root').click();
+    cy.get('[data-cy="4-column-annotation-card-standardized-variable-dropdown"]').type(
+      'diagnosis{downArrow}{enter}'
+    );
+    cy.get('[data-cy="5-column-annotation-card-standardized-variable-dropdown"]').type(
+      'assessment{downArrow}{enter}'
+    );
+    cy.get('[data-cy="next-button"]').should('contain', 'Multi-Column Measures');
+    cy.get('[data-cy="next-button"]').click();
+
+    // Multi-Column Measures view
+    cy.get('[data-cy="back-button"]').should('contain', 'Column Annotation');
+    cy.get('[data-cy="next-button"]').should('contain', 'Value Annotation');
+    cy.get('[data-cy="nav-stepper"]').should('be.visible');
+    cy.get('[data-cy="Column Annotation-step"]').within(() => {
+      cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
+    });
+    cy.get('[data-cy="multi-column-measures-card-9090417a-9594-4af8-93b4-5331785a0a1f"]').should(
+      'be.visible'
+    );
+    cy.get('[data-cy="multi-column-measures"]').should('contain.text', 'No columns assigned');
+    cy.get(
+      '[data-cy="multi-column-measures-card-9090417a-9594-4af8-93b4-5331785a0a1f-title-dropdown"]'
+    ).type('Previous IQ assessment{downArrow}{enter}');
+    cy.get(
+      '[data-cy="multi-column-measures-card-9090417a-9594-4af8-93b4-5331785a0a1f-header"]'
+    ).should('contain.text', 'Previous IQ assessment by pronunciation');
+    cy.get(
+      '[data-cy="multi-column-measures-card-9090417a-9594-4af8-93b4-5331785a0a1f-columns-dropdown"]'
+    ).type('iq{downArrow}{enter}');
+    cy.get('[data-cy="mapped-column-5').should('be.visible').and('contain', 'iq');
+    cy.get('[data-cy="multi-column-measures"]').should('contain.text', '1 column assigned');
     cy.get('[data-cy="next-button"]').click();
 
     // Value Annotation view
@@ -165,22 +211,40 @@ describe('Main user flow', () => {
     cy.get('[data-cy="2-description-input"]').clear();
     cy.get('[data-cy="2-description-input"]').type('Years');
     cy.get('[data-cy="2-save-description-button"]').click();
-
     cy.get('[data-cy="side-column-nav-bar-sex-sex"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-sex-select-button"]').click();
     cy.get('[data-cy="3-M-edit-description-button"]').click();
-    cy.get('[data-cy="3-M-description-input"]').clear();
     cy.get('[data-cy="3-M-description-input"]').type('Male');
     cy.get('[data-cy="3-M-save-description-button"]').click();
     cy.get('[data-cy="3-M-description"]').should('contain', 'Male');
+    cy.get('[data-cy="3-M-term-dropdown"]').type('Male{downArrow}{enter}');
     cy.get('[data-cy="3-F-edit-description-button"]').click();
-    cy.get('[data-cy="3-F-description-input"]').clear();
     cy.get('[data-cy="3-F-description-input"]').type('Female');
     cy.get('[data-cy="3-F-save-description-button"]').click();
     cy.get('[data-cy="3-F-description"]').should('contain', 'Female');
+    cy.get('[data-cy="3-F-term-dropdown"]').type('Female{downArrow}{enter}');
+    cy.get('[data-cy="3-N/A-missing-value-button"]').click();
+    cy.get('[data-cy="side-column-nav-bar-diagnosis-group_dx"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-diagnosis-select-button"]').click();
+    cy.get('[data-cy="4-HC-edit-description-button"]').click();
+    cy.get('[data-cy="4-HC-description-input"]').type('Healthy control');
+    cy.get('[data-cy="4-HC-save-description-button"]').click();
+    cy.get('[data-cy="4-HC-description"]').should('contain', 'Healthy control');
+    cy.get('[data-cy="4-HC-term-dropdown"]').type('Healthy control{downArrow}{enter}');
+    cy.get('[data-cy="4-PD-edit-description-button"]').click();
+    cy.get('[data-cy="4-PD-description-input"]').type('Parkinsons');
+    cy.get('[data-cy="4-PD-save-description-button"]').click();
+    cy.get('[data-cy="4-PD-description"]').should('contain', 'Parkinsons');
+    cy.get('[data-cy="4-PD-term-dropdown"]').type(
+      'Parkinsonism caused by methanol{downArrow}{enter}'
+    );
+    cy.get('[data-cy="side-column-nav-bar-assessment tool-select-button"]').click();
+    cy.get('[data-cy="5-continuous"]').should('be.visible');
+    cy.get('[data-cy="5-continuous-table"]').should('be.visible').and('contain.text', '110');
     cy.get('[data-cy="next-button"]').click();
 
     // Download view
+    cy.get('[data-cy="complete-annotations-alert"]').should('be.visible');
     cy.get('[data-cy="datadictionary-preview"]')
       .should('be.visible')
       .and('contain', 'Description:"Age of the participant"')
@@ -200,9 +264,9 @@ describe('Main user flow', () => {
       expect(fileContentString).to.contain('"Description":"Male"');
       expect(fileContentString).to.contain('"Description":"Female"');
     });
+    cy.get('[data-cy="annotate-new-dataset-button"]').click();
 
-    cy.visit('http://localhost:5173');
-    cy.get('[data-cy="next-button"]').click();
+    // Upload view
     cy.get('[data-cy="datatable-upload-input"]').selectFile(mockDataTableFilePath, {
       force: true,
     });
@@ -218,16 +282,96 @@ describe('Main user flow', () => {
     cy.get('[data-cy="2-description"]').should('contain', 'Age of the participant');
     cy.get('[data-cy="2-column-annotation-card-data-type"').should('contain', 'Continuous');
     cy.get('[data-cy="3-column-annotation-card-data-type"]').should('contain', 'Categorical');
+    cy.get('[data-cy="1-column-annotation-card-data-type"]').should('contain', 'Not applicable');
+    // Move to the next page of columns using the pagination
+    cy.get(':nth-child(3) > .MuiButtonBase-root').click();
+    cy.get('[data-cy="4-column-annotation-card-data-type"]').should('contain', 'Categorical');
+    cy.get('[data-cy="next-button"]').click();
+
+    // Multi-Column Measures view
+    cy.get('[data-cy="multi-column-measures-card-9090417a-9594-4af8-93b4-5331785a0a1f"]').should(
+      'be.visible'
+    );
+    cy.get(
+      '[data-cy="multi-column-measures-card-9090417a-9594-4af8-93b4-5331785a0a1f-header"]'
+    ).should('contain.text', 'Previous IQ assessment by pronunciation');
+    cy.get('[data-cy="mapped-column-5').should('be.visible').and('contain', 'iq');
+    cy.get('[data-cy="multi-column-measures"]').should('contain.text', '1 column assigned');
     cy.get('[data-cy="next-button"]').click();
 
     // Value Annotation view
-    // TODO: expand the logic used here to the download page for a valid annotation
     cy.get('[data-cy="side-column-nav-bar-age-age"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-age-select-button"]').click();
     cy.get('[data-cy="2-description"]').should('contain', 'Years');
+    cy.get('[data-cy="2-format-dropdown"] input').should('have.value', 'float');
     cy.get('[data-cy="side-column-nav-bar-sex-sex"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-sex-select-button"]').click();
     cy.get('[data-cy="3-M-description"]').should('contain', 'Male');
+    cy.get('[data-cy="3-M-term-dropdown"] input').should('have.value', 'Male');
     cy.get('[data-cy="3-F-description"]').should('contain', 'Female');
+    cy.get('[data-cy="3-F-term-dropdown"] input').should('have.value', 'Female');
+    cy.get('[data-cy="side-column-nav-bar-diagnosis-group_dx"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-diagnosis-select-button"]').click();
+    cy.get('[data-cy="4-HC-description"]').should('contain', 'Healthy control');
+    cy.get('[data-cy="4-HC-term-dropdown"] input').should('have.value', 'Healthy Control');
+    cy.get('[data-cy="4-PD-description"]').should('contain', 'Parkinsons');
+    cy.get('[data-cy="4-PD-term-dropdown"] input').should(
+      'have.value',
+      'Parkinsonism caused by methanol'
+    );
+    cy.get('[data-cy="next-button"]').click();
+
+    // Download view
+    cy.get('[data-cy="complete-annotations-alert"]').should('be.visible');
+    cy.get('[data-cy="download-datadictionary-button"]').click();
+
+    cy.readFile(`cypress/downloads/${outputFileName}`).then((fileContent) => {
+      expect(fileContent.participant_id.Description).to.equal('A participant ID');
+      expect(fileContent.participant_id.Annotations.IsAbout.TermURL).to.equal('nb:ParticipantID');
+      expect(fileContent.participant_id.Annotations.IsAbout.Label).to.equal('Subject ID');
+      expect(fileContent.participant_id.Annotations.Identifies).to.equal('participant');
+
+      expect(fileContent.age.Description).to.equal('Age of the participant');
+      expect(fileContent.age.Annotations.IsAbout.TermURL).to.equal('nb:Age');
+      expect(fileContent.age.Annotations.IsAbout.Label).to.equal('Age');
+      expect(fileContent.age.Units).to.equal('Years');
+      expect(fileContent.age.Annotations.Format.TermURL).to.equal('nb:FromFloat');
+      expect(fileContent.age.Annotations.Format.Label).to.equal('float');
+
+      expect(fileContent.sex.Description).to.equal('');
+      expect(fileContent.sex.Annotations.IsAbout.TermURL).to.equal('nb:Sex');
+      expect(fileContent.sex.Annotations.IsAbout.Label).to.equal('Sex');
+      expect(fileContent.sex.Levels.M.Description).to.equal('Male');
+      expect(fileContent.sex.Levels.M.TermURL).to.equal('snomed:248153007');
+      expect(fileContent.sex.Levels.F.Description).to.equal('Female');
+      expect(fileContent.sex.Levels.F.TermURL).to.equal('snomed:248152002');
+      expect(fileContent.sex.Annotations.Levels.M.TermURL).to.equal('snomed:248153007');
+      expect(fileContent.sex.Annotations.Levels.M.Label).to.equal('Male');
+      expect(fileContent.sex.Annotations.Levels.F.TermURL).to.equal('snomed:248152002');
+      expect(fileContent.sex.Annotations.Levels.F.Label).to.equal('Female');
+      expect(fileContent.sex.Annotations.MissingValues).to.include('N/A');
+
+      expect(fileContent.group_dx.Description).to.equal('');
+      expect(fileContent.group_dx.Annotations.IsAbout.TermURL).to.equal('nb:Diagnosis');
+      expect(fileContent.group_dx.Annotations.IsAbout.Label).to.equal('Diagnosis');
+      expect(fileContent.group_dx.Levels.HC.Description).to.equal('Healthy control');
+      expect(fileContent.group_dx.Levels.HC.TermURL).to.equal('ncit:C94342');
+      expect(fileContent.group_dx.Levels.PD.Description).to.equal('Parkinsons');
+      expect(fileContent.group_dx.Levels.PD.TermURL).to.equal('snomed:870288002');
+      expect(fileContent.group_dx.Annotations.Levels.HC.TermURL).to.equal('ncit:C94342');
+      expect(fileContent.group_dx.Annotations.Levels.HC.Label).to.equal('Healthy Control');
+      expect(fileContent.group_dx.Annotations.Levels.PD.TermURL).to.equal('snomed:870288002');
+      expect(fileContent.group_dx.Annotations.Levels.PD.Label).to.equal(
+        'Parkinsonism caused by methanol'
+      );
+
+      expect(fileContent.iq.Description).to.equal('');
+      expect(fileContent.iq.Annotations.IsAbout.TermURL).to.equal('nb:AssessmentTool');
+      expect(fileContent.iq.Annotations.IsAbout.Label).to.equal('Assessment Tool');
+      expect(fileContent.iq.Annotations.IsPartOf.TermURL).to.equal('snomed:273712001');
+      expect(fileContent.iq.Annotations.IsPartOf.Label).to.equal(
+        'Previous IQ assessment by pronunciation'
+      );
+    });
   });
 });
