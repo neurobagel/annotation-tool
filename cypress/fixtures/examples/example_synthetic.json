@@ -19,9 +19,9 @@
         "TermURL": "nb:Age",
         "Label": "Age"
       },
-      "Transformation": {
+      "Format": {
         "TermURL": "nb:FromEuro",
-        "Label": "european decimal value"
+        "Label": "euro"
       },
       "MissingValues": ["NA"]
     }
