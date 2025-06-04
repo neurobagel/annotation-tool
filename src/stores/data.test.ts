@@ -274,7 +274,7 @@ describe('data store actions', () => {
         label: 'Diagnosis',
       },
       {
-        identifier: 'nb:AssessmentTool',
+        identifier: 'nb:Assessment',
         label: 'Assessment Tool',
       },
     ]);
