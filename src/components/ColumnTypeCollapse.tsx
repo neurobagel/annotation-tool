@@ -169,6 +169,7 @@ function ColumnTypeCollapse({
                 <div key={groupName}>
                   <div className="flex items-center">
                     <IconButton
+                      data-cy={`side-column-nav-bar-${labelToDisplay}-${groupName}-toggle-button`}
                       size="small"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -182,6 +183,7 @@ function ColumnTypeCollapse({
                     </IconButton>
                     <Typography
                       onClick={() => handleGroupSelect(groupColumns)}
+                      data-cy={`side-column-nav-bar-${labelToDisplay}-${groupName}`}
                       sx={{
                         cursor: 'pointer',
                         fontWeight: isGroupSelected ? 'bold' : 'normal',
@@ -198,7 +200,7 @@ function ColumnTypeCollapse({
                     <List sx={{ pl: 4 }}>
                       {groupColumns.map(([columnId, column]) => (
                         <ListItem
-                          data-cy={`side-column-nav-bar-${labelToDisplay}-${column.header}`}
+                          data-cy={`side-column-nav-bar-${labelToDisplay}-${groupName}-${column.header}`}
                           key={columnId}
                           sx={{
                             pl: 4,
