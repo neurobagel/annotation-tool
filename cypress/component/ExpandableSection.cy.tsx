@@ -28,7 +28,8 @@ describe('ColumnTypeCollapse', () => {
     cy.get('[data-cy="side-column-nav-bar-subject id"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-some title-toggle-button"]').click();
     cy.get('[data-cy="side-column-nav-bar-subject id"]').should('not.be.visible');
-
+  });
+  it('renders the component correctly when defaultExpanded is false', () => {
     cy.mount(<TestComponent defaultExpanded={false} />);
     cy.get('[data-cy="side-column-nav-bar-subject id"]').should('not.be.visible');
   });
