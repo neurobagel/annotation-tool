@@ -1,7 +1,7 @@
 import Landing from '../../src/components/Landing';
 
 describe('Landing', () => {
-  it('should render the content of Landing view  correctly', () => {
+  it('renders the component correctly', () => {
     cy.mount(<Landing />);
     cy.contains('Welcome to the Neurobagel Annotation Tool');
     cy.get('img[alt="Neurobagel Logo"]').should('be.visible');

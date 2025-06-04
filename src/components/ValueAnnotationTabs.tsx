@@ -47,6 +47,7 @@ function ValueAnnotationTabs({
   return (
     <Paper elevation={3} className="h-full flex flex-col">
       <Tabs
+        data-cy="value-annotation-tabs"
         value={selectedColumnId || false}
         onChange={handleTabChange}
         variant="scrollable"

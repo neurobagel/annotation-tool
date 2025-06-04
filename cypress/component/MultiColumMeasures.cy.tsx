@@ -75,7 +75,7 @@ describe('MultiColumnMeasures', () => {
       .and('contain', 'some other column')
       .and('contain', '1 column assigned');
   });
-  it('fires updateColumnIsPartOf with the  appropriate payload when a column is mapped to a term', () => {
+  it('fires updateColumnIsPartOf with the appropriate payload when a column is mapped to a term', () => {
     cy.get('[data-cy="add-term-card-button"]').click();
     cy.get('[data-cy="multi-column-measures-card-mock-uuid-1-title-dropdown"]').should(
       'be.visible'

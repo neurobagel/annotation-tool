@@ -30,6 +30,7 @@
     "lodash": "^4.17.21",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "seedrandom": "^3.0.5",
     "uuid": "^11.1.0",
     "zustand": "^5.0.3"
   },
@@ -42,6 +43,7 @@
     "@types/node": "^22.15.21",
     "@types/react": "^18.3.20",
     "@types/react-dom": "^18.3.1",
+    "@types/seedrandom": "^3.0.8",
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
     "@vitejs/plugin-react-swc": "^3.10.0",

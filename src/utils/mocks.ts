@@ -14,7 +14,9 @@ export const mockDataTable = {
     'sub-718225',
   ],
   2: ['28.4', '24.6', '43.6', '28.4', '72.1', '56.2', '23', '22', '21', '45', '34', '65'],
-  3: ['M', 'F', 'M', 'F', 'M', 'M', 'M', 'F', 'M', 'F', 'M', 'M'],
+  3: ['M', 'F', 'M', 'F', 'M', 'M', 'M', 'F', 'M', 'F', 'M', 'N/A'],
+  4: ['HC', 'HC', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'HC', 'PD'],
+  5: ['80', '90', '100', '110', '65', '87', '94', '90', '81', '66', '67', '83'],
 };
 
 export const mockInitialColumns = {
@@ -26,6 +28,12 @@ export const mockInitialColumns = {
   },
   3: {
     header: 'sex',
+  },
+  4: {
+    header: 'group_dx',
+  },
+  5: {
+    header: 'iq',
   },
 };
 
@@ -64,7 +72,39 @@ export const mockColumns = {
     levels: {
       F: { description: '' },
       M: { description: '' },
+      'N/A': { description: '' },
     },
+  },
+  4: {
+    header: 'group_dx',
+    description: 'Diagnosis of the participant',
+    standardizedVariable: {
+      identifier: 'nb:Diagnosis',
+      label: 'Diagnosis',
+    },
+    dataType: 'Categorical' as 'Categorical' | 'Continuous' | null,
+    levels: {
+      HC: { description: 'Healthy Control', label: 'Healthy Control', termURL: 'ncit:C94342' },
+      PD: {
+        description: 'Parkinsons',
+        label: 'Parkinsonism caused by methanol',
+        termURL: 'snomed:870288002',
+      },
+    },
+  },
+  5: {
+    header: 'iq',
+    description: 'iq test score of the participant',
+    standardizedVariable: {
+      identifier: 'nb:AssessmentTool',
+      label: 'Assessment Tool',
+    },
+    dataType: 'Continuous' as 'Categorical' | 'Continuous' | null,
+    isPartOf: {
+      termURL: 'snomed:273712001',
+      label: 'Previous IQ assessment by pronunciation',
+    },
+    units: '',
   },
 };
 
@@ -104,6 +144,12 @@ export const mockDataDictionaryWithNoDescription = {
   sex: {
     Description: '',
   },
+  group_dx: {
+    Description: '',
+  },
+  iq: {
+    Description: '',
+  },
 };
 
 export const mockDataDictionaryWithAnnotations = {
@@ -140,6 +186,9 @@ export const mockDataDictionaryWithAnnotations = {
       M: {
         Description: '',
       },
+      'N/A': {
+        Description: '',
+      },
     },
     Annotations: {
       IsAbout: {
@@ -155,6 +204,53 @@ export const mockDataDictionaryWithAnnotations = {
           TermURL: '',
           Label: '',
         },
+        'N/A': {
+          TermURL: '',
+          Label: '',
+        },
+      },
+    },
+  },
+  group_dx: {
+    Description: 'Diagnosis of the participant',
+    Levels: {
+      HC: {
+        Description: 'Healthy Control',
+        TermURL: 'ncit:C94342',
+      },
+      PD: {
+        Description: 'Parkinsons',
+        TermURL: 'snomed:870288002',
+      },
+    },
+    Annotations: {
+      IsAbout: {
+        TermURL: 'nb:Diagnosis',
+        Label: 'Diagnosis',
+      },
+      Levels: {
+        HC: {
+          TermURL: 'ncit:C94342',
+          Label: 'Healthy Control',
+        },
+        PD: {
+          TermURL: 'snomed:870288002',
+          Label: 'Parkinsonism caused by methanol',
+        },
+      },
+    },
+  },
+  iq: {
+    Description: 'iq test score of the participant',
+    Units: '',
+    Annotations: {
+      IsAbout: {
+        TermURL: 'nb:AssessmentTool',
+        Label: 'Assessment Tool',
+      },
+      IsPartOf: {
+        TermURL: 'snomed:273712001',
+        Label: 'Previous IQ assessment by pronunciation',
       },
     },
   },
