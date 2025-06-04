@@ -323,5 +323,55 @@ describe('Main user flow', () => {
 
     // Download view
     cy.get('[data-cy="complete-annotations-alert"]').should('be.visible');
+    cy.get('[data-cy="download-datadictionary-button"]').click();
+
+    cy.readFile(`cypress/downloads/${outputFileName}`).then((fileContent) => {
+      expect(fileContent.participant_id.Description).to.equal('A participant ID');
+      expect(fileContent.participant_id.Annotations.IsAbout.TermURL).to.equal('nb:ParticipantID');
+      expect(fileContent.participant_id.Annotations.IsAbout.Label).to.equal('Subject ID');
+      expect(fileContent.participant_id.Annotations.Identifies).to.equal('participant');
+
+      expect(fileContent.age.Description).to.equal('Age of the participant');
+      expect(fileContent.age.Annotations.IsAbout.TermURL).to.equal('nb:Age');
+      expect(fileContent.age.Annotations.IsAbout.Label).to.equal('Age');
+      expect(fileContent.age.Units).to.equal('Years');
+      expect(fileContent.age.Annotations.Format.TermURL).to.equal('nb:FromFloat');
+      expect(fileContent.age.Annotations.Format.Label).to.equal('float');
+
+      expect(fileContent.sex.Description).to.equal('');
+      expect(fileContent.sex.Annotations.IsAbout.TermURL).to.equal('nb:Sex');
+      expect(fileContent.sex.Annotations.IsAbout.Label).to.equal('Sex');
+      expect(fileContent.sex.Levels.M.Description).to.equal('Male');
+      expect(fileContent.sex.Levels.M.TermURL).to.equal('snomed:248153007');
+      expect(fileContent.sex.Levels.F.Description).to.equal('Female');
+      expect(fileContent.sex.Levels.F.TermURL).to.equal('snomed:248152002');
+      expect(fileContent.sex.Annotations.Levels.M.TermURL).to.equal('snomed:248153007');
+      expect(fileContent.sex.Annotations.Levels.M.Label).to.equal('Male');
+      expect(fileContent.sex.Annotations.Levels.F.TermURL).to.equal('snomed:248152002');
+      expect(fileContent.sex.Annotations.Levels.F.Label).to.equal('Female');
+      expect(fileContent.sex.Annotations.MissingValues).to.include('N/A');
+
+      expect(fileContent.group_dx.Description).to.equal('');
+      expect(fileContent.group_dx.Annotations.IsAbout.TermURL).to.equal('nb:Diagnosis');
+      expect(fileContent.group_dx.Annotations.IsAbout.Label).to.equal('Diagnosis');
+      expect(fileContent.group_dx.Levels.HC.Description).to.equal('Healthy control');
+      expect(fileContent.group_dx.Levels.HC.TermURL).to.equal('ncit:C94342');
+      expect(fileContent.group_dx.Levels.PD.Description).to.equal('Parkinsons');
+      expect(fileContent.group_dx.Levels.PD.TermURL).to.equal('snomed:870288002');
+      expect(fileContent.group_dx.Annotations.Levels.HC.TermURL).to.equal('ncit:C94342');
+      expect(fileContent.group_dx.Annotations.Levels.HC.Label).to.equal('Healthy Control');
+      expect(fileContent.group_dx.Annotations.Levels.PD.TermURL).to.equal('snomed:870288002');
+      expect(fileContent.group_dx.Annotations.Levels.PD.Label).to.equal(
+        'Parkinsonism caused by methanol'
+      );
+
+      expect(fileContent.iq.Description).to.equal('');
+      expect(fileContent.iq.Annotations.IsAbout.TermURL).to.equal('nb:AssessmentTool');
+      expect(fileContent.iq.Annotations.IsAbout.Label).to.equal('Assessment Tool');
+      expect(fileContent.iq.Annotations.IsPartOf.TermURL).to.equal('snomed:273712001');
+      expect(fileContent.iq.Annotations.IsPartOf.Label).to.equal(
+        'Previous IQ assessment by pronunciation'
+      );
+    });
   });
 });
