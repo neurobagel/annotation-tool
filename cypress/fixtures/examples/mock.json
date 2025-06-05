@@ -66,7 +66,7 @@
     "Description": "iq test score of the participant",
     "Annotations": {
       "IsAbout": {
-        "TermURL": "nb:AssessmentTool",
+        "TermURL": "nb:Assessment",
         "Label": "Assessment Tool"
       },
       "IsPartOf": {

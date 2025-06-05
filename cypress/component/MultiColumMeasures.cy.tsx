@@ -33,7 +33,7 @@ describe('MultiColumnMeasures', () => {
         '1': {
           header: 'some column',
           standardizedVariable: {
-            identifier: 'nb:AssessmentTool',
+            identifier: 'nb:Assessment',
             label: 'Assessment Tool',
           },
           isPartOf: {
@@ -44,14 +44,14 @@ describe('MultiColumnMeasures', () => {
         '2': {
           header: 'another column',
           standardizedVariable: {
-            identifier: 'nb:AssessmentTool',
+            identifier: 'nb:Assessment',
             label: 'Assessment Tool',
           },
         },
         '3': {
           header: 'some other column',
           standardizedVariable: {
-            identifier: 'nb:AssessmentTool',
+            identifier: 'nb:Assessment',
             label: 'Assessment Tool',
           },
         },

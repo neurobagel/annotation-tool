@@ -1,0 +1,119 @@
+{
+  "participant_id": {
+    "Description": "A participant ID",
+    "Annotations": {
+      "IsAbout": {
+        "TermURL": "nb:ParticipantID",
+        "Label": "Subject Unique Identifier"
+      },
+      "Identifies": "participant"
+    }
+  },
+  "session_id": {
+    "Description": "A session ID"
+  },
+  "pheno_age": {
+    "Description": "Age of the participant",
+    "Annotations": {
+      "IsAbout": {
+        "TermURL": "nb:Age",
+        "Label": "Age"
+      },
+      "Format": {
+        "TermURL": "nb:FromEuro",
+        "Label": "euro"
+      },
+      "MissingValues": ["NA"]
+    }
+  },
+  "pheno_sex": {
+    "Description": "Sex variable",
+    "Levels": {
+      "M": "Male",
+      "F": "Female"
+    },
+    "Annotations": {
+      "IsAbout": {
+        "TermURL": "nb:Sex",
+        "Label": "Sex"
+      },
+      "Levels": {
+        "M": {
+          "TermURL": "snomed:248153007",
+          "Label": "Male"
+        },
+        "F": {
+          "TermURL": "snomed:248152002",
+          "Label": "Female"
+        }
+      },
+      "MissingValues": ["missing"]
+    }
+  },
+  "pheno_group": {
+    "Description": "Group variable",
+    "Levels": {
+      "PAT": "Patient",
+      "CTRL": "Control subject"
+    },
+    "Annotations": {
+      "IsAbout": {
+        "TermURL": "nb:Diagnosis",
+        "Label": "Diagnosis"
+      },
+      "Levels": {
+        "PAT": {
+          "TermURL": "snomed:406506008",
+          "Label": "Attention deficit hyperactivity disorder"
+        },
+        "CTRL": {
+          "TermURL": "ncit:C94342",
+          "Label": "Healthy Control"
+        }
+      },
+      "MissingValues": ["NA"]
+    }
+  },
+  "tool1_item1": {
+    "Description": "item 1 scores for tool1",
+    "Annotations": {
+      "IsAbout": {
+        "TermURL": "nb:Assessment",
+        "Label": "Assessment tool"
+      },
+      "IsPartOf": {
+        "TermURL": "snomed:859351000000102",
+        "Label": "Montreal Cognitive Assessment"
+      },
+      "MissingValues": ["missing"]
+    }
+  },
+  "tool1_item2": {
+    "Description": "item 2 scores for tool1",
+    "Annotations": {
+      "IsAbout": {
+        "TermURL": "nb:Assessment",
+        "Label": "Assessment tool"
+      },
+      "IsPartOf": {
+        "TermURL": "snomed:859351000000102",
+        "Label": "Montreal Cognitive Assessment"
+      },
+      "MissingValues": ["missing"]
+    }
+  },
+  "tool2_item1": {
+    "Description": "item 1 scores for tool2",
+    "Annotations": {
+      "IsAbout": {
+        "TermURL": "nb:Assessment",
+        "Label": "Assessment tool"
+      },
+      "IsPartOf": {
+        "TermURL": "snomed:342061000000106",
+        "Label": "Unified Parkinsons disease rating scale score"
+      },
+      "MissingValues": ["not completed"]
+    }
+  }
+}

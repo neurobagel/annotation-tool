@@ -96,7 +96,7 @@ export const mockColumns = {
     header: 'iq',
     description: 'iq test score of the participant',
     standardizedVariable: {
-      identifier: 'nb:AssessmentTool',
+      identifier: 'nb:Assessment',
       label: 'Assessment Tool',
     },
     dataType: 'Continuous' as 'Categorical' | 'Continuous' | null,
@@ -245,7 +245,7 @@ export const mockDataDictionaryWithAnnotations = {
     Units: '',
     Annotations: {
       IsAbout: {
-        TermURL: 'nb:AssessmentTool',
+        TermURL: 'nb:Assessment',
         Label: 'Assessment Tool',
       },
       IsPartOf: {
@@ -278,7 +278,7 @@ export const mockStandardizedVariables = {
     label: 'Diagnosis',
   },
   'Assessment Tool': {
-    identifier: 'nb:AssessmentTool',
+    identifier: 'nb:Assessment',
     label: 'Assessment Tool',
   },
 };

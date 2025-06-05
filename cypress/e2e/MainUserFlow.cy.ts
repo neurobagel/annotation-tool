@@ -4,6 +4,10 @@ const mockDataDictionaryFileName = 'mock.json';
 const mockDataDictionaryFilePath = `cypress/fixtures/examples/${mockDataDictionaryFileName}`;
 const mockPartiallyAnnotatedDataDictionaryFileName = 'mock_annotated.json';
 const mockPartiallyAnnotatedDataDictionaryFilePath = `cypress/downloads/${mockPartiallyAnnotatedDataDictionaryFileName}`;
+const legacyDataTableFileName = 'example_synthetic.tsv';
+const legacyDataTableFilePath = `cypress/fixtures/examples/${legacyDataTableFileName}`;
+const legacyDataDictionaryFileName = 'example_synthetic.json';
+const legacyDataDictionaryFilePath = `cypress/fixtures/examples/${legacyDataDictionaryFileName}`;
 
 describe('Main user flow', () => {
   it('steps through different app views and goes through the basic user flow', () => {
@@ -63,7 +67,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="3-column-annotation-card-standardized-variable-dropdown"]').type(
       'sex{downArrow}{enter}'
     );
-    // Move to the next page of columns using the pagination
+    // Move to the 2nd page of columns using the pagination
     cy.get(':nth-child(3) > .MuiButtonBase-root').click();
     cy.get('[data-cy="4-column-annotation-card-data-type-categorical-button"]').click();
     cy.get('[data-cy="next-button"]').click();
@@ -169,7 +173,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="2-description"]').should('contain', 'Age of the participant');
     cy.get('[data-cy="2-column-annotation-card-data-type"').should('contain', 'Continuous');
     cy.get('[data-cy="3-column-annotation-card-data-type"').should('contain', 'Categorical');
-    // Move to the next page of columns using the pagination
+    // Move to the 2nd page of columns using the pagination
     cy.get(':nth-child(3) > .MuiButtonBase-root').click();
     cy.get('[data-cy="4-column-annotation-card-standardized-variable-dropdown"]').type(
       'diagnosis{downArrow}{enter}'
@@ -283,7 +287,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="2-column-annotation-card-data-type"').should('contain', 'Continuous');
     cy.get('[data-cy="3-column-annotation-card-data-type"]').should('contain', 'Categorical');
     cy.get('[data-cy="1-column-annotation-card-data-type"]').should('contain', 'Not applicable');
-    // Move to the next page of columns using the pagination
+    // Move to the 2nd page of columns using the pagination
     cy.get(':nth-child(3) > .MuiButtonBase-root').click();
     cy.get('[data-cy="4-column-annotation-card-data-type"]').should('contain', 'Categorical');
     cy.get('[data-cy="next-button"]').click();
@@ -366,12 +370,191 @@ describe('Main user flow', () => {
       );
 
       expect(fileContent.iq.Description).to.equal('');
-      expect(fileContent.iq.Annotations.IsAbout.TermURL).to.equal('nb:AssessmentTool');
+      expect(fileContent.iq.Annotations.IsAbout.TermURL).to.equal('nb:Assessment');
       expect(fileContent.iq.Annotations.IsAbout.Label).to.equal('Assessment Tool');
       expect(fileContent.iq.Annotations.IsPartOf.TermURL).to.equal('snomed:273712001');
       expect(fileContent.iq.Annotations.IsPartOf.Label).to.equal(
         'Previous IQ assessment by pronunciation'
       );
     });
+  });
+  it('loads in a data dictionary from the legacy annotation tool', () => {
+    cy.visit('http://localhost:5173');
+    cy.get('[data-cy="next-button"]').click();
+    cy.get('[data-cy="datatable-upload-input"]').selectFile(legacyDataTableFilePath, {
+      force: true,
+    });
+    cy.get('[data-cy="datadictionary-upload-input"]').selectFile(legacyDataDictionaryFilePath, {
+      force: true,
+    });
+    cy.get('[data-cy="next-button"]').click();
+
+    // Column Annotation view
+    cy.get('[data-cy="1-description"]').should('contain', 'A participant ID');
+    cy.get('[data-cy="1-column-annotation-card-data-type"]').should('contain', 'Not applicable');
+    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"] input').should(
+      'have.value',
+      'Subject ID'
+    );
+    cy.get('[data-cy="2-description"]').should('contain', 'A session ID');
+    cy.get('[data-cy="3-description"]').should('contain', 'Age of the participant');
+    cy.get('[data-cy="3-column-annotation-card-data-type"]').should('contain', 'Continuous');
+    cy.get('[data-cy="3-column-annotation-card-standardized-variable-dropdown"] input').should(
+      'have.value',
+      'Age'
+    );
+    // Move to the 2nd page of columns using the pagination
+    cy.get(':nth-child(3) > .MuiButtonBase-root').click();
+    cy.get('[data-cy="4-description"]').should('contain', 'Sex');
+    cy.get('[data-cy="4-column-annotation-card-data-type"]').should('contain', 'Categorical');
+    cy.get('[data-cy="4-column-annotation-card-standardized-variable-dropdown"] input').should(
+      'have.value',
+      'Sex'
+    );
+    cy.get('[data-cy="5-description"]').should('contain', 'Group variable');
+    cy.get('[data-cy="5-column-annotation-card-data-type"]').should('contain', 'Categorical');
+    cy.get('[data-cy="5-column-annotation-card-standardized-variable-dropdown"] input').should(
+      'have.value',
+      'Diagnosis'
+    );
+    cy.get('[data-cy="6-description"]').should('contain', 'item 1 scores for tool1');
+    cy.get('[data-cy="6-column-annotation-card-data-type"]').should('contain', 'Continuous');
+    cy.get('[data-cy="6-column-annotation-card-standardized-variable-dropdown"] input').should(
+      'have.value',
+      'Assessment Tool'
+    );
+    // Move to the 3rd page of columns using the pagination
+    cy.get(':nth-child(4) > .MuiButtonBase-root').click();
+    cy.get('[data-cy="7-description"]').should('contain', 'item 2 scores for tool1');
+    cy.get('[data-cy="7-column-annotation-card-data-type"]').should('contain', 'Continuous');
+    cy.get('[data-cy="7-column-annotation-card-standardized-variable-dropdown"] input').should(
+      'have.value',
+      'Assessment Tool'
+    );
+    cy.get('[data-cy="8-description"]').should('contain', 'item 1 scores for tool2');
+    cy.get('[data-cy="8-column-annotation-card-data-type"]').should('contain', 'Continuous');
+    cy.get('[data-cy="8-column-annotation-card-standardized-variable-dropdown"] input').should(
+      'have.value',
+      'Assessment Tool'
+    );
+    cy.get('[data-cy="next-button"]').click();
+
+    // Multi-Column Measures view
+    cy.get('[data-cy="multi-column-measures"]').should('contain.text', '3 columns assigned');
+
+    cy.get('[data-cy="multi-column-measures-card-9090417a-9594-4af8-93b4-5331785a0a1f"]').should(
+      'be.visible'
+    );
+    cy.get('[data-cy="mapped-column-6"]').should('be.visible').and('contain', 'tool1_item1');
+    cy.get('[data-cy="mapped-column-7"]').should('be.visible').and('contain', 'tool1_item2');
+    cy.get(
+      '[data-cy="multi-column-measures-card-9090417a-9594-4af8-93b4-5331785a0a1f-header"]'
+    ).should('contain.text', 'Montreal cognitive assessment');
+
+    cy.get('[data-cy="multi-column-measures-card-9090417a-9594-4af8-93b4-5331785a0a1f"]')
+      .should('contain.text', 'tool1_item1')
+      .and('contain.text', 'tool1_item2');
+
+    cy.get('[data-cy="multi-column-measures-card-e43763af-0e82-4d31-add8-ab678bf57d48"]').should(
+      'be.visible'
+    );
+    cy.get('[data-cy="mapped-column-8"]').should('be.visible').and('contain', 'tool2_item1');
+    cy.get(
+      '[data-cy="multi-column-measures-card-e43763af-0e82-4d31-add8-ab678bf57d48-header"]'
+    ).should('contain.text', 'Unified Parkinsons disease rating scale');
+    cy.get('[data-cy="multi-column-measures-card-e43763af-0e82-4d31-add8-ab678bf57d48"]').should(
+      'contain.text',
+      'tool2_item1'
+    );
+
+    cy.get('[data-cy="next-button"]').click();
+
+    // Value Annotation view
+    cy.get('[data-cy="side-column-nav-bar-age-pheno_age"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-age-select-button"]').click();
+    cy.get('[data-cy="3-continuous"]').should('be.visible');
+    cy.get('[data-cy="3-format-dropdown"] input').should('have.value', 'euro');
+    cy.get('[data-cy="3-continuous-table"]').should('be.visible').and('contain.text', 'NA');
+    cy.get('[data-cy="3-NA-missing-value-button"]')
+      .should('be.visible')
+      .and('contain.text', 'Mark as not missing');
+
+    cy.get('[data-cy="side-column-nav-bar-sex-pheno_sex"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-sex-select-button"]').click();
+    cy.get('[data-cy="4-categorical"]').should('be.visible');
+    cy.get('[data-cy="4-categorical-table"]').should('be.visible').and('contain.text', 'missing');
+    cy.get('[data-cy="4-M-term-dropdown"] input').should('have.value', 'Male');
+    cy.get('[data-cy="4-F-term-dropdown"] input').should('have.value', 'Female');
+    cy.get('[data-cy="4-missing-missing-value-button"]')
+      .should('be.visible')
+      .and('contain.text', 'Mark as not missing');
+
+    cy.get('[data-cy="side-column-nav-bar-diagnosis-pheno_group"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-diagnosis-select-button"]').click();
+    cy.get('[data-cy="5-categorical"]').should('be.visible');
+    cy.get('[data-cy="5-categorical-table"]').should('be.visible').and('contain.text', 'missing');
+    cy.get('[data-cy="5-CTRL-term-dropdown"] input').should('have.value', 'Healthy Control');
+    cy.get('[data-cy="5-PAT-term-dropdown"] input').should(
+      'have.value',
+      'Attention deficit hyperactivity disorder'
+    );
+    cy.get('[data-cy="5-NA-missing-value-button"]')
+      .should('be.visible')
+      .and('contain.text', 'Mark as not missing');
+
+    cy.get('[data-cy="side-column-nav-bar-assessment tool-select-button"]').click();
+    cy.get(
+      '[data-cy="side-column-nav-bar-assessment tool-Montreal Cognitive Assessment-toggle-button"]'
+    )
+      .should('be.visible')
+      .click();
+    cy.get(
+      '[data-cy="side-column-nav-bar-assessment tool-Montreal Cognitive Assessment-tool1_item1"]'
+    ).should('be.visible');
+    cy.get(
+      '[data-cy="side-column-nav-bar-assessment tool-Montreal Cognitive Assessment-tool1_item2"]'
+    ).should('be.visible');
+    cy.get('[data-cy="6-tab"]').should('be.visible').and('contain.text', 'tool1_item1');
+    cy.get('[data-cy="6-continuous"]').should('be.visible');
+    cy.get('[data-cy="6-continuous-table"]').should('be.visible').and('contain.text', 'good');
+    cy.get('[data-cy="6-missing-missing-value-button"]')
+      .should('be.visible')
+      .and('contain.text', 'Mark as not missing');
+
+    cy.get('[data-cy="7-tab"]').should('be.visible').and('contain.text', 'tool1_item2').click();
+    cy.get('[data-cy="7-continuous"]').should('be.visible');
+    cy.get('[data-cy="7-continuous-table"]').should('be.visible').and('contain.text', 'far');
+    cy.get('[data-cy="7-missing-missing-value-button"]')
+      .should('be.visible')
+      .and('contain.text', 'Mark as not missing');
+
+    cy.get(
+      '[data-cy="side-column-nav-bar-assessment tool-Unified Parkinsons disease rating scale score"]'
+    )
+      .should('be.visible')
+      .click();
+    cy.get(
+      '[data-cy="side-column-nav-bar-assessment tool-Unified Parkinsons disease rating scale score-toggle-button"]'
+    )
+      .should('be.visible')
+      .click();
+    cy.get(
+      '[data-cy="side-column-nav-bar-assessment tool-Unified Parkinsons disease rating scale score-tool2_item1"]'
+    ).should('be.visible');
+    cy.get('[data-cy="8-tab"]').should('be.visible').and('contain.text', 'tool2_item1');
+    cy.get('[data-cy="8-continuous"]').should('be.visible');
+    cy.get('[data-cy="8-continuous-table"]').should('be.visible').and('contain.text', 'hello');
+    cy.get('[data-cy="8-not completed-missing-value-button"]')
+      .should('be.visible')
+      .and('contain.text', 'Mark as not missing');
+
+    cy.get('[data-cy="side-column-nav-bar-other-session_id"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-other-select-button"]').click();
+    cy.get('[data-cy="other"]').should('be.visible').and('contain.text', 'session_id');
+
+    cy.get('[data-cy="next-button"]').click();
+
+    // Download view
+    cy.get('[data-cy="complete-annotations-alert"]').should('be.visible');
   });
 });
