@@ -4,30 +4,35 @@
       "identifier": "nb:ParticipantID",
       "label": "Subject ID",
       "data_type": null,
+      "is_multi_column_measurement": false,
       "vocab_file": null
     },
     "Session ID": {
       "identifier": "nb:SessionID",
       "label": "Session ID",
       "data_type": null,
+      "is_multi_column_measurement": false,
       "vocab_file": null
     },
     "Age": {
       "identifier": "nb:Age",
       "label": "Age",
       "data_type": "Continuous",
+      "is_multi_column_measurement": false,
       "vocab_file": null
     },
     "Sex": {
       "identifier": "nb:Sex",
       "label": "Sex",
       "data_type": "Categorical",
+      "is_multi_column_measurement": false,
       "vocab_file": "./sexTerms.json"
     },
     "Diagnosis": {
       "identifier": "nb:Diagnosis",
       "label": "Diagnosis",
       "data_type": "Categorical",
+      "is_multi_column_measurement": false,
       "vocab_file": "diagnosisTerms.json"
     },
     "Assessment Tool": {
