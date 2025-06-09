@@ -75,16 +75,19 @@ export interface StandardizedVariableConfigCollection {
   [key: string]: StandardizedVariableConfig;
 }
 
-// TODO: find a better name than Term
-export interface Term {
+export interface StandardizedTerm {
   identifier: string;
   label: string;
+}
+
+// TODO: find a better name than Term
+export interface MultiColumnMeasuresTerm extends StandardizedTerm {
   disabled?: boolean;
 }
 
-export interface TermCard {
+export interface MultiColumnMeasuresTermCard {
   id: string;
-  term: Term | null;
+  term: MultiColumnMeasuresTerm | null;
   mappedColumns: string[];
 }
 
@@ -101,4 +104,9 @@ export type StepConfig = {
   label: string;
   view: View;
   icon: React.ComponentType;
+};
+
+export type ConfigLoaderOptions = {
+  excludeDefault?: boolean;
+  defaultConfigName?: string;
 };

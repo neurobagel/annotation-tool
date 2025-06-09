@@ -10,7 +10,7 @@ import {
   TextField,
 } from '@mui/material';
 import useDataStore from '~/stores/data';
-import diagnosisTerms from '../assets/diagnosisTerms.json';
+import diagnosisTerms from '../../configs/Neurobagel/diagnosisTerms.json';
 import { StandardizedVariable } from '../utils/types';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueButton from './MissingValueButton';

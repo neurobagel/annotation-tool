@@ -2,10 +2,10 @@ import AddIcon from '@mui/icons-material/Add';
 import { Fab, Card, CardContent, CardHeader, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useState } from 'react';
-import assessmentTerms from '../assets/assessmentTerms.json';
+import assessmentTerms from '../../configs/Neurobagel/assessmentTerms.json';
 import { usePagination } from '../hooks';
 import useDataStore from '../stores/data';
-import { Term, TermCard } from '../utils/types';
+import { MultiColumnMeasuresTerm, MultiColumnMeasuresTermCard } from '../utils/types';
 import {
   createSeededUuidGenerator,
   initializeTermCards,
@@ -18,7 +18,7 @@ import MultiColumnMeasuresCard from './MultiColumnMeasuresCard';
 
 interface MultiColumnMeasuresProps {
   generateID?: () => string;
-  terms?: Term[];
+  terms?: MultiColumnMeasuresTerm[];
 }
 
 const defaultProps = {
@@ -40,7 +40,7 @@ function MultiColumnMeasures({
 
   const assessmentToolColumns = useDataStore.getState().getAssessmentToolColumns();
 
-  const [termCards, setTermCards] = useState<TermCard[]>(
+  const [termCards, setTermCards] = useState<MultiColumnMeasuresTermCard[]>(
     initializeTermCards({
       columns,
       terms,
@@ -50,15 +50,13 @@ function MultiColumnMeasures({
   );
 
   const itemsPerPage = 3;
-  const { currentPage, currentItems, totalPages, handlePaginationChange } = usePagination<TermCard>(
-    termCards,
-    itemsPerPage
-  );
+  const { currentPage, currentItems, totalPages, handlePaginationChange } =
+    usePagination<MultiColumnMeasuresTermCard>(termCards, itemsPerPage);
 
   const allMappedColumns = getAllMappedColumns(termCards);
 
   const handleAddNewCard = () => {
-    const newCard: TermCard = {
+    const newCard: MultiColumnMeasuresTermCard = {
       id: generateID(),
       term: null,
       mappedColumns: [],
@@ -72,7 +70,7 @@ function MultiColumnMeasures({
     }
   };
 
-  const handleTermSelect = (cardId: string, term: Term | null) => {
+  const handleTermSelect = (cardId: string, term: MultiColumnMeasuresTerm | null) => {
     setTermCards((prev) => prev.map((card) => (card.id === cardId ? { ...card, term } : card)));
   };
 

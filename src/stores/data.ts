@@ -1,7 +1,7 @@
 import { produce } from 'immer';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import defaultConfig from '../../configs/default.json';
+import defaultConfig from '../../configs/Neurobagel/config.json';
 import {
   DataTable,
   Columns,
@@ -11,6 +11,7 @@ import {
   StandardizedVariableConfig,
   StandardizedVariableConfigCollection,
 } from '../utils/types';
+import { getConfigDirs } from '../utils/util';
 
 type DataStore = {
   dataTable: DataTable;
@@ -50,6 +51,10 @@ type DataStore = {
   setUploadedDataDictionaryFileName: (fileName: string | null) => void;
   processDataDictionaryFile: (file: File) => Promise<void>;
 
+  configOptions: string[];
+  loadConfigOptions: () => Promise<void>;
+  selectedConfig: string | null;
+  setSelectedConfig: (configName: string | null) => void;
   config: StandardizedVariableConfigCollection;
   hasMultiColumnMeasures: () => boolean;
 
@@ -62,6 +67,8 @@ const initialState = {
   uploadedDataTableFileName: null,
   uploadedDataDictionary: {},
   uploadedDataDictionaryFileName: null,
+  configOptions: [],
+  selectedConfig: null,
   // TODO this is temporary to access the config in the store for now and should be removed after configuration functionality implementation
   config: defaultConfig.standardizedVariables as StandardizedVariableConfigCollection,
 };
@@ -507,6 +514,36 @@ const useDataStore = create<DataStore>()(
         (column) =>
           column.standardizedVariable?.identifier === get().getAssessmentToolConfig().identifier
       );
+    },
+
+    loadConfigOptions: async () => {
+      try {
+        const dirNames = await getConfigDirs();
+        set({ configOptions: dirNames });
+      } catch (error) {
+        // TODO: show a notif error
+        set({ configOptions: [] });
+      }
+    },
+
+    // loadConfig: async (configName: string) => {
+    //   try {
+    //     const config = await import(`../../configs/${configName}/config.json`);
+    //     set({ config: config.standardizedVariables });
+    //   } catch (error) {
+    //     console.error(`Failed to load config ${configName}:`, error);
+    //     // Fall back to default config
+    //     const defaultConfig = await import('../../configs/Neurobagel/config.json');
+    //     set({
+    //       config: defaultConfig.standardizedVariables,
+    //       selectedConfig: null // Reset selection on failure
+    //     });
+    //   }
+    // },
+
+    setSelectedConfig: (configName: string | null) => {
+      set({ selectedConfig: configName });
+      // TODO load the actual config when one is selected
     },
 
     reset: () => set(initialState),
