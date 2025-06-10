@@ -42,14 +42,13 @@ function Continuous({
   onToggleMissingValue,
   onUpdateFormat,
 }: ContinuousProps) {
-  const { getFormatOptions, getAssessmentToolConfig } = useDataStore();
+  const { getFormatOptions, isMultiColumnMeasureStandardizedVariable: isMultiMeasureColumnStandardizedVariable } = useDataStore();
 
   // TODO: show examples for formats
 
   // Remove/refactor the conditional logic once we decided how to handle the data type for multi column measure standardized variables
   const showFormat =
-    standardizedVariable &&
-    standardizedVariable?.identifier !== getAssessmentToolConfig().identifier;
+    standardizedVariable && !isMultiMeasureColumnStandardizedVariable(standardizedVariable);
 
   return (
     <Paper elevation={3} className="h-full shadow-lg" data-cy={`${columnID}-continuous`}>

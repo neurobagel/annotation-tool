@@ -26,7 +26,11 @@ type DataStore = {
   getStandardizedVariables: () => StandardizedVaribleCollection;
   getAssessmentToolConfig: () => StandardizedVariableConfig;
   getAssessmentToolColumns: () => { id: string; header: string }[];
+  getStandardizedVariableColumns: (
+    StandardizedVariable: StandardizedVariable
+  ) => { id: string; header: string }[];
   getMappedStandardizedVariables: () => StandardizedVariable[];
+  getMappedMultiColumnMeasureStandardizedVariables: () => StandardizedVariable[];
   updateColumnDescription: (columnID: string, description: string | null) => void;
   updateColumnDataType: (columnID: string, dataType: 'Categorical' | 'Continuous' | null) => void;
   updateColumnStandardizedVariable: (
@@ -62,6 +66,9 @@ type DataStore = {
   hasMultiColumnMeasures: () => boolean;
   getTermOptions: (standardizedVariable: StandardizedVariable) => StandardizedTerm[];
   getFormatOptions: (StandardizedVariable: StandardizedVariable) => Format[];
+  isMultiColumnMeasureStandardizedVariable: (
+    standardizedVariable: StandardizedVariable | null
+  ) => boolean;
 
   reset: () => void;
 };
@@ -149,6 +156,14 @@ const useDataStore = create<DataStore>()(
         )
         .map(([id, column]) => ({ id, header: column.header })),
 
+    getStandardizedVariableColumns: (standardizedVariable: StandardizedVariable) =>
+      Object.entries(get().columns)
+        .filter(
+          ([_, column]) =>
+            column.standardizedVariable?.identifier === standardizedVariable.identifier
+        )
+        .map(([id, column]) => ({ id, header: column.header })),
+
     getMappedStandardizedVariables: () => {
       const { config } = get();
       const { columns } = get();
@@ -170,6 +185,18 @@ const useDataStore = create<DataStore>()(
       });
 
       return uniqueVariables;
+    },
+
+    getMappedMultiColumnMeasureStandardizedVariables: () => {
+      const allMappedVariables = get().getMappedStandardizedVariables();
+      const { config } = get();
+
+      return allMappedVariables.filter((variable) => {
+        const configEntry = Object.values(config).find(
+          (item) => item.identifier === variable.identifier
+        );
+        return configEntry?.is_multi_column_measurement === true;
+      });
     },
 
     updateColumnDescription: (columnID: string, description: string | null) => {
@@ -581,6 +608,19 @@ const useDataStore = create<DataStore>()(
         return matchingConfigEntry.formats;
       }
       return [];
+    },
+
+    isMultiColumnMeasureStandardizedVariable: (
+      standardizedVariable: StandardizedVariable | null
+    ) => {
+      if (!standardizedVariable) return false;
+
+      const { config } = get();
+      const configEntry = Object.values(config).find(
+        (item) => item.identifier === standardizedVariable.identifier
+      );
+
+      return configEntry?.is_multi_column_measurement === true;
     },
 
     reset: () => set(initialState),
