@@ -64,6 +64,7 @@ export interface StandardizedVariable {
 export interface StandardizedVariableConfig extends StandardizedVariable {
   data_type?: 'Categorical' | 'Continuous' | null;
   is_multi_column_measurement?: boolean;
+  vocab_file?: string | null;
 }
 
 export interface StandardizedVaribleCollection {
@@ -71,7 +72,7 @@ export interface StandardizedVaribleCollection {
 }
 
 // TODO: reduce the depth and try to have a single object for all configuration
-export interface StandardizedVariableConfigCollection {
+export interface Config {
   [key: string]: StandardizedVariableConfig;
 }
 
@@ -80,7 +81,6 @@ export interface StandardizedTerm {
   label: string;
 }
 
-// TODO: find a better name than Term
 export interface MultiColumnMeasuresTerm extends StandardizedTerm {
   disabled?: boolean;
 }

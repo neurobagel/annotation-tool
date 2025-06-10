@@ -32,6 +32,7 @@ function Download() {
   const dataDictionary = useMemo(
     () =>
       Object.entries(columns).reduce((dictAcc, [_columnKey, column]) => {
+        // Hard-coded for participant and session
         const participantIDConfig = config['Subject ID'];
         const sessionIDConfig = config['Session ID'];
 
@@ -90,6 +91,7 @@ function Download() {
               );
             }
 
+            // Hard-coded for participant and session
             if (column.standardizedVariable?.identifier === participantIDConfig.identifier) {
               dictionaryEntry.Annotations.Identifies = 'participant';
             } else if (column.standardizedVariable?.identifier === sessionIDConfig.identifier) {

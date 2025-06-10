@@ -9,21 +9,11 @@ import {
   Autocomplete,
   TextField,
 } from '@mui/material';
+import { useEffect, useState } from 'react';
 import useDataStore from '~/stores/data';
-import diagnosisTerms from '../../configs/Neurobagel/diagnosisTerms.json';
 import { StandardizedVariable } from '../utils/types';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueButton from './MissingValueButton';
-
-// TODO: Remove this when the terms are fetched from the config
-const sexTerms = [
-  { label: 'Male', identifier: 'snomed:248153007' },
-  { label: 'Female', identifier: 'snomed:248152002' },
-  { label: 'Other', identifier: 'snomed:32570681000036106' },
-];
-
-// Manually add the healthy control term
-diagnosisTerms.push({ label: 'Healthy Control', identifier: 'ncit:C94342' });
 
 interface CategoricalProps {
   columnID: string;
@@ -59,24 +49,24 @@ function Categorical({
   const showStandardizedTerm =
     standardizedVariable &&
     standardizedVariable?.identifier !== getAssessmentToolConfig().identifier;
+  const [options, setOptions] = useState<StandardizedVariable[]>([]);
 
-  const getTermOptions = () => {
-    if (standardizedVariable?.identifier === 'nb:Diagnosis') {
-      return diagnosisTerms;
+  const { getTermOptions } = useDataStore();
+
+  useEffect(() => {
+    if (standardizedVariable) {
+      const fetchOptions = async () => {
+        try {
+          const result = await getTermOptions(standardizedVariable);
+          setOptions(result);
+        } catch (error) {
+          // TODO: show a notif error
+        }
+      };
+
+      fetchOptions();
     }
-    if (standardizedVariable?.identifier === 'nb:Sex') {
-      return sexTerms;
-    }
-    return [];
-  };
-
-  const termOptions = getTermOptions();
-
-  // TODO: Move this function to the store once the config functionality is implemented
-  const getTermByURL = (termURL: string | undefined) => {
-    if (!termURL) return null;
-    return termOptions.find((opt) => opt.identifier === termURL) || null;
-  };
+  }, [standardizedVariable, getTermOptions]);
 
   return (
     <TableContainer
@@ -126,9 +116,9 @@ function Categorical({
                 <TableCell align="left">
                   <Autocomplete
                     data-cy={`${columnID}-${value}-term-dropdown`}
-                    options={termOptions}
+                    options={options}
                     getOptionLabel={(option) => option.label}
-                    value={getTermByURL(levels[value]?.termURL)}
+                    value={options.find((opt) => opt.identifier === levels[value]?.termURL) || null}
                     onChange={(_, newValue) => {
                       onUpdateLevelTerm(columnID, value, newValue);
                     }}

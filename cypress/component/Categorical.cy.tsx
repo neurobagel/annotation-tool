@@ -1,4 +1,5 @@
 import Categorical from '../../src/components/Categorical';
+import useDataStore from '../../src/stores/data';
 
 const props = {
   columnID: '3',
@@ -18,6 +19,9 @@ const props = {
 };
 
 describe('Categorical', () => {
+  beforeEach(() => {
+    useDataStore.setState({ getTermOptions: () => [{ label: 'test', identifier: 'test' }] });
+  });
   it('renders the component correctly', () => {
     cy.mount(
       <Categorical
@@ -59,5 +63,25 @@ describe('Categorical', () => {
     cy.get('[data-cy="3-F-description-input"]').type('new description');
     cy.get('[data-cy="3-F-save-description-button"]').click();
     cy.get('@spy').should('have.been.calledWith', '3', 'F', 'new description');
+  });
+  it('fires the onUpdateLevelTerm event handler with the appropriate payload when the level term is changed', () => {
+    const spy = cy.spy().as('spy');
+    cy.mount(
+      <Categorical
+        columnID={props.columnID}
+        uniqueValues={props.uniqueValues}
+        missingValues={props.missingValues}
+        standardizedVariable={props.standardizedVariable}
+        levels={props.levels}
+        onUpdateDescription={props.onUpdateDescription}
+        onToggleMissingValue={props.onToggleMissingValue}
+        onUpdateLevelTerm={spy}
+      />
+    );
+    cy.get('[data-cy="3-F-term-dropdown"]').type('test{downArrow}{Enter}');
+    cy.get('@spy').should('have.been.calledWith', '3', 'F', {
+      identifier: 'test',
+      label: 'test',
+    });
   });
 });

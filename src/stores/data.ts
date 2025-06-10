@@ -1,7 +1,7 @@
 import { produce } from 'immer';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import defaultConfig from '../../configs/Neurobagel/config.json';
+import NeurobagelConfig from '../../configs/Neurobagel/config.json';
 import {
   DataTable,
   Columns,
@@ -9,7 +9,8 @@ import {
   StandardizedVaribleCollection,
   StandardizedVariable,
   StandardizedVariableConfig,
-  StandardizedVariableConfigCollection,
+  Config,
+  StandardizedTerm,
 } from '../utils/types';
 import { getConfigDirs } from '../utils/util';
 
@@ -51,12 +52,14 @@ type DataStore = {
   setUploadedDataDictionaryFileName: (fileName: string | null) => void;
   processDataDictionaryFile: (file: File) => Promise<void>;
 
+  config: Config;
   configOptions: string[];
   loadConfigOptions: () => Promise<void>;
   selectedConfig: string | null;
   setSelectedConfig: (configName: string | null) => void;
-  config: StandardizedVariableConfigCollection;
+  loadConfig: (configName: string) => Promise<void>;
   hasMultiColumnMeasures: () => boolean;
+  getTermOptions: (standardizedVariable: StandardizedVariable) => StandardizedTerm[];
 
   reset: () => void;
 };
@@ -68,9 +71,8 @@ const initialState = {
   uploadedDataDictionary: {},
   uploadedDataDictionaryFileName: null,
   configOptions: [],
-  selectedConfig: null,
-  // TODO this is temporary to access the config in the store for now and should be removed after configuration functionality implementation
-  config: defaultConfig.standardizedVariables as StandardizedVariableConfigCollection,
+  selectedConfig: 'Neurobagel',
+  config: NeurobagelConfig.standardizedVariables as Config,
 };
 
 const useDataStore = create<DataStore>()(
@@ -526,24 +528,46 @@ const useDataStore = create<DataStore>()(
       }
     },
 
-    // loadConfig: async (configName: string) => {
-    //   try {
-    //     const config = await import(`../../configs/${configName}/config.json`);
-    //     set({ config: config.standardizedVariables });
-    //   } catch (error) {
-    //     console.error(`Failed to load config ${configName}:`, error);
-    //     // Fall back to default config
-    //     const defaultConfig = await import('../../configs/Neurobagel/config.json');
-    //     set({
-    //       config: defaultConfig.standardizedVariables,
-    //       selectedConfig: null // Reset selection on failure
-    //     });
-    //   }
-    // },
+    loadConfig: async (configName: string) => {
+      try {
+        const config = await import(`../../configs/${configName}/config.json`);
+        set({ config: config.standardizedVariables });
+      } catch (error) {
+        // TODO: show a notif error
+      }
+    },
 
     setSelectedConfig: (configName: string | null) => {
-      set({ selectedConfig: configName });
-      // TODO load the actual config when one is selected
+      if (configName) {
+        set({ selectedConfig: configName });
+        get().loadConfig(configName);
+      } else {
+        set({ selectedConfig: 'Neurobagel' });
+        get().loadConfig('Neurobagel');
+      }
+    },
+
+    getTermOptions: async (standardizedVariable: StandardizedVariable) => {
+      const { config } = get();
+      const matchingConfigEntry = Object.values(config).find(
+        (configEntry) => configEntry.identifier === standardizedVariable.identifier
+      );
+      if (matchingConfigEntry && matchingConfigEntry.vocab_file) {
+        try {
+          const response = await fetch(
+            `../../configs/${get().selectedConfig}/${matchingConfigEntry.vocab_file}`
+          );
+          const data = await response.json();
+          // TODO: remove once we haev a dedicated healthy control std var
+          if (matchingConfigEntry.identifier === 'nb:Diagnosis') {
+            data.push({ label: 'Healthy Control', identifier: 'ncit:C94342' });
+          }
+          return data;
+        } catch (error) {
+          // TODO: show a notif error
+        }
+      }
+      return [];
     },
 
     reset: () => set(initialState),
