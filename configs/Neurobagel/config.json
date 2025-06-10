@@ -19,7 +19,34 @@
       "label": "Age",
       "data_type": "Continuous",
       "is_multi_column_measurement": false,
-      "vocab_file": null
+      "vocab_file": null,
+      "formats": [
+        {
+          "termURL": "nb:FromFloat",
+          "label": "float",
+          "examples": ["24.2", "32.3"]
+        },
+        {
+          "termURL": "nb:FromRange",
+          "label": "range",
+          "examples": ["20-50", "53-81"]
+        },
+        {
+          "termURL": "nb:FromEuro",
+          "label": "euro",
+          "examples": ["24,2", "32,3"]
+        },
+        {
+          "termURL": "nb:FromBounded",
+          "label": "bounded",
+          "examples": []
+        },
+        {
+          "termURL": "nb:FromISO8601",
+          "label": "iso8601",
+          "examples": []
+        }
+      ]
     },
     "Sex": {
       "identifier": "nb:Sex",

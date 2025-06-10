@@ -11,6 +11,7 @@ import {
   StandardizedVariableConfig,
   Config,
   StandardizedTerm,
+  Format,
 } from '../utils/types';
 import { getConfigDirs } from '../utils/util';
 
@@ -60,6 +61,7 @@ type DataStore = {
   loadConfig: (configName: string) => Promise<void>;
   hasMultiColumnMeasures: () => boolean;
   getTermOptions: (standardizedVariable: StandardizedVariable) => StandardizedTerm[];
+  getFormatOptions: (StandardizedVariable: StandardizedVariable) => Format[];
 
   reset: () => void;
 };
@@ -558,7 +560,7 @@ const useDataStore = create<DataStore>()(
             `../../configs/${get().selectedConfig}/${matchingConfigEntry.vocab_file}`
           );
           const data = await response.json();
-          // TODO: remove once we haev a dedicated healthy control std var
+          // TODO: remove once we have a dedicated healthy control std var
           if (matchingConfigEntry.identifier === 'nb:Diagnosis') {
             data.push({ label: 'Healthy Control', identifier: 'ncit:C94342' });
           }
@@ -566,6 +568,17 @@ const useDataStore = create<DataStore>()(
         } catch (error) {
           // TODO: show a notif error
         }
+      }
+      return [];
+    },
+
+    getFormatOptions: (standardizedVariable: StandardizedVariable) => {
+      const { config } = get();
+      const matchingConfigEntry = Object.values(config).find(
+        (configEntry) => configEntry.identifier === standardizedVariable.identifier
+      );
+      if (matchingConfigEntry && matchingConfigEntry.formats) {
+        return matchingConfigEntry.formats;
       }
       return [];
     },

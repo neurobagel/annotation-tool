@@ -10,7 +10,7 @@ import {
   TextField,
 } from '@mui/material';
 import useDataStore from '~/stores/data';
-import { StandardizedVariable } from '~/utils/types';
+import { StandardizedVariable, Format } from '~/utils/types';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueButton from './MissingValueButton';
 
@@ -19,10 +19,7 @@ interface ContinuousProps {
   units: string;
   uniqueValues: string[];
   missingValues: string[];
-  format?: {
-    termURL?: string;
-    label?: string;
-  };
+  format?: Format;
   standardizedVariable?: StandardizedVariable | null;
   onUpdateUnits: (columnID: string, units: string) => void;
   onToggleMissingValue: (columnID: string, value: string, isMissing: boolean) => void;
@@ -33,15 +30,6 @@ const defaultProps = {
   standardizedVariable: null,
   format: null,
 };
-
-// TODO: Remove this when the terms are fetched from the config
-const formatOptions = [
-  { label: 'euro', value: 'nb:FromEuro' },
-  { label: 'bounded', value: 'nb:FromBounded' },
-  { label: 'float', value: 'nb:FromFloat' },
-  { label: 'iso8601', value: 'nb:FromISO8601' },
-  { label: 'range', value: 'nb:FromRange' },
-];
 
 function Continuous({
   columnID,
@@ -54,10 +42,11 @@ function Continuous({
   onToggleMissingValue,
   onUpdateFormat,
 }: ContinuousProps) {
-  const { getAssessmentToolConfig } = useDataStore();
+  const { getFormatOptions, getAssessmentToolConfig } = useDataStore();
+
+  // TODO: show examples for formats
 
   // Remove/refactor the conditional logic once we decided how to handle the data type for multi column measure standardized variables
-  const showUnit = standardizedVariable?.identifier !== getAssessmentToolConfig().identifier;
   const showFormat =
     standardizedVariable &&
     standardizedVariable?.identifier !== getAssessmentToolConfig().identifier;
@@ -122,30 +111,32 @@ function Continuous({
         </div>
 
         <div className="w-2/5 p-4 space-y-4">
-          {showUnit && (
-            <DescriptionEditor
-              key={`${columnID}-units`}
-              label="Units"
-              columnID={columnID}
-              description={units}
-              onDescriptionChange={(id, newUnits) => {
-                onUpdateUnits(id, newUnits || '');
-              }}
-            />
-          )}
+          <DescriptionEditor
+            key={`${columnID}-units`}
+            label="Units"
+            columnID={columnID}
+            description={units}
+            onDescriptionChange={(id, newUnits) => {
+              onUpdateUnits(id, newUnits || '');
+            }}
+          />
 
           {showFormat && (
             <Autocomplete
               data-cy={`${columnID}-format-dropdown`}
-              options={formatOptions}
+              options={getFormatOptions(standardizedVariable)}
               getOptionLabel={(option) => option.label}
-              value={formatOptions.find((opt) => opt.value === format?.termURL) || null}
+              value={
+                getFormatOptions(standardizedVariable).find(
+                  (opt) => opt.termURL === format?.termURL
+                ) || null
+              }
               onChange={(_, newValue) => {
                 onUpdateFormat(
                   columnID,
                   newValue
                     ? {
-                        termURL: newValue.value,
+                        termURL: newValue.termURL,
                         label: newValue.label,
                       }
                     : null

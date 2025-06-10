@@ -14,10 +14,7 @@ export type Column = {
   levels?: { [key: string]: { description: string; label?: string; termURL?: string } } | null;
   units?: string;
   missingValues?: string[];
-  format?: {
-    termURL?: string;
-    label?: string;
-  };
+  format?: Format;
 };
 
 export type Columns = {
@@ -65,6 +62,7 @@ export interface StandardizedVariableConfig extends StandardizedVariable {
   data_type?: 'Categorical' | 'Continuous' | null;
   is_multi_column_measurement?: boolean;
   vocab_file?: string | null;
+  formats?: Format[];
 }
 
 export interface StandardizedVaribleCollection {
@@ -79,6 +77,12 @@ export interface Config {
 export interface StandardizedTerm {
   identifier: string;
   label: string;
+}
+
+export interface Format {
+  termURL: string;
+  label: string;
+  example?: string[];
 }
 
 export interface MultiColumnMeasuresTerm extends StandardizedTerm {
