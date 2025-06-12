@@ -42,7 +42,10 @@ function Continuous({
   onToggleMissingValue,
   onUpdateFormat,
 }: ContinuousProps) {
-  const { getFormatOptions, isMultiColumnMeasureStandardizedVariable: isMultiMeasureColumnStandardizedVariable } = useDataStore();
+  const {
+    getFormatOptions,
+    isMultiColumnMeasureStandardizedVariable: isMultiMeasureColumnStandardizedVariable,
+  } = useDataStore();
 
   // TODO: show examples for formats
 

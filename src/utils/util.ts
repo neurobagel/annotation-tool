@@ -36,17 +36,17 @@ export function createSeededUuidGenerator(seed: string) {
 export function initializeTermCards({
   columns,
   terms,
-  assessmentToolColumns,
+  variableColumns,
   generateID,
 }: {
   columns: Columns;
   terms: MultiColumnMeasuresTerm[];
-  assessmentToolColumns: { id: string }[];
+  variableColumns: { id: string }[];
   generateID: () => string;
 }): MultiColumnMeasuresTermCard[] {
   const cardMap = new Map<string, MultiColumnMeasuresTermCard>();
 
-  assessmentToolColumns.forEach(({ id }) => {
+  variableColumns.forEach(({ id }) => {
     const column = columns[id];
     const termIdentifier = column.isPartOf?.termURL;
     const term = termIdentifier && terms.find((t) => t.identifier === termIdentifier);
@@ -95,11 +95,13 @@ export function getAvailableTerms(
 
 export function getColumnOptions(
   columns: Columns,
-  assessmentToolIdentifier: string,
+  standardizedVariableIdentifier: string,
   allMappedColumns: string[]
 ): { id: string; label: string; disabled: boolean }[] {
   return Object.entries(columns)
-    .filter(([_, column]) => column.standardizedVariable?.identifier === assessmentToolIdentifier)
+    .filter(
+      ([_, column]) => column.standardizedVariable?.identifier === standardizedVariableIdentifier
+    )
     .map(([id, column]) => ({
       id,
       label: column.header,
