@@ -442,27 +442,27 @@ describe('Main user flow', () => {
     // Multi-Column Measures view
     cy.get('[data-cy="multi-column-measures"]').should('contain.text', '3 columns assigned');
 
-    cy.get('[data-cy="multi-column-measures-card-9090417a-9594-4af8-93b4-5331785a0a1f"]').should(
+    cy.get('[data-cy="multi-column-measures-card-f0af972d-edd3-4987-ab6f-bb1f5c0c7046"]').should(
       'be.visible'
     );
     cy.get('[data-cy="mapped-column-6"]').should('be.visible').and('contain', 'tool1_item1');
     cy.get('[data-cy="mapped-column-7"]').should('be.visible').and('contain', 'tool1_item2');
     cy.get(
-      '[data-cy="multi-column-measures-card-9090417a-9594-4af8-93b4-5331785a0a1f-header"]'
+      '[data-cy="multi-column-measures-card-f0af972d-edd3-4987-ab6f-bb1f5c0c7046-header"]'
     ).should('contain.text', 'Montreal cognitive assessment');
 
-    cy.get('[data-cy="multi-column-measures-card-9090417a-9594-4af8-93b4-5331785a0a1f"]')
+    cy.get('[data-cy="multi-column-measures-card-f0af972d-edd3-4987-ab6f-bb1f5c0c7046"]')
       .should('contain.text', 'tool1_item1')
       .and('contain.text', 'tool1_item2');
 
-    cy.get('[data-cy="multi-column-measures-card-e43763af-0e82-4d31-add8-ab678bf57d48"]').should(
+    cy.get('[data-cy="multi-column-measures-card-fd2adea6-0be4-469a-9957-4fb19c1ae485"]').should(
       'be.visible'
     );
     cy.get('[data-cy="mapped-column-8"]').should('be.visible').and('contain', 'tool2_item1');
     cy.get(
-      '[data-cy="multi-column-measures-card-e43763af-0e82-4d31-add8-ab678bf57d48-header"]'
+      '[data-cy="multi-column-measures-card-fd2adea6-0be4-469a-9957-4fb19c1ae485-header"]'
     ).should('contain.text', 'Unified Parkinsons disease rating scale');
-    cy.get('[data-cy="multi-column-measures-card-e43763af-0e82-4d31-add8-ab678bf57d48"]').should(
+    cy.get('[data-cy="multi-column-measures-card-fd2adea6-0be4-469a-9957-4fb19c1ae485"]').should(
       'contain.text',
       'tool2_item1'
     );
