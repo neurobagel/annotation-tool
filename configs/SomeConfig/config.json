@@ -29,7 +29,7 @@
       "vocab_file": "diagnosisTerms.json"
     },
     "Assessment Tool": {
-      "identifier": "nb:AssessmentTool",
+      "identifier": "nb:Assessment",
       "label": "Assessment Tool",
       "data_type": "Continuous",
       "is_multi_column_measurement": true,
