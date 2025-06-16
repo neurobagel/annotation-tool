@@ -77,7 +77,7 @@ function Categorical({
       style={{ maxHeight: '500px' }}
       data-cy={`${columnID}-categorical`}
     >
-      <Table stickyHeader className="min-w-[768px]">
+      <Table stickyHeader className="min-w-[768px]" data-cy={`${columnID}-categorical-table`}>
         <TableHead data-cy={`${columnID}-categorical-table-head`}>
           <TableRow className="bg-blue-50">
             <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>

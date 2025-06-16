@@ -138,12 +138,12 @@ describe('data store actions', () => {
     const { result } = renderHook(() => useDataStore());
     act(() => {
       result.current.updateColumnStandardizedVariable('1', {
-        identifier: 'nb:AssessmentTool',
+        identifier: 'nb:Assessment',
         label: 'Assessment Tool',
       });
     });
     expect(result.current.columns['1'].standardizedVariable).toEqual({
-      identifier: 'nb:AssessmentTool',
+      identifier: 'nb:Assessment',
       label: 'Assessment Tool',
     });
     expect(result.current.columns['1'].dataType).toEqual('Continuous');
@@ -166,12 +166,12 @@ describe('data store actions', () => {
     const { result } = renderHook(() => useDataStore());
     act(() => {
       result.current.updateColumnStandardizedVariable('1', {
-        identifier: 'nb:AssessmentTool',
+        identifier: 'nb:Assessment',
         label: 'Assessment Tool',
       });
     });
     expect(result.current.columns['1'].standardizedVariable).toEqual({
-      identifier: 'nb:AssessmentTool',
+      identifier: 'nb:Assessment',
       label: 'Assessment Tool',
     });
     expect(result.current.columns['1'].isPartOf).toEqual({});
@@ -185,7 +185,7 @@ describe('data store actions', () => {
     const { result } = renderHook(() => useDataStore());
     act(() => {
       result.current.updateColumnStandardizedVariable('1', {
-        identifier: 'nb:AssessmentTool',
+        identifier: 'nb:Assessment',
         label: 'Assessment Tool',
       });
       result.current.updateColumnIsPartOf('1', {
@@ -274,7 +274,7 @@ describe('data store actions', () => {
         label: 'Diagnosis',
       },
       {
-        identifier: 'nb:AssessmentTool',
+        identifier: 'nb:Assessment',
         label: 'Assessment Tool',
       },
     ]);
