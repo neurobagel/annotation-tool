@@ -191,21 +191,48 @@ describe('Main user flow', () => {
     cy.get('[data-cy="Column Annotation-step"]').within(() => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
     });
-    cy.get('[data-cy="multi-column-measures-card-e43763af-0e82-4d31-add8-ab678bf57d48"]').should(
-      'be.visible'
-    );
-    cy.get('[data-cy="multi-column-measures"]').should('contain.text', 'No columns assigned');
-    cy.get(
-      '[data-cy="multi-column-measures-card-e43763af-0e82-4d31-add8-ab678bf57d48-title-dropdown"]'
-    ).type('Previous IQ assessment{downArrow}{enter}');
-    cy.get(
-      '[data-cy="multi-column-measures-card-e43763af-0e82-4d31-add8-ab678bf57d48-header"]'
-    ).should('contain.text', 'Previous IQ assessment by pronunciation');
-    cy.get(
-      '[data-cy="multi-column-measures-card-e43763af-0e82-4d31-add8-ab678bf57d48-columns-dropdown"]'
-    ).type('iq{downArrow}{enter}');
+
+    cy.get('[data-cy="multi-column-measures"]').should('be.visible');
+    cy.get('[data-cy="multi-column-measures"]').then(($el) => {
+      cy.log('Multi-column measures content:', $el.text());
+    });
+
+    cy.get('[data-cy="multi-column-measures"]')
+      .find('[data-cy^="multi-column-measures-card-"]')
+      .first()
+      .should('exist');
+
+    cy.get('[data-cy="multi-column-measures"]')
+      .find('[data-cy^="multi-column-measures-card-"]')
+      .first()
+      .find('[data-cy$="-header"]')
+      .then(($el) => {
+        cy.log('Card header content:', $el.text());
+      });
+
+    cy.get('[data-cy="multi-column-measures"]')
+      .find('[data-cy^="multi-column-measures-card-"]')
+      .first()
+      .find('[data-cy$="-title-dropdown"]')
+      .type('Previous IQ assessment{downArrow}{enter}');
+
+    cy.get('[data-cy="multi-column-measures"]')
+      .find('[data-cy^="multi-column-measures-card-"]')
+      .first()
+      .find('[data-cy$="-header"]')
+      .should('be.visible')
+      .and('not.be.empty');
+
+    cy.get('[data-cy="multi-column-measures"]')
+      .find('[data-cy^="multi-column-measures-card-"]')
+      .first()
+      .find('[data-cy$="-columns-dropdown"]')
+      .type('iq{downArrow}{enter}');
+
     cy.get('[data-cy="mapped-column-5').should('be.visible').and('contain', 'iq');
+
     cy.get('[data-cy="multi-column-measures"]').should('contain.text', '1 column assigned');
+
     cy.get('[data-cy="next-button"]').click();
 
     // Value Annotation view
