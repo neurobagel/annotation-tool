@@ -52,31 +52,39 @@ function MultiColumnMeasures({ generateID = defaultGenerateID }: MultiColumnMeas
   const [loading, setLoading] = useState(true);
   const [variableStates, setVariableStates] = useState<Record<string, VariableState>>({});
 
+  // Memoized to prevent new array reference on every render from Zustand selector
   const multiColumnVariables = useDataStore
     .getState()
     .getMappedMultiColumnMeasureStandardizedVariables();
+
+  // Memoized to prevent recalculation on every render since it depends on two values
   const currentVariable = useMemo(
     () => multiColumnVariables[activeTab] || null,
     [multiColumnVariables, activeTab]
   );
 
+  // Memoized to prevent object lookup on every render
   const currentState = useMemo(
     () => (currentVariable ? variableStates[currentVariable.identifier] : null),
     [currentVariable, variableStates]
   );
 
+  // Memoized to prevent new array reference on every render from Zustand selector
   const currentVariableColumns = useMemo(
     () => (currentVariable ? getStandardizedVariableColumns(currentVariable) : []),
     [currentVariable, getStandardizedVariableColumns]
   );
 
   const currentTerms = currentState?.terms || [];
+
+  // Memoized to maintain stable reference for dependent hooks (useMemo and useCallback)
   const currentTermCards = useMemo(() => currentState?.termCards || [], [currentState]);
 
   const itemsPerPage = 3;
   const { currentPage, totalPages, handlePaginationChange } =
     usePagination<MultiColumnMeasuresTermCard>(currentTermCards, itemsPerPage);
 
+  // Memoized to prevent expensive array slicing operation on every render
   const paginatedItems = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return currentTermCards.slice(startIndex, startIndex + itemsPerPage);
