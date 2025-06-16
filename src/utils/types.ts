@@ -63,6 +63,7 @@ export interface StandardizedVariableConfig extends StandardizedVariable {
   is_multi_column_measurement?: boolean;
   vocab_file?: string | null;
   formats?: Format[];
+  identifies?: string;
 }
 
 export interface StandardizedVaribleCollection {

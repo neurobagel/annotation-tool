@@ -5,14 +5,16 @@
       "label": "Subject ID",
       "data_type": null,
       "is_multi_column_measurement": false,
-      "vocab_file": null
+      "vocab_file": null,
+      "identifies": "participant"
     },
     "Session ID": {
       "identifier": "nb:SessionID",
       "label": "Session ID",
       "data_type": null,
       "is_multi_column_measurement": false,
-      "vocab_file": null
+      "vocab_file": null,
+      "identifies": "session"
     },
     "Age": {
       "identifier": "nb:Age",

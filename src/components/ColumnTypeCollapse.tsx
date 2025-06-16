@@ -41,9 +41,9 @@ function ColumnTypeCollapse({
 }: ColumnTypeCollapseProps) {
   const [showColumns, setShowColumns] = useState<boolean>(true);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
-  const columnIsAssessmentTool =
-    standardizedVariable?.identifier ===
-    useDataStore.getState().getAssessmentToolConfig().identifier;
+  const columnIsMultiColumnMeasure = useDataStore
+    .getState()
+    .isMultiColumnMeasureStandardizedVariable(standardizedVariable);
 
   let columnsToDisplay;
   // TODO: find a better name for the below variable
@@ -70,7 +70,7 @@ function ColumnTypeCollapse({
   const handleSelect = () => {
     if (columnsToDisplay.length > 0) {
       // For assessment tool, find the first group and select it
-      if (columnIsAssessmentTool) {
+      if (columnIsMultiColumnMeasure) {
         const groupedColumns: Record<string, ColumnEntry[]> = {};
 
         columnsToDisplay.forEach(([columnId, column]) => {
@@ -112,7 +112,7 @@ function ColumnTypeCollapse({
     }));
   };
 
-  if (columnIsAssessmentTool) {
+  if (columnIsMultiColumnMeasure) {
     const groupedColumns: Record<string, ColumnEntry[]> = {};
 
     columnsToDisplay.forEach(([columnId, column]) => {

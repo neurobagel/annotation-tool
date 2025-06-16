@@ -8,7 +8,6 @@ import {
   DataDictionary,
   StandardizedVaribleCollection,
   StandardizedVariable,
-  StandardizedVariableConfig,
   Config,
   StandardizedTerm,
   Format,
@@ -24,8 +23,6 @@ type DataStore = {
   setUploadedDataTableFileName: (fileName: string | null) => void;
   processDataTableFile: (file: File) => Promise<void>;
   getStandardizedVariables: () => StandardizedVaribleCollection;
-  getAssessmentToolConfig: () => StandardizedVariableConfig;
-  getAssessmentToolColumns: () => { id: string; header: string }[];
   getStandardizedVariableColumns: (
     StandardizedVariable: StandardizedVariable
   ) => { id: string; header: string }[];
@@ -147,14 +144,6 @@ const useDataStore = create<DataStore>()(
         ])
       );
     },
-    getAssessmentToolConfig: () => get().config['Assessment Tool'],
-    getAssessmentToolColumns: () =>
-      Object.entries(get().columns)
-        .filter(
-          ([_, column]) =>
-            column.standardizedVariable?.identifier === get().getAssessmentToolConfig().identifier
-        )
-        .map(([id, column]) => ({ id, header: column.header })),
 
     getStandardizedVariableColumns: (standardizedVariable: StandardizedVariable) =>
       Object.entries(get().columns)
@@ -249,12 +238,12 @@ const useDataStore = create<DataStore>()(
         columns: produce(state.columns, (draft) => {
           draft[columnID].standardizedVariable = standardizedVariable;
 
-          if (standardizedVariable?.identifier === get().getAssessmentToolConfig().identifier) {
-            // When setting to Assessment Tool, initialize IsPartOf if it doesn't exist
+          if (get().isMultiColumnMeasureStandardizedVariable(standardizedVariable)) {
+            // When setting to a multi-column measure, initialize IsPartOf if it doesn't exist
             if (!draft[columnID].isPartOf) {
               draft[columnID].isPartOf = {};
             }
-            // Remove isPartOf when changing from Assessment Tool to something else
+            // Remove isPartOf when changing from multi-column measure to something else
           } else if (draft[columnID].isPartOf) {
             delete draft[columnID].isPartOf;
           }
@@ -443,8 +432,9 @@ const useDataStore = create<DataStore>()(
                   }
 
                   if (
-                    draft[internalColumnID].standardizedVariable?.identifier ===
-                      get().getAssessmentToolConfig().identifier &&
+                    get().isMultiColumnMeasureStandardizedVariable(
+                      draft[internalColumnID].standardizedVariable || null
+                    ) &&
                     columnData.Annotations?.IsPartOf
                   ) {
                     draft[internalColumnID].isPartOf = {
@@ -539,13 +529,8 @@ const useDataStore = create<DataStore>()(
         reader.readAsText(file);
       }),
 
-    hasMultiColumnMeasures: () => {
-      const { columns } = get();
-      return Object.values(columns).some(
-        (column) =>
-          column.standardizedVariable?.identifier === get().getAssessmentToolConfig().identifier
-      );
-    },
+    hasMultiColumnMeasures: () =>
+      get().getMappedMultiColumnMeasureStandardizedVariables().length > 0,
 
     loadConfigOptions: async () => {
       try {
