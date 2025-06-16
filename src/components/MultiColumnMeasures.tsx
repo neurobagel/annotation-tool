@@ -43,9 +43,6 @@ function MultiColumnMeasures({ generateID = defaultGenerateID }: MultiColumnMeas
   const theme = useTheme();
   const columns = useDataStore((state) => state.columns);
   const updateColumnIsPartOf = useDataStore((state) => state.updateColumnIsPartOf);
-  const getMappedMultiColumnMeasureStandardizedVariables = useDataStore(
-    (state) => state.getMappedMultiColumnMeasureStandardizedVariables
-  );
   const getStandardizedVariableColumns = useDataStore(
     (state) => state.getStandardizedVariableColumns
   );
@@ -55,10 +52,9 @@ function MultiColumnMeasures({ generateID = defaultGenerateID }: MultiColumnMeas
   const [loading, setLoading] = useState(true);
   const [variableStates, setVariableStates] = useState<Record<string, VariableState>>({});
 
-  const multiColumnVariables = useMemo(
-    () => getMappedMultiColumnMeasureStandardizedVariables(),
-    [getMappedMultiColumnMeasureStandardizedVariables]
-  );
+  const multiColumnVariables = useDataStore
+    .getState()
+    .getMappedMultiColumnMeasureStandardizedVariables();
   const currentVariable = useMemo(
     () => multiColumnVariables[activeTab] || null,
     [multiColumnVariables, activeTab]
@@ -74,7 +70,7 @@ function MultiColumnMeasures({ generateID = defaultGenerateID }: MultiColumnMeas
     [currentVariable, getStandardizedVariableColumns]
   );
 
-  const currentTerms = useMemo(() => currentState?.terms || [], [currentState]);
+  const currentTerms = currentState?.terms || [];
   const currentTermCards = useMemo(() => currentState?.termCards || [], [currentState]);
 
   const itemsPerPage = 3;
@@ -86,10 +82,7 @@ function MultiColumnMeasures({ generateID = defaultGenerateID }: MultiColumnMeas
     return currentTermCards.slice(startIndex, startIndex + itemsPerPage);
   }, [currentTermCards, currentPage, itemsPerPage]);
 
-  const variableAllMappedColumns = useMemo(
-    () => getAllMappedColumns(currentTermCards),
-    [currentTermCards]
-  );
+  const variableAllMappedColumns = getAllMappedColumns(currentTermCards);
 
   const loadTermsAndInitializeCards = useCallback(async () => {
     if (multiColumnVariables.length === 0) {
