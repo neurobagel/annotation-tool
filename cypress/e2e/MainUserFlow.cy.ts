@@ -191,6 +191,8 @@ describe('Main user flow', () => {
     cy.get('[data-cy="Column Annotation-step"]').within(() => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
     });
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(5000);
     cy.get('[data-cy="multi-column-measures-card-e43763af-0e82-4d31-add8-ab678bf57d48"]').should(
       'be.visible'
     );
