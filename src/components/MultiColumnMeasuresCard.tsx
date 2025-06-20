@@ -10,14 +10,14 @@ import {
   Autocomplete,
   TextField,
 } from '@mui/material';
-import { Term, TermCard } from '../utils/types';
+import { MultiColumnMeasuresTerm, MultiColumnMeasuresTermCard } from '../utils/types';
 
 interface TermCardProps {
-  card: TermCard;
+  card: MultiColumnMeasuresTermCard;
   mappedColumnHeaders: { [columnId: string]: string };
-  availableTerms: Term[];
+  availableTerms: MultiColumnMeasuresTerm[];
   columnOptions: Array<{ id: string; label: string; disabled: boolean }>;
-  onTermSelect: (term: Term | null) => void;
+  onTermSelect: (term: MultiColumnMeasuresTerm | null) => void;
   onColumnSelect: (columnId: string | null) => void;
   onRemoveColumn: (columnId: string) => void;
   onRemoveCard: () => void;
@@ -50,7 +50,7 @@ function MultiColumnMeasuresCard({
             <Autocomplete
               data-cy={`multi-column-measures-card-${card.id}-title-dropdown`}
               options={availableTerms}
-              getOptionLabel={(option: Term) => option.label}
+              getOptionLabel={(option: MultiColumnMeasuresTerm) => option.label}
               getOptionDisabled={(option) => option.disabled || false}
               onChange={(_, newValue) => onTermSelect(newValue)}
               renderInput={(params) => (

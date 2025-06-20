@@ -1,16 +1,18 @@
 import { produce } from 'immer';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import defaultConfig from '../../configs/default.json';
+import NeurobagelConfig from '../../configs/Neurobagel/config.json';
 import {
   DataTable,
   Columns,
   DataDictionary,
   StandardizedVaribleCollection,
   StandardizedVariable,
-  StandardizedVariableConfig,
-  StandardizedVariableConfigCollection,
+  Config,
+  StandardizedTerm,
+  Format,
 } from '../utils/types';
+import { getConfigDirs } from '../utils/util';
 
 type DataStore = {
   dataTable: DataTable;
@@ -21,9 +23,11 @@ type DataStore = {
   setUploadedDataTableFileName: (fileName: string | null) => void;
   processDataTableFile: (file: File) => Promise<void>;
   getStandardizedVariables: () => StandardizedVaribleCollection;
-  getAssessmentToolConfig: () => StandardizedVariableConfig;
-  getAssessmentToolColumns: () => { id: string; header: string }[];
+  getStandardizedVariableColumns: (
+    StandardizedVariable: StandardizedVariable
+  ) => { id: string; header: string }[];
   getMappedStandardizedVariables: () => StandardizedVariable[];
+  getMappedMultiColumnMeasureStandardizedVariables: () => StandardizedVariable[];
   updateColumnDescription: (columnID: string, description: string | null) => void;
   updateColumnDataType: (columnID: string, dataType: 'Categorical' | 'Continuous' | null) => void;
   updateColumnStandardizedVariable: (
@@ -50,8 +54,18 @@ type DataStore = {
   setUploadedDataDictionaryFileName: (fileName: string | null) => void;
   processDataDictionaryFile: (file: File) => Promise<void>;
 
-  config: StandardizedVariableConfigCollection;
+  config: Config;
+  configOptions: string[];
+  loadConfigOptions: () => Promise<void>;
+  selectedConfig: string | null;
+  setSelectedConfig: (configName: string | null) => void;
+  loadConfig: (configName: string) => Promise<void>;
   hasMultiColumnMeasures: () => boolean;
+  getTermOptions: (standardizedVariable: StandardizedVariable) => StandardizedTerm[];
+  getFormatOptions: (StandardizedVariable: StandardizedVariable) => Format[];
+  isMultiColumnMeasureStandardizedVariable: (
+    standardizedVariable: StandardizedVariable | null
+  ) => boolean;
 
   reset: () => void;
 };
@@ -62,8 +76,9 @@ const initialState = {
   uploadedDataTableFileName: null,
   uploadedDataDictionary: {},
   uploadedDataDictionaryFileName: null,
-  // TODO this is temporary to access the config in the store for now and should be removed after configuration functionality implementation
-  config: defaultConfig.standardizedVariables as StandardizedVariableConfigCollection,
+  configOptions: [],
+  selectedConfig: 'Neurobagel',
+  config: NeurobagelConfig.standardizedVariables as Config,
 };
 
 const useDataStore = create<DataStore>()(
@@ -129,12 +144,12 @@ const useDataStore = create<DataStore>()(
         ])
       );
     },
-    getAssessmentToolConfig: () => get().config['Assessment Tool'],
-    getAssessmentToolColumns: () =>
+
+    getStandardizedVariableColumns: (standardizedVariable: StandardizedVariable) =>
       Object.entries(get().columns)
         .filter(
           ([_, column]) =>
-            column.standardizedVariable?.identifier === get().getAssessmentToolConfig().identifier
+            column.standardizedVariable?.identifier === standardizedVariable.identifier
         )
         .map(([id, column]) => ({ id, header: column.header })),
 
@@ -159,6 +174,18 @@ const useDataStore = create<DataStore>()(
       });
 
       return uniqueVariables;
+    },
+
+    getMappedMultiColumnMeasureStandardizedVariables: () => {
+      const allMappedVariables = get().getMappedStandardizedVariables();
+      const { config } = get();
+
+      return allMappedVariables.filter((variable) => {
+        const configEntry = Object.values(config).find(
+          (item) => item.identifier === variable.identifier
+        );
+        return configEntry?.is_multi_column_measurement === true;
+      });
     },
 
     updateColumnDescription: (columnID: string, description: string | null) => {
@@ -211,12 +238,12 @@ const useDataStore = create<DataStore>()(
         columns: produce(state.columns, (draft) => {
           draft[columnID].standardizedVariable = standardizedVariable;
 
-          if (standardizedVariable?.identifier === get().getAssessmentToolConfig().identifier) {
-            // When setting to Assessment Tool, initialize IsPartOf if it doesn't exist
+          if (get().isMultiColumnMeasureStandardizedVariable(standardizedVariable)) {
+            // When setting to a multi-column measure, initialize IsPartOf if it doesn't exist
             if (!draft[columnID].isPartOf) {
               draft[columnID].isPartOf = {};
             }
-            // Remove isPartOf when changing from Assessment Tool to something else
+            // Remove isPartOf when changing from multi-column measure to something else
           } else if (draft[columnID].isPartOf) {
             delete draft[columnID].isPartOf;
           }
@@ -405,8 +432,9 @@ const useDataStore = create<DataStore>()(
                   }
 
                   if (
-                    draft[internalColumnID].standardizedVariable?.identifier ===
-                      get().getAssessmentToolConfig().identifier &&
+                    get().isMultiColumnMeasureStandardizedVariable(
+                      draft[internalColumnID].standardizedVariable || null
+                    ) &&
                     columnData.Annotations?.IsPartOf
                   ) {
                     draft[internalColumnID].isPartOf = {
@@ -501,12 +529,83 @@ const useDataStore = create<DataStore>()(
         reader.readAsText(file);
       }),
 
-    hasMultiColumnMeasures: () => {
-      const { columns } = get();
-      return Object.values(columns).some(
-        (column) =>
-          column.standardizedVariable?.identifier === get().getAssessmentToolConfig().identifier
+    hasMultiColumnMeasures: () =>
+      get().getMappedMultiColumnMeasureStandardizedVariables().length > 0,
+
+    loadConfigOptions: async () => {
+      try {
+        const dirNames = await getConfigDirs();
+        set({ configOptions: dirNames });
+      } catch (error) {
+        // TODO: show a notif error
+        set({ configOptions: [] });
+      }
+    },
+
+    loadConfig: async (configName: string) => {
+      try {
+        const config = await import(`../../configs/${configName}/config.json`);
+        set({ config: config.standardizedVariables });
+      } catch (error) {
+        // TODO: show a notif error
+      }
+    },
+
+    setSelectedConfig: (configName: string | null) => {
+      if (configName) {
+        set({ selectedConfig: configName });
+        get().loadConfig(configName);
+      } else {
+        set({ selectedConfig: 'Neurobagel' });
+        get().loadConfig('Neurobagel');
+      }
+    },
+
+    getTermOptions: async (standardizedVariable: StandardizedVariable) => {
+      const { config } = get();
+      const matchingConfigEntry = Object.values(config).find(
+        (configEntry) => configEntry.identifier === standardizedVariable.identifier
       );
+      if (matchingConfigEntry && matchingConfigEntry.vocab_file) {
+        try {
+          const response = await fetch(
+            `../../configs/${get().selectedConfig}/${matchingConfigEntry.vocab_file}`
+          );
+          const data = await response.json();
+          // TODO: remove once we have a dedicated healthy control std var
+          if (matchingConfigEntry.identifier === 'nb:Diagnosis') {
+            data.push({ label: 'Healthy Control', identifier: 'ncit:C94342' });
+          }
+          return data;
+        } catch (error) {
+          // TODO: show a notif error
+        }
+      }
+      return [];
+    },
+
+    getFormatOptions: (standardizedVariable: StandardizedVariable) => {
+      const { config } = get();
+      const matchingConfigEntry = Object.values(config).find(
+        (configEntry) => configEntry.identifier === standardizedVariable.identifier
+      );
+      if (matchingConfigEntry && matchingConfigEntry.formats) {
+        return matchingConfigEntry.formats;
+      }
+      return [];
+    },
+
+    isMultiColumnMeasureStandardizedVariable: (
+      standardizedVariable: StandardizedVariable | null
+    ) => {
+      if (!standardizedVariable) return false;
+
+      const { config } = get();
+      const configEntry = Object.values(config).find(
+        (item) => item.identifier === standardizedVariable.identifier
+      );
+
+      return configEntry?.is_multi_column_measurement === true;
     },
 
     reset: () => set(initialState),

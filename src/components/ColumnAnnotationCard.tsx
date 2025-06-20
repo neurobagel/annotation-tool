@@ -10,7 +10,7 @@ import {
   Autocomplete,
   Tooltip,
 } from '@mui/material';
-import { StandardizedVariable, StandardizedVariableConfigCollection } from '../utils/types';
+import { StandardizedVariable, Config } from '../utils/types';
 import DescriptionEditor from './DescriptionEditor';
 
 interface ColumnAnnotationCardProps {
@@ -19,7 +19,7 @@ interface ColumnAnnotationCardProps {
   description: string | null;
   dataType: 'Categorical' | 'Continuous' | null;
   standardizedVariable: StandardizedVariable | null;
-  standardizedVariableOptions: StandardizedVariableConfigCollection;
+  standardizedVariableOptions: Config;
   onDescriptionChange: (columnId: string, newDescription: string | null) => void;
   onDataTypeChange: (columnId: string, newDataType: 'Categorical' | 'Continuous' | null) => void;
   onStandardizedVariableChange: (
