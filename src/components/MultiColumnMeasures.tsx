@@ -20,7 +20,7 @@ import {
   getColumnOptions,
   getAllMappedColumns,
   getAssignedTermIdentifiers,
-  createSeededUuidGenerator,
+  createDeterministicIdGenerator,
 } from '../utils/util';
 import MultiColumnMeasuresCard from './MultiColumnMeasuresCard';
 
@@ -33,13 +33,13 @@ interface VariableState {
   termCards: MultiColumnMeasuresTermCard[];
 }
 
-const defaultGenerateID = createSeededUuidGenerator('seed');
-
 const defaultProps = {
-  generateID: defaultGenerateID,
+  generateID: createDeterministicIdGenerator(),
 };
 
-function MultiColumnMeasures({ generateID = defaultGenerateID }: MultiColumnMeasuresProps) {
+function MultiColumnMeasures({
+  generateID = createDeterministicIdGenerator(),
+}: MultiColumnMeasuresProps) {
   const theme = useTheme();
   const columns = useDataStore((state) => state.columns);
   const updateColumnIsPartOf = useDataStore((state) => state.updateColumnIsPartOf);

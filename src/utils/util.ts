@@ -108,3 +108,12 @@ export function getColumnOptions(
       disabled: allMappedColumns.includes(id),
     }));
 }
+
+// Simple deterministic ID generator
+export function createDeterministicIdGenerator() {
+  let counter = 0;
+  return () => {
+    counter += 1;
+    return `${counter}`;
+  };
+}

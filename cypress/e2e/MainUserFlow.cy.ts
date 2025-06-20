@@ -191,19 +191,18 @@ describe('Main user flow', () => {
     cy.get('[data-cy="Column Annotation-step"]').within(() => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
     });
-    cy.get('[data-cy="multi-column-measures-card-e43763af-0e82-4d31-add8-ab678bf57d48"]').should(
-      'be.visible'
-    );
+    cy.get('[data-cy="multi-column-measures-card-2"]').should('be.visible');
     cy.get('[data-cy="multi-column-measures"]').should('contain.text', 'No columns assigned');
-    cy.get(
-      '[data-cy="multi-column-measures-card-e43763af-0e82-4d31-add8-ab678bf57d48-title-dropdown"]'
-    ).type('Previous IQ assessment{downArrow}{enter}');
-    cy.get(
-      '[data-cy="multi-column-measures-card-e43763af-0e82-4d31-add8-ab678bf57d48-header"]'
-    ).should('contain.text', 'Previous IQ assessment by pronunciation');
-    cy.get(
-      '[data-cy="multi-column-measures-card-e43763af-0e82-4d31-add8-ab678bf57d48-columns-dropdown"]'
-    ).type('iq{downArrow}{enter}');
+    cy.get('[data-cy="multi-column-measures-card-2-title-dropdown"]').type(
+      'Previous IQ assessment{downArrow}{enter}'
+    );
+    cy.get('[data-cy="multi-column-measures-card-2-header"]').should(
+      'contain.text',
+      'Previous IQ assessment by pronunciation'
+    );
+    cy.get('[data-cy="multi-column-measures-card-2-columns-dropdown"]').type(
+      'iq{downArrow}{enter}'
+    );
     cy.get('[data-cy="mapped-column-5').should('be.visible').and('contain', 'iq');
     cy.get('[data-cy="multi-column-measures"]').should('contain.text', '1 column assigned');
     cy.get('[data-cy="next-button"]').click();
@@ -293,12 +292,11 @@ describe('Main user flow', () => {
     cy.get('[data-cy="next-button"]').click();
 
     // Multi-Column Measures view
-    cy.get('[data-cy="multi-column-measures-card-fd2adea6-0be4-469a-9957-4fb19c1ae485"]').should(
-      'be.visible'
+    cy.get('[data-cy="multi-column-measures-card-2"]').should('be.visible');
+    cy.get('[data-cy="multi-column-measures-card-2-header"]').should(
+      'contain.text',
+      'Previous IQ assessment by pronunciation'
     );
-    cy.get(
-      '[data-cy="multi-column-measures-card-fd2adea6-0be4-469a-9957-4fb19c1ae485-header"]'
-    ).should('contain.text', 'Previous IQ assessment by pronunciation');
     cy.get('[data-cy="mapped-column-5').should('be.visible').and('contain', 'iq');
     cy.get('[data-cy="multi-column-measures"]').should('contain.text', '1 column assigned');
     cy.get('[data-cy="next-button"]').click();
@@ -442,30 +440,25 @@ describe('Main user flow', () => {
     // Multi-Column Measures view
     cy.get('[data-cy="multi-column-measures"]').should('contain.text', '3 columns assigned');
 
-    cy.get('[data-cy="multi-column-measures-card-f0af972d-edd3-4987-ab6f-bb1f5c0c7046"]').should(
-      'be.visible'
-    );
+    cy.get('[data-cy="multi-column-measures-card-3"]').should('be.visible');
     cy.get('[data-cy="mapped-column-6"]').should('be.visible').and('contain', 'tool1_item1');
     cy.get('[data-cy="mapped-column-7"]').should('be.visible').and('contain', 'tool1_item2');
-    cy.get(
-      '[data-cy="multi-column-measures-card-f0af972d-edd3-4987-ab6f-bb1f5c0c7046-header"]'
-    ).should('contain.text', 'Montreal cognitive assessment');
+    cy.get('[data-cy="multi-column-measures-card-3-header"]').should(
+      'contain.text',
+      'Montreal cognitive assessment'
+    );
 
-    cy.get('[data-cy="multi-column-measures-card-f0af972d-edd3-4987-ab6f-bb1f5c0c7046"]')
+    cy.get('[data-cy="multi-column-measures-card-3"]')
       .should('contain.text', 'tool1_item1')
       .and('contain.text', 'tool1_item2');
 
-    cy.get('[data-cy="multi-column-measures-card-fd2adea6-0be4-469a-9957-4fb19c1ae485"]').should(
-      'be.visible'
-    );
+    cy.get('[data-cy="multi-column-measures-card-4"]').should('be.visible');
     cy.get('[data-cy="mapped-column-8"]').should('be.visible').and('contain', 'tool2_item1');
-    cy.get(
-      '[data-cy="multi-column-measures-card-fd2adea6-0be4-469a-9957-4fb19c1ae485-header"]'
-    ).should('contain.text', 'Unified Parkinsons disease rating scale');
-    cy.get('[data-cy="multi-column-measures-card-fd2adea6-0be4-469a-9957-4fb19c1ae485"]').should(
+    cy.get('[data-cy="multi-column-measures-card-4-header"]').should(
       'contain.text',
-      'tool2_item1'
+      'Unified Parkinsons disease rating scale'
     );
+    cy.get('[data-cy="multi-column-measures-card-4"]').should('contain.text', 'tool2_item1');
 
     cy.get('[data-cy="next-button"]').click();
 
