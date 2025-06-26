@@ -36,10 +36,7 @@
           "type": "object"
         }
       },
-      "required": [
-        "Description",
-        "Levels"
-      ],
+      "required": ["Description", "Levels"],
       "title": "CategoricalColumn",
       "type": "object"
     },
@@ -70,10 +67,7 @@
           "type": "object"
         }
       },
-      "required": [
-        "IsAbout",
-        "Levels"
-      ],
+      "required": ["IsAbout", "Levels"],
       "title": "CategoricalNeurobagel",
       "type": "object"
     },
@@ -111,9 +105,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "Description"
-      ],
+      "required": ["Description"],
       "title": "ContinuousColumn",
       "type": "object"
     },
@@ -140,10 +132,7 @@
           "description": "For continuous columns this field is used to describe the format of the raw numerical values in the column. This information is used to transform the column values into the desired format of the standardized data element referenced in the IsAbout attribute."
         }
       },
-      "required": [
-        "IsAbout",
-        "Format"
-      ],
+      "required": ["IsAbout", "Format"],
       "title": "ContinuousNeurobagel",
       "type": "object"
     },
@@ -161,10 +150,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "TermURL",
-        "Label"
-      ],
+      "required": ["TermURL", "Label"],
       "title": "Identifier",
       "type": "object"
     },
@@ -192,10 +178,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "IsAbout",
-        "Identifies"
-      ],
+      "required": ["IsAbout", "Identifies"],
       "title": "IdentifierNeurobagel",
       "type": "object"
     },
@@ -222,10 +205,7 @@
           "description": "If the column is a subscale or item of an assessment tool then the assessment tool should be specified here."
         }
       },
-      "required": [
-        "IsAbout",
-        "IsPartOf"
-      ],
+      "required": ["IsAbout", "IsPartOf"],
       "title": "ToolNeurobagel",
       "type": "object"
     }
