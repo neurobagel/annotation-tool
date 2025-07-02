@@ -14,10 +14,7 @@ export type Column = {
   levels?: { [key: string]: { description: string; label?: string; termURL?: string } } | null;
   units?: string;
   missingValues?: string[];
-  format?: {
-    termURL?: string;
-    label?: string;
-  };
+  format?: Format;
 };
 
 export type Columns = {
@@ -64,6 +61,9 @@ export interface StandardizedVariable {
 export interface StandardizedVariableConfig extends StandardizedVariable {
   data_type?: 'Categorical' | 'Continuous' | null;
   is_multi_column_measurement?: boolean;
+  vocab_file?: string | null;
+  formats?: Format[];
+  identifies?: string;
 }
 
 export interface StandardizedVaribleCollection {
@@ -71,20 +71,28 @@ export interface StandardizedVaribleCollection {
 }
 
 // TODO: reduce the depth and try to have a single object for all configuration
-export interface StandardizedVariableConfigCollection {
+export interface Config {
   [key: string]: StandardizedVariableConfig;
 }
 
-// TODO: find a better name than Term
-export interface Term {
+export interface StandardizedTerm {
   identifier: string;
   label: string;
+}
+
+export interface Format {
+  termURL: string;
+  label: string;
+  example?: string[];
+}
+
+export interface MultiColumnMeasuresTerm extends StandardizedTerm {
   disabled?: boolean;
 }
 
-export interface TermCard {
+export interface MultiColumnMeasuresTermCard {
   id: string;
-  term: Term | null;
+  term: MultiColumnMeasuresTerm | null;
   mappedColumns: string[];
 }
 
@@ -101,4 +109,9 @@ export type StepConfig = {
   label: string;
   view: View;
   icon: React.ComponentType;
+};
+
+export type ConfigLoaderOptions = {
+  excludeDefault?: boolean;
+  defaultConfigName?: string;
 };

@@ -1,0 +1,82 @@
+{
+  "standardizedVariables": {
+    "Subject ID": {
+      "identifier": "nb:ParticipantID",
+      "label": "Subject ID",
+      "data_type": null,
+      "is_multi_column_measurement": false,
+      "vocab_file": null,
+      "identifies": "participant"
+    },
+    "Session ID": {
+      "identifier": "nb:SessionID",
+      "label": "Session ID",
+      "data_type": null,
+      "is_multi_column_measurement": false,
+      "vocab_file": null,
+      "identifies": "session"
+    },
+    "Age": {
+      "identifier": "nb:Age",
+      "label": "Age",
+      "data_type": "Continuous",
+      "is_multi_column_measurement": false,
+      "vocab_file": null,
+      "formats": [
+        {
+          "termURL": "nb:FromFloat",
+          "label": "float",
+          "examples": ["24.2", "32.3"]
+        },
+        {
+          "termURL": "nb:FromRange",
+          "label": "range",
+          "examples": ["20-50", "53-81"]
+        },
+        {
+          "termURL": "nb:FromEuro",
+          "label": "euro",
+          "examples": ["24,2", "32,3"]
+        },
+        {
+          "termURL": "nb:FromBounded",
+          "label": "bounded",
+          "examples": []
+        },
+        {
+          "termURL": "nb:FromISO8601",
+          "label": "iso8601",
+          "examples": []
+        }
+      ]
+    },
+    "Sex": {
+      "identifier": "nb:Sex",
+      "label": "Sex",
+      "data_type": "Categorical",
+      "is_multi_column_measurement": false,
+      "vocab_file": "sexTerms.json"
+    },
+    "Diagnosis": {
+      "identifier": "nb:Diagnosis",
+      "label": "Diagnosis",
+      "data_type": "Categorical",
+      "is_multi_column_measurement": false,
+      "vocab_file": "diagnosisTerms.json"
+    },
+    "Assessment Tool": {
+      "identifier": "nb:Assessment",
+      "label": "Assessment Tool",
+      "data_type": "Continuous",
+      "is_multi_column_measurement": true,
+      "vocab_file": "assessmentTerms.json"
+    },
+    "Some Variable": {
+      "identifier": "nb:SomeVariable",
+      "label": "Some Variable",
+      "data_type": "Continuous",
+      "is_multi_column_measurement": true,
+      "vocab_file": "assessmentTerms.json"
+    }
+  }
+}
