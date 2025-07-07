@@ -1,82 +1,113 @@
-{
-  "standardizedVariables": {
-    "Subject ID": {
-      "identifier": "nb:ParticipantID",
-      "label": "Subject ID",
-      "data_type": null,
-      "is_multi_column_measurement": false,
-      "vocab_file": null,
-      "identifies": "participant"
-    },
-    "Session ID": {
-      "identifier": "nb:SessionID",
-      "label": "Session ID",
-      "data_type": null,
-      "is_multi_column_measurement": false,
-      "vocab_file": null,
-      "identifies": "session"
-    },
-    "Age": {
-      "identifier": "nb:Age",
-      "label": "Age",
-      "data_type": "Continuous",
-      "is_multi_column_measurement": false,
-      "vocab_file": null,
-      "formats": [
-        {
-          "termURL": "nb:FromFloat",
-          "label": "float",
-          "examples": ["24.2", "32.3"]
-        },
-        {
-          "termURL": "nb:FromRange",
-          "label": "range",
-          "examples": ["20-50", "53-81"]
-        },
-        {
-          "termURL": "nb:FromEuro",
-          "label": "euro",
-          "examples": ["24,2", "32,3"]
-        },
-        {
-          "termURL": "nb:FromBounded",
-          "label": "bounded",
-          "examples": []
-        },
-        {
-          "termURL": "nb:FromISO8601",
-          "label": "iso8601",
-          "examples": []
-        }
-      ]
-    },
-    "Sex": {
-      "identifier": "nb:Sex",
-      "label": "Sex",
-      "data_type": "Categorical",
-      "is_multi_column_measurement": false,
-      "vocab_file": "sexTerms.json"
-    },
-    "Diagnosis": {
-      "identifier": "nb:Diagnosis",
-      "label": "Diagnosis",
-      "data_type": "Categorical",
-      "is_multi_column_measurement": false,
-      "vocab_file": "diagnosisTerms.json"
-    },
-    "Assessment Tool": {
-      "identifier": "nb:Assessment",
-      "label": "Assessment Tool",
-      "data_type": "Continuous",
-      "is_multi_column_measurement": true,
-      "vocab_file": "assessmentTerms.json"
-    },
-    "Some Variable": {
-      "identifier": "nb:SomeVariable",
-      "label": "Some Variable",
-      "data_type": "Continuous",
-      "is_multi_column_measurement": true,
-      "vocab_file": "assessmentTerms.json"
-    }
+[
+  {
+    "vocabulary_name": "Neurobagel Phenotypic Variables",
+    "namespace_prefix": "nb",
+    "namespace_url": "http://neurobagel.org/vocab/",
+    "version": "1.0.0",
+    "standardized_variables": [
+      {
+        "name": "Participant ID",
+        "id": "ParticipantID",
+        "data_type": null,
+        "terms_file": null,
+        "formats": null,
+        "required": true,
+        "description": null,
+        "is_multi_column_measure": false,
+        "can_have_multiple_columns": false,
+        "same_as": null
+      },
+      {
+        "name": "Session ID",
+        "id": "SessionID",
+        "data_type": null,
+        "terms_file": null,
+        "formats": null,
+        "required": false,
+        "description": null,
+        "is_multi_column_measure": false,
+        "can_have_multiple_columns": false,
+        "same_as": null
+      },
+      {
+        "name": "Age",
+        "id": "Age",
+        "data_type": "Continuous",
+        "terms_file": null,
+        "formats": [
+          {
+            "id": "FromFloat",
+            "name": "float",
+            "examples": ["31.5"]
+          },
+          {
+            "id": "FromInt",
+            "name": "int",
+            "examples": ["31"]
+          },
+          {
+            "id": "FromEuro",
+            "name": "euro",
+            "examples": ["31,5"]
+          },
+          {
+            "id": "FromBounded",
+            "name": "bounded",
+            "examples": ["30+"]
+          },
+          {
+            "id": "FromRange",
+            "name": "range",
+            "examples": ["30-35"]
+          },
+          {
+            "id": "FromISO8601",
+            "name": "iso8601",
+            "examples": ["31Y6M"]
+          }
+        ],
+        "required": false,
+        "description": null,
+        "is_multi_column_measure": false,
+        "can_have_multiple_columns": false,
+        "same_as": null
+      },
+      {
+        "name": "Sex",
+        "id": "Sex",
+        "data_type": "Categorical",
+        "terms_file": "sexTerms.json",
+        "formats": null,
+        "required": false,
+        "description": null,
+        "is_multi_column_measure": false,
+        "can_have_multiple_columns": false,
+        "same_as": null
+      },
+      {
+        "name": "Diagnosis",
+        "id": "Diagnosis",
+        "data_type": "Categorical",
+        "terms_file": "diagnosisTerms.json",
+        "formats": null,
+        "required": false,
+        "description": null,
+        "is_multi_column_measure": false,
+        "can_have_multiple_columns": true,
+        "same_as": null
+      },
+      {
+        "name": "Assessment Tool",
+        "id": "Assessment",
+        "data_type": null,
+        "terms_file": "assessmentTerms.json",
+        "formats": null,
+        "required": false,
+        "description": null,
+        "is_multi_column_measure": true,
+        "can_have_multiple_columns": true,
+        "same_as": null
+      }
+    ]
   }
-}
+]
