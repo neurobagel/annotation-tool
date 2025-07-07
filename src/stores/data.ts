@@ -10,7 +10,7 @@ import {
   StandardizedVariable,
   Config,
   StandardizedTerm,
-  Format,
+  TermFormat,
 } from '../utils/types';
 import { getConfigDirs } from '../utils/util';
 
@@ -62,7 +62,7 @@ type DataStore = {
   loadConfig: (configName: string) => Promise<void>;
   hasMultiColumnMeasures: () => boolean;
   getTermOptions: (standardizedVariable: StandardizedVariable) => StandardizedTerm[];
-  getFormatOptions: (StandardizedVariable: StandardizedVariable) => Format[];
+  getFormatOptions: (StandardizedVariable: StandardizedVariable) => TermFormat[];
   isMultiColumnMeasureStandardizedVariable: (
     standardizedVariable: StandardizedVariable | null
   ) => boolean;
@@ -566,10 +566,10 @@ const useDataStore = create<DataStore>()(
       const matchingConfigEntry = Object.values(config).find(
         (configEntry) => configEntry.identifier === standardizedVariable.identifier
       );
-      if (matchingConfigEntry && matchingConfigEntry.vocab_file) {
+      if (matchingConfigEntry && matchingConfigEntry.terms_file) {
         try {
           const response = await fetch(
-            `../../configs/${get().selectedConfig}/${matchingConfigEntry.vocab_file}`
+            `../../configs/${get().selectedConfig}/${matchingConfigEntry.terms_file}`
           );
           const data = await response.json();
           // TODO: remove once we have a dedicated healthy control std var

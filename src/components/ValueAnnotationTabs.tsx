@@ -1,6 +1,6 @@
 import { Paper, Tab, Tabs } from '@mui/material';
 import { useState, useEffect } from 'react';
-import { Columns, Format } from '../utils/types';
+import { Columns, TermFormat } from '../utils/types';
 import Categorical from './Categorical';
 import Continuous from './Continuous';
 
@@ -10,7 +10,7 @@ interface ValueAnnotationTabsProps {
   onUpdateDescription: (columnID: string, value: string, description: string) => void;
   onUpdateUnits: (columnID: string, units: string) => void;
   onToggleMissingValue: (columnID: string, value: string, isMissing: boolean) => void;
-  onUpdateFormat: (columnID: string, format: Format | null) => void;
+  onUpdateFormat: (columnID: string, format: TermFormat | null) => void;
   onUpdateLevelTerm: (
     columnID: string,
     value: string,

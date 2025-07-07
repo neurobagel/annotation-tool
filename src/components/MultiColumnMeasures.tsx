@@ -58,21 +58,21 @@ function MultiColumnMeasures({
     .getMappedMultiColumnMeasureStandardizedVariables();
 
   // Memoized to prevent recalculation on every render since it depends on two values
-  const currentVariable = useMemo(
+  const activeVariableTab = useMemo(
     () => multiColumnVariables[activeTab] || null,
     [multiColumnVariables, activeTab]
   );
 
-  // Memoized to prevent object lookup on every render
+  // Memoized to prevent object lookup on every render. CurrentState contains the columns and cards of the active multi-column variable
   const currentState = useMemo(
-    () => (currentVariable ? variableStates[currentVariable.identifier] : null),
-    [currentVariable, variableStates]
+    () => (activeVariableTab ? variableStates[activeVariableTab.identifier] : null),
+    [activeVariableTab, variableStates]
   );
 
   // Memoized to prevent new array reference on every render from Zustand selector
   const currentVariableColumns = useMemo(
-    () => (currentVariable ? getStandardizedVariableColumns(currentVariable) : []),
-    [currentVariable, getStandardizedVariableColumns]
+    () => (activeVariableTab ? getStandardizedVariableColumns(activeVariableTab) : []),
+    [activeVariableTab, getStandardizedVariableColumns]
   );
 
   const currentTerms = currentState?.terms || [];
@@ -169,7 +169,7 @@ function MultiColumnMeasures({
   }, []);
 
   const handleAddNewCard = useCallback(() => {
-    if (!currentVariable) return;
+    if (!activeVariableTab) return;
 
     const newCard: MultiColumnMeasuresTermCard = {
       id: generateID(),
@@ -178,13 +178,13 @@ function MultiColumnMeasures({
     };
 
     setVariableStates((prev) => {
-      const currentCards = prev[currentVariable.identifier]?.termCards || [];
+      const currentCards = prev[activeVariableTab.identifier]?.termCards || [];
       const newTermCards = [...currentCards, newCard];
 
       return {
         ...prev,
-        [currentVariable.identifier]: {
-          terms: prev[currentVariable.identifier]?.terms || [],
+        [activeVariableTab.identifier]: {
+          terms: prev[activeVariableTab.identifier]?.terms || [],
           termCards: newTermCards,
         },
       };
@@ -198,7 +198,7 @@ function MultiColumnMeasures({
       }
     }, 0);
   }, [
-    currentVariable,
+    activeVariableTab,
     currentTermCards.length,
     generateID,
     handlePaginationChange,
@@ -208,10 +208,10 @@ function MultiColumnMeasures({
 
   const handleTermSelect = useCallback(
     (cardId: string, term: MultiColumnMeasuresTerm | null) => {
-      if (!currentVariable) return;
+      if (!activeVariableTab) return;
 
       setVariableStates((prev) => {
-        const currentCards = prev[currentVariable.identifier]?.termCards || [];
+        const currentCards = prev[activeVariableTab.identifier]?.termCards || [];
         const updatedCards = currentCards.map((card) =>
           card.id === cardId
             ? {
@@ -223,22 +223,22 @@ function MultiColumnMeasures({
 
         return {
           ...prev,
-          [currentVariable.identifier]: {
-            terms: prev[currentVariable.identifier]?.terms || [],
+          [activeVariableTab.identifier]: {
+            terms: prev[activeVariableTab.identifier]?.terms || [],
             termCards: updatedCards,
           },
         };
       });
     },
-    [currentVariable]
+    [activeVariableTab]
   );
 
   const handleColumnSelect = useCallback(
     (cardId: string, columnId: string | null) => {
-      if (!columnId || !currentVariable) return;
+      if (!columnId || !activeVariableTab) return;
 
       setVariableStates((prev) => {
-        const currentCards = prev[currentVariable.identifier]?.termCards || [];
+        const currentCards = prev[activeVariableTab.identifier]?.termCards || [];
         const updatedCards = currentCards.map((card) =>
           card.id === cardId && !card.mappedColumns.includes(columnId)
             ? { ...card, mappedColumns: [...card.mappedColumns, columnId] }
@@ -247,8 +247,8 @@ function MultiColumnMeasures({
 
         return {
           ...prev,
-          [currentVariable.identifier]: {
-            terms: prev[currentVariable.identifier]?.terms || [],
+          [activeVariableTab.identifier]: {
+            terms: prev[activeVariableTab.identifier]?.terms || [],
             termCards: updatedCards,
           },
         };
@@ -262,15 +262,15 @@ function MultiColumnMeasures({
         });
       }
     },
-    [currentVariable, currentTermCards, updateColumnIsPartOf]
+    [activeVariableTab, currentTermCards, updateColumnIsPartOf]
   );
 
   const removeColumnFromCard = useCallback(
     (cardId: string, columnId: string) => {
-      if (!currentVariable) return;
+      if (!activeVariableTab) return;
 
       setVariableStates((prev) => {
-        const currentCards = prev[currentVariable.identifier]?.termCards || [];
+        const currentCards = prev[activeVariableTab.identifier]?.termCards || [];
         const updatedCards = currentCards.map((card) =>
           card.id === cardId
             ? {
@@ -282,20 +282,20 @@ function MultiColumnMeasures({
 
         return {
           ...prev,
-          [currentVariable.identifier]: {
-            terms: prev[currentVariable.identifier]?.terms || [],
+          [activeVariableTab.identifier]: {
+            terms: prev[activeVariableTab.identifier]?.terms || [],
             termCards: updatedCards,
           },
         };
       });
       updateColumnIsPartOf(columnId, null);
     },
-    [currentVariable, updateColumnIsPartOf]
+    [activeVariableTab, updateColumnIsPartOf]
   );
 
   const removeCard = useCallback(
     (cardId: string) => {
-      if (!currentVariable) return;
+      if (!activeVariableTab) return;
 
       const card = currentTermCards.find((c) => c.id === cardId);
       if (card) {
@@ -305,13 +305,13 @@ function MultiColumnMeasures({
       }
 
       setVariableStates((prev) => {
-        const currentCards = prev[currentVariable.identifier]?.termCards || [];
+        const currentCards = prev[activeVariableTab.identifier]?.termCards || [];
         const newCards = currentCards.filter((termCard) => termCard.id !== cardId);
 
         return {
           ...prev,
-          [currentVariable.identifier]: {
-            terms: prev[currentVariable.identifier]?.terms || [],
+          [activeVariableTab.identifier]: {
+            terms: prev[activeVariableTab.identifier]?.terms || [],
             termCards:
               newCards.length === 0
                 ? [{ id: generateID(), term: null, mappedColumns: [] }]
@@ -330,7 +330,7 @@ function MultiColumnMeasures({
       }
     },
     [
-      currentVariable,
+      activeVariableTab,
       currentTermCards,
       currentPage,
       generateID,
@@ -388,7 +388,7 @@ function MultiColumnMeasures({
                   )}
                   columnOptions={getColumnOptions(
                     columns,
-                    currentVariable.identifier,
+                    activeVariableTab.identifier,
                     variableAllMappedColumns
                   )}
                   onTermSelect={(term) => handleTermSelect(card.id, term)}
@@ -416,7 +416,7 @@ function MultiColumnMeasures({
             elevation={3}
             data-cy="multi-column-measures-columns-card"
           >
-            <CardHeader className="bg-gray-50" title={`${currentVariable.label}: all columns`} />
+            <CardHeader className="bg-gray-50" title={`${activeVariableTab.label}: all columns`} />
             <CardContent className="text-center">
               <div className="max-h-[500px] overflow-auto">
                 {currentVariableColumns.map(({ id, header }) => (

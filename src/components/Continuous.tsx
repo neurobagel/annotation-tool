@@ -10,7 +10,7 @@ import {
   TextField,
 } from '@mui/material';
 import useDataStore from '~/stores/data';
-import { StandardizedVariable, Format } from '~/utils/types';
+import { StandardizedVariable, TermFormat } from '~/utils/types';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueButton from './MissingValueButton';
 
@@ -19,7 +19,7 @@ interface ContinuousProps {
   units: string;
   uniqueValues: string[];
   missingValues: string[];
-  format?: Format;
+  format?: TermFormat;
   standardizedVariable?: StandardizedVariable | null;
   onUpdateUnits: (columnID: string, units: string) => void;
   onToggleMissingValue: (columnID: string, value: string, isMissing: boolean) => void;
