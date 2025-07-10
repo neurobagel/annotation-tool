@@ -1,16 +1,141 @@
+import axios from 'axios';
 import seedrandom from 'seedrandom';
 import { v4 as uuidv4 } from 'uuid';
-import { MultiColumnMeasuresTerm, MultiColumnMeasuresTermCard, Columns } from './types';
+import {
+  ConfigFile,
+  Config,
+  MultiColumnMeasuresTerm,
+  MultiColumnMeasuresTermCard,
+  VocabConfig,
+  Columns,
+  StandardizedTerm,
+  TermsFileStandardizedTerm,
+  ConfigFileTermFormat,
+  ConfigFileStandardizedVariable,
+  TermFormat,
+} from './types';
 
 // Utility functions for store
 
-export async function getConfigDirs(): Promise<string[]> {
+export async function fetchAvailableConfigNames(): Promise<string[]> {
   try {
-    const modules = import.meta.glob('../../configs/*/config.json');
-    return Object.keys(modules).map((path) => path.split('/').slice(-2, -1)[0]);
+    const response = await axios.get(
+      'https://api.github.com/repos/neurobagel/communities/contents/'
+    );
+    const data = response.data as { type: string; name: string }[];
+    const dirs = data.filter((item) => item.type === 'dir');
+    return dirs.map((dir) => dir.name);
   } catch (error) {
+    // TODO: show a notif error
     return [];
   }
+}
+
+export async function fetchConfig(
+  selectedConfig: string
+): Promise<{ config: ConfigFile; termsData: Record<string, VocabConfig[]> }> {
+  try {
+    // 1. Fetch config.json
+    const configRes = await axios.get(
+      `https://raw.githubusercontent.com/neurobagel/communities/main/${selectedConfig}/config.json`
+    );
+    const configArray = configRes.data;
+    if (!Array.isArray(configArray) || configArray.length === 0) {
+      throw new Error('Config file is not in expected format');
+    }
+    const config = configArray[0];
+
+    // 2. Find all unique terms_file values in standardized_variables
+    const termFiles = new Set<string>();
+    config.standardized_variables.forEach((variable: ConfigFileStandardizedVariable) => {
+      if (variable.terms_file) {
+        termFiles.add(variable.terms_file);
+      }
+    });
+
+    // 3. Fetch all term files
+    const termsData: Record<string, VocabConfig[]> = {};
+    await Promise.all(
+      Array.from(termFiles).map(async (file) => {
+        try {
+          const res = await axios.get(
+            `https://raw.githubusercontent.com/neurobagel/communities/main/${selectedConfig}/${file}`
+          );
+          termsData[file] = res.data;
+        } catch (e) {
+          // TODO: show notif error
+          termsData[file] = [];
+        }
+      })
+    );
+
+    return { config, termsData };
+  } catch (error) {
+    // TODO: show a notif error
+    return { config: {} as ConfigFile, termsData: {} };
+  }
+}
+
+export function mapConfigFileToStoreConfig(
+  configFile: ConfigFile,
+  termsData: Record<string, VocabConfig[]>
+): Config {
+  const namespacePrefix = configFile.namespace_prefix;
+
+  const config: Config = {};
+
+  // Loop through each standardized variable in the config file
+  configFile.standardized_variables.forEach((variable: ConfigFileStandardizedVariable) => {
+    const identifier = `${namespacePrefix}:${variable.id}`;
+    const label = variable.name;
+
+    // Copy all other fields except id, name, termsFile, formats
+    const { id, name, terms_file: termsFile, formats: rawFormats, ...rest } = variable;
+
+    // Map terms from all vocabularies in the terms file (if present)
+    let terms: StandardizedTerm[] | undefined;
+    if (termsFile && termsData[termsFile]) {
+      const vocabsArr = termsData[termsFile];
+      const allTerms: StandardizedTerm[] = [];
+      vocabsArr.forEach((vocab: VocabConfig) => {
+        const termsNamespace = vocab.namespace_prefix;
+        if (Array.isArray(vocab.terms)) {
+          (vocab.terms as TermsFileStandardizedTerm[]).forEach((term) => {
+            const { id: termId, name: termName, ...restTermFields } = term;
+            allTerms.push({
+              identifier: `${termsNamespace}:${termId}`,
+              label: termName,
+              ...restTermFields,
+            });
+          });
+        }
+      });
+      terms = allTerms;
+    }
+
+    // Map formats from config file to in-app format (if present)
+    let formats: TermFormat[] | undefined;
+    if (rawFormats) {
+      formats = (rawFormats as ConfigFileTermFormat[]).map((format) => {
+        const { id: formatId, name: formatName, ...restFormatFields } = format;
+        return {
+          termURL: formatId,
+          label: formatName,
+          ...restFormatFields,
+        };
+      });
+    }
+
+    config[identifier] = {
+      identifier,
+      label,
+      ...rest,
+      ...(terms ? { terms } : {}),
+      ...(formats ? { formats } : {}),
+    };
+  });
+
+  return config;
 }
 
 // Utility functions for MultiColumnMeasures component

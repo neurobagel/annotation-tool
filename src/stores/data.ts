@@ -1,7 +1,6 @@
 import { produce } from 'immer';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import NeurobagelConfig from '../../configs/Neurobagel/config.json';
 import {
   DataTable,
   Columns,
@@ -12,7 +11,7 @@ import {
   StandardizedTerm,
   TermFormat,
 } from '../utils/types';
-import { getConfigDirs } from '../utils/util';
+import { fetchAvailableConfigNames, fetchConfig, mapConfigFileToStoreConfig } from '../utils/util';
 
 type DataStore = {
   dataTable: DataTable;
@@ -78,7 +77,7 @@ const initialState = {
   uploadedDataDictionaryFileName: null,
   configOptions: [],
   selectedConfig: 'Neurobagel',
-  config: NeurobagelConfig.standardizedVariables as Config,
+  config: {},
 };
 
 const useDataStore = create<DataStore>()(
@@ -534,7 +533,7 @@ const useDataStore = create<DataStore>()(
 
     loadConfigOptions: async () => {
       try {
-        const dirNames = await getConfigDirs();
+        const dirNames = await fetchAvailableConfigNames();
         set({ configOptions: dirNames });
       } catch (error) {
         // TODO: show a notif error
@@ -544,8 +543,9 @@ const useDataStore = create<DataStore>()(
 
     loadConfig: async (configName: string) => {
       try {
-        const config = await import(`../../configs/${configName}/config.json`);
-        set({ config: config.standardizedVariables });
+        const { config: configFile, termsData } = await fetchConfig(configName);
+        const mappedConfig = mapConfigFileToStoreConfig(configFile, termsData);
+        set({ config: mappedConfig });
       } catch (error) {
         // TODO: show a notif error
       }
@@ -566,20 +566,8 @@ const useDataStore = create<DataStore>()(
       const matchingConfigEntry = Object.values(config).find(
         (configEntry) => configEntry.identifier === standardizedVariable.identifier
       );
-      if (matchingConfigEntry && matchingConfigEntry.terms_file) {
-        try {
-          const response = await fetch(
-            `../../configs/${get().selectedConfig}/${matchingConfigEntry.terms_file}`
-          );
-          const data = await response.json();
-          // TODO: remove once we have a dedicated healthy control std var
-          if (matchingConfigEntry.identifier === 'nb:Diagnosis') {
-            data.push({ label: 'Healthy Control', identifier: 'ncit:C94342' });
-          }
-          return data;
-        } catch (error) {
-          // TODO: show a notif error
-        }
+      if (matchingConfigEntry && matchingConfigEntry.terms) {
+        return matchingConfigEntry.terms;
       }
       return [];
     },
