@@ -10,7 +10,7 @@ import {
   Autocomplete,
   Tooltip,
 } from '@mui/material';
-import { StandardizedVariable, Config } from '../utils/types';
+import { StandardizedVariable, Config } from '../utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
 
 interface ColumnAnnotationCardProps {

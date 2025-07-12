@@ -9,7 +9,7 @@ import Upload from './components/Upload';
 import ValueAnnotation from './components/ValueAnnotation';
 import useDataStore from './stores/data';
 import useViewStore, { getNavigationProps } from './stores/view';
-import { View } from './utils/types';
+import { View } from './utils/internal_types';
 
 function App() {
   const currentView = useViewStore((state) => state.currentView);

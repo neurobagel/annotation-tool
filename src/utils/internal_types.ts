@@ -33,6 +33,7 @@ export interface DataDictionary {
         TermURL: string;
         Label: string;
       };
+      // TODO: Remove once we get rid of identifies in CLI
       Identifies?: string;
       Format?: {
         TermURL: string;
@@ -67,8 +68,6 @@ export interface StandardizedVariableConfig extends StandardizedVariable {
   is_multi_column_measurement?: boolean;
   can_have_multiple_columns?: boolean;
   same_as?: string;
-  // TODO: remove identifies
-  identifies?: string;
 }
 
 export interface StandardizedVaribleCollection {
@@ -94,54 +93,6 @@ export interface TermFormat {
   termURL: string;
   label: string;
   examples?: string[];
-}
-
-// --- Raw config file types (used for parsing config files from disk/network) ---
-
-// A term as it appears in a terms file (raw config)
-export type TermsFileStandardizedTerm = {
-  id: string;
-  name: string;
-  abbreviation?: string;
-  description?: string;
-  same_as?: string;
-  status?: string;
-};
-
-// A format as it appears in a config file (raw config)
-export type ConfigFileTermFormat = {
-  id: string;
-  name: string;
-  examples?: string[];
-};
-
-// A vocabulary config as it appears in a terms file (raw config)
-export interface VocabConfig {
-  namespace_prefix: string;
-  namespace_url: string;
-  vocabulary_name: string;
-  version: string;
-  terms: TermsFileStandardizedTerm[];
-}
-
-// A standardized variable as it appears in a config file (raw config)
-export type ConfigFileStandardizedVariable = Omit<
-  StandardizedVariableConfig,
-  'identifier' | 'label' | 'terms' | 'formats' | 'identifies'
-> & {
-  id: string;
-  name: string;
-  terms_file?: string;
-  formats?: ConfigFileTermFormat[];
-};
-
-// The config file as it appears on disk/network (raw config)
-export interface ConfigFile {
-  vocabulary_name: string;
-  namespace_prefix: string;
-  namespace_url: string;
-  version: string;
-  standardized_variables: ConfigFileStandardizedVariable[];
 }
 
 export interface MultiColumnMeasuresTerm extends StandardizedTerm {

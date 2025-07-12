@@ -10,7 +10,7 @@ import {
   TextField,
 } from '@mui/material';
 import useDataStore from '~/stores/data';
-import { StandardizedVariable, TermFormat } from '~/utils/types';
+import { StandardizedVariable, TermFormat } from '~/utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueButton from './MissingValueButton';
 

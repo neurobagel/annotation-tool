@@ -10,7 +10,7 @@ import {
   Autocomplete,
   TextField,
 } from '@mui/material';
-import { MultiColumnMeasuresTerm, MultiColumnMeasuresTermCard } from '../utils/types';
+import { MultiColumnMeasuresTerm, MultiColumnMeasuresTermCard } from '../utils/internal_types';
 
 interface TermCardProps {
   card: MultiColumnMeasuresTermCard;

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import useDataStore from './stores/data';
-import { StandardizedVariable } from './utils/types';
+import { StandardizedVariable } from './utils/internal_types';
 
 export const useColumnUpdates = () => {
   const updateColumnDescription = useDataStore((state) => state.updateColumnDescription);

@@ -1,6 +1,6 @@
 import { Paper, Tab, Tabs } from '@mui/material';
 import { useState, useEffect } from 'react';
-import { Columns, TermFormat } from '../utils/types';
+import { Columns, TermFormat } from '../utils/internal_types';
 import Categorical from './Categorical';
 import Continuous from './Continuous';
 

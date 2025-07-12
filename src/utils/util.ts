@@ -3,17 +3,19 @@ import seedrandom from 'seedrandom';
 import { v4 as uuidv4 } from 'uuid';
 import {
   ConfigFile,
-  Config,
-  MultiColumnMeasuresTerm,
-  MultiColumnMeasuresTermCard,
   VocabConfig,
-  Columns,
-  StandardizedTerm,
   TermsFileStandardizedTerm,
   ConfigFileTermFormat,
   ConfigFileStandardizedVariable,
+} from './external_types';
+import {
+  Config,
+  MultiColumnMeasuresTerm,
+  MultiColumnMeasuresTermCard,
+  Columns,
+  StandardizedTerm,
   TermFormat,
-} from './types';
+} from './internal_types';
 
 // Utility functions for store
 

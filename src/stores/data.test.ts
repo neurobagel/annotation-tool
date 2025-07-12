@@ -4,7 +4,7 @@ import { produce } from 'immer';
 import path from 'path';
 import { beforeEach, describe, it, expect } from 'vitest';
 import { mockDataTable, mockInitialColumns, mockColumns } from '~/utils/mocks';
-import { Columns } from '../utils/types';
+import { Columns } from '../utils/internal_types';
 import useDataStore from './data';
 
 describe('data store actions', () => {

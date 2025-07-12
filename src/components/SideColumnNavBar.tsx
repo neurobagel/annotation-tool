@@ -1,6 +1,6 @@
 import { List, Paper, ListItem } from '@mui/material';
 import useDataStore from '~/stores/data';
-import { Columns } from '../utils/types';
+import { Columns } from '../utils/internal_types';
 import ColumnTypeCollapse from './ColumnTypeCollapse';
 import ExpandableSection from './ExpandableSection';
 

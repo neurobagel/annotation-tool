@@ -13,7 +13,7 @@ import { useTheme } from '@mui/material/styles';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { usePagination } from '../hooks';
 import useDataStore from '../stores/data';
-import { MultiColumnMeasuresTerm, MultiColumnMeasuresTermCard } from '../utils/types';
+import { MultiColumnMeasuresTerm, MultiColumnMeasuresTermCard } from '../utils/internal_types';
 import {
   initializeTermCards,
   getAvailableTerms,

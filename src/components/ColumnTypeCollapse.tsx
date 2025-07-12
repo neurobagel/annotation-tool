@@ -4,7 +4,7 @@ import { Typography, Collapse, List, ListItem, IconButton } from '@mui/material'
 import { capitalize } from 'lodash';
 import { useState } from 'react';
 import useDataStore from '~/stores/data';
-import { ColumnEntry, Columns, StandardizedVariable } from '../utils/types';
+import { ColumnEntry, Columns, StandardizedVariable } from '../utils/internal_types';
 
 interface ColumnTypeCollapseProps {
   dataType?: 'Categorical' | 'Continuous' | null;

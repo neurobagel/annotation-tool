@@ -1,7 +1,7 @@
 import { Paper, Typography, List, ListItem } from '@mui/material';
 import { useState } from 'react';
 import useDataStore from '../stores/data';
-import { Columns } from '../utils/types';
+import { Columns } from '../utils/internal_types';
 import SideColumnNavBar from './SideColumnNavBar';
 import ValueAnnotationTabs from './ValueAnnotationTabs';
 

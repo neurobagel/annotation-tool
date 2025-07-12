@@ -1,7 +1,7 @@
 import Pagination from '@mui/material/Pagination';
 import { useColumnUpdates, usePagination } from '../hooks';
 import useDataStore from '../stores/data';
-import { Column } from '../utils/types';
+import { Column } from '../utils/internal_types';
 import ColumnAnnotationCard from './ColumnAnnotationCard';
 
 function ColumnAnnotation() {

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { steps } from '../utils/constants';
-import { View } from '../utils/types';
+import { View } from '../utils/internal_types';
 import useDataStore from './data';
 
 type NavigationProps = {

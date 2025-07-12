@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import { View } from '../utils/types';
+import { View } from '../utils/internal_types';
 import useViewStore from './view';
 
 describe('store actions', () => {

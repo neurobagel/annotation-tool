@@ -10,7 +10,7 @@ import {
   Config,
   StandardizedTerm,
   TermFormat,
-} from '../utils/types';
+} from '../utils/internal_types';
 import { fetchAvailableConfigs, fetchConfig, mapConfigFileToStoreConfig } from '../utils/util';
 
 type DataStore = {
