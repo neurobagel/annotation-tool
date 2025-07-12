@@ -57,7 +57,7 @@ export const mockColumns = {
     dataType: 'Continuous' as 'Categorical' | 'Continuous' | null,
     format: {
       termURL: 'nb:FromFloat',
-      label: 'Float',
+      label: 'float',
     },
     units: '',
   },
@@ -157,7 +157,7 @@ export const mockDataDictionaryWithAnnotations = {
     Annotations: {
       IsAbout: {
         TermURL: 'nb:ParticipantID',
-        Label: 'Subject ID',
+        Label: 'Participant ID',
       },
       Identifies: 'participant',
     },
@@ -171,7 +171,7 @@ export const mockDataDictionaryWithAnnotations = {
       },
       Format: {
         TermURL: 'nb:FromFloat',
-        Label: 'Float',
+        Label: 'float',
       },
     },
     Units: '',
@@ -241,7 +241,6 @@ export const mockDataDictionaryWithAnnotations = {
   },
   iq: {
     Description: 'iq test score of the participant',
-    Units: '',
     Annotations: {
       IsAbout: {
         TermURL: 'nb:Assessment',
@@ -314,32 +313,32 @@ export const mockConfig = {
     same_as: undefined,
     formats: [
       {
-        termURL: 'FromFloat',
+        termURL: 'nb:FromFloat',
         label: 'float',
         examples: ['31.5'],
       },
       {
-        termURL: 'FromInt',
+        termURL: 'nb:FromInt',
         label: 'int',
         examples: ['31'],
       },
       {
-        termURL: 'FromEuro',
+        termURL: 'nb:FromEuro',
         label: 'euro',
         examples: ['31,5'],
       },
       {
-        termURL: 'FromBounded',
+        termURL: 'nb:FromBounded',
         label: 'bounded',
         examples: ['30+'],
       },
       {
-        termURL: 'FromRange',
+        termURL: 'nb:FromRange',
         label: 'range',
         examples: ['30-35'],
       },
       {
-        termURL: 'FromISO8601',
+        termURL: 'nb:FromISO8601',
         label: 'iso8601',
         examples: ['31Y6M'],
       },

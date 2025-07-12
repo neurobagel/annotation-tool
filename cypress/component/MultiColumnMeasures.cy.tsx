@@ -1,5 +1,6 @@
 import MultiColumnMeasures from '../../src/components/MultiColumnMeasures';
 import useDataStore from '../../src/stores/data';
+import { mockConfig } from '../../src/utils/mocks';
 
 describe('MultiColumnMeasures', () => {
   beforeEach(() => {
@@ -58,6 +59,7 @@ describe('MultiColumnMeasures', () => {
         },
       },
     });
+    useDataStore.setState({ config: mockConfig });
     cy.mount(<MultiColumnMeasures generateID={mockGenerateId} />);
   });
 

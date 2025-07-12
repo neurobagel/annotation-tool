@@ -1,4 +1,4 @@
-import { mockColumns, mockDataTable } from '~/utils/mocks';
+import { mockColumns, mockConfig, mockDataTable } from '~/utils/mocks';
 import ValueAnnotationTabs from '../../src/components/ValueAnnotationTabs';
 import useDataStore from '../../src/stores/data';
 
@@ -14,7 +14,10 @@ const props = {
 
 describe('ValueAnnotationTabs', () => {
   beforeEach(() => {
-    useDataStore.setState({ getTermOptions: () => [{ label: 'test', identifier: 'test' }] });
+    useDataStore.setState({
+      getTermOptions: () => [{ label: 'test', identifier: 'test' }],
+      config: mockConfig,
+    });
   });
   it('renders the component correctly', () => {
     cy.mount(
