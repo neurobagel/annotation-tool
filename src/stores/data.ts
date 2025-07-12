@@ -63,7 +63,7 @@ type DataStore = {
   getTermOptions: (standardizedVariable: StandardizedVariable) => StandardizedTerm[];
   getFormatOptions: (StandardizedVariable: StandardizedVariable) => TermFormat[];
   isMultiColumnMeasureStandardizedVariable: (
-    standardizedVariable: StandardizedVariable | null
+    standardizedVariable: StandardizedVariable | null | undefined
   ) => boolean;
 
   reset: () => void;
@@ -164,7 +164,11 @@ const useDataStore = create<DataStore>()(
             (configItem) => configItem.identifier === variable.identifier
           );
           // Filter out variables with null data_type e.g., Subject ID, Session ID
-          if (configEntry?.data_type !== null) {
+          // but keep multi column measures in
+          if (
+            configEntry?.data_type !== null ||
+            (configEntry?.data_type === null && configEntry?.is_multi_column_measure !== false)
+          ) {
             seenIdentifiers.add(variable.identifier);
             uniqueVariables.push(variable);
           }
@@ -182,7 +186,7 @@ const useDataStore = create<DataStore>()(
         const configEntry = Object.values(config).find(
           (item) => item.identifier === variable.identifier
         );
-        return configEntry?.is_multi_column_measurement === true;
+        return configEntry?.is_multi_column_measure === true;
       });
     },
 
@@ -585,7 +589,7 @@ const useDataStore = create<DataStore>()(
     },
 
     isMultiColumnMeasureStandardizedVariable: (
-      standardizedVariable: StandardizedVariable | null
+      standardizedVariable: StandardizedVariable | null | undefined
     ) => {
       if (!standardizedVariable) return false;
 
@@ -594,7 +598,7 @@ const useDataStore = create<DataStore>()(
         (item) => item.identifier === standardizedVariable.identifier
       );
 
-      return configEntry?.is_multi_column_measurement === true;
+      return configEntry?.is_multi_column_measure === true;
     },
 
     reset: () => set(initialState),

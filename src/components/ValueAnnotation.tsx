@@ -14,6 +14,7 @@ function ValueAnnotation() {
     updateColumnMissingValues,
     updateColumnFormat,
     updateColumnLevelTerm,
+    isMultiColumnMeasureStandardizedVariable,
   } = useDataStore();
   const [selectedColumnIds, setSelectedColumnIds] = useState<string[]>([]);
 
@@ -56,7 +57,9 @@ function ValueAnnotation() {
     const unknownDataTypeColumns = selectedColumnIds.filter(
       (id) =>
         filteredColumns[id].dataType !== 'Categorical' &&
-        filteredColumns[id].dataType !== 'Continuous'
+        filteredColumns[id].dataType !== 'Continuous' &&
+        // Treat multi column measure columns differently
+        !isMultiColumnMeasureStandardizedVariable(filteredColumns[id].standardizedVariable)
     );
 
     if (unknownDataTypeColumns.length !== 0) {

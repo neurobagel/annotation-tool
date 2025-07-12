@@ -43,15 +43,20 @@ function Continuous({
   onUpdateFormat,
 }: ContinuousProps) {
   const {
+    columns,
     getFormatOptions,
     isMultiColumnMeasureStandardizedVariable: isMultiMeasureColumnStandardizedVariable,
   } = useDataStore();
 
   // TODO: show examples for formats
 
-  // Remove/refactor the conditional logic once we decided how to handle the data type for multi column measure standardized variables
   const showFormat =
     standardizedVariable && !isMultiMeasureColumnStandardizedVariable(standardizedVariable);
+  // Don't show units when the variable is a multi column measure and its data type is null
+  const showUnits = !(
+    isMultiMeasureColumnStandardizedVariable(standardizedVariable) &&
+    columns[columnID].dataType === null
+  );
 
   return (
     <Paper elevation={3} className="h-full shadow-lg" data-cy={`${columnID}-continuous`}>
@@ -113,15 +118,17 @@ function Continuous({
         </div>
 
         <div className="w-2/5 p-4 space-y-4">
-          <DescriptionEditor
-            key={`${columnID}-units`}
-            label="Units"
-            columnID={columnID}
-            description={units}
-            onDescriptionChange={(id, newUnits) => {
-              onUpdateUnits(id, newUnits || '');
-            }}
-          />
+          {showUnits && (
+            <DescriptionEditor
+              key={`${columnID}-units`}
+              label="Units"
+              columnID={columnID}
+              description={units}
+              onDescriptionChange={(id, newUnits) => {
+                onUpdateUnits(id, newUnits || '');
+              }}
+            />
+          )}
 
           {showFormat && (
             <Autocomplete
