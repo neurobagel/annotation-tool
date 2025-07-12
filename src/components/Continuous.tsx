@@ -48,8 +48,6 @@ function Continuous({
     isMultiColumnMeasureStandardizedVariable: isMultiMeasureColumnStandardizedVariable,
   } = useDataStore();
 
-  // TODO: show examples for formats
-
   const showFormat =
     standardizedVariable && !isMultiMeasureColumnStandardizedVariable(standardizedVariable);
   // Don't show units when the variable is a multi column measure and its data type is null
@@ -135,6 +133,19 @@ function Continuous({
               data-cy={`${columnID}-format-dropdown`}
               options={getFormatOptions(standardizedVariable)}
               getOptionLabel={(option) => option.label}
+              renderOption={(props, option) => (
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                <li {...props}>
+                  <div>
+                    <div>{option.label}</div>
+                    {option.examples && (
+                      <div className="text-xs text-gray-500">
+                        Examples: {option.examples.join(', ')}
+                      </div>
+                    )}
+                  </div>
+                </li>
+              )}
               value={
                 getFormatOptions(standardizedVariable).find(
                   (opt) => opt.termURL === format?.termURL
