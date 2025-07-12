@@ -1,0 +1,13 @@
+[
+  {
+    "namespace_prefix": "snomed",
+    "namespace_url": "http://purl.bioontology.org/ontology/SNOMEDCT/",
+    "vocabulary_name": "Neurobagel vocabulary of Sex terms",
+    "version": "1.0.0",
+    "terms": [
+      { "name": "Male", "id": "248153007" },
+      { "name": "Female", "id": "248152002" },
+      { "name": "Other", "id": "32570681000036106" }
+    ]
+  }
+]

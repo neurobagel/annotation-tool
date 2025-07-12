@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import useDataStore from '../stores/data';
 import ConfigCard from './ConfigCard';
 import DataDictionaryPreview from './DataDictionaryPreview';
@@ -15,7 +14,6 @@ function Upload() {
   const configOptions = useDataStore((state) => state.configOptions);
   const selectedConfig = useDataStore((state) => state.selectedConfig);
   const setSelectedConfig = useDataStore((state) => state.setSelectedConfig);
-  const loadConfigOptions = useDataStore((state) => state.loadConfigOptions);
   const setUploadedDataTableFileName = useDataStore((state) => state.setUploadedDataTableFileName);
   const setUploadedDataDictionaryFileName = useDataStore(
     (state) => state.setUploadedDataDictionaryFileName
@@ -25,14 +23,6 @@ function Upload() {
   );
 
   const isDataTableEmpty = Object.keys(dataTable).length === 0;
-
-  // Load config options when component mounts
-  useEffect(() => {
-    const loadConfigs = async () => {
-      await loadConfigOptions();
-    };
-    loadConfigs();
-  }, [loadConfigOptions]);
 
   const handleFileUpload = (file: File) => {
     setUploadedDataTableFileName(file.name);

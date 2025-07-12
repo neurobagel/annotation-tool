@@ -11,7 +11,7 @@ import {
   StandardizedTerm,
   TermFormat,
 } from '../utils/types';
-import { fetchAvailableConfigNames, fetchConfig, mapConfigFileToStoreConfig } from '../utils/util';
+import { fetchAvailableConfigs, fetchConfig, mapConfigFileToStoreConfig } from '../utils/util';
 
 type DataStore = {
   dataTable: DataTable;
@@ -76,7 +76,6 @@ const initialState = {
   uploadedDataDictionary: {},
   uploadedDataDictionaryFileName: null,
   configOptions: [],
-  selectedConfig: 'Neurobagel',
   config: {},
 };
 
@@ -533,8 +532,8 @@ const useDataStore = create<DataStore>()(
 
     loadConfigOptions: async () => {
       try {
-        const dirNames = await fetchAvailableConfigNames();
-        set({ configOptions: dirNames });
+        const availableConfigs = await fetchAvailableConfigs();
+        set({ configOptions: availableConfigs });
       } catch (error) {
         // TODO: show a notif error
         set({ configOptions: [] });
@@ -548,6 +547,8 @@ const useDataStore = create<DataStore>()(
         set({ config: mappedConfig });
       } catch (error) {
         // TODO: show a notif error
+        // The fallback is already handled in fetchConfig, so if we get here,
+        // both remote and default config failed
       }
     },
 

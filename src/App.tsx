@@ -15,8 +15,18 @@ function App() {
   const currentView = useViewStore((state) => state.currentView);
   const setCurrentView = useViewStore((state) => state.setCurrentView);
   const hasMultiColumnMeasures = useDataStore((state) => state.hasMultiColumnMeasures());
+  const loadConfigOptions = useDataStore((state) => state.loadConfigOptions);
+  const setSelectedConfig = useDataStore((state) => state.setSelectedConfig);
 
   const { backView, nextView, backLabel, nextLabel, className } = getNavigationProps(currentView);
+
+  useEffect(() => {
+    const loadConfigs = async () => {
+      await loadConfigOptions();
+    };
+    loadConfigs();
+    setSelectedConfig('Neurobagel');
+  }, [loadConfigOptions, setSelectedConfig]);
 
   useEffect(() => {
     if (currentView === View.MultiColumnMeasures && !hasMultiColumnMeasures) {

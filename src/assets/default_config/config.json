@@ -12,7 +12,7 @@
         "terms_file": null,
         "formats": null,
         "required": true,
-        "description": null,
+        "description": "Unique participant identifier.",
         "is_multi_column_measure": false,
         "can_have_multiple_columns": false,
         "same_as": null
@@ -24,7 +24,7 @@
         "terms_file": null,
         "formats": null,
         "required": false,
-        "description": null,
+        "description": "Unique session identifier.",
         "is_multi_column_measure": false,
         "can_have_multiple_columns": false,
         "same_as": null
@@ -67,7 +67,7 @@
           }
         ],
         "required": false,
-        "description": null,
+        "description": "The age of the participant.",
         "is_multi_column_measure": false,
         "can_have_multiple_columns": false,
         "same_as": null
@@ -76,10 +76,10 @@
         "name": "Sex",
         "id": "Sex",
         "data_type": "Categorical",
-        "terms_file": "sexTerms.json",
+        "terms_file": "sex.json",
         "formats": null,
         "required": false,
-        "description": null,
+        "description": "The sex of the participant.",
         "is_multi_column_measure": false,
         "can_have_multiple_columns": false,
         "same_as": null
@@ -88,10 +88,10 @@
         "name": "Diagnosis",
         "id": "Diagnosis",
         "data_type": "Categorical",
-        "terms_file": "diagnosisTerms.json",
+        "terms_file": "diagnosis.json",
         "formats": null,
         "required": false,
-        "description": null,
+        "description": "Participant diagnosis information",
         "is_multi_column_measure": false,
         "can_have_multiple_columns": true,
         "same_as": null
@@ -100,10 +100,10 @@
         "name": "Assessment Tool",
         "id": "Assessment",
         "data_type": null,
-        "terms_file": "assessmentTerms.json",
+        "terms_file": "assessment.json",
         "formats": null,
         "required": false,
-        "description": null,
+        "description": "A cognitive or clinical rating scale, instrument, or assessment tool.",
         "is_multi_column_measure": true,
         "can_have_multiple_columns": true,
         "same_as": null

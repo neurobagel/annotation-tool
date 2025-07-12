@@ -17,7 +17,7 @@ import {
 
 // Utility functions for store
 
-export async function fetchAvailableConfigNames(): Promise<string[]> {
+export async function fetchAvailableConfigs(): Promise<string[]> {
   try {
     const response = await axios.get(
       'https://api.github.com/repos/neurobagel/communities/contents/'
@@ -27,52 +27,63 @@ export async function fetchAvailableConfigNames(): Promise<string[]> {
     return dirs.map((dir) => dir.name);
   } catch (error) {
     // TODO: show a notif error
-    return [];
+    // Return a default config option when remote fetching fails
+    return ['Neurobagel'];
   }
+}
+
+// Helper function to load config from a given path
+async function loadConfigFromPath(
+  configPath: string
+): Promise<{ config: ConfigFile; termsData: Record<string, VocabConfig[]> }> {
+  const configRes = await axios.get(configPath);
+  const configArray = configRes.data;
+  const config = configArray[0];
+
+  // Find all unique terms_file values in standardized_variables
+  const termFiles = new Set<string>();
+  const variables = config.standardized_variables;
+
+  variables.forEach((variable: ConfigFileStandardizedVariable) => {
+    if (variable.terms_file) {
+      termFiles.add(variable.terms_file);
+    }
+  });
+
+  // Load all term files
+  const termsData: Record<string, VocabConfig[]> = {};
+  const baseUrl = configPath.replace('/config.json', '');
+
+  await Promise.all(
+    Array.from(termFiles).map(async (file) => {
+      try {
+        const res = await axios.get(`${baseUrl}/${file}`);
+        termsData[file] = res.data;
+      } catch (e) {
+        // TODO: show notif error for remote
+        termsData[file] = [];
+      }
+    })
+  );
+
+  return { config, termsData };
 }
 
 export async function fetchConfig(
   selectedConfig: string
 ): Promise<{ config: ConfigFile; termsData: Record<string, VocabConfig[]> }> {
   try {
-    // 1. Fetch config.json
-    const configRes = await axios.get(
+    return await loadConfigFromPath(
       `https://raw.githubusercontent.com/neurobagel/communities/main/${selectedConfig}/config.json`
     );
-    const configArray = configRes.data;
-    if (!Array.isArray(configArray) || configArray.length === 0) {
-      throw new Error('Config file is not in expected format');
-    }
-    const config = configArray[0];
-
-    // 2. Find all unique terms_file values in standardized_variables
-    const termFiles = new Set<string>();
-    config.standardized_variables.forEach((variable: ConfigFileStandardizedVariable) => {
-      if (variable.terms_file) {
-        termFiles.add(variable.terms_file);
-      }
-    });
-
-    // 3. Fetch all term files
-    const termsData: Record<string, VocabConfig[]> = {};
-    await Promise.all(
-      Array.from(termFiles).map(async (file) => {
-        try {
-          const res = await axios.get(
-            `https://raw.githubusercontent.com/neurobagel/communities/main/${selectedConfig}/${file}`
-          );
-          termsData[file] = res.data;
-        } catch (e) {
-          // TODO: show notif error
-          termsData[file] = [];
-        }
-      })
-    );
-
-    return { config, termsData };
   } catch (error) {
     // TODO: show a notif error
-    return { config: {} as ConfigFile, termsData: {} };
+    // Fallback to default config when remote fetching fails
+    try {
+      return await loadConfigFromPath('/src/assets/default_config/config.json');
+    } catch (fallbackError) {
+      return { config: {} as ConfigFile, termsData: {} };
+    }
   }
 }
 
