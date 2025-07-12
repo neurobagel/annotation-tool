@@ -418,3 +418,208 @@ export const mockConfig = {
     ],
   },
 };
+
+// Test data for fetch functions
+export const mockGitHubResponse = [
+  { type: 'file', name: 'README.md' },
+  { type: 'dir', name: 'Neurobagel' },
+  { type: 'dir', name: 'OtherConfig' },
+  { type: 'file', name: 'config.json' },
+  { type: 'dir', name: 'TestConfig' },
+];
+
+export const mockConfigFile = {
+  vocabulary_name: 'Neurobagel Phenotypic Variables',
+  namespace_prefix: 'nb',
+  namespace_url: 'http://neurobagel.org/vocab/',
+  version: '1.0.0',
+  standardized_variables: [
+    {
+      name: 'Participant ID',
+      id: 'ParticipantID',
+      data_type: null as 'Categorical' | 'Continuous' | null,
+      terms_file: undefined,
+      formats: undefined,
+      required: true,
+      description: 'Unique participant identifier.',
+      is_multi_column_measure: false,
+      can_have_multiple_columns: false,
+      same_as: undefined,
+    },
+    {
+      name: 'Session ID',
+      id: 'SessionID',
+      data_type: null as 'Categorical' | 'Continuous' | null,
+      terms_file: undefined,
+      formats: undefined,
+      required: false,
+      description: 'Unique session identifier.',
+      is_multi_column_measure: false,
+      can_have_multiple_columns: false,
+      same_as: undefined,
+    },
+    {
+      name: 'Age',
+      id: 'Age',
+      data_type: 'Continuous' as 'Categorical' | 'Continuous' | null,
+      terms_file: undefined,
+      formats: [
+        {
+          id: 'FromFloat',
+          name: 'float',
+          examples: ['31.5'],
+        },
+        {
+          id: 'FromInt',
+          name: 'int',
+          examples: ['31'],
+        },
+        {
+          id: 'FromEuro',
+          name: 'euro',
+          examples: ['31,5'],
+        },
+        {
+          id: 'FromBounded',
+          name: 'bounded',
+          examples: ['30+'],
+        },
+        {
+          id: 'FromRange',
+          name: 'range',
+          examples: ['30-35'],
+        },
+        {
+          id: 'FromISO8601',
+          name: 'iso8601',
+          examples: ['31Y6M'],
+        },
+      ],
+      required: false,
+      description: 'The age of the participant.',
+      is_multi_column_measure: false,
+      can_have_multiple_columns: false,
+      same_as: undefined,
+    },
+    {
+      name: 'Sex',
+      id: 'Sex',
+      data_type: 'Categorical' as 'Categorical' | 'Continuous' | null,
+      terms_file: 'sex.json',
+      formats: undefined,
+      required: false,
+      description: 'The sex of the participant.',
+      is_multi_column_measure: false,
+      can_have_multiple_columns: false,
+      same_as: undefined,
+    },
+    {
+      name: 'Diagnosis',
+      id: 'Diagnosis',
+      data_type: 'Categorical' as 'Categorical' | 'Continuous' | null,
+      terms_file: 'diagnosis.json',
+      formats: undefined,
+      required: false,
+      description: 'Participant diagnosis information',
+      is_multi_column_measure: false,
+      can_have_multiple_columns: true,
+      same_as: undefined,
+    },
+    {
+      name: 'Assessment Tool',
+      id: 'Assessment',
+      data_type: null as 'Categorical' | 'Continuous' | null,
+      terms_file: 'assessment.json',
+      formats: undefined,
+      required: false,
+      description: 'A cognitive or clinical rating scale, instrument, or assessment tool.',
+      is_multi_column_measure: true,
+      can_have_multiple_columns: true,
+      same_as: undefined,
+    },
+  ],
+};
+
+export const mockTermsData = {
+  'sex.json': [
+    {
+      namespace_prefix: 'snomed',
+      namespace_url: 'http://snomed.info/sct/',
+      vocabulary_name: 'SNOMED CT',
+      version: '1.0.0',
+      terms: [
+        {
+          id: '248153007',
+          name: 'Male',
+        },
+        {
+          id: '248152002',
+          name: 'Female',
+        },
+        {
+          id: '32570681000036106',
+          name: 'Other',
+        },
+      ],
+    },
+  ],
+  'diagnosis.json': [
+    {
+      namespace_prefix: 'snomed',
+      namespace_url: 'http://snomed.info/sct/',
+      vocabulary_name: 'SNOMED CT',
+      version: '1.0.0',
+      terms: [
+        {
+          id: '1231282002',
+          name: 'Self-limited familial neonatal-infantile epilepsy',
+        },
+        {
+          id: '1237571004',
+          name: 'Self-limited familial infantile epilepsy',
+        },
+        {
+          id: '1259106002',
+          name: 'Alexander disease type I',
+        },
+      ],
+    },
+  ],
+  'assessment.json': [
+    {
+      namespace_prefix: 'snomed',
+      namespace_url: 'http://snomed.info/sct/',
+      vocabulary_name: 'SNOMED CT',
+      version: '1.0.0',
+      terms: [
+        {
+          id: '1303696008',
+          name: 'Robson Ten Group Classification System',
+        },
+        {
+          id: '1304062007',
+          name: 'Malnutrition Screening Tool',
+        },
+        {
+          id: '1332329009',
+          name: 'Interviewer led Chronic Respiratory Questionnaire',
+        },
+      ],
+    },
+  ],
+};
+
+export const mockDiagnosisTerms = [
+  {
+    namespace_prefix: 'snomed',
+    namespace_url: 'http://snomed.info/sct/',
+    vocabulary_name: 'SNOMED CT',
+    version: '1.0.0',
+    terms: [
+      {
+        id: '123456789',
+        name: 'Test Diagnosis',
+      },
+    ],
+  },
+];
