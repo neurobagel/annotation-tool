@@ -3,7 +3,7 @@ import fs from 'fs';
 import { produce } from 'immer';
 import path from 'path';
 import { beforeEach, describe, it, expect } from 'vitest';
-import { mockDataTable, mockInitialColumns, mockColumns } from '~/utils/mocks';
+import { mockDataTable, mockInitialColumns, mockColumns, mockConfig } from '~/utils/mocks';
 import { Columns } from '../utils/internal_types';
 import useDataStore from './data';
 
@@ -22,6 +22,8 @@ describe('data store actions', () => {
     await act(async () => {
       await result.current.processDataTableFile(dataTableFile);
     });
+
+    result.current.config = mockConfig;
   });
   it('processes a data table file with empty lines', async () => {
     const { result } = renderHook(() => useDataStore());
@@ -146,8 +148,8 @@ describe('data store actions', () => {
       identifier: 'nb:Assessment',
       label: 'Assessment Tool',
     });
-    expect(result.current.columns['1'].dataType).toEqual('Continuous');
-    expect(result.current.columns['1'].units).toBeDefined();
+    expect(result.current.columns['1'].dataType).toEqual(null);
+    expect(result.current.columns['1'].units).toBeUndefined();
     act(() => {
       result.current.updateColumnStandardizedVariable('1', {
         identifier: 'nb:Age',

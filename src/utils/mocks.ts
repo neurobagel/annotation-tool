@@ -43,7 +43,7 @@ export const mockColumns = {
     description: 'A participant ID',
     standardizedVariable: {
       identifier: 'nb:ParticipantID',
-      label: 'Subject ID',
+      label: 'Participant ID',
     },
     dataType: null as 'Categorical' | 'Continuous' | null,
   },
@@ -99,12 +99,11 @@ export const mockColumns = {
       identifier: 'nb:Assessment',
       label: 'Assessment Tool',
     },
-    dataType: 'Continuous' as 'Categorical' | 'Continuous' | null,
+    dataType: null as 'Categorical' | 'Continuous' | null,
     isPartOf: {
       termURL: 'snomed:273712001',
       label: 'Previous IQ assessment by pronunciation',
     },
-    units: '',
   },
 };
 
@@ -280,5 +279,142 @@ export const mockStandardizedVariables = {
   'Assessment Tool': {
     identifier: 'nb:Assessment',
     label: 'Assessment Tool',
+  },
+};
+
+export const mockConfig = {
+  'nb:ParticipantID': {
+    identifier: 'nb:ParticipantID',
+    label: 'Participant ID',
+    data_type: null as 'Categorical' | 'Continuous' | null,
+    required: true,
+    description: 'Unique participant identifier.',
+    is_multi_column_measure: false,
+    can_have_multiple_columns: false,
+    same_as: undefined,
+  },
+  'nb:SessionID': {
+    identifier: 'nb:SessionID',
+    label: 'Session ID',
+    data_type: null as 'Categorical' | 'Continuous' | null,
+    required: false,
+    description: 'Unique session identifier.',
+    is_multi_column_measure: false,
+    can_have_multiple_columns: false,
+    same_as: undefined,
+  },
+  'nb:Age': {
+    identifier: 'nb:Age',
+    label: 'Age',
+    data_type: 'Continuous' as 'Categorical' | 'Continuous' | null,
+    required: false,
+    description: 'The age of the participant.',
+    is_multi_column_measure: false,
+    can_have_multiple_columns: false,
+    same_as: undefined,
+    formats: [
+      {
+        termURL: 'FromFloat',
+        label: 'float',
+        examples: ['31.5'],
+      },
+      {
+        termURL: 'FromInt',
+        label: 'int',
+        examples: ['31'],
+      },
+      {
+        termURL: 'FromEuro',
+        label: 'euro',
+        examples: ['31,5'],
+      },
+      {
+        termURL: 'FromBounded',
+        label: 'bounded',
+        examples: ['30+'],
+      },
+      {
+        termURL: 'FromRange',
+        label: 'range',
+        examples: ['30-35'],
+      },
+      {
+        termURL: 'FromISO8601',
+        label: 'iso8601',
+        examples: ['31Y6M'],
+      },
+    ],
+  },
+  'nb:Sex': {
+    identifier: 'nb:Sex',
+    label: 'Sex',
+    data_type: 'Categorical' as 'Categorical' | 'Continuous' | null,
+    required: false,
+    description: 'The sex of the participant.',
+    is_multi_column_measure: false,
+    can_have_multiple_columns: false,
+    same_as: undefined,
+    terms: [
+      {
+        identifier: 'snomed:248153007',
+        label: 'Male',
+      },
+      {
+        identifier: 'snomed:248152002',
+        label: 'Female',
+      },
+      {
+        identifier: 'snomed:32570681000036106',
+        label: 'Other',
+      },
+    ],
+  },
+  'nb:Diagnosis': {
+    identifier: 'nb:Diagnosis',
+    label: 'Diagnosis',
+    data_type: 'Categorical' as 'Categorical' | 'Continuous' | null,
+    required: false,
+    description: 'Participant diagnosis information',
+    is_multi_column_measure: false,
+    can_have_multiple_columns: true,
+    same_as: undefined,
+    terms: [
+      {
+        identifier: 'snomed:1231282002',
+        label: 'Self-limited familial neonatal-infantile epilepsy',
+      },
+      {
+        identifier: 'snomed:1237571004',
+        label: 'Self-limited familial infantile epilepsy',
+      },
+      {
+        identifier: 'snomed:1259106002',
+        label: 'Alexander disease type I',
+      },
+    ],
+  },
+  'nb:Assessment': {
+    identifier: 'nb:Assessment',
+    label: 'Assessment Tool',
+    data_type: null as 'Categorical' | 'Continuous' | null,
+    required: false,
+    description: 'A cognitive or clinical rating scale, instrument, or assessment tool.',
+    is_multi_column_measure: true,
+    can_have_multiple_columns: true,
+    same_as: undefined,
+    terms: [
+      {
+        identifier: 'snomed:1303696008',
+        label: 'Robson Ten Group Classification System',
+      },
+      {
+        identifier: 'snomed:1304062007',
+        label: 'Malnutrition Screening Tool',
+      },
+      {
+        identifier: 'snomed:1332329009',
+        label: 'Interviewer led Chronic Respiratory Questionnaire',
+      },
+    ],
   },
 };
