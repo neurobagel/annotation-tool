@@ -36,8 +36,8 @@ export async function fetchAvailableConfigs(): Promise<string[]> {
 async function loadConfigFromPath(
   configPath: string
 ): Promise<{ config: ConfigFile; termsData: Record<string, VocabConfig[]> }> {
-  const configRes = await axios.get(configPath);
-  const configArray = configRes.data;
+  const configResponse = await axios.get(configPath);
+  const configArray = configResponse.data;
   const config = configArray[0];
 
   // Find all unique terms_file values in standardized_variables
