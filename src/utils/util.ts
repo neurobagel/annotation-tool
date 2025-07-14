@@ -157,13 +157,14 @@ export function mapConfigFileToStoreConfig(
 
 /*
  Simple deterministic ID generator
- so we can reliably prouduce consistent UUIDs for testing.
+ Always use a fixed seed (e.g., 0) for deterministic results in tests and production.
 */
-export function deterministicIdGenerator() {
-  let counter = 0;
+export function deterministicIdGenerator(seed = 0) {
+  let counter = seed;
   return () => {
+    const id = `deterministic-id-${counter}`;
     counter += 1;
-    return `${counter}`;
+    return id;
   };
 }
 

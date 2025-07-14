@@ -390,6 +390,7 @@ export const mockConfig = {
         identifier: 'snomed:1259106002',
         label: 'Alexander disease type I',
       },
+      // TODO: Remove once we have healthy control workflow
       {
         identifier: 'ncit:C94342',
         label: 'Healthy Control',

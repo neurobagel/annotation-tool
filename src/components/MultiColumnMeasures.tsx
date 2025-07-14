@@ -34,11 +34,11 @@ interface VariableState {
 }
 
 const defaultProps = {
-  generateID: deterministicIdGenerator(),
+  generateID: deterministicIdGenerator(0),
 };
 
 function MultiColumnMeasures({
-  generateID = deterministicIdGenerator(),
+  generateID = deterministicIdGenerator(0),
 }: MultiColumnMeasuresProps) {
   const theme = useTheme();
   const columns = useDataStore((state) => state.columns);
