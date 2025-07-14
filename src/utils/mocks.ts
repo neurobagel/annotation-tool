@@ -390,6 +390,10 @@ export const mockConfig = {
         identifier: 'snomed:1259106002',
         label: 'Alexander disease type I',
       },
+      {
+        identifier: 'ncit:C94342',
+        label: 'Healthy Control',
+      },
     ],
   },
   'nb:Assessment': {

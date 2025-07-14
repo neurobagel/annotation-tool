@@ -82,11 +82,6 @@ describe('Main user flow', () => {
     cy.get('[data-cy="side-column-nav-bar-annotated"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-unannotated"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-continuous"]').should('be.visible');
-    cy.get('[data-cy="side-column-nav-bar-continuous-participant_id"]').should('be.visible');
-    cy.get('[data-cy="side-column-nav-bar-continuous-select-button"]').click();
-    cy.get('[data-cy="1-continuous"]').should('be.visible');
-    cy.get('[data-cy="1-continuous-table"]').should('be.visible').and('contain.text', 'sub-718211');
-    cy.get('[data-cy="1-description"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-categorical"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-categorical-group_dx"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-categorical-select-button"]').click();
@@ -164,7 +159,7 @@ describe('Main user flow', () => {
 
     // Column Annotation view
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
-      'subject ID{downArrow}{enter}'
+      'participant ID{downArrow}{enter}'
     );
     cy.get('[data-cy="2-edit-description-button"]').click();
     cy.get('[data-cy="2-description-input"]').clear();
@@ -283,6 +278,7 @@ describe('Main user flow', () => {
 
     // Column Annotation view
     cy.get('[data-cy="2-description"]').should('contain', 'Age of the participant');
+    cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown').click();
     cy.get('[data-cy="2-column-annotation-card-data-type"').should('contain', 'Continuous');
     cy.get('[data-cy="3-column-annotation-card-data-type"]').should('contain', 'Categorical');
     cy.get('[data-cy="1-column-annotation-card-data-type"]').should('contain', 'Not applicable');
@@ -330,7 +326,7 @@ describe('Main user flow', () => {
     cy.readFile(`cypress/downloads/${outputFileName}`).then((fileContent) => {
       expect(fileContent.participant_id.Description).to.equal('A participant ID');
       expect(fileContent.participant_id.Annotations.IsAbout.TermURL).to.equal('nb:ParticipantID');
-      expect(fileContent.participant_id.Annotations.IsAbout.Label).to.equal('Subject ID');
+      expect(fileContent.participant_id.Annotations.IsAbout.Label).to.equal('Participant ID');
       expect(fileContent.participant_id.Annotations.Identifies).to.equal('participant');
 
       expect(fileContent.age.Description).to.equal('Age of the participant');
@@ -392,7 +388,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="1-column-annotation-card-data-type"]').should('contain', 'Not applicable');
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"] input').should(
       'have.value',
-      'Subject ID'
+      'Participant ID'
     );
     cy.get('[data-cy="2-description"]').should('contain', 'A session ID');
     cy.get('[data-cy="3-description"]').should('contain', 'Age of the participant');

@@ -1,6 +1,4 @@
 import axios from 'axios';
-import seedrandom from 'seedrandom';
-import { v4 as uuidv4 } from 'uuid';
 import {
   ConfigFile,
   VocabConfig,
@@ -26,7 +24,7 @@ export async function fetchAvailableConfigs(): Promise<string[]> {
     );
     const data = response.data as { type: string; name: string }[];
     const dirs = data.filter((item) => item.type === 'dir');
-    return dirs.map((dir) => dir.name);
+    return dirs.map((dir) => dir.name).sort();
   } catch (error) {
     // TODO: show a notif error
     // Return a default config option when remote fetching fails
@@ -121,6 +119,10 @@ export function mapConfigFileToStoreConfig(
               ...restTermFields,
             });
           });
+          // TODO: Remove this once we have a workflow for handling Healthy control
+          if (termsFile.includes('diagnosis')) {
+            allTerms.push({ label: 'Healthy Control', identifier: 'ncit:C94342' });
+          }
         }
       });
       terms = allTerms;
@@ -154,19 +156,14 @@ export function mapConfigFileToStoreConfig(
 // Utility functions for MultiColumnMeasures component
 
 /*
-Generate a UUID using a seeded random number generator
-so we can reliably prouduce consistent UUIDs for testing.
+ Simple deterministic ID generator
+ so we can reliably prouduce consistent UUIDs for testing.
 */
-
-export function createSeededUuidGenerator(seed: string) {
-  const rng = seedrandom(seed);
-  const buffer = new Uint8Array(16);
-
+export function deterministicIdGenerator() {
+  let counter = 0;
   return () => {
-    for (let i = 0; i < 16; i += 1) {
-      buffer[i] = Math.floor(rng.quick() * 256);
-    }
-    return uuidv4({ rng: () => buffer });
+    counter += 1;
+    return `${counter}`;
   };
 }
 
@@ -245,13 +242,4 @@ export function getColumnOptions(
       label: column.header,
       disabled: allMappedColumns.includes(id),
     }));
-}
-
-// Simple deterministic ID generator
-export function createDeterministicIdGenerator() {
-  let counter = 0;
-  return () => {
-    counter += 1;
-    return `${counter}`;
-  };
 }

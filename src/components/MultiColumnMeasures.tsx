@@ -20,7 +20,7 @@ import {
   getColumnOptions,
   getAllMappedColumns,
   getAssignedTermIdentifiers,
-  createDeterministicIdGenerator,
+  deterministicIdGenerator,
 } from '../utils/util';
 import MultiColumnMeasuresCard from './MultiColumnMeasuresCard';
 
@@ -34,11 +34,11 @@ interface VariableState {
 }
 
 const defaultProps = {
-  generateID: createDeterministicIdGenerator(),
+  generateID: deterministicIdGenerator(),
 };
 
 function MultiColumnMeasures({
-  generateID = createDeterministicIdGenerator(),
+  generateID = deterministicIdGenerator(),
 }: MultiColumnMeasuresProps) {
   const theme = useTheme();
   const columns = useDataStore((state) => state.columns);

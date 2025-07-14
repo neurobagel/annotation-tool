@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import useDataStore from '../stores/data';
 import ConfigCard from './ConfigCard';
 import DataDictionaryPreview from './DataDictionaryPreview';
@@ -11,6 +12,7 @@ function Upload() {
   const columns = useDataStore((state) => state.columns);
   const dataDictionary = useDataStore((state) => state.uploadedDataDictionary);
   const uploadedDataTableFileName = useDataStore((state) => state.uploadedDataTableFileName);
+  const loadConfigOptions = useDataStore((state) => state.loadConfigOptions);
   const configOptions = useDataStore((state) => state.configOptions);
   const selectedConfig = useDataStore((state) => state.selectedConfig);
   const setSelectedConfig = useDataStore((state) => state.setSelectedConfig);
@@ -33,6 +35,14 @@ function Upload() {
     processDataDictionaryFile(file);
     setUploadedDataDictionaryFileName(file.name);
   };
+
+  useEffect(() => {
+    const loadConfigs = async () => {
+      await loadConfigOptions();
+    };
+    loadConfigs();
+    setSelectedConfig('Neurobagel');
+  }, [loadConfigOptions, setSelectedConfig]);
 
   return (
     <div className="flex flex-col items-center gap-8">
