@@ -30,6 +30,13 @@ jobs:
           start: npm run preview
           component: false
 
+      - name: Upload Cypress screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots/
+
       - name: Upload e2e coverage artifact
         uses: actions/upload-artifact@v4
         with:
