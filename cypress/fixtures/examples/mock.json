@@ -18,7 +18,7 @@
       },
       "Format": {
         "TermURL": "nb:FromFloat",
-        "Label": "Float"
+        "Label": "float"
       }
     }
   },

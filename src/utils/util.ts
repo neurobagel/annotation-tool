@@ -132,7 +132,7 @@ export function mapConfigFileToStoreConfig(
       formats = (rawFormats as ConfigFileTermFormat[]).map((format) => {
         const { id: formatId, name: formatName, ...restFormatFields } = format;
         return {
-          termURL: formatId,
+          termURL: `${namespacePrefix}:${formatId}`,
           label: formatName,
           ...restFormatFields,
         };

@@ -279,12 +279,12 @@ describe('mapConfigFileToStoreConfig', () => {
         same_as: undefined,
         formats: [
           {
-            termURL: 'FromFloat',
+            termURL: 'nb:FromFloat',
             label: 'float',
             examples: ['31.5'],
           },
           {
-            termURL: 'FromInt',
+            termURL: 'nb:FromInt',
             label: 'int',
             examples: ['31'],
           },
