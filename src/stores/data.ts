@@ -13,12 +13,6 @@ import {
 } from '../utils/internal_types';
 import { fetchAvailableConfigs, fetchConfig, mapConfigFileToStoreConfig } from '../utils/util';
 
-const multiColumnVariablesCache: {
-  columns?: Columns;
-  config?: Config;
-  result: StandardizedVariable[];
-} = { columns: undefined, config: undefined, result: [] };
-
 type DataStore = {
   dataTable: DataTable;
   columns: Columns;
@@ -185,31 +179,15 @@ const useDataStore = create<DataStore>()(
     },
 
     getMappedMultiColumnMeasureStandardizedVariables: () => {
-      const { columns, config } = get();
-      if (
-        multiColumnVariablesCache.columns === columns &&
-        multiColumnVariablesCache.config === config
-      ) {
-        return multiColumnVariablesCache.result;
-      }
-      const seenIdentifiers = new Set<string>();
-      const uniqueVariables: StandardizedVariable[] = [];
-      Object.values(columns).forEach((column) => {
-        const variable = column.standardizedVariable;
-        if (variable && !seenIdentifiers.has(variable.identifier)) {
-          const configEntry = Object.values(config).find(
-            (configItem) => configItem.identifier === variable.identifier
-          );
-          if (configEntry?.is_multi_column_measure === true) {
-            seenIdentifiers.add(variable.identifier);
-            uniqueVariables.push(variable);
-          }
-        }
+      const allMappedVariables = get().getMappedStandardizedVariables();
+      const { config } = get();
+
+      return allMappedVariables.filter((variable) => {
+        const configEntry = Object.values(config).find(
+          (item) => item.identifier === variable.identifier
+        );
+        return configEntry?.is_multi_column_measure === true;
       });
-      multiColumnVariablesCache.columns = columns;
-      multiColumnVariablesCache.config = config;
-      multiColumnVariablesCache.result = uniqueVariables;
-      return uniqueVariables;
     },
 
     updateColumnDescription: (columnID: string, description: string | null) => {
