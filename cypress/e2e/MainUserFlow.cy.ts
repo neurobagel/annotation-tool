@@ -190,16 +190,16 @@ describe('Main user flow', () => {
       cy.log($body.html());
     });
     cy.screenshot('before-multi-column-measures-card');
-    cy.get('[data-cy="multi-column-measures-card-deterministic-id-1"]').should('be.visible');
+    cy.get('[data-cy="multi-column-measures-card-0"]').should('be.visible');
     cy.get('[data-cy="multi-column-measures"]').should('contain.text', 'No columns assigned');
-    cy.get('[data-cy="multi-column-measures-card-deterministic-id-1-title-dropdown"]').type(
+    cy.get('[data-cy="multi-column-measures-card-0-title-dropdown"]').type(
       'Previous IQ assessment{downArrow}{enter}'
     );
-    cy.get('[data-cy="multi-column-measures-card-deterministic-id-1-header"]').should(
+    cy.get('[data-cy="multi-column-measures-card-0-header"]').should(
       'contain.text',
       'Previous IQ assessment by pronunciation'
     );
-    cy.get('[data-cy="multi-column-measures-card-deterministic-id-1-columns-dropdown"]').type(
+    cy.get('[data-cy="multi-column-measures-card-0-columns-dropdown"]').type(
       'iq{downArrow}{enter}'
     );
     cy.get('[data-cy="mapped-column-5').should('be.visible').and('contain', 'iq');
@@ -292,8 +292,8 @@ describe('Main user flow', () => {
     cy.get('[data-cy="next-button"]').click();
 
     // Multi-Column Measures view
-    cy.get('[data-cy="multi-column-measures-card-deterministic-id-1"]').should('be.visible');
-    cy.get('[data-cy="multi-column-measures-card-deterministic-id-1-header"]').should(
+    cy.get('[data-cy="multi-column-measures-card-0"]').should('be.visible');
+    cy.get('[data-cy="multi-column-measures-card-0-header"]').should(
       'contain.text',
       'Previous IQ assessment by pronunciation'
     );
@@ -442,32 +442,29 @@ describe('Main user flow', () => {
       cy.log($body.html());
     });
     cy.screenshot('before-multi-column-measures-card-legacy');
-    cy.get('[data-cy="multi-column-measures-card-deterministic-id-2"]').should('be.visible');
+    cy.get('[data-cy="multi-column-measures-card-0"]').should('be.visible');
 
     cy.get('[data-cy="multi-column-measures"]').should('contain.text', '3 columns assigned');
 
-    cy.get('[data-cy="multi-column-measures-card-deterministic-id-2"]').should('be.visible');
+    cy.get('[data-cy="multi-column-measures-card-0"]').should('be.visible');
     cy.get('[data-cy="mapped-column-6"]').should('be.visible').and('contain', 'tool1_item1');
     cy.get('[data-cy="mapped-column-7"]').should('be.visible').and('contain', 'tool1_item2');
-    cy.get('[data-cy="multi-column-measures-card-deterministic-id-2-header"]').should(
+    cy.get('[data-cy="multi-column-measures-card-0-header"]').should(
       'contain.text',
       'Montreal cognitive assessment'
     );
 
-    cy.get('[data-cy="multi-column-measures-card-deterministic-id-2"]')
+    cy.get('[data-cy="multi-column-measures-card-0"]')
       .should('contain.text', 'tool1_item1')
       .and('contain.text', 'tool1_item2');
 
-    cy.get('[data-cy="multi-column-measures-card-deterministic-id-3"]').should('be.visible');
+    cy.get('[data-cy="multi-column-measures-card-1"]').should('be.visible');
     cy.get('[data-cy="mapped-column-8"]').should('be.visible').and('contain', 'tool2_item1');
-    cy.get('[data-cy="multi-column-measures-card-deterministic-id-3-header"]').should(
+    cy.get('[data-cy="multi-column-measures-card-1-header"]').should(
       'contain.text',
       'Unified Parkinsons disease rating scale'
     );
-    cy.get('[data-cy="multi-column-measures-card-deterministic-id-3"]').should(
-      'contain.text',
-      'tool2_item1'
-    );
+    cy.get('[data-cy="multi-column-measures-card-1"]').should('contain.text', 'tool2_item1');
 
     cy.get('[data-cy="next-button"]').click();
 

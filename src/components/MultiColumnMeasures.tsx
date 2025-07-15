@@ -346,10 +346,11 @@ function MultiColumnMeasures({
 
           <div className="flex flex-col items-center">
             <div className="w-full flex flex-col gap-4 mb-4">
-              {paginatedItems.map((card) => (
+              {paginatedItems.map((card, index) => (
                 <MultiColumnMeasuresCard
                   key={card.id}
                   card={card}
+                  cardIndex={index}
                   mappedColumnHeaders={Object.fromEntries(
                     card.mappedColumns.map((id) => [id, columns[id]?.header || `Column ${id}`])
                   )}

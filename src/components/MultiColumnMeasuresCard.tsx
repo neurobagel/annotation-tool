@@ -14,6 +14,7 @@ import { MultiColumnMeasuresTerm, MultiColumnMeasuresTermCard } from '../utils/i
 
 interface TermCardProps {
   card: MultiColumnMeasuresTermCard;
+  cardIndex: number;
   mappedColumnHeaders: { [columnId: string]: string };
   availableTerms: MultiColumnMeasuresTerm[];
   columnOptions: Array<{ id: string; label: string; disabled: boolean }>;
@@ -25,6 +26,7 @@ interface TermCardProps {
 
 function MultiColumnMeasuresCard({
   card,
+  cardIndex,
   mappedColumnHeaders,
   availableTerms,
   columnOptions,
@@ -37,10 +39,10 @@ function MultiColumnMeasuresCard({
     <Card
       elevation={3}
       className="w-full shadow-lg"
-      data-cy={`multi-column-measures-card-${card.id}`}
+      data-cy={`multi-column-measures-card-${cardIndex}`}
     >
       <CardHeader
-        data-cy={`multi-column-measures-card-${card.id}-header`}
+        data-cy={`multi-column-measures-card-${cardIndex}-header`}
         title={
           card.term ? (
             <Typography variant="h6" className="font-bold">
@@ -48,7 +50,7 @@ function MultiColumnMeasuresCard({
             </Typography>
           ) : (
             <Autocomplete
-              data-cy={`multi-column-measures-card-${card.id}-title-dropdown`}
+              data-cy={`multi-column-measures-card-${cardIndex}-title-dropdown`}
               options={availableTerms}
               getOptionLabel={(option: MultiColumnMeasuresTerm) => option.label}
               getOptionDisabled={(option) => option.disabled || false}
@@ -67,7 +69,7 @@ function MultiColumnMeasuresCard({
           )
         }
         action={
-          <IconButton onClick={onRemoveCard} data-cy={`remove-card-${card.id}-button`}>
+          <IconButton onClick={onRemoveCard} data-cy={`remove-card-${cardIndex}-button`}>
             <CancelIcon color="error" />
           </IconButton>
         }
@@ -79,7 +81,7 @@ function MultiColumnMeasuresCard({
           <CardContent>
             <div className="mt-4">
               <Autocomplete
-                data-cy={`multi-column-measures-card-${card.id}-columns-dropdown`}
+                data-cy={`multi-column-measures-card-${cardIndex}-columns-dropdown`}
                 options={columnOptions}
                 getOptionLabel={(option) => option.label}
                 getOptionDisabled={(option) => option.disabled || false}
