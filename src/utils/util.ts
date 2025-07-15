@@ -155,19 +155,6 @@ export function mapConfigFileToStoreConfig(
 
 // Utility functions for MultiColumnMeasures component
 
-/*
- Simple deterministic ID generator
- Always use a fixed seed (e.g., 0) for deterministic results in tests and production.
-*/
-export function deterministicIdGenerator(seed = 0) {
-  let counter = seed;
-  return () => {
-    const id = `deterministic-id-${counter}`;
-    counter += 1;
-    return id;
-  };
-}
-
 // Initialize term cards based on existing isPartOf relationships
 export function initializeTermCards({
   columns,

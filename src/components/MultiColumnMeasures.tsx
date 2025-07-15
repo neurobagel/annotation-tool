@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { usePagination } from '../hooks';
 import useDataStore from '../stores/data';
 import { MultiColumnMeasuresTerm, MultiColumnMeasuresTermCard } from '../utils/internal_types';
@@ -20,26 +21,15 @@ import {
   getColumnOptions,
   getAllMappedColumns,
   getAssignedTermIdentifiers,
-  deterministicIdGenerator,
 } from '../utils/util';
 import MultiColumnMeasuresCard from './MultiColumnMeasuresCard';
-
-interface MultiColumnMeasuresProps {
-  generateID?: () => string;
-}
 
 interface VariableState {
   terms: MultiColumnMeasuresTerm[];
   termCards: MultiColumnMeasuresTermCard[];
 }
 
-const defaultProps = {
-  generateID: deterministicIdGenerator(0),
-};
-
-function MultiColumnMeasures({
-  generateID = deterministicIdGenerator(0),
-}: MultiColumnMeasuresProps) {
+function MultiColumnMeasures() {
   const theme = useTheme();
   const columns = useDataStore((state) => state.columns);
   const updateColumnIsPartOf = useDataStore((state) => state.updateColumnIsPartOf);
@@ -108,7 +98,7 @@ function MultiColumnMeasures({
           columns,
           terms,
           variableColumns,
-          generateID,
+          generateID: uuidv4,
         });
         newStates[variable.identifier] = { terms, termCards };
       });
@@ -122,7 +112,6 @@ function MultiColumnMeasures({
     columns,
     getTermOptions,
     getStandardizedVariableColumns,
-    generateID,
     variableStates,
   ]);
 
@@ -143,7 +132,7 @@ function MultiColumnMeasures({
     if (!activeVariableTab) return;
 
     const newCard: MultiColumnMeasuresTermCard = {
-      id: generateID(),
+      id: uuidv4(),
       term: null,
       mappedColumns: [],
     };
@@ -171,7 +160,6 @@ function MultiColumnMeasures({
   }, [
     activeVariableTab,
     currentTermCards.length,
-    generateID,
     handlePaginationChange,
     itemsPerPage,
     totalPages,
@@ -284,9 +272,7 @@ function MultiColumnMeasures({
           [activeVariableTab.identifier]: {
             terms: prev[activeVariableTab.identifier]?.terms || [],
             termCards:
-              newCards.length === 0
-                ? [{ id: generateID(), term: null, mappedColumns: [] }]
-                : newCards,
+              newCards.length === 0 ? [{ id: uuidv4(), term: null, mappedColumns: [] }] : newCards,
           },
         };
       });
@@ -304,7 +290,6 @@ function MultiColumnMeasures({
       activeVariableTab,
       currentTermCards,
       currentPage,
-      generateID,
       handlePaginationChange,
       itemsPerPage,
       updateColumnIsPartOf,
@@ -416,5 +401,4 @@ function MultiColumnMeasures({
   );
 }
 
-MultiColumnMeasures.defaultProps = defaultProps;
 export default MultiColumnMeasures;

@@ -4,14 +4,6 @@ import { mockConfig } from '../../src/utils/mocks';
 
 describe('MultiColumnMeasures', () => {
   beforeEach(() => {
-    // Mock the generateID function to return a predictable value for testing
-    let counter = 0;
-    const mockGenerateId = () => {
-      const currentCount = counter;
-      counter += 1;
-      return `mock-uuid-${currentCount}`;
-    };
-
     const updateColumnIsPartOfSpy = cy.spy().as('updateColumnIsPartOfSpy');
     const getTermOptionsSpy = cy.stub().returns([
       {
@@ -60,7 +52,7 @@ describe('MultiColumnMeasures', () => {
       },
     });
     useDataStore.setState({ config: mockConfig });
-    cy.mount(<MultiColumnMeasures generateID={mockGenerateId} />);
+    cy.mount(<MultiColumnMeasures />);
   });
 
   it('renders the component correctly', () => {
