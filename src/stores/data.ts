@@ -566,7 +566,7 @@ const useDataStore = create<DataStore>()(
       }
     },
 
-    getTermOptions: async (standardizedVariable: StandardizedVariable) => {
+    getTermOptions: (standardizedVariable: StandardizedVariable) => {
       const { config } = get();
       const matchingConfigEntry = Object.values(config).find(
         (configEntry) => configEntry.identifier === standardizedVariable.identifier
