@@ -13,7 +13,7 @@ describe('MultiColumnMeasures', () => {
     };
 
     const updateColumnIsPartOfSpy = cy.spy().as('updateColumnIsPartOfSpy');
-    const getTermOptionsSpy = cy.stub().resolves([
+    const getTermOptionsSpy = cy.stub().returns([
       {
         identifier: 'someIdentifier',
         label: 'some term',
