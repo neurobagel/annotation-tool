@@ -92,60 +92,31 @@ function MultiColumnMeasures({
 
   const variableAllMappedColumns = getAllMappedColumns(currentTermCards);
 
-  const loadTermsAndInitializeCards = useCallback(async () => {
+  const loadTermsAndInitializeCards = useCallback(() => {
     if (multiColumnVariables.length === 0) {
       setLoading(false);
       return;
     }
 
-    try {
-      const variablePromises = multiColumnVariables
-        .filter((variable) => !variableStates[variable.identifier])
-        .map(async (variable) => {
-          try {
-            const terms = await getTermOptions(variable);
-            const variableColumns = getStandardizedVariableColumns(variable);
-            const termCards = initializeTermCards({
-              columns,
-              terms,
-              variableColumns,
-              generateID,
-            });
-
-            return {
-              identifier: variable.identifier,
-              state: { terms, termCards },
-            };
-          } catch (error) {
-            // show a notif error
-            return {
-              identifier: variable.identifier,
-              state: {
-                terms: [],
-                termCards: [{ id: generateID(), term: null, mappedColumns: [] }],
-              },
-            };
-          }
+    const newStates: Record<string, VariableState> = {};
+    multiColumnVariables
+      .filter((variable) => !variableStates[variable.identifier])
+      .forEach((variable) => {
+        const terms = getTermOptions(variable);
+        const variableColumns = getStandardizedVariableColumns(variable);
+        const termCards = initializeTermCards({
+          columns,
+          terms,
+          variableColumns,
+          generateID,
         });
+        newStates[variable.identifier] = { terms, termCards };
+      });
 
-      const results = await Promise.all(variablePromises);
-
-      const newStates = results.reduce(
-        (acc, { identifier, state }) => ({
-          ...acc,
-          [identifier]: state,
-        }),
-        {}
-      );
-
-      if (Object.keys(newStates).length > 0) {
-        setVariableStates((prev) => ({ ...prev, ...newStates }));
-      }
-    } catch (error) {
-      // show a notif error
-    } finally {
-      setLoading(false);
+    if (Object.keys(newStates).length > 0) {
+      setVariableStates((prev) => ({ ...prev, ...newStates }));
     }
+    setLoading(false);
   }, [
     multiColumnVariables,
     columns,
