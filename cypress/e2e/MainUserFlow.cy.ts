@@ -186,10 +186,6 @@ describe('Main user flow', () => {
     cy.get('[data-cy="Column Annotation-step"]').within(() => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
     });
-    cy.get('body').then(($body) => {
-      cy.log($body.html());
-    });
-    cy.screenshot('before-multi-column-measures-card');
     cy.get('[data-cy="multi-column-measures-card-0"]').should('be.visible');
     cy.get('[data-cy="multi-column-measures"]').should('contain.text', 'No columns assigned');
     cy.get('[data-cy="multi-column-measures-card-0-title-dropdown"]').type(
@@ -438,10 +434,6 @@ describe('Main user flow', () => {
     cy.get('[data-cy="next-button"]').click();
 
     // Multi-Column Measures view
-    cy.get('body').then(($body) => {
-      cy.log($body.html());
-    });
-    cy.screenshot('before-multi-column-measures-card-legacy');
     cy.get('[data-cy="multi-column-measures-card-0"]').should('be.visible');
 
     cy.get('[data-cy="multi-column-measures"]').should('contain.text', '3 columns assigned');
