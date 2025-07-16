@@ -8,7 +8,7 @@ const props = {
   handleDrop: () => {},
   handleDragOver: () => {},
   handleFileUpload: () => {},
-  fileInputRef: React.createRef<HTMLInputElement>(),
+  fileInputRef: React.createRef<HTMLInputElement | null>(),
   allowedFileType: '.csv',
 };
 

@@ -28,7 +28,7 @@ function FileUploader({
   handleDrop: (event: React.DragEvent<HTMLDivElement>) => void;
   handleDragOver: (event: React.DragEvent<HTMLDivElement>) => void;
   handleFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  fileInputRef: React.RefObject<HTMLInputElement>;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
   allowedFileType: string;
   disabled?: boolean;
   tooltipContent?: string;
@@ -89,7 +89,7 @@ function FileUploader({
           hidden
           accept={allowedFileType}
           onChange={handleFileUpload}
-          ref={fileInputRef}
+          ref={fileInputRef as React.Ref<HTMLInputElement>}
           disabled={disabled}
         />
       </Card>
