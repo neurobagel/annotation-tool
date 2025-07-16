@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { steps } from '../utils/constants';
 import { View } from '../utils/internal_types';
-import useDataStore from './data';
 
 type NavigationProps = {
   backView: View | undefined;
@@ -24,21 +23,22 @@ const useViewStore = create<ViewStore>()(
   }))
 );
 
-export const getNavigationProps = (currentView: View): NavigationProps => {
-  const hasMultiColumnMeasures = useDataStore.getState().hasMultiColumnMeasures();
-
+export const getNavigationProps = (
+  currentView: View,
+  showMultiColumnMeasures: boolean
+): NavigationProps => {
   const navigationFlow = [
     View.Landing,
     View.Upload,
     View.ColumnAnnotation,
-    ...(hasMultiColumnMeasures ? [View.MultiColumnMeasures] : []),
+    ...(showMultiColumnMeasures ? [View.MultiColumnMeasures] : []),
     View.ValueAnnotation,
     View.Download,
   ];
 
   const currentIndex = navigationFlow.indexOf(currentView);
 
-  if (currentView === View.ColumnAnnotation && hasMultiColumnMeasures) {
+  if (currentView === View.ColumnAnnotation && showMultiColumnMeasures) {
     return {
       backView: View.Upload,
       nextView: View.MultiColumnMeasures,
@@ -48,7 +48,7 @@ export const getNavigationProps = (currentView: View): NavigationProps => {
     };
   }
 
-  if (currentView === View.ValueAnnotation && hasMultiColumnMeasures) {
+  if (currentView === View.ValueAnnotation && showMultiColumnMeasures) {
     return {
       backView: View.MultiColumnMeasures,
       nextView: View.Download,

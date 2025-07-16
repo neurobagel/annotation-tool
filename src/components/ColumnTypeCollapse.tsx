@@ -41,9 +41,8 @@ function ColumnTypeCollapse({
 }: ColumnTypeCollapseProps) {
   const [showColumns, setShowColumns] = useState<boolean>(true);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
-  const columnIsMultiColumnMeasure = useDataStore
-    .getState()
-    .isMultiColumnMeasureStandardizedVariable(standardizedVariable);
+  const { isMultiColumnMeasureStandardizedVariable } = useDataStore();
+  const columnIsMultiColumnMeasure = isMultiColumnMeasureStandardizedVariable(standardizedVariable);
 
   let columnsToDisplay;
   // TODO: find a better name for the below variable

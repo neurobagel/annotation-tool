@@ -14,7 +14,8 @@ interface SideColumnNavBarProps {
 }
 
 function SideColumnNavBar({ columns, onSelect, selectedColumnId }: SideColumnNavBarProps) {
-  const mappedStandardizedVariables = useDataStore.getState().getMappedStandardizedVariables();
+  const { getMappedStandardizedVariables } = useDataStore();
+  const mappedStandardizedVariables = getMappedStandardizedVariables();
 
   return (
     <Paper className="w-full max-w-80 p-4" elevation={3} data-cy="side-column-nav-bar">

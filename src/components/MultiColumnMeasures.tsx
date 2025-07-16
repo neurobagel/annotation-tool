@@ -43,9 +43,10 @@ function MultiColumnMeasures() {
   const [variableStates, setVariableStates] = useState<Record<string, VariableState>>({});
 
   // Memoized to prevent new array reference on every render from Zustand selector
-  const multiColumnVariables = useDataStore
-    .getState()
-    .getMappedMultiColumnMeasureStandardizedVariables();
+  const getMappedMultiColumnMeasureStandardizedVariables = useDataStore(
+    (state) => state.getMappedMultiColumnMeasureStandardizedVariables
+  );
+  const multiColumnVariables = getMappedMultiColumnMeasureStandardizedVariables();
 
   // Memoized to prevent recalculation on every render since it depends on two values
   const activeVariableTab = useMemo(

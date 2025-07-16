@@ -16,7 +16,10 @@ function App() {
   const setCurrentView = useViewStore((state) => state.setCurrentView);
   const hasMultiColumnMeasures = useDataStore((state) => state.hasMultiColumnMeasures());
 
-  const { backView, nextView, backLabel, nextLabel, className } = getNavigationProps(currentView);
+  const { backView, nextView, backLabel, nextLabel, className } = getNavigationProps(
+    currentView,
+    hasMultiColumnMeasures
+  );
 
   useEffect(() => {
     if (currentView === View.MultiColumnMeasures && !hasMultiColumnMeasures) {
