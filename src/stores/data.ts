@@ -1,16 +1,17 @@
 import { produce } from 'immer';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import defaultConfig from '../../configs/default.json';
 import {
   DataTable,
   Columns,
   DataDictionary,
   StandardizedVaribleCollection,
   StandardizedVariable,
-  StandardizedVariableConfig,
-  StandardizedVariableConfigCollection,
-} from '../utils/types';
+  Config,
+  StandardizedTerm,
+  TermFormat,
+} from '../utils/internal_types';
+import { fetchAvailableConfigs, fetchConfig, mapConfigFileToStoreConfig } from '../utils/util';
 
 type DataStore = {
   dataTable: DataTable;
@@ -21,9 +22,11 @@ type DataStore = {
   setUploadedDataTableFileName: (fileName: string | null) => void;
   processDataTableFile: (file: File) => Promise<void>;
   getStandardizedVariables: () => StandardizedVaribleCollection;
-  getAssessmentToolConfig: () => StandardizedVariableConfig;
-  getAssessmentToolColumns: () => { id: string; header: string }[];
+  getStandardizedVariableColumns: (
+    StandardizedVariable: StandardizedVariable
+  ) => { id: string; header: string }[];
   getMappedStandardizedVariables: () => StandardizedVariable[];
+  getMappedMultiColumnMeasureStandardizedVariables: () => StandardizedVariable[];
   updateColumnDescription: (columnID: string, description: string | null) => void;
   updateColumnDataType: (columnID: string, dataType: 'Categorical' | 'Continuous' | null) => void;
   updateColumnStandardizedVariable: (
@@ -50,8 +53,18 @@ type DataStore = {
   setUploadedDataDictionaryFileName: (fileName: string | null) => void;
   processDataDictionaryFile: (file: File) => Promise<void>;
 
-  config: StandardizedVariableConfigCollection;
+  config: Config;
+  configOptions: string[];
+  loadConfigOptions: () => Promise<void>;
+  selectedConfig: string | null;
+  setSelectedConfig: (configName: string | null) => void;
+  loadConfig: (configName: string) => Promise<void>;
   hasMultiColumnMeasures: () => boolean;
+  getTermOptions: (standardizedVariable: StandardizedVariable) => StandardizedTerm[];
+  getFormatOptions: (StandardizedVariable: StandardizedVariable) => TermFormat[];
+  isMultiColumnMeasureStandardizedVariable: (
+    standardizedVariable: StandardizedVariable | null | undefined
+  ) => boolean;
 
   reset: () => void;
 };
@@ -62,8 +75,8 @@ const initialState = {
   uploadedDataTableFileName: null,
   uploadedDataDictionary: {},
   uploadedDataDictionaryFileName: null,
-  // TODO this is temporary to access the config in the store for now and should be removed after configuration functionality implementation
-  config: defaultConfig.standardizedVariables as StandardizedVariableConfigCollection,
+  configOptions: [],
+  config: {},
 };
 
 const useDataStore = create<DataStore>()(
@@ -129,12 +142,12 @@ const useDataStore = create<DataStore>()(
         ])
       );
     },
-    getAssessmentToolConfig: () => get().config['Assessment Tool'],
-    getAssessmentToolColumns: () =>
+
+    getStandardizedVariableColumns: (standardizedVariable: StandardizedVariable) =>
       Object.entries(get().columns)
         .filter(
           ([_, column]) =>
-            column.standardizedVariable?.identifier === get().getAssessmentToolConfig().identifier
+            column.standardizedVariable?.identifier === standardizedVariable.identifier
         )
         .map(([id, column]) => ({ id, header: column.header })),
 
@@ -151,7 +164,11 @@ const useDataStore = create<DataStore>()(
             (configItem) => configItem.identifier === variable.identifier
           );
           // Filter out variables with null data_type e.g., Subject ID, Session ID
-          if (configEntry?.data_type !== null) {
+          // but keep multi column measures in
+          if (
+            configEntry?.data_type !== null ||
+            (configEntry?.data_type === null && configEntry?.is_multi_column_measure !== false)
+          ) {
             seenIdentifiers.add(variable.identifier);
             uniqueVariables.push(variable);
           }
@@ -159,6 +176,18 @@ const useDataStore = create<DataStore>()(
       });
 
       return uniqueVariables;
+    },
+
+    getMappedMultiColumnMeasureStandardizedVariables: () => {
+      const allMappedVariables = get().getMappedStandardizedVariables();
+      const { config } = get();
+
+      return allMappedVariables.filter((variable) => {
+        const configEntry = Object.values(config).find(
+          (item) => item.identifier === variable.identifier
+        );
+        return configEntry?.is_multi_column_measure === true;
+      });
     },
 
     updateColumnDescription: (columnID: string, description: string | null) => {
@@ -211,12 +240,12 @@ const useDataStore = create<DataStore>()(
         columns: produce(state.columns, (draft) => {
           draft[columnID].standardizedVariable = standardizedVariable;
 
-          if (standardizedVariable?.identifier === get().getAssessmentToolConfig().identifier) {
-            // When setting to Assessment Tool, initialize IsPartOf if it doesn't exist
+          if (get().isMultiColumnMeasureStandardizedVariable(standardizedVariable)) {
+            // When setting to a multi-column measure, initialize IsPartOf if it doesn't exist
             if (!draft[columnID].isPartOf) {
               draft[columnID].isPartOf = {};
             }
-            // Remove isPartOf when changing from Assessment Tool to something else
+            // Remove isPartOf when changing from multi-column measure to something else
           } else if (draft[columnID].isPartOf) {
             delete draft[columnID].isPartOf;
           }
@@ -405,8 +434,9 @@ const useDataStore = create<DataStore>()(
                   }
 
                   if (
-                    draft[internalColumnID].standardizedVariable?.identifier ===
-                      get().getAssessmentToolConfig().identifier &&
+                    get().isMultiColumnMeasureStandardizedVariable(
+                      draft[internalColumnID].standardizedVariable || null
+                    ) &&
                     columnData.Annotations?.IsPartOf
                   ) {
                     draft[internalColumnID].isPartOf = {
@@ -501,12 +531,74 @@ const useDataStore = create<DataStore>()(
         reader.readAsText(file);
       }),
 
-    hasMultiColumnMeasures: () => {
-      const { columns } = get();
-      return Object.values(columns).some(
-        (column) =>
-          column.standardizedVariable?.identifier === get().getAssessmentToolConfig().identifier
+    hasMultiColumnMeasures: () =>
+      get().getMappedMultiColumnMeasureStandardizedVariables().length > 0,
+
+    loadConfigOptions: async () => {
+      try {
+        const availableConfigs = await fetchAvailableConfigs();
+        set({ configOptions: availableConfigs });
+      } catch (error) {
+        // TODO: show a notif error
+        set({ configOptions: [] });
+      }
+    },
+
+    loadConfig: async (configName: string) => {
+      try {
+        const { config: configFile, termsData } = await fetchConfig(configName);
+        const mappedConfig = mapConfigFileToStoreConfig(configFile, termsData);
+        set({ config: mappedConfig });
+      } catch (error) {
+        // TODO: show a notif error
+        // The fallback is already handled in fetchConfig, so if we get here,
+        // both remote and default config failed
+      }
+    },
+
+    setSelectedConfig: (configName: string | null) => {
+      if (configName) {
+        set({ selectedConfig: configName });
+        get().loadConfig(configName);
+      } else {
+        set({ selectedConfig: 'Neurobagel' });
+        get().loadConfig('Neurobagel');
+      }
+    },
+
+    getTermOptions: (standardizedVariable: StandardizedVariable) => {
+      const { config } = get();
+      const matchingConfigEntry = Object.values(config).find(
+        (configEntry) => configEntry.identifier === standardizedVariable.identifier
       );
+      if (matchingConfigEntry && matchingConfigEntry.terms) {
+        return matchingConfigEntry.terms;
+      }
+      return [];
+    },
+
+    getFormatOptions: (standardizedVariable: StandardizedVariable) => {
+      const { config } = get();
+      const matchingConfigEntry = Object.values(config).find(
+        (configEntry) => configEntry.identifier === standardizedVariable.identifier
+      );
+      if (matchingConfigEntry && matchingConfigEntry.formats) {
+        return matchingConfigEntry.formats;
+      }
+      return [];
+    },
+
+    isMultiColumnMeasureStandardizedVariable: (
+      standardizedVariable: StandardizedVariable | null | undefined
+    ) => {
+      if (!standardizedVariable) return false;
+
+      const { config } = get();
+      const configEntry = Object.values(config).find(
+        (item) => item.identifier === standardizedVariable.identifier
+      );
+
+      return configEntry?.is_multi_column_measure === true;
     },
 
     reset: () => set(initialState),

@@ -40,6 +40,7 @@ describe('MultiColumnMeasuresCard', () => {
     cy.mount(
       <MultiColumnMeasuresCard
         card={props.card}
+        cardIndex={1}
         mappedColumnHeaders={props.mappedColumnHeaders}
         availableTerms={props.availableTerms}
         columnOptions={props.columnOptions}
@@ -59,6 +60,7 @@ describe('MultiColumnMeasuresCard', () => {
     cy.mount(
       <MultiColumnMeasuresCard
         card={props.card}
+        cardIndex={1}
         mappedColumnHeaders={props.mappedColumnHeaders}
         availableTerms={props.availableTerms}
         columnOptions={props.columnOptions}
@@ -76,6 +78,7 @@ describe('MultiColumnMeasuresCard', () => {
     cy.mount(
       <MultiColumnMeasuresCard
         card={props.card}
+        cardIndex={1}
         mappedColumnHeaders={props.mappedColumnHeaders}
         availableTerms={props.availableTerms}
         columnOptions={props.columnOptions}
@@ -95,6 +98,7 @@ describe('MultiColumnMeasuresCard', () => {
     cy.mount(
       <MultiColumnMeasuresCard
         card={props.card}
+        cardIndex={1}
         mappedColumnHeaders={props.mappedColumnHeaders}
         availableTerms={props.availableTerms}
         columnOptions={props.columnOptions}

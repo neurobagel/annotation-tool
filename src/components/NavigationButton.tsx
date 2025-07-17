@@ -1,6 +1,6 @@
 import { Button } from '@mui/material';
 import useViewStore from '../stores/view';
-import { View } from '../utils/types';
+import { View } from '../utils/internal_types';
 
 const defaultProps = {
   backLabel: 'Back',

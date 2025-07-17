@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
 import { useTablePagination } from '../hooks';
-import { DataTable, Columns, Column } from '../utils/types';
+import { DataTable, Columns, Column } from '../utils/internal_types';
 
 function DataTablePreview({ dataTable, columns }: { dataTable: DataTable; columns: Columns }) {
   const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage } = useTablePagination(5);

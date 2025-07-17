@@ -4,7 +4,7 @@
 // straightforward way to achieve this. The performance impact is minimal in this case.
 import { Stepper, Step, StepLabel, StepConnector, useTheme, SvgIcon } from '@mui/material';
 import { steps } from '../utils/constants';
-import { View } from '../utils/types';
+import { View } from '../utils/internal_types';
 
 function NavStepper({ currentView }: { currentView: View }) {
   const theme = useTheme();

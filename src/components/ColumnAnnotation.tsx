@@ -1,12 +1,13 @@
 import Pagination from '@mui/material/Pagination';
 import { useColumnUpdates, usePagination } from '../hooks';
 import useDataStore from '../stores/data';
-import { Column } from '../utils/types';
+import { Column } from '../utils/internal_types';
 import ColumnAnnotationCard from './ColumnAnnotationCard';
 
 function ColumnAnnotation() {
   const columns = useDataStore((state) => state.columns);
-  const standardizedVariableOptions = useDataStore.getState().getStandardizedVariables();
+  const { getStandardizedVariables } = useDataStore();
+  const standardizedVariableOptions = getStandardizedVariables();
 
   const { handleDescriptionChange, handleDataTypeChange, handleStandardizedVariableChange } =
     useColumnUpdates();

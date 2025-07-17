@@ -1,4 +1,6 @@
 import Continuous from '../../src/components/Continuous';
+import useDataStore from '../../src/stores/data';
+import { mockConfig } from '../../src/utils/mocks';
 
 const props = {
   columnID: '1',
@@ -98,6 +100,7 @@ describe('Continuous', () => {
     cy.get('@spy').should('have.been.calledWith', '1', '3', true);
   });
   it('fires the onUpdateFormat event handler with the appropriate payload when the format is changed', () => {
+    useDataStore.setState({ config: mockConfig });
     const spy = cy.spy().as('spy');
     cy.mount(
       <Continuous

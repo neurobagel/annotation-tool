@@ -1,11 +1,12 @@
 import ValueAnnotation from '../../src/components/ValueAnnotation';
 import useDataStore from '../../src/stores/data';
-import { mockColumnsWithDataType, mockColumns } from '../../src/utils/mocks';
+import { mockColumnsWithDataType, mockColumns, mockConfig } from '../../src/utils/mocks';
 
 describe('ValueAnnotation', () => {
   beforeEach(() => {
     useDataStore.setState({
       columns: { ...mockColumns, ...mockColumnsWithDataType },
+      config: mockConfig,
     });
   });
   it('renders the component correctly', () => {

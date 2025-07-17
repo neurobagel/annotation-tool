@@ -1,6 +1,6 @@
 import SideColumnNavBar from '../../src/components/SideColumnNavBar';
 import useDataStore from '../../src/stores/data';
-import { mockColumnsWithDataType, mockColumns } from '../../src/utils/mocks';
+import { mockColumnsWithDataType, mockColumns, mockConfig } from '../../src/utils/mocks';
 
 const props = {
   columns: { ...mockColumns, ...mockColumnsWithDataType },
@@ -12,6 +12,7 @@ describe('SideColumnNavBar', () => {
   beforeEach(() => {
     useDataStore.setState({
       columns: props.columns,
+      config: mockConfig,
     });
   });
   it('renders the component correctly', () => {
