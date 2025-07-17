@@ -35,7 +35,7 @@ function UploadCard({
   diableFileUploader = false,
   FileUploaderToolTipContent = 'Uploading is disabled',
 }: UploadCardProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const isFileUploaded = uploadedFileName !== null;
