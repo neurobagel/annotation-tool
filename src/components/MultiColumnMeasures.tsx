@@ -12,7 +12,6 @@ import {
 import { useTheme } from '@mui/material/styles';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { usePagination } from '../hooks';
 import useDataStore from '../stores/data';
 import { MultiColumnMeasuresTerm, MultiColumnMeasuresTermCard } from '../utils/internal_types';
 import {
@@ -71,16 +70,6 @@ function MultiColumnMeasures() {
   // Memoized to maintain stable reference for dependent hooks (useMemo and useCallback)
   const currentTermCards = useMemo(() => currentState?.termCards || [], [currentState]);
 
-  const itemsPerPage = 3;
-  const { currentPage, totalPages, handlePaginationChange } =
-    usePagination<MultiColumnMeasuresTermCard>(currentTermCards, itemsPerPage);
-
-  // Memoized to prevent expensive array slicing operation on every render
-  const paginatedItems = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return currentTermCards.slice(startIndex, startIndex + itemsPerPage);
-  }, [currentTermCards, currentPage, itemsPerPage]);
-
   const variableAllMappedColumns = getAllMappedColumns(currentTermCards);
 
   const loadTermsAndInitializeCards = useCallback(() => {
@@ -120,11 +109,6 @@ function MultiColumnMeasures() {
     loadTermsAndInitializeCards();
   }, [loadTermsAndInitializeCards]);
 
-  // Reset pagination when changing tabs
-  useEffect(() => {
-    handlePaginationChange({} as React.ChangeEvent<unknown>, 1);
-  }, [activeTab, handlePaginationChange]);
-
   const handleTabChange = useCallback((_: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   }, []);
@@ -150,21 +134,7 @@ function MultiColumnMeasures() {
         },
       };
     });
-
-    // Update pagination after state update
-    setTimeout(() => {
-      const newTotalPages = Math.ceil((currentTermCards.length + 1) / itemsPerPage);
-      if (newTotalPages > totalPages) {
-        handlePaginationChange({} as React.ChangeEvent<unknown>, newTotalPages);
-      }
-    }, 0);
-  }, [
-    activeVariableTab,
-    currentTermCards.length,
-    handlePaginationChange,
-    itemsPerPage,
-    totalPages,
-  ]);
+  }, [activeVariableTab]);
 
   const handleTermSelect = useCallback(
     (cardId: string, term: MultiColumnMeasuresTerm | null) => {
@@ -277,24 +247,8 @@ function MultiColumnMeasures() {
           },
         };
       });
-
-      if (currentTermCards.length <= 1) {
-        handlePaginationChange({} as React.ChangeEvent<unknown>, 1);
-      } else {
-        const newTotalPages = Math.ceil((currentTermCards.length - 1) / itemsPerPage);
-        if (currentPage > newTotalPages) {
-          handlePaginationChange({} as React.ChangeEvent<unknown>, newTotalPages);
-        }
-      }
     },
-    [
-      activeVariableTab,
-      currentTermCards,
-      currentPage,
-      handlePaginationChange,
-      itemsPerPage,
-      updateColumnIsPartOf,
-    ]
+    [activeVariableTab, currentTermCards, updateColumnIsPartOf]
   );
 
   const columnsAssigned = useCallback(() => {
@@ -330,41 +284,41 @@ function MultiColumnMeasures() {
             ))}
           </Tabs>
 
-          <div className="flex flex-col items-center">
-            <div className="w-full flex flex-col gap-4 mb-4">
-              {paginatedItems.map((card, index) => (
-                <MultiColumnMeasuresCard
-                  key={card.id}
-                  card={card}
-                  cardIndex={index}
-                  mappedColumnHeaders={Object.fromEntries(
-                    card.mappedColumns.map((id) => [id, columns[id]?.header || `Column ${id}`])
-                  )}
-                  availableTerms={getAvailableTerms(
-                    currentTerms,
-                    getAssignedTermIdentifiers(currentTermCards, card.id)
-                  )}
-                  columnOptions={getColumnOptions(
-                    columns,
-                    activeVariableTab.identifier,
-                    variableAllMappedColumns
-                  )}
-                  onTermSelect={(term) => handleTermSelect(card.id, term)}
-                  onColumnSelect={(columnId) => handleColumnSelect(card.id, columnId)}
-                  onRemoveColumn={(columnId) => removeColumnFromCard(card.id, columnId)}
-                  onRemoveCard={() => removeCard(card.id)}
-                />
-              ))}
+          <div className="flex flex-col">
+            <div className="w-full h-[65vh] overflow-y-auto">
+              <div className="space-y-4">
+                {currentTermCards.map((card, index) => (
+                  <div key={card.id} className="w-full">
+                    <MultiColumnMeasuresCard
+                      card={card}
+                      cardIndex={index}
+                      mappedColumnHeaders={Object.fromEntries(
+                        card.mappedColumns.map((id) => [id, columns[id]?.header || `Column ${id}`])
+                      )}
+                      availableTerms={getAvailableTerms(
+                        currentTerms,
+                        getAssignedTermIdentifiers(currentTermCards, card.id)
+                      )}
+                      columnOptions={getColumnOptions(
+                        columns,
+                        activeVariableTab.identifier,
+                        variableAllMappedColumns
+                      )}
+                      onTermSelect={(term) => handleTermSelect(card.id, term)}
+                      onColumnSelect={(columnId) => handleColumnSelect(card.id, columnId)}
+                      onRemoveColumn={(columnId) => removeColumnFromCard(card.id, columnId)}
+                      onRemoveCard={() => removeCard(card.id)}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <Fab
-              color="primary"
-              onClick={handleAddNewCard}
-              className="mt-4"
-              data-cy="add-term-card-button"
-            >
-              <AddIcon />
-            </Fab>
+            <div className="flex justify-center mt-4">
+              <Fab color="primary" onClick={handleAddNewCard} data-cy="add-term-card-button">
+                <AddIcon />
+              </Fab>
+            </div>
           </div>
         </div>
 
