@@ -1,4 +1,5 @@
 import AddIcon from '@mui/icons-material/Add';
+import CancelIcon from '@mui/icons-material/Cancel';
 import {
   Fab,
   Card,
@@ -16,6 +17,7 @@ import {
   useMultiColumnMeasuresData,
   useActiveVariableData,
 } from '../hooks';
+import useDataStore from '../stores/data';
 import { MultiColumnMeasuresTerm } from '../utils/internal_types';
 import { getColumnsAssignedText, createMappedColumnHeaders } from '../utils/util';
 import MultiColumnMeasuresCard from './MultiColumnMeasuresCard';
@@ -23,6 +25,7 @@ import MultiColumnMeasuresCard from './MultiColumnMeasuresCard';
 function MultiColumnMeasures() {
   const theme = useTheme();
   const [activeTab, setActiveTab] = useState(0);
+  const { updateColumnStandardizedVariable } = useDataStore();
 
   const stateManager = useMultiColumnMeasuresState();
   const { loading, multiColumnVariables, columns } = useMultiColumnMeasuresData();
@@ -57,6 +60,10 @@ function MultiColumnMeasures() {
   const handleRemoveCard = (cardId: string) => {
     if (!activeVariableTab) return;
     stateManager.removeTermCard(activeVariableTab.identifier, cardId);
+  };
+
+  const handleUnassignColumn = (columnId: string) => {
+    updateColumnStandardizedVariable(columnId, null);
   };
 
   if (loading) {
@@ -133,7 +140,7 @@ function MultiColumnMeasures() {
             <CardContent className="text-center">
               <div className="max-h-[500px] overflow-auto">
                 {currentVariableColumns.map(({ id, header }) => (
-                  <div key={id} className="p-2 border-b">
+                  <div key={id} className="p-2 border-b flex items-center justify-between">
                     <Typography
                       sx={{
                         color: variableAllMappedColumns.includes(id)
@@ -143,6 +150,18 @@ function MultiColumnMeasures() {
                     >
                       {header}
                     </Typography>
+                    <CancelIcon
+                      sx={{
+                        fontSize: 16,
+                        color: theme.palette.grey[500],
+                        cursor: 'pointer',
+                        '&:hover': {
+                          color: theme.palette.error.main,
+                        },
+                      }}
+                      onClick={() => handleUnassignColumn(id)}
+                      data-cy={`unassign-column-${id}`}
+                    />
                   </div>
                 ))}
               </div>

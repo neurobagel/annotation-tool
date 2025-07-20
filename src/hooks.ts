@@ -79,14 +79,16 @@ export function useMultiColumnMeasuresState() {
   const initializeMultiColumnMeasuresState = useDataStore(
     (state) => state.initializeMultiColumnMeasuresState
   );
-  const addTermCard = useDataStore((state) => state.addTermCard);
-  const updateTermInCard = useDataStore((state) => state.updateTermInCard);
-  const addColumnToCard = useDataStore((state) => state.addColumnToCard);
-  const removeColumnFromCard = useDataStore((state) => state.removeColumnFromCard);
-  const removeTermCard = useDataStore((state) => state.removeTermCard);
-  const getMultiColumnMeasuresState = useDataStore((state) => state.getMultiColumnMeasuresState);
-  const getAvailableTermsForVariable = useDataStore((state) => state.getAvailableTermsForVariable);
-  const getColumnOptionsForVariable = useDataStore((state) => state.getColumnOptionsForVariable);
+  const {
+    addTermCard,
+    updateTermInCard,
+    addColumnToCard,
+    removeColumnFromCard,
+    removeTermCard,
+    getMultiColumnMeasuresState,
+    getAvailableTermsForVariable,
+    getColumnOptionsForVariable,
+  } = useDataStore();
 
   return {
     initializeMultiColumnMeasuresState,
