@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import useDataStore from './stores/data';
 import { StandardizedVariable } from './utils/internal_types';
+import { getAllMappedColumns } from './utils/util';
 
 export const useColumnUpdates = () => {
   const updateColumnDescription = useDataStore((state) => state.updateColumnDescription);
@@ -74,3 +75,104 @@ export const usePagination = <T>(items: T[], itemsPerPage: number) => {
     handlePaginationChange,
   };
 };
+export function useMultiColumnMeasuresState() {
+  const initializeMultiColumnMeasuresState = useDataStore(
+    (state) => state.initializeMultiColumnMeasuresState
+  );
+  const addTermCard = useDataStore((state) => state.addTermCard);
+  const updateTermInCard = useDataStore((state) => state.updateTermInCard);
+  const addColumnToCard = useDataStore((state) => state.addColumnToCard);
+  const removeColumnFromCard = useDataStore((state) => state.removeColumnFromCard);
+  const removeTermCard = useDataStore((state) => state.removeTermCard);
+  const getMultiColumnMeasuresState = useDataStore((state) => state.getMultiColumnMeasuresState);
+  const getAvailableTermsForVariable = useDataStore((state) => state.getAvailableTermsForVariable);
+  const getColumnOptionsForVariable = useDataStore((state) => state.getColumnOptionsForVariable);
+
+  return {
+    initializeMultiColumnMeasuresState,
+    addTermCard,
+    updateTermInCard,
+    addColumnToCard,
+    removeColumnFromCard,
+    removeTermCard,
+    getMultiColumnMeasuresState,
+    getAvailableTermsForVariable,
+    getColumnOptionsForVariable,
+  };
+}
+
+export function useMultiColumnMeasuresData() {
+  const [loading, setLoading] = useState(true);
+
+  const columns = useDataStore((state) => state.columns);
+  const getStandardizedVariableColumns = useDataStore(
+    (state) => state.getStandardizedVariableColumns
+  );
+  const initializeMultiColumnMeasuresState = useDataStore(
+    (state) => state.initializeMultiColumnMeasuresState
+  );
+  const getMappedMultiColumnMeasureStandardizedVariables = useDataStore(
+    (state) => state.getMappedMultiColumnMeasureStandardizedVariables
+  );
+
+  const multiColumnVariables = getMappedMultiColumnMeasureStandardizedVariables();
+
+  useEffect(() => {
+    if (multiColumnVariables.length === 0) {
+      setLoading(false);
+      return;
+    }
+
+    multiColumnVariables.forEach((variable) => {
+      initializeMultiColumnMeasuresState(variable.identifier);
+    });
+
+    setLoading(false);
+  }, [multiColumnVariables, initializeMultiColumnMeasuresState]);
+
+  return {
+    loading,
+    multiColumnVariables,
+    columns,
+    getStandardizedVariableColumns,
+  };
+}
+
+export function useActiveVariableData(
+  multiColumnVariables: StandardizedVariable[],
+  activeTab: number
+) {
+  const getStandardizedVariableColumns = useDataStore(
+    (state) => state.getStandardizedVariableColumns
+  );
+
+  // Memoize to prevent recalculation when array reference changes
+  const activeVariableTab = useMemo(
+    () => multiColumnVariables[activeTab] || null,
+    [multiColumnVariables, activeTab]
+  );
+
+  // Memoize to prevent recalculation when store state changes
+  const multiColumnMeasuresStates = useDataStore((state) => state.multiColumnMeasuresStates);
+  const currentState = useMemo(
+    () => (activeVariableTab ? multiColumnMeasuresStates[activeVariableTab.identifier] : null),
+    [activeVariableTab, multiColumnMeasuresStates]
+  );
+
+  // Memoize to prevent expensive function call
+  const currentVariableColumns = useMemo(
+    () => (activeVariableTab ? getStandardizedVariableColumns(activeVariableTab) : []),
+    [activeVariableTab, getStandardizedVariableColumns]
+  );
+
+  const currentTermCards = currentState?.termCards || [];
+  const variableAllMappedColumns = getAllMappedColumns(currentTermCards);
+
+  return {
+    activeVariableTab,
+    currentState,
+    currentVariableColumns,
+    currentTermCards,
+    variableAllMappedColumns,
+  };
+}

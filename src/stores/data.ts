@@ -1,4 +1,5 @@
 import { produce } from 'immer';
+import { v4 as uuidv4 } from 'uuid';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import {
@@ -10,6 +11,7 @@ import {
   Config,
   StandardizedTerm,
   TermFormat,
+  MultiColumnMeasuresTermCard,
 } from '../utils/internal_types';
 import { fetchAvailableConfigs, fetchConfig, mapConfigFileToStoreConfig } from '../utils/util';
 
@@ -66,6 +68,28 @@ type DataStore = {
     standardizedVariable: StandardizedVariable | null | undefined
   ) => boolean;
 
+  // Multi-column measures state management
+  multiColumnMeasuresStates: Record<
+    string,
+    { terms: StandardizedTerm[]; termCards: MultiColumnMeasuresTermCard[] }
+  >;
+  initializeMultiColumnMeasuresState: (variableId: string) => void;
+  addTermCard: (variableId: string) => void;
+  updateTermInCard: (variableId: string, cardId: string, term: StandardizedTerm | null) => void;
+  addColumnToCard: (variableId: string, cardId: string, columnId: string) => void;
+  removeColumnFromCard: (variableId: string, cardId: string, columnId: string) => void;
+  removeTermCard: (variableId: string, cardId: string) => void;
+  getMultiColumnMeasuresState: (
+    variableId: string
+  ) => { terms: StandardizedTerm[]; termCards: MultiColumnMeasuresTermCard[] } | null;
+  getAvailableTermsForVariable: (
+    variableId: string,
+    currentCardId?: string
+  ) => (StandardizedTerm & { disabled: boolean })[];
+  getColumnOptionsForVariable: (
+    variableId: string
+  ) => { id: string; label: string; disabled: boolean }[];
+
   reset: () => void;
 };
 
@@ -77,6 +101,7 @@ const initialState = {
   uploadedDataDictionaryFileName: null,
   configOptions: [],
   config: {},
+  multiColumnMeasuresStates: {},
 };
 
 const useDataStore = create<DataStore>()(
@@ -599,6 +624,195 @@ const useDataStore = create<DataStore>()(
       );
 
       return configEntry?.is_multi_column_measure === true;
+    },
+
+    // Multi-column measures state management
+    initializeMultiColumnMeasuresState: (variableId: string) => {
+      const { multiColumnMeasuresStates } = get();
+
+      if (multiColumnMeasuresStates[variableId]) {
+        return;
+      }
+
+      const multiColumnVariables = get().getMappedMultiColumnMeasureStandardizedVariables();
+      const variable = multiColumnVariables.find((v) => v.identifier === variableId);
+
+      if (!variable) return;
+
+      const terms = get().getTermOptions(variable);
+      const variableColumns = get().getStandardizedVariableColumns(variable);
+      const { columns } = get();
+
+      // Initialize term cards based on existing isPartOf relationships
+      const cardMap = new Map<string, MultiColumnMeasuresTermCard>();
+
+      variableColumns.forEach(({ id }) => {
+        const column = columns[id];
+        const termIdentifier = column.isPartOf?.termURL;
+        const term = termIdentifier && terms.find((t) => t.identifier === termIdentifier);
+
+        if (!term) return;
+
+        if (!cardMap.has(term.identifier)) {
+          cardMap.set(term.identifier, {
+            id: uuidv4(),
+            term,
+            mappedColumns: [],
+          });
+        }
+
+        const card = cardMap.get(term.identifier)!;
+        if (!card.mappedColumns.includes(id)) {
+          card.mappedColumns.push(id);
+        }
+      });
+
+      const termCards = Array.from(cardMap.values());
+      const finalTermCards =
+        termCards.length > 0 ? termCards : [{ id: uuidv4(), term: null, mappedColumns: [] }];
+
+      set((state) => ({
+        multiColumnMeasuresStates: {
+          ...state.multiColumnMeasuresStates,
+          [variableId]: { terms, termCards: finalTermCards },
+        },
+      }));
+    },
+
+    addTermCard: (variableId: string) => {
+      set((state) => ({
+        multiColumnMeasuresStates: produce(state.multiColumnMeasuresStates, (draft) => {
+          if (!draft[variableId]) return;
+
+          const newCard: MultiColumnMeasuresTermCard = {
+            id: uuidv4(),
+            term: null,
+            mappedColumns: [],
+          };
+
+          draft[variableId].termCards.push(newCard);
+        }),
+      }));
+    },
+
+    updateTermInCard: (variableId: string, cardId: string, term: StandardizedTerm | null) => {
+      set((state) => ({
+        multiColumnMeasuresStates: produce(state.multiColumnMeasuresStates, (draft) => {
+          if (!draft[variableId]) return;
+
+          const card = draft[variableId].termCards.find((c) => c.id === cardId);
+          if (card) {
+            card.term = term;
+          }
+        }),
+      }));
+    },
+
+    addColumnToCard: (variableId: string, cardId: string, columnId: string) => {
+      set((state) => ({
+        multiColumnMeasuresStates: produce(state.multiColumnMeasuresStates, (draft) => {
+          if (!draft[variableId]) return;
+
+          const card = draft[variableId].termCards.find((c) => c.id === cardId);
+          if (card && !card.mappedColumns.includes(columnId)) {
+            card.mappedColumns.push(columnId);
+          }
+        }),
+      }));
+
+      // Update column isPartOf relationship
+      const state = get().multiColumnMeasuresStates[variableId];
+      if (state) {
+        const card = state.termCards.find((c) => c.id === cardId);
+        if (card?.term) {
+          get().updateColumnIsPartOf(columnId, {
+            identifier: card.term.identifier,
+            label: card.term.label,
+          });
+        }
+      }
+    },
+
+    removeColumnFromCard: (variableId: string, cardId: string, columnId: string) => {
+      set((state) => ({
+        multiColumnMeasuresStates: produce(state.multiColumnMeasuresStates, (draft) => {
+          if (!draft[variableId]) return;
+
+          const card = draft[variableId].termCards.find((c) => c.id === cardId);
+          if (card) {
+            card.mappedColumns = card.mappedColumns.filter((id) => id !== columnId);
+          }
+        }),
+      }));
+
+      get().updateColumnIsPartOf(columnId, null);
+    },
+
+    removeTermCard: (variableId: string, cardId: string) => {
+      // Get the current state and find the card to remove
+      const currentState = get().multiColumnMeasuresStates[variableId];
+      if (!currentState) return;
+
+      const cardToRemove = currentState.termCards.find((c) => c.id === cardId);
+      if (!cardToRemove) return;
+
+      // Clear isPartOf for all mapped columns before removing the card
+      cardToRemove.mappedColumns.forEach((columnId) => {
+        get().updateColumnIsPartOf(columnId, null);
+      });
+
+      // Update the state to remove the card
+      set((state) => ({
+        multiColumnMeasuresStates: produce(state.multiColumnMeasuresStates, (draft) => {
+          if (!draft[variableId]) return;
+
+          const newCards = draft[variableId].termCards.filter((card) => card.id !== cardId);
+
+          // Ensure at least one empty card exists
+          if (newCards.length === 0) {
+            newCards.push({
+              id: uuidv4(),
+              term: null,
+              mappedColumns: [],
+            });
+          }
+
+          draft[variableId].termCards = newCards;
+        }),
+      }));
+    },
+
+    getMultiColumnMeasuresState: (variableId: string) =>
+      get().multiColumnMeasuresStates[variableId] || null,
+
+    getAvailableTermsForVariable: (variableId: string, currentCardId?: string) => {
+      const state = get().multiColumnMeasuresStates[variableId];
+      if (!state) return [];
+
+      const usedIdentifiers = state.termCards
+        .filter((card) => card.term !== null && card.id !== currentCardId)
+        .map((card) => card.term!.identifier);
+
+      return state.terms.map((term) => ({
+        ...term,
+        disabled: usedIdentifiers.includes(term.identifier),
+      }));
+    },
+
+    getColumnOptionsForVariable: (variableId: string) => {
+      const state = get().multiColumnMeasuresStates[variableId];
+      const { columns } = get();
+      if (!state) return [];
+
+      const allMappedColumns = state.termCards.flatMap((card) => card.mappedColumns);
+
+      return Object.entries(columns)
+        .filter(([_, column]) => column.standardizedVariable?.identifier === variableId)
+        .map(([id, column]) => ({
+          id,
+          label: column.header,
+          disabled: allMappedColumns.includes(id),
+        }));
     },
 
     reset: () => set(initialState),

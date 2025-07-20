@@ -8,9 +8,8 @@ import {
 } from './external_types';
 import {
   Config,
-  MultiColumnMeasuresTerm,
-  MultiColumnMeasuresTermCard,
   Columns,
+  MultiColumnMeasuresTermCard,
   StandardizedTerm,
   TermFormat,
 } from './internal_types';
@@ -155,79 +154,18 @@ export function mapConfigFileToStoreConfig(
 
 // Utility functions for MultiColumnMeasures component
 
-// Initialize term cards based on existing isPartOf relationships
-export function initializeTermCards({
-  columns,
-  terms,
-  variableColumns,
-  generateID,
-}: {
-  columns: Columns;
-  terms: MultiColumnMeasuresTerm[];
-  variableColumns: { id: string }[];
-  generateID: () => string;
-}): MultiColumnMeasuresTermCard[] {
-  const cardMap = new Map<string, MultiColumnMeasuresTermCard>();
-
-  variableColumns.forEach(({ id }) => {
-    const column = columns[id];
-    const termIdentifier = column.isPartOf?.termURL;
-    const term = termIdentifier && terms.find((t) => t.identifier === termIdentifier);
-
-    if (!term) return;
-
-    if (!cardMap.has(term.identifier)) {
-      cardMap.set(term.identifier, {
-        id: generateID(),
-        term,
-        mappedColumns: [],
-      });
-    }
-
-    const card = cardMap.get(term.identifier)!;
-    if (!card.mappedColumns.includes(id)) {
-      card.mappedColumns.push(id);
-    }
-  });
-
-  const termCards = Array.from(cardMap.values());
-  return termCards.length > 0 ? termCards : [{ id: generateID(), term: null, mappedColumns: [] }];
-}
-
 export const getAllMappedColumns = (termCards: MultiColumnMeasuresTermCard[]) =>
   termCards.flatMap((card) => card.mappedColumns);
 
-export function getAssignedTermIdentifiers(
-  termCards: MultiColumnMeasuresTermCard[],
-  currentCardId?: string
-): string[] {
-  return termCards
-    .filter((card) => card.term !== null && card.id !== currentCardId)
-    .map((card) => card.term!.identifier);
+export function getColumnsAssignedText(mappedColumnsCount: number): string {
+  if (mappedColumnsCount === 0) return 'No columns assigned';
+  if (mappedColumnsCount === 1) return '1 column assigned';
+  return `${mappedColumnsCount} columns assigned`;
 }
 
-export function getAvailableTerms(
-  allTerms: MultiColumnMeasuresTerm[],
-  usedIdentifiers: string[]
-): (MultiColumnMeasuresTerm & { disabled: boolean })[] {
-  return allTerms.map((term) => ({
-    ...term,
-    disabled: usedIdentifiers.includes(term.identifier),
-  }));
-}
-
-export function getColumnOptions(
-  columns: Columns,
-  standardizedVariableIdentifier: string,
-  allMappedColumns: string[]
-): { id: string; label: string; disabled: boolean }[] {
-  return Object.entries(columns)
-    .filter(
-      ([_, column]) => column.standardizedVariable?.identifier === standardizedVariableIdentifier
-    )
-    .map(([id, column]) => ({
-      id,
-      label: column.header,
-      disabled: allMappedColumns.includes(id),
-    }));
+export function createMappedColumnHeaders(
+  mappedColumns: string[],
+  columns: Columns
+): Record<string, string> {
+  return Object.fromEntries(mappedColumns.map((id) => [id, columns[id]?.header || `Column ${id}`]));
 }

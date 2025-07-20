@@ -10,252 +10,54 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import useDataStore from '../stores/data';
-import { MultiColumnMeasuresTerm, MultiColumnMeasuresTermCard } from '../utils/internal_types';
+import { useState } from 'react';
 import {
-  initializeTermCards,
-  getAvailableTerms,
-  getColumnOptions,
-  getAllMappedColumns,
-  getAssignedTermIdentifiers,
-} from '../utils/util';
+  useMultiColumnMeasuresState,
+  useMultiColumnMeasuresData,
+  useActiveVariableData,
+} from '../hooks';
+import { MultiColumnMeasuresTerm } from '../utils/internal_types';
+import { getColumnsAssignedText, createMappedColumnHeaders } from '../utils/util';
 import MultiColumnMeasuresCard from './MultiColumnMeasuresCard';
-
-interface VariableState {
-  terms: MultiColumnMeasuresTerm[];
-  termCards: MultiColumnMeasuresTermCard[];
-}
 
 function MultiColumnMeasures() {
   const theme = useTheme();
-  const columns = useDataStore((state) => state.columns);
-  const updateColumnIsPartOf = useDataStore((state) => state.updateColumnIsPartOf);
-  const getStandardizedVariableColumns = useDataStore(
-    (state) => state.getStandardizedVariableColumns
-  );
-  const getTermOptions = useDataStore((state) => state.getTermOptions);
-
   const [activeTab, setActiveTab] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [variableStates, setVariableStates] = useState<Record<string, VariableState>>({});
 
-  // Memoized to prevent new array reference on every render from Zustand selector
-  const getMappedMultiColumnMeasureStandardizedVariables = useDataStore(
-    (state) => state.getMappedMultiColumnMeasureStandardizedVariables
-  );
-  const multiColumnVariables = getMappedMultiColumnMeasureStandardizedVariables();
+  const stateManager = useMultiColumnMeasuresState();
+  const { loading, multiColumnVariables, columns } = useMultiColumnMeasuresData();
 
-  // Memoized to prevent recalculation on every render since it depends on two values
-  const activeVariableTab = useMemo(
-    () => multiColumnVariables[activeTab] || null,
-    [multiColumnVariables, activeTab]
-  );
+  const { activeVariableTab, currentVariableColumns, currentTermCards, variableAllMappedColumns } =
+    useActiveVariableData(multiColumnVariables, activeTab);
 
-  // Memoized to prevent object lookup on every render. CurrentState contains the columns and cards of the active multi-column variable
-  const currentState = useMemo(
-    () => (activeVariableTab ? variableStates[activeVariableTab.identifier] : null),
-    [activeVariableTab, variableStates]
-  );
-
-  // Memoized to prevent new array reference on every render from Zustand selector
-  const currentVariableColumns = useMemo(
-    () => (activeVariableTab ? getStandardizedVariableColumns(activeVariableTab) : []),
-    [activeVariableTab, getStandardizedVariableColumns]
-  );
-
-  const currentTerms = currentState?.terms || [];
-
-  // Memoized to maintain stable reference for dependent hooks (useMemo and useCallback)
-  const currentTermCards = useMemo(() => currentState?.termCards || [], [currentState]);
-
-  const variableAllMappedColumns = getAllMappedColumns(currentTermCards);
-
-  const loadTermsAndInitializeCards = useCallback(() => {
-    if (multiColumnVariables.length === 0) {
-      setLoading(false);
-      return;
-    }
-
-    const newStates: Record<string, VariableState> = {};
-    multiColumnVariables
-      .filter((variable) => !variableStates[variable.identifier])
-      .forEach((variable) => {
-        const terms = getTermOptions(variable);
-        const variableColumns = getStandardizedVariableColumns(variable);
-        const termCards = initializeTermCards({
-          columns,
-          terms,
-          variableColumns,
-          generateID: uuidv4,
-        });
-        newStates[variable.identifier] = { terms, termCards };
-      });
-
-    if (Object.keys(newStates).length > 0) {
-      setVariableStates((prev) => ({ ...prev, ...newStates }));
-    }
-    setLoading(false);
-  }, [
-    multiColumnVariables,
-    columns,
-    getTermOptions,
-    getStandardizedVariableColumns,
-    variableStates,
-  ]);
-
-  useEffect(() => {
-    loadTermsAndInitializeCards();
-  }, [loadTermsAndInitializeCards]);
-
-  const handleTabChange = useCallback((_: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
-  }, []);
+  };
 
-  const handleAddNewCard = useCallback(() => {
+  const handleAddNewCard = () => {
     if (!activeVariableTab) return;
+    stateManager.addTermCard(activeVariableTab.identifier);
+  };
 
-    const newCard: MultiColumnMeasuresTermCard = {
-      id: uuidv4(),
-      term: null,
-      mappedColumns: [],
-    };
+  const handleTermSelect = (cardId: string, term: MultiColumnMeasuresTerm | null) => {
+    if (!activeVariableTab) return;
+    stateManager.updateTermInCard(activeVariableTab.identifier, cardId, term);
+  };
 
-    setVariableStates((prev) => {
-      const currentCards = prev[activeVariableTab.identifier]?.termCards || [];
-      const newTermCards = [...currentCards, newCard];
+  const handleColumnSelect = (cardId: string, columnId: string | null) => {
+    if (!columnId || !activeVariableTab) return;
+    stateManager.addColumnToCard(activeVariableTab.identifier, cardId, columnId);
+  };
 
-      return {
-        ...prev,
-        [activeVariableTab.identifier]: {
-          terms: prev[activeVariableTab.identifier]?.terms || [],
-          termCards: newTermCards,
-        },
-      };
-    });
-  }, [activeVariableTab]);
+  const handleRemoveColumn = (cardId: string, columnId: string) => {
+    if (!activeVariableTab) return;
+    stateManager.removeColumnFromCard(activeVariableTab.identifier, cardId, columnId);
+  };
 
-  const handleTermSelect = useCallback(
-    (cardId: string, term: MultiColumnMeasuresTerm | null) => {
-      if (!activeVariableTab) return;
-
-      setVariableStates((prev) => {
-        const currentCards = prev[activeVariableTab.identifier]?.termCards || [];
-        const updatedCards = currentCards.map((card) =>
-          card.id === cardId
-            ? {
-                ...card,
-                term,
-              }
-            : card
-        );
-
-        return {
-          ...prev,
-          [activeVariableTab.identifier]: {
-            terms: prev[activeVariableTab.identifier]?.terms || [],
-            termCards: updatedCards,
-          },
-        };
-      });
-    },
-    [activeVariableTab]
-  );
-
-  const handleColumnSelect = useCallback(
-    (cardId: string, columnId: string | null) => {
-      if (!columnId || !activeVariableTab) return;
-
-      setVariableStates((prev) => {
-        const currentCards = prev[activeVariableTab.identifier]?.termCards || [];
-        const updatedCards = currentCards.map((card) =>
-          card.id === cardId && !card.mappedColumns.includes(columnId)
-            ? { ...card, mappedColumns: [...card.mappedColumns, columnId] }
-            : card
-        );
-
-        return {
-          ...prev,
-          [activeVariableTab.identifier]: {
-            terms: prev[activeVariableTab.identifier]?.terms || [],
-            termCards: updatedCards,
-          },
-        };
-      });
-
-      const card = currentTermCards.find((c) => c.id === cardId);
-      if (card?.term) {
-        updateColumnIsPartOf(columnId, {
-          identifier: card.term.identifier,
-          label: card.term.label,
-        });
-      }
-    },
-    [activeVariableTab, currentTermCards, updateColumnIsPartOf]
-  );
-
-  const removeColumnFromCard = useCallback(
-    (cardId: string, columnId: string) => {
-      if (!activeVariableTab) return;
-
-      setVariableStates((prev) => {
-        const currentCards = prev[activeVariableTab.identifier]?.termCards || [];
-        const updatedCards = currentCards.map((card) =>
-          card.id === cardId
-            ? {
-                ...card,
-                mappedColumns: card.mappedColumns.filter((id) => id !== columnId),
-              }
-            : card
-        );
-
-        return {
-          ...prev,
-          [activeVariableTab.identifier]: {
-            terms: prev[activeVariableTab.identifier]?.terms || [],
-            termCards: updatedCards,
-          },
-        };
-      });
-      updateColumnIsPartOf(columnId, null);
-    },
-    [activeVariableTab, updateColumnIsPartOf]
-  );
-
-  const removeCard = useCallback(
-    (cardId: string) => {
-      if (!activeVariableTab) return;
-
-      const card = currentTermCards.find((c) => c.id === cardId);
-      if (card) {
-        card.mappedColumns.forEach((columnId) => {
-          updateColumnIsPartOf(columnId, null);
-        });
-      }
-
-      setVariableStates((prev) => {
-        const currentCards = prev[activeVariableTab.identifier]?.termCards || [];
-        const newCards = currentCards.filter((termCard) => termCard.id !== cardId);
-
-        return {
-          ...prev,
-          [activeVariableTab.identifier]: {
-            terms: prev[activeVariableTab.identifier]?.terms || [],
-            termCards:
-              newCards.length === 0 ? [{ id: uuidv4(), term: null, mappedColumns: [] }] : newCards,
-          },
-        };
-      });
-    },
-    [activeVariableTab, currentTermCards, updateColumnIsPartOf]
-  );
-
-  const columnsAssigned = useCallback(() => {
-    if (variableAllMappedColumns.length === 0) return 'No columns assigned';
-    if (variableAllMappedColumns.length === 1) return '1 column assigned';
-    return `${variableAllMappedColumns.length} columns assigned`;
-  }, [variableAllMappedColumns.length]);
+  const handleRemoveCard = (cardId: string) => {
+    if (!activeVariableTab) return;
+    stateManager.removeTermCard(activeVariableTab.identifier, cardId);
+  };
 
   if (loading) {
     return (
@@ -292,22 +94,18 @@ function MultiColumnMeasures() {
                     <MultiColumnMeasuresCard
                       card={card}
                       cardIndex={index}
-                      mappedColumnHeaders={Object.fromEntries(
-                        card.mappedColumns.map((id) => [id, columns[id]?.header || `Column ${id}`])
+                      mappedColumnHeaders={createMappedColumnHeaders(card.mappedColumns, columns)}
+                      availableTerms={stateManager.getAvailableTermsForVariable(
+                        activeVariableTab?.identifier || '',
+                        card.id
                       )}
-                      availableTerms={getAvailableTerms(
-                        currentTerms,
-                        getAssignedTermIdentifiers(currentTermCards, card.id)
-                      )}
-                      columnOptions={getColumnOptions(
-                        columns,
-                        activeVariableTab.identifier,
-                        variableAllMappedColumns
+                      columnOptions={stateManager.getColumnOptionsForVariable(
+                        activeVariableTab?.identifier || ''
                       )}
                       onTermSelect={(term) => handleTermSelect(card.id, term)}
                       onColumnSelect={(columnId) => handleColumnSelect(card.id, columnId)}
-                      onRemoveColumn={(columnId) => removeColumnFromCard(card.id, columnId)}
-                      onRemoveCard={() => removeCard(card.id)}
+                      onRemoveColumn={(columnId) => handleRemoveColumn(card.id, columnId)}
+                      onRemoveCard={() => handleRemoveCard(card.id)}
                     />
                   </div>
                 ))}
@@ -328,7 +126,10 @@ function MultiColumnMeasures() {
             elevation={3}
             data-cy="multi-column-measures-columns-card"
           >
-            <CardHeader className="bg-gray-50" title={`${activeVariableTab.label}: all columns`} />
+            <CardHeader
+              className="bg-gray-50"
+              title={`${activeVariableTab?.label || 'Variable'}: all columns`}
+            />
             <CardContent className="text-center">
               <div className="max-h-[500px] overflow-auto">
                 {currentVariableColumns.map(({ id, header }) => (
@@ -346,7 +147,7 @@ function MultiColumnMeasures() {
                 ))}
               </div>
               <Typography variant="body2" className="mt-8">
-                {columnsAssigned()}
+                {getColumnsAssignedText(variableAllMappedColumns.length)}
               </Typography>
             </CardContent>
           </Card>

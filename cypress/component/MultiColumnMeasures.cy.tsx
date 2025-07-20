@@ -50,6 +50,34 @@ describe('MultiColumnMeasures', () => {
           },
         },
       },
+      multiColumnMeasuresStates: {
+        'nb:Assessment': {
+          terms: [
+            {
+              identifier: 'someIdentifier',
+              label: 'some term',
+            },
+            {
+              identifier: 'anotherIdentifier',
+              label: 'another term',
+            },
+            {
+              identifier: 'someOtherIdentifier',
+              label: 'some other term',
+            },
+          ],
+          termCards: [
+            {
+              id: 'card-0',
+              term: {
+                identifier: 'someIdentifier',
+                label: 'some term',
+              },
+              mappedColumns: ['1'],
+            },
+          ],
+        },
+      },
     });
     useDataStore.setState({ config: mockConfig });
     cy.mount(<MultiColumnMeasures />);
