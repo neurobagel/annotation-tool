@@ -63,6 +63,14 @@ function MultiColumnMeasures() {
   };
 
   const handleUnassignColumn = (columnId: string) => {
+    if (!activeVariableTab) return;
+
+    const cardWithColumn = currentTermCards.find((card) => card.mappedColumns.includes(columnId));
+
+    if (cardWithColumn) {
+      stateManager.removeColumnFromCard(activeVariableTab.identifier, cardWithColumn.id, columnId);
+    }
+
     updateColumnStandardizedVariable(columnId, null);
   };
 

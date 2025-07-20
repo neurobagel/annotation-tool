@@ -5,6 +5,7 @@ import { mockConfig } from '../../src/utils/mocks';
 describe('MultiColumnMeasures', () => {
   beforeEach(() => {
     const updateColumnIsPartOfSpy = cy.spy().as('updateColumnIsPartOfSpy');
+    const updateColumnStandardizedVariable = cy.spy().as('updateColumnStandardizedVariable');
     const getTermOptionsSpy = cy.stub().returns([
       {
         identifier: 'someIdentifier',
@@ -22,6 +23,7 @@ describe('MultiColumnMeasures', () => {
 
     useDataStore.setState({
       updateColumnIsPartOf: updateColumnIsPartOfSpy,
+      updateColumnStandardizedVariable,
       getTermOptions: getTermOptionsSpy,
       columns: {
         '1': {
@@ -122,6 +124,11 @@ describe('MultiColumnMeasures', () => {
   it('fires updateColumnIsPartOf with the appropriate payload when a term card containing columns is removed', () => {
     cy.get('[data-cy="remove-card-0-button"]').click();
     cy.get('@updateColumnIsPartOfSpy').should('have.been.calledWith', '1', null);
+    cy.get('[data-cy="mapped-column-1"]').should('not.exist');
+  });
+  it('fires updateColumnStandardizedVariable with the appropriate payload when a column is unannotated', () => {
+    cy.get('[data-cy="unassign-column-1"]').click();
+    cy.get('@updateColumnStandardizedVariable').should('have.been.calledWith', '1', null);
     cy.get('[data-cy="mapped-column-1"]').should('not.exist');
   });
 });
