@@ -80,6 +80,7 @@ function MultiColumnMeasures() {
     updateColumnStandardizedVariable(columnId, null);
   };
 
+  // TODO: Remove if not necessary
   if (loading) {
     return (
       <div className="flex justify-center p-4">

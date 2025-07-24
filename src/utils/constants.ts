@@ -13,5 +13,6 @@ export const steps: StepConfig[] = [
 
 export const fetchConfigGitHubURL = 'https://api.github.com/repos/neurobagel/communities/contents/';
 
-export const fetchFileGitHubURL =
-  'https://raw.githubusercontent.com/neurobagel/communities/main/Neurobagel/';
+export const githubRawBaseURL = 'https://raw.githubusercontent.com/neurobagel/communities/main/';
+
+export const defaultConfigPath = '/src/assets/default_config/';

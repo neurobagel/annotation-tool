@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { fetchConfigGitHubURL } from './constants';
+import { fetchConfigGitHubURL, githubRawBaseURL, defaultConfigPath } from './constants';
 import {
   ConfigFile,
   VocabConfig,
@@ -71,14 +71,12 @@ export async function fetchConfig(
   selectedConfig: string
 ): Promise<{ config: ConfigFile; termsData: Record<string, VocabConfig[]> }> {
   try {
-    return await loadConfigFromPath(
-      `https://raw.githubusercontent.com/neurobagel/communities/main/${selectedConfig}/config.json`
-    );
+    return await loadConfigFromPath(`${githubRawBaseURL}${selectedConfig}/config.json`);
   } catch (error) {
     // TODO: show a notif error
     // Fallback to default config when remote fetching fails
     try {
-      return await loadConfigFromPath('/src/assets/default_config/config.json');
+      return await loadConfigFromPath(`${defaultConfigPath}config.json`);
     } catch (fallbackError) {
       return { config: {} as ConfigFile, termsData: {} };
     }
