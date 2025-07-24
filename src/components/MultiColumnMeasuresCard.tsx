@@ -10,14 +10,15 @@ import {
   Autocomplete,
   TextField,
 } from '@mui/material';
-import { Term, TermCard } from '../utils/types';
+import { MultiColumnMeasuresTerm, MultiColumnMeasuresTermCard } from '../utils/internal_types';
 
 interface TermCardProps {
-  card: TermCard;
+  card: MultiColumnMeasuresTermCard;
+  cardIndex: number;
   mappedColumnHeaders: { [columnId: string]: string };
-  availableTerms: Term[];
+  availableTerms: MultiColumnMeasuresTerm[];
   columnOptions: Array<{ id: string; label: string; disabled: boolean }>;
-  onTermSelect: (term: Term | null) => void;
+  onTermSelect: (term: MultiColumnMeasuresTerm | null) => void;
   onColumnSelect: (columnId: string | null) => void;
   onRemoveColumn: (columnId: string) => void;
   onRemoveCard: () => void;
@@ -25,6 +26,7 @@ interface TermCardProps {
 
 function MultiColumnMeasuresCard({
   card,
+  cardIndex,
   mappedColumnHeaders,
   availableTerms,
   columnOptions,
@@ -37,10 +39,10 @@ function MultiColumnMeasuresCard({
     <Card
       elevation={3}
       className="w-full shadow-lg"
-      data-cy={`multi-column-measures-card-${card.id}`}
+      data-cy={`multi-column-measures-card-${cardIndex}`}
     >
       <CardHeader
-        data-cy={`multi-column-measures-card-${card.id}-header`}
+        data-cy={`multi-column-measures-card-${cardIndex}-header`}
         title={
           card.term ? (
             <Typography variant="h6" className="font-bold">
@@ -48,9 +50,9 @@ function MultiColumnMeasuresCard({
             </Typography>
           ) : (
             <Autocomplete
-              data-cy={`multi-column-measures-card-${card.id}-title-dropdown`}
+              data-cy={`multi-column-measures-card-${cardIndex}-title-dropdown`}
               options={availableTerms}
-              getOptionLabel={(option: Term) => option.label}
+              getOptionLabel={(option: MultiColumnMeasuresTerm) => option.label}
               getOptionDisabled={(option) => option.disabled || false}
               onChange={(_, newValue) => onTermSelect(newValue)}
               renderInput={(params) => (
@@ -67,7 +69,7 @@ function MultiColumnMeasuresCard({
           )
         }
         action={
-          <IconButton onClick={onRemoveCard} data-cy={`remove-card-${card.id}-button`}>
+          <IconButton onClick={onRemoveCard} data-cy={`remove-card-${cardIndex}-button`}>
             <CancelIcon color="error" />
           </IconButton>
         }
@@ -79,7 +81,7 @@ function MultiColumnMeasuresCard({
           <CardContent>
             <div className="mt-4">
               <Autocomplete
-                data-cy={`multi-column-measures-card-${card.id}-columns-dropdown`}
+                data-cy={`multi-column-measures-card-${cardIndex}-columns-dropdown`}
                 options={columnOptions}
                 getOptionLabel={(option) => option.label}
                 getOptionDisabled={(option) => option.disabled || false}

@@ -10,7 +10,8 @@ import {
   Autocomplete,
   Tooltip,
 } from '@mui/material';
-import { StandardizedVariable, StandardizedVariableConfigCollection } from '../utils/types';
+import useDataStore from '~/stores/data';
+import { StandardizedVariable, Config } from '../utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
 
 interface ColumnAnnotationCardProps {
@@ -19,7 +20,7 @@ interface ColumnAnnotationCardProps {
   description: string | null;
   dataType: 'Categorical' | 'Continuous' | null;
   standardizedVariable: StandardizedVariable | null;
-  standardizedVariableOptions: StandardizedVariableConfigCollection;
+  standardizedVariableOptions: Config;
   onDescriptionChange: (columnId: string, newDescription: string | null) => void;
   onDataTypeChange: (columnId: string, newDataType: 'Categorical' | 'Continuous' | null) => void;
   onStandardizedVariableChange: (
@@ -39,6 +40,9 @@ function ColumnAnnotationCard({
   onDataTypeChange,
   onStandardizedVariableChange,
 }: ColumnAnnotationCardProps) {
+  const columnIsMultiColumnMeasure = useDataStore((state) =>
+    state.isMultiColumnMeasureStandardizedVariable(standardizedVariable)
+  );
   const handleDataTypeChange = (
     _: React.MouseEvent<HTMLElement>,
     newDataType: 'Categorical' | 'Continuous' | null
@@ -61,7 +65,10 @@ function ColumnAnnotationCard({
     !!standardizedVariable &&
     Object.values(standardizedVariableOptions).some(
       (option) => option.identifier === standardizedVariable.identifier
-    );
+    ) &&
+    // Treat multi column measures differently
+    // allow user to select a data type even when the standardized variable is selected
+    !columnIsMultiColumnMeasure;
 
   return (
     <Card data-cy={`${id}-column-annotation-card`} className="mx-auto w-full max-w-5xl shadow-lg">

@@ -1,5 +1,6 @@
-import { mockColumns, mockDataTable } from '~/utils/mocks';
+import { mockColumns, mockConfig, mockDataTable } from '~/utils/mocks';
 import ValueAnnotationTabs from '../../src/components/ValueAnnotationTabs';
+import useDataStore from '../../src/stores/data';
 
 const props = {
   columns: mockColumns,
@@ -12,6 +13,28 @@ const props = {
 };
 
 describe('ValueAnnotationTabs', () => {
+  beforeEach(() => {
+    useDataStore.setState({
+      config: mockConfig,
+      formatOptions: {
+        'nb:Age': [
+          {
+            termURL: 'nb:FromFloat',
+            label: 'float',
+            examples: ['31.5'],
+          },
+          {
+            termURL: 'nb:FromEuro',
+            label: 'euro',
+            examples: ['31,5'],
+          },
+        ],
+      },
+      termOptions: {
+        'nb:Sex': [{ identifier: 'test', label: 'test' }],
+      },
+    });
+  });
   it('renders the component correctly', () => {
     cy.mount(
       <ValueAnnotationTabs
@@ -118,10 +141,10 @@ describe('ValueAnnotationTabs', () => {
       />
     );
     cy.get('[data-cy="3-tab"]').click();
-    cy.get('[data-cy="3-F-term-dropdown"]').type('female{downArrow}{Enter}');
+    cy.get('[data-cy="3-F-term-dropdown"]').type('test{downArrow}{Enter}');
     cy.get('@spy').should('have.been.calledWith', '3', 'F', {
-      identifier: 'snomed:248152002',
-      label: 'Female',
+      identifier: 'test',
+      label: 'test',
     });
   });
 });

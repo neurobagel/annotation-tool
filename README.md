@@ -14,6 +14,7 @@ The annotation tool is a React application, developed in [TypeScript](https://ww
 [Quickstart](#quickstart) |
 [Local Installation](#local-installation) |
 [Usage](#usage) |
+[Configuration](#configuration) |
 [Testing](#testing) |
 [License](#license)
 
@@ -49,6 +50,11 @@ $ npm run preview
 3. Annotate the values of the annotated columns
    - Add/edit levels' description (if column data type is categorical) or units description (if column data type is continuous)
 4. Download an annotated version of a BIDS-valid data dictionary for your dataset
+
+## Configuration
+
+The annotation tool is designed to be highly configurable, allowing it to adapt to different research contexts and data standards. You can define your own set of standardized variables and vocabularies to match your specific needs.
+For detailed technical information about creating and customizing configurations, see the [Configuration Guide](CONFIGURATION.md).
 
 ## Testing
 

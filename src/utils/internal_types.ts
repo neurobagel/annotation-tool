@@ -14,10 +14,7 @@ export type Column = {
   levels?: { [key: string]: { description: string; label?: string; termURL?: string } } | null;
   units?: string;
   missingValues?: string[];
-  format?: {
-    termURL?: string;
-    label?: string;
-  };
+  format?: TermFormat;
 };
 
 export type Columns = {
@@ -36,6 +33,7 @@ export interface DataDictionary {
         TermURL: string;
         Label: string;
       };
+      // TODO: Remove once we get rid of identifies in CLI
       Identifies?: string;
       Format?: {
         TermURL: string;
@@ -63,7 +61,13 @@ export interface StandardizedVariable {
 
 export interface StandardizedVariableConfig extends StandardizedVariable {
   data_type?: 'Categorical' | 'Continuous' | null;
-  is_multi_column_measurement?: boolean;
+  terms?: StandardizedTerm[] | null;
+  formats?: TermFormat[];
+  required?: boolean;
+  description?: string;
+  is_multi_column_measure?: boolean;
+  can_have_multiple_columns?: boolean;
+  same_as?: string;
 }
 
 export interface StandardizedVaribleCollection {
@@ -71,20 +75,33 @@ export interface StandardizedVaribleCollection {
 }
 
 // TODO: reduce the depth and try to have a single object for all configuration
-export interface StandardizedVariableConfigCollection {
+// The main config object used in the app
+export interface Config {
   [key: string]: StandardizedVariableConfig;
 }
 
-// TODO: find a better name than Term
-export interface Term {
+export interface StandardizedTerm {
   identifier: string;
   label: string;
+  abbreviation?: string;
+  description?: string;
+  same_as?: string;
+  status?: string;
+}
+
+export interface TermFormat {
+  termURL: string;
+  label: string;
+  examples?: string[];
+}
+
+export interface MultiColumnMeasuresTerm extends StandardizedTerm {
   disabled?: boolean;
 }
 
-export interface TermCard {
+export interface MultiColumnMeasuresTermCard {
   id: string;
-  term: Term | null;
+  term: MultiColumnMeasuresTerm | null;
   mappedColumns: string[];
 }
 
@@ -101,4 +118,9 @@ export type StepConfig = {
   label: string;
   view: View;
   icon: React.ComponentType;
+};
+
+export type ConfigLoaderOptions = {
+  excludeDefault?: boolean;
+  defaultConfigName?: string;
 };

@@ -1,29 +1,40 @@
 import { produce } from 'immer';
+import { v4 as uuidv4 } from 'uuid';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import defaultConfig from '../../configs/default.json';
 import {
   DataTable,
   Columns,
   DataDictionary,
   StandardizedVaribleCollection,
   StandardizedVariable,
-  StandardizedVariableConfig,
-  StandardizedVariableConfigCollection,
-} from '../utils/types';
+  Config,
+  StandardizedTerm,
+  TermFormat,
+  MultiColumnMeasuresTermCard,
+} from '../utils/internal_types';
+import { fetchAvailableConfigs, fetchConfig, mapConfigFileToStoreConfig } from '../utils/util';
 
 type DataStore = {
   dataTable: DataTable;
   columns: Columns;
   uploadedDataTableFileName: string | null;
+  isConfigLoading: boolean;
   setDataTable: (data: DataTable) => void;
   initializeColumns: (data: Columns) => void;
   setUploadedDataTableFileName: (fileName: string | null) => void;
   processDataTableFile: (file: File) => Promise<void>;
-  getStandardizedVariables: () => StandardizedVaribleCollection;
-  getAssessmentToolConfig: () => StandardizedVariableConfig;
-  getAssessmentToolColumns: () => { id: string; header: string }[];
-  getMappedStandardizedVariables: () => StandardizedVariable[];
+  standardizedVariables: StandardizedVaribleCollection;
+  updateStandardizedVariables: () => void;
+  mappedStandardizedVariables: StandardizedVariable[];
+  updateMappedStandardizedVariables: () => void;
+  mappedMultiColumnMeasureStandardizedVariables: StandardizedVariable[];
+  updateMappedMultiColumnMeasureStandardizedVariables: () => void;
+  multiColumnMeasureVariableIdentifiers: Set<string>;
+  updateMultiColumnMeasureVariableIdentifiers: () => void;
+  getStandardizedVariableColumns: (
+    StandardizedVariable: StandardizedVariable
+  ) => { id: string; header: string }[];
   updateColumnDescription: (columnID: string, description: string | null) => void;
   updateColumnDataType: (columnID: string, dataType: 'Categorical' | 'Continuous' | null) => void;
   updateColumnStandardizedVariable: (
@@ -50,8 +61,43 @@ type DataStore = {
   setUploadedDataDictionaryFileName: (fileName: string | null) => void;
   processDataDictionaryFile: (file: File) => Promise<void>;
 
-  config: StandardizedVariableConfigCollection;
+  config: Config;
+  configOptions: string[];
+  loadConfigOptions: () => Promise<void>;
+  selectedConfig: string | null;
+  setSelectedConfig: (configName: string | null) => void;
+  loadConfig: (configName: string) => Promise<void>;
   hasMultiColumnMeasures: () => boolean;
+  termOptions: Record<string, StandardizedTerm[]>;
+  updateTermOptions: () => void;
+  formatOptions: Record<string, TermFormat[]>;
+  updateFormatOptions: () => void;
+  isMultiColumnMeasureStandardizedVariable: (
+    standardizedVariable: StandardizedVariable | null | undefined
+  ) => boolean;
+
+  // Multi-column measures state management
+  multiColumnMeasuresStates: Record<
+    string,
+    { terms: StandardizedTerm[]; termCards: MultiColumnMeasuresTermCard[] }
+  >;
+  columnOptionsForVariables: Record<string, { id: string; label: string; disabled: boolean }[]>;
+  updateColumnOptionsForVariable: (variableId: string) => void;
+  updateAllColumnOptionsForVariables: () => void;
+  availableTermsForVariables: Record<
+    string,
+    Record<string, (StandardizedTerm & { disabled: boolean })[]>
+  >;
+  updateAvailableTermsForVariable: (variableId: string) => void;
+  initializeMultiColumnMeasuresState: (variableId: string) => void;
+  addTermCard: (variableId: string) => void;
+  updateTermInCard: (variableId: string, cardId: string, term: StandardizedTerm | null) => void;
+  addColumnToCard: (variableId: string, cardId: string, columnId: string) => void;
+  removeColumnFromCard: (variableId: string, cardId: string, columnId: string) => void;
+  removeTermCard: (variableId: string, cardId: string) => void;
+  getMultiColumnMeasuresState: (
+    variableId: string
+  ) => { terms: StandardizedTerm[]; termCards: MultiColumnMeasuresTermCard[] } | null;
 
   reset: () => void;
 };
@@ -60,10 +106,20 @@ const initialState = {
   dataTable: {},
   columns: {},
   uploadedDataTableFileName: null,
+  isConfigLoading: true,
   uploadedDataDictionary: {},
   uploadedDataDictionaryFileName: null,
-  // TODO this is temporary to access the config in the store for now and should be removed after configuration functionality implementation
-  config: defaultConfig.standardizedVariables as StandardizedVariableConfigCollection,
+  configOptions: [],
+  config: {},
+  standardizedVariables: {},
+  mappedStandardizedVariables: [],
+  mappedMultiColumnMeasureStandardizedVariables: [],
+  multiColumnMeasureVariableIdentifiers: new Set<string>(),
+  termOptions: {},
+  formatOptions: {},
+  multiColumnMeasuresStates: {},
+  columnOptionsForVariables: {},
+  availableTermsForVariables: {},
 };
 
 const useDataStore = create<DataStore>()(
@@ -120,27 +176,19 @@ const useDataStore = create<DataStore>()(
       }),
 
     // Column updates
-    getStandardizedVariables: () => {
+    updateStandardizedVariables: () => {
       const standardizedVariableConfigs = get().config;
-      return Object.fromEntries(
+      const standardizedVariables = Object.fromEntries(
         Object.entries(standardizedVariableConfigs).map(([standardizedVariableName, config]) => [
           standardizedVariableName,
           { identifier: config.identifier, label: config.label },
         ])
       );
+      set({ standardizedVariables });
     },
-    getAssessmentToolConfig: () => get().config['Assessment Tool'],
-    getAssessmentToolColumns: () =>
-      Object.entries(get().columns)
-        .filter(
-          ([_, column]) =>
-            column.standardizedVariable?.identifier === get().getAssessmentToolConfig().identifier
-        )
-        .map(([id, column]) => ({ id, header: column.header })),
 
-    getMappedStandardizedVariables: () => {
-      const { config } = get();
-      const { columns } = get();
+    updateMappedStandardizedVariables: () => {
+      const { config, columns } = get();
       const seenIdentifiers = new Set<string>();
       const uniqueVariables: StandardizedVariable[] = [];
 
@@ -151,15 +199,59 @@ const useDataStore = create<DataStore>()(
             (configItem) => configItem.identifier === variable.identifier
           );
           // Filter out variables with null data_type e.g., Subject ID, Session ID
-          if (configEntry?.data_type !== null) {
+          // but keep multi column measures in
+          if (configEntry?.data_type !== null || configEntry?.is_multi_column_measure === true) {
             seenIdentifiers.add(variable.identifier);
             uniqueVariables.push(variable);
           }
         }
       });
 
-      return uniqueVariables;
+      set({ mappedStandardizedVariables: uniqueVariables });
     },
+
+    updateMappedMultiColumnMeasureStandardizedVariables: () => {
+      const { config, columns } = get();
+      const seenIdentifiers = new Set<string>();
+      const uniqueVariables: StandardizedVariable[] = [];
+
+      Object.values(columns).forEach((column) => {
+        const variable = column.standardizedVariable;
+        if (variable && !seenIdentifiers.has(variable.identifier)) {
+          const configEntry = Object.values(config).find(
+            (item) => item.identifier === variable.identifier
+          );
+
+          if (configEntry?.is_multi_column_measure === true) {
+            seenIdentifiers.add(variable.identifier);
+            uniqueVariables.push(variable);
+          }
+        }
+      });
+
+      set({ mappedMultiColumnMeasureStandardizedVariables: uniqueVariables });
+    },
+
+    updateMultiColumnMeasureVariableIdentifiers: () => {
+      const { config } = get();
+      const identifiers = new Set<string>();
+
+      Object.values(config).forEach((configEntry) => {
+        if (configEntry.is_multi_column_measure === true) {
+          identifiers.add(configEntry.identifier);
+        }
+      });
+
+      set({ multiColumnMeasureVariableIdentifiers: identifiers });
+    },
+
+    getStandardizedVariableColumns: (standardizedVariable: StandardizedVariable) =>
+      Object.entries(get().columns)
+        .filter(
+          ([_, column]) =>
+            column.standardizedVariable?.identifier === standardizedVariable.identifier
+        )
+        .map(([id, column]) => ({ id, header: column.header })),
 
     updateColumnDescription: (columnID: string, description: string | null) => {
       set((state) => ({
@@ -211,12 +303,12 @@ const useDataStore = create<DataStore>()(
         columns: produce(state.columns, (draft) => {
           draft[columnID].standardizedVariable = standardizedVariable;
 
-          if (standardizedVariable?.identifier === get().getAssessmentToolConfig().identifier) {
-            // When setting to Assessment Tool, initialize IsPartOf if it doesn't exist
+          if (get().isMultiColumnMeasureStandardizedVariable(standardizedVariable)) {
+            // When setting to a multi-column measure, initialize IsPartOf if it doesn't exist
             if (!draft[columnID].isPartOf) {
               draft[columnID].isPartOf = {};
             }
-            // Remove isPartOf when changing from Assessment Tool to something else
+            // Remove isPartOf when changing from multi-column measure to something else
           } else if (draft[columnID].isPartOf) {
             delete draft[columnID].isPartOf;
           }
@@ -233,6 +325,10 @@ const useDataStore = create<DataStore>()(
 
       // Call updateColumnDataType with the found data_type
       get().updateColumnDataType(columnID, dataType);
+
+      // Update mapped standardized variables when standardized variable changes
+      get().updateMappedStandardizedVariables();
+      get().updateMappedMultiColumnMeasureStandardizedVariables();
     },
 
     updateColumnIsPartOf: (
@@ -405,8 +501,9 @@ const useDataStore = create<DataStore>()(
                   }
 
                   if (
-                    draft[internalColumnID].standardizedVariable?.identifier ===
-                      get().getAssessmentToolConfig().identifier &&
+                    get().isMultiColumnMeasureStandardizedVariable(
+                      draft[internalColumnID].standardizedVariable || null
+                    ) &&
                     columnData.Annotations?.IsPartOf
                   ) {
                     draft[internalColumnID].isPartOf = {
@@ -488,6 +585,10 @@ const useDataStore = create<DataStore>()(
               get().updateColumnDataType(columnId, dataType);
             });
 
+            // Update mapped standardized variables after processing data dictionary
+            get().updateMappedStandardizedVariables();
+            get().updateMappedMultiColumnMeasureStandardizedVariables();
+
             resolve();
           } catch (error) {
             reject(error);
@@ -501,12 +602,339 @@ const useDataStore = create<DataStore>()(
         reader.readAsText(file);
       }),
 
-    hasMultiColumnMeasures: () => {
-      const { columns } = get();
-      return Object.values(columns).some(
-        (column) =>
-          column.standardizedVariable?.identifier === get().getAssessmentToolConfig().identifier
+    hasMultiColumnMeasures: () => get().mappedMultiColumnMeasureStandardizedVariables.length > 0,
+
+    loadConfigOptions: async () => {
+      try {
+        const availableConfigs = await fetchAvailableConfigs();
+        set({ configOptions: availableConfigs });
+      } catch (error) {
+        // TODO: show a notif error
+        set({ configOptions: [] });
+      }
+    },
+
+    loadConfig: async (configName: string) => {
+      set({ isConfigLoading: true });
+      try {
+        const { config: configFile, termsData } = await fetchConfig(configName);
+        const mappedConfig = mapConfigFileToStoreConfig(configFile, termsData);
+        set({ config: mappedConfig });
+        // Update derived state when config changes
+        get().updateStandardizedVariables();
+        get().updateTermOptions();
+        get().updateFormatOptions();
+        get().updateMappedStandardizedVariables();
+        get().updateMappedMultiColumnMeasureStandardizedVariables();
+        get().updateMultiColumnMeasureVariableIdentifiers();
+        set({ isConfigLoading: false });
+      } catch (error) {
+        // TODO: show a notif error
+        // The fallback is already handled in fetchConfig, so if we get here,
+        // both remote and default config failed
+        set({ isConfigLoading: false });
+      }
+    },
+
+    setSelectedConfig: (configName: string | null) => {
+      if (configName) {
+        set({ selectedConfig: configName });
+        get().loadConfig(configName);
+      } else {
+        set({ selectedConfig: 'Neurobagel' });
+        get().loadConfig('Neurobagel');
+      }
+    },
+
+    updateTermOptions: () => {
+      const { config } = get();
+      const termOptions: Record<string, StandardizedTerm[]> = {};
+
+      Object.values(config).forEach((configEntry) => {
+        if (configEntry.terms) {
+          termOptions[configEntry.identifier] = configEntry.terms;
+        } else {
+          termOptions[configEntry.identifier] = [];
+        }
+      });
+
+      set({ termOptions });
+    },
+
+    updateFormatOptions: () => {
+      const { config } = get();
+      const formatOptions: Record<string, TermFormat[]> = {};
+
+      Object.values(config).forEach((configEntry) => {
+        if (configEntry.formats) {
+          formatOptions[configEntry.identifier] = configEntry.formats;
+        } else {
+          formatOptions[configEntry.identifier] = [];
+        }
+      });
+
+      set({ formatOptions });
+    },
+
+    isMultiColumnMeasureStandardizedVariable: (
+      standardizedVariable: StandardizedVariable | null | undefined
+    ) => {
+      if (!standardizedVariable) return false;
+
+      const { config } = get();
+      const configEntry = Object.values(config).find(
+        (item) => item.identifier === standardizedVariable.identifier
       );
+
+      return configEntry?.is_multi_column_measure === true;
+    },
+
+    // Multi-column measures state management
+    initializeMultiColumnMeasuresState: (variableId: string) => {
+      const { multiColumnMeasuresStates } = get();
+
+      if (multiColumnMeasuresStates[variableId]) {
+        return;
+      }
+
+      const multiColumnVariables = get().mappedMultiColumnMeasureStandardizedVariables;
+      const variable = multiColumnVariables.find((v) => v.identifier === variableId);
+
+      if (!variable) return;
+
+      const { termOptions } = get();
+      const terms = termOptions[variable.identifier] || [];
+      const variableColumns = get().getStandardizedVariableColumns(variable);
+      const { columns } = get();
+
+      // Initialize term cards based on existing isPartOf relationships
+      const cardMap = new Map<string, MultiColumnMeasuresTermCard>();
+
+      variableColumns.forEach(({ id }) => {
+        const column = columns[id];
+        const termIdentifier = column.isPartOf?.termURL;
+        const term = termIdentifier && terms.find((t) => t.identifier === termIdentifier);
+
+        if (!term) return;
+
+        if (!cardMap.has(term.identifier)) {
+          cardMap.set(term.identifier, {
+            id: uuidv4(),
+            term,
+            mappedColumns: [],
+          });
+        }
+
+        const card = cardMap.get(term.identifier)!;
+        if (!card.mappedColumns.includes(id)) {
+          card.mappedColumns.push(id);
+        }
+      });
+
+      const termCards = Array.from(cardMap.values());
+      const finalTermCards =
+        termCards.length > 0 ? termCards : [{ id: uuidv4(), term: null, mappedColumns: [] }];
+
+      set((state) => ({
+        multiColumnMeasuresStates: {
+          ...state.multiColumnMeasuresStates,
+          [variableId]: { terms, termCards: finalTermCards },
+        },
+      }));
+
+      // Initialize column options and available terms for this variable
+      get().updateColumnOptionsForVariable(variableId);
+      get().updateAvailableTermsForVariable(variableId);
+    },
+
+    addTermCard: (variableId: string) => {
+      set((state) => ({
+        multiColumnMeasuresStates: produce(state.multiColumnMeasuresStates, (draft) => {
+          if (!draft[variableId]) return;
+
+          const newCard: MultiColumnMeasuresTermCard = {
+            id: uuidv4(),
+            term: null,
+            mappedColumns: [],
+          };
+
+          draft[variableId].termCards.push(newCard);
+        }),
+      }));
+
+      // Update available terms after adding new card
+      get().updateAvailableTermsForVariable(variableId);
+    },
+
+    updateTermInCard: (variableId: string, cardId: string, term: StandardizedTerm | null) => {
+      set((state) => ({
+        multiColumnMeasuresStates: produce(state.multiColumnMeasuresStates, (draft) => {
+          if (!draft[variableId]) return;
+
+          const card = draft[variableId].termCards.find((c) => c.id === cardId);
+          if (card) {
+            card.term = term;
+          }
+        }),
+      }));
+
+      // Update available terms after updating term in card
+      get().updateAvailableTermsForVariable(variableId);
+    },
+
+    addColumnToCard: (variableId: string, cardId: string, columnId: string) => {
+      set((state) => ({
+        multiColumnMeasuresStates: produce(state.multiColumnMeasuresStates, (draft) => {
+          if (!draft[variableId]) return;
+
+          const card = draft[variableId].termCards.find((c) => c.id === cardId);
+          if (card && !card.mappedColumns.includes(columnId)) {
+            card.mappedColumns.push(columnId);
+          }
+        }),
+      }));
+
+      // Update column isPartOf relationship
+      const state = get().multiColumnMeasuresStates[variableId];
+      if (state) {
+        const card = state.termCards.find((c) => c.id === cardId);
+        if (card?.term) {
+          get().updateColumnIsPartOf(columnId, {
+            identifier: card.term.identifier,
+            label: card.term.label,
+          });
+        }
+      }
+
+      // Update column options after adding column to card
+      get().updateColumnOptionsForVariable(variableId);
+    },
+
+    removeColumnFromCard: (variableId: string, cardId: string, columnId: string) => {
+      set((state) => ({
+        multiColumnMeasuresStates: produce(state.multiColumnMeasuresStates, (draft) => {
+          if (!draft[variableId]) return;
+
+          const card = draft[variableId].termCards.find((c) => c.id === cardId);
+          if (card) {
+            card.mappedColumns = card.mappedColumns.filter((id) => id !== columnId);
+          }
+        }),
+      }));
+
+      get().updateColumnIsPartOf(columnId, null);
+
+      // Update column options after removing column from card
+      get().updateColumnOptionsForVariable(variableId);
+    },
+
+    removeTermCard: (variableId: string, cardId: string) => {
+      // Get the current state and find the card to remove
+      const currentState = get().multiColumnMeasuresStates[variableId];
+      if (!currentState) return;
+
+      const cardToRemove = currentState.termCards.find((c) => c.id === cardId);
+      if (!cardToRemove) return;
+
+      // Clear isPartOf for all mapped columns before removing the card
+      cardToRemove.mappedColumns.forEach((columnId) => {
+        get().updateColumnIsPartOf(columnId, null);
+      });
+
+      // Update the state to remove the card
+      set((state) => ({
+        multiColumnMeasuresStates: produce(state.multiColumnMeasuresStates, (draft) => {
+          if (!draft[variableId]) return;
+
+          const newCards = draft[variableId].termCards.filter((card) => card.id !== cardId);
+
+          // Ensure at least one empty card exists
+          if (newCards.length === 0) {
+            newCards.push({
+              id: uuidv4(),
+              term: null,
+              mappedColumns: [],
+            });
+          }
+
+          draft[variableId].termCards = newCards;
+        }),
+      }));
+
+      // Update available terms after removing card
+      get().updateAvailableTermsForVariable(variableId);
+    },
+
+    getMultiColumnMeasuresState: (variableId: string) =>
+      get().multiColumnMeasuresStates[variableId] || null,
+
+    updateColumnOptionsForVariable: (variableId: string) => {
+      const state = get().multiColumnMeasuresStates[variableId];
+      const { columns } = get();
+      if (!state) return;
+
+      const allMappedColumns = state.termCards.flatMap((card) => card.mappedColumns);
+
+      const columnOptions = Object.entries(columns)
+        .filter(([_, column]) => column.standardizedVariable?.identifier === variableId)
+        .map(([id, column]) => ({
+          id,
+          label: column.header,
+          disabled: allMappedColumns.includes(id),
+        }));
+
+      set((currentState) => ({
+        columnOptionsForVariables: {
+          ...currentState.columnOptionsForVariables,
+          [variableId]: columnOptions,
+        },
+      }));
+    },
+
+    updateAllColumnOptionsForVariables: () => {
+      const multiColumnVariables = get().mappedMultiColumnMeasureStandardizedVariables;
+
+      multiColumnVariables.forEach((variable) => {
+        get().updateColumnOptionsForVariable(variable.identifier);
+      });
+    },
+
+    updateAvailableTermsForVariable: (variableId: string) => {
+      const state = get().multiColumnMeasuresStates[variableId];
+      if (!state) return;
+
+      // Pre-compute available terms for each card (including 'null' for new cards)
+      const availableTermsForCards: Record<string, (StandardizedTerm & { disabled: boolean })[]> =
+        {};
+
+      // For each card, compute available terms with proper disabled state
+      state.termCards.forEach((card) => {
+        const usedIdentifiers = state.termCards
+          .filter((c) => c.term !== null && c.id !== card.id)
+          .map((c) => c.term!.identifier);
+
+        availableTermsForCards[card.id] = state.terms.map((term) => ({
+          ...term,
+          disabled: usedIdentifiers.includes(term.identifier),
+        }));
+      });
+
+      // Also compute for 'null' (new cards that don't exist yet)
+      const allUsedIdentifiers = state.termCards
+        .filter((c) => c.term !== null)
+        .map((c) => c.term!.identifier);
+
+      availableTermsForCards.null = state.terms.map((term) => ({
+        ...term,
+        disabled: allUsedIdentifiers.includes(term.identifier),
+      }));
+
+      set((currentState) => ({
+        availableTermsForVariables: {
+          ...currentState.availableTermsForVariables,
+          [variableId]: availableTermsForCards,
+        },
+      }));
     },
 
     reset: () => set(initialState),

@@ -15,7 +15,7 @@ import emoji from '../assets/download-emoji.png';
 import schema from '../assets/neurobagel_data_dictionary.schema.json';
 import useDataStore from '../stores/data';
 import useViewStore from '../stores/view';
-import { DataDictionary, View } from '../utils/types';
+import { DataDictionary, View } from '../utils/internal_types';
 import DataDictionaryPreview from './DataDictionaryPreview';
 
 function Download() {
@@ -32,9 +32,6 @@ function Download() {
   const dataDictionary = useMemo(
     () =>
       Object.entries(columns).reduce((dictAcc, [_columnKey, column]) => {
-        const participantIDConfig = config['Subject ID'];
-        const sessionIDConfig = config['Session ID'];
-
         if (column.header) {
           const dictionaryEntry: DataDictionary[string] = {
             Description: column.description || '',
@@ -90,10 +87,12 @@ function Download() {
               );
             }
 
-            if (column.standardizedVariable?.identifier === participantIDConfig.identifier) {
-              dictionaryEntry.Annotations.Identifies = 'participant';
-            } else if (column.standardizedVariable?.identifier === sessionIDConfig.identifier) {
-              dictionaryEntry.Annotations.Identifies = 'session';
+            const configEntry = Object.values(config).find(
+              (configItem) => configItem.identifier === column.standardizedVariable?.identifier
+            );
+            // TODO: Remove once we get rid of identifies in CLI
+            if (configEntry?.label.includes('ID')) {
+              dictionaryEntry.Annotations.Identifies = configEntry.label.slice(0, -3).toLowerCase();
             }
 
             if (column.isPartOf?.termURL && column.isPartOf?.label) {

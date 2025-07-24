@@ -10,20 +10,9 @@ import {
   TextField,
 } from '@mui/material';
 import useDataStore from '~/stores/data';
-import diagnosisTerms from '../assets/diagnosisTerms.json';
-import { StandardizedVariable } from '../utils/types';
+import { StandardizedVariable } from '../utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueButton from './MissingValueButton';
-
-// TODO: Remove this when the terms are fetched from the config
-const sexTerms = [
-  { label: 'Male', identifier: 'snomed:248153007' },
-  { label: 'Female', identifier: 'snomed:248152002' },
-  { label: 'Other', identifier: 'snomed:32570681000036106' },
-];
-
-// Manually add the healthy control term
-diagnosisTerms.push({ label: 'Healthy Control', identifier: 'ncit:C94342' });
 
 interface CategoricalProps {
   columnID: string;
@@ -54,29 +43,13 @@ function Categorical({
   onToggleMissingValue,
   onUpdateLevelTerm,
 }: CategoricalProps) {
-  const { getAssessmentToolConfig } = useDataStore();
+  const isMultiColumnMeasureStandardizedVariable = useDataStore((state) =>
+    state.isMultiColumnMeasureStandardizedVariable(standardizedVariable)
+  );
+  const showStandardizedTerm = standardizedVariable && !isMultiColumnMeasureStandardizedVariable;
 
-  const showStandardizedTerm =
-    standardizedVariable &&
-    standardizedVariable?.identifier !== getAssessmentToolConfig().identifier;
-
-  const getTermOptions = () => {
-    if (standardizedVariable?.identifier === 'nb:Diagnosis') {
-      return diagnosisTerms;
-    }
-    if (standardizedVariable?.identifier === 'nb:Sex') {
-      return sexTerms;
-    }
-    return [];
-  };
-
-  const termOptions = getTermOptions();
-
-  // TODO: Move this function to the store once the config functionality is implemented
-  const getTermByURL = (termURL: string | undefined) => {
-    if (!termURL) return null;
-    return termOptions.find((opt) => opt.identifier === termURL) || null;
-  };
+  const termOptions = useDataStore((state) => state.termOptions);
+  const options = standardizedVariable ? termOptions[standardizedVariable.identifier] || [] : [];
 
   return (
     <TableContainer
@@ -126,9 +99,9 @@ function Categorical({
                 <TableCell align="left">
                   <Autocomplete
                     data-cy={`${columnID}-${value}-term-dropdown`}
-                    options={termOptions}
+                    options={options}
                     getOptionLabel={(option) => option.label}
-                    value={getTermByURL(levels[value]?.termURL)}
+                    value={options.find((opt) => opt.identifier === levels[value]?.termURL) || null}
                     onChange={(_, newValue) => {
                       onUpdateLevelTerm(columnID, value, newValue);
                     }}

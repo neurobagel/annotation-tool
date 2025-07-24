@@ -10,7 +10,7 @@ import {
   TextField,
 } from '@mui/material';
 import useDataStore from '~/stores/data';
-import { StandardizedVariable } from '~/utils/types';
+import { StandardizedVariable, TermFormat } from '~/utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueButton from './MissingValueButton';
 
@@ -19,10 +19,7 @@ interface ContinuousProps {
   units: string;
   uniqueValues: string[];
   missingValues: string[];
-  format?: {
-    termURL?: string;
-    label?: string;
-  };
+  format?: TermFormat;
   standardizedVariable?: StandardizedVariable | null;
   onUpdateUnits: (columnID: string, units: string) => void;
   onToggleMissingValue: (columnID: string, value: string, isMissing: boolean) => void;
@@ -33,15 +30,6 @@ const defaultProps = {
   standardizedVariable: null,
   format: null,
 };
-
-// TODO: Remove this when the terms are fetched from the config
-const formatOptions = [
-  { label: 'euro', value: 'nb:FromEuro' },
-  { label: 'bounded', value: 'nb:FromBounded' },
-  { label: 'float', value: 'nb:FromFloat' },
-  { label: 'iso8601', value: 'nb:FromISO8601' },
-  { label: 'range', value: 'nb:FromRange' },
-];
 
 function Continuous({
   columnID,
@@ -54,13 +42,16 @@ function Continuous({
   onToggleMissingValue,
   onUpdateFormat,
 }: ContinuousProps) {
-  const { getAssessmentToolConfig } = useDataStore();
+  const columns = useDataStore((state) => state.columns);
+  const formatOptions = useDataStore((state) => state.formatOptions);
 
-  // Remove/refactor the conditional logic once we decided how to handle the data type for multi column measure standardized variables
-  const showUnit = standardizedVariable?.identifier !== getAssessmentToolConfig().identifier;
-  const showFormat =
-    standardizedVariable &&
-    standardizedVariable?.identifier !== getAssessmentToolConfig().identifier;
+  const columnIsMultiColumnMeasure = useDataStore((state) =>
+    state.isMultiColumnMeasureStandardizedVariable(standardizedVariable)
+  );
+
+  const showFormat = standardizedVariable && !columnIsMultiColumnMeasure;
+  // Don't show units when the variable is a multi column measure and its data type is null
+  const showUnits = !(columnIsMultiColumnMeasure && columns[columnID].dataType === null);
 
   return (
     <Paper elevation={3} className="h-full shadow-lg" data-cy={`${columnID}-continuous`}>
@@ -122,7 +113,7 @@ function Continuous({
         </div>
 
         <div className="w-2/5 p-4 space-y-4">
-          {showUnit && (
+          {showUnits && (
             <DescriptionEditor
               key={`${columnID}-units`}
               label="Units"
@@ -137,15 +128,32 @@ function Continuous({
           {showFormat && (
             <Autocomplete
               data-cy={`${columnID}-format-dropdown`}
-              options={formatOptions}
+              options={formatOptions[standardizedVariable.identifier] || []}
               getOptionLabel={(option) => option.label}
-              value={formatOptions.find((opt) => opt.value === format?.termURL) || null}
+              renderOption={(props, option) => (
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                <li {...props}>
+                  <div>
+                    <div>{option.label}</div>
+                    {option.examples && (
+                      <div className="text-xs text-gray-500">
+                        Examples: {option.examples.join(', ')}
+                      </div>
+                    )}
+                  </div>
+                </li>
+              )}
+              value={
+                (formatOptions[standardizedVariable.identifier] || []).find(
+                  (opt) => opt.termURL === format?.termURL
+                ) || null
+              }
               onChange={(_, newValue) => {
                 onUpdateFormat(
                   columnID,
                   newValue
                     ? {
-                        termURL: newValue.value,
+                        termURL: newValue.termURL,
                         label: newValue.label,
                       }
                     : null

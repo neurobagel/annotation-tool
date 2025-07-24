@@ -1,0 +1,113 @@
+[
+  {
+    "vocabulary_name": "Neurobagel Phenotypic Variables",
+    "namespace_prefix": "nb",
+    "namespace_url": "http://neurobagel.org/vocab/",
+    "version": "1.0.0",
+    "standardized_variables": [
+      {
+        "name": "Participant ID",
+        "id": "ParticipantID",
+        "data_type": null,
+        "terms_file": null,
+        "formats": null,
+        "required": true,
+        "description": "Unique participant identifier.",
+        "is_multi_column_measure": false,
+        "can_have_multiple_columns": false,
+        "same_as": null
+      },
+      {
+        "name": "Session ID",
+        "id": "SessionID",
+        "data_type": null,
+        "terms_file": null,
+        "formats": null,
+        "required": false,
+        "description": "Unique session identifier.",
+        "is_multi_column_measure": false,
+        "can_have_multiple_columns": false,
+        "same_as": null
+      },
+      {
+        "name": "Age",
+        "id": "Age",
+        "data_type": "Continuous",
+        "terms_file": null,
+        "formats": [
+          {
+            "id": "FromFloat",
+            "name": "float",
+            "examples": ["31.5"]
+          },
+          {
+            "id": "FromInt",
+            "name": "int",
+            "examples": ["31"]
+          },
+          {
+            "id": "FromEuro",
+            "name": "euro",
+            "examples": ["31,5"]
+          },
+          {
+            "id": "FromBounded",
+            "name": "bounded",
+            "examples": ["30+"]
+          },
+          {
+            "id": "FromRange",
+            "name": "range",
+            "examples": ["30-35"]
+          },
+          {
+            "id": "FromISO8601",
+            "name": "iso8601",
+            "examples": ["31Y6M"]
+          }
+        ],
+        "required": false,
+        "description": "The age of the participant.",
+        "is_multi_column_measure": false,
+        "can_have_multiple_columns": false,
+        "same_as": null
+      },
+      {
+        "name": "Sex",
+        "id": "Sex",
+        "data_type": "Categorical",
+        "terms_file": "sex.json",
+        "formats": null,
+        "required": false,
+        "description": "The sex of the participant.",
+        "is_multi_column_measure": false,
+        "can_have_multiple_columns": false,
+        "same_as": null
+      },
+      {
+        "name": "Diagnosis",
+        "id": "Diagnosis",
+        "data_type": "Categorical",
+        "terms_file": "diagnosis.json",
+        "formats": null,
+        "required": false,
+        "description": "Participant diagnosis information",
+        "is_multi_column_measure": false,
+        "can_have_multiple_columns": true,
+        "same_as": null
+      },
+      {
+        "name": "Assessment Tool",
+        "id": "Assessment",
+        "data_type": null,
+        "terms_file": "assessment.json",
+        "formats": null,
+        "required": false,
+        "description": "A cognitive or clinical rating scale, instrument, or assessment tool.",
+        "is_multi_column_measure": true,
+        "can_have_multiple_columns": true,
+        "same_as": null
+      }
+    ]
+  }
+]

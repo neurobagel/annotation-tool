@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import useDataStore from '../stores/data';
+import ConfigCard from './ConfigCard';
 import DataDictionaryPreview from './DataDictionaryPreview';
 import DataTablePreview from './DataTablePreview';
 import UploadCard from './UploadCard';
@@ -10,6 +12,10 @@ function Upload() {
   const columns = useDataStore((state) => state.columns);
   const dataDictionary = useDataStore((state) => state.uploadedDataDictionary);
   const uploadedDataTableFileName = useDataStore((state) => state.uploadedDataTableFileName);
+  const loadConfigOptions = useDataStore((state) => state.loadConfigOptions);
+  const configOptions = useDataStore((state) => state.configOptions);
+  const selectedConfig = useDataStore((state) => state.selectedConfig);
+  const setSelectedConfig = useDataStore((state) => state.setSelectedConfig);
   const setUploadedDataTableFileName = useDataStore((state) => state.setUploadedDataTableFileName);
   const setUploadedDataDictionaryFileName = useDataStore(
     (state) => state.setUploadedDataDictionaryFileName
@@ -17,6 +23,7 @@ function Upload() {
   const uploadedDataDictionaryFileName = useDataStore(
     (state) => state.uploadedDataDictionaryFileName
   );
+  const isConfigLoading = useDataStore((state) => state.isConfigLoading);
 
   const isDataTableEmpty = Object.keys(dataTable).length === 0;
 
@@ -30,8 +37,23 @@ function Upload() {
     setUploadedDataDictionaryFileName(file.name);
   };
 
+  useEffect(() => {
+    const loadConfigs = async () => {
+      await loadConfigOptions();
+    };
+    loadConfigs();
+    setSelectedConfig('Neurobagel');
+  }, [loadConfigOptions, setSelectedConfig]);
+
   return (
-    <div className="flex flex-col items-center gap-8">
+    <div className="flex flex-col items-center gap-8" data-config-loading={isConfigLoading}>
+      <ConfigCard
+        title="Configuration"
+        options={configOptions}
+        value={selectedConfig}
+        isLoading={isConfigLoading}
+        onChange={(value) => setSelectedConfig(value)}
+      />
       <UploadCard
         id="datatable"
         title="Data Table"
@@ -40,6 +62,7 @@ function Upload() {
         uploadedFileName={uploadedDataTableFileName}
         onFileUpload={handleFileUpload}
         previewComponent={<DataTablePreview dataTable={dataTable} columns={columns} />}
+        diableFileUploader={isConfigLoading}
       />
       <UploadCard
         id="datadictionary"
@@ -49,7 +72,7 @@ function Upload() {
         uploadedFileName={uploadedDataDictionaryFileName}
         onFileUpload={handleDataDictionaryFileUpload}
         previewComponent={<DataDictionaryPreview dataDictionary={dataDictionary} />}
-        diableFileUploader={isDataTableEmpty}
+        diableFileUploader={isDataTableEmpty || isConfigLoading}
         FileUploaderToolTipContent={isDataTableEmpty ? 'Please upload a data table first' : ''}
       />
     </div>

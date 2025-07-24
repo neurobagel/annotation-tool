@@ -1,180 +1,152 @@
 import AddIcon from '@mui/icons-material/Add';
-import { Fab, Card, CardContent, CardHeader, Typography } from '@mui/material';
+import CancelIcon from '@mui/icons-material/Cancel';
+import {
+  Fab,
+  Card,
+  CardContent,
+  CardHeader,
+  Typography,
+  Tabs,
+  Tab,
+  CircularProgress,
+} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useState } from 'react';
-import assessmentTerms from '../assets/assessmentTerms.json';
-import { usePagination } from '../hooks';
-import useDataStore from '../stores/data';
-import { Term, TermCard } from '../utils/types';
 import {
-  createSeededUuidGenerator,
-  initializeTermCards,
-  getAvailableTerms,
-  getColumnOptions,
-  getAllMappedColumns,
-  getAssignedTermIdentifiers,
-} from '../utils/util';
+  useMultiColumnMeasuresState,
+  useMultiColumnMeasuresData,
+  useActiveVariableData,
+} from '../hooks';
+import useDataStore from '../stores/data';
+import { MultiColumnMeasuresTerm } from '../utils/internal_types';
+import { getColumnsAssignedText, createMappedColumnHeaders } from '../utils/util';
 import MultiColumnMeasuresCard from './MultiColumnMeasuresCard';
 
-interface MultiColumnMeasuresProps {
-  generateID?: () => string;
-  terms?: Term[];
-}
-
-const defaultProps = {
-  generateID: createSeededUuidGenerator('seed'),
-  terms: assessmentTerms,
-};
-
-function MultiColumnMeasures({
-  generateID = createSeededUuidGenerator('seed'),
-  terms = assessmentTerms,
-}: MultiColumnMeasuresProps) {
+function MultiColumnMeasures() {
   const theme = useTheme();
-  const columns = useDataStore((state) => state.columns);
-  const updateColumnIsPartOf = useDataStore((state) => state.updateColumnIsPartOf);
-
-  const assessmentToolConfigIdentifier = useDataStore
-    .getState()
-    .getAssessmentToolConfig().identifier;
-
-  const assessmentToolColumns = useDataStore.getState().getAssessmentToolColumns();
-
-  const [termCards, setTermCards] = useState<TermCard[]>(
-    initializeTermCards({
-      columns,
-      terms,
-      assessmentToolColumns,
-      generateID,
-    })
+  const [activeTab, setActiveTab] = useState(0);
+  const updateColumnStandardizedVariable = useDataStore(
+    (state) => state.updateColumnStandardizedVariable
   );
 
-  const itemsPerPage = 3;
-  const { currentPage, currentItems, totalPages, handlePaginationChange } = usePagination<TermCard>(
-    termCards,
-    itemsPerPage
-  );
+  const stateManager = useMultiColumnMeasuresState();
+  const { loading, multiColumnVariables, columns } = useMultiColumnMeasuresData();
+  const { activeVariableTab, currentVariableColumns, currentTermCards, variableAllMappedColumns } =
+    useActiveVariableData(multiColumnVariables, activeTab);
 
-  const allMappedColumns = getAllMappedColumns(termCards);
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue);
+  };
 
   const handleAddNewCard = () => {
-    const newCard: TermCard = {
-      id: generateID(),
-      term: null,
-      mappedColumns: [],
-    };
-    const newTermCards = [...termCards, newCard];
-    setTermCards(newTermCards);
-
-    const newTotalPages = Math.ceil(newTermCards.length / itemsPerPage);
-    if (newTotalPages > totalPages) {
-      handlePaginationChange({} as React.ChangeEvent<unknown>, newTotalPages);
+    if (activeVariableTab) {
+      stateManager.addTermCard(activeVariableTab.identifier);
     }
   };
 
-  const handleTermSelect = (cardId: string, term: Term | null) => {
-    setTermCards((prev) => prev.map((card) => (card.id === cardId ? { ...card, term } : card)));
+  const handleTermSelect = (cardId: string, term: MultiColumnMeasuresTerm | null) => {
+    if (activeVariableTab) {
+      stateManager.updateTermInCard(activeVariableTab.identifier, cardId, term);
+    }
   };
 
   const handleColumnSelect = (cardId: string, columnId: string | null) => {
-    if (!columnId) return;
+    if (columnId && activeVariableTab) {
+      stateManager.addColumnToCard(activeVariableTab.identifier, cardId, columnId);
+    }
+  };
 
-    setTermCards((prev) =>
-      prev.map((card) =>
-        card.id === cardId && !card.mappedColumns.includes(columnId)
-          ? { ...card, mappedColumns: [...card.mappedColumns, columnId] }
-          : card
-      )
+  const handleRemoveColumn = (cardId: string, columnId: string) => {
+    if (activeVariableTab) {
+      stateManager.removeColumnFromCard(activeVariableTab.identifier, cardId, columnId);
+    }
+  };
+
+  const handleRemoveCard = (cardId: string) => {
+    if (activeVariableTab) {
+      stateManager.removeTermCard(activeVariableTab.identifier, cardId);
+    }
+  };
+
+  const handleUnassignColumn = (columnId: string) => {
+    if (!activeVariableTab) return;
+
+    const cardWithColumn = currentTermCards.find((card) => card.mappedColumns.includes(columnId));
+
+    if (cardWithColumn) {
+      stateManager.removeColumnFromCard(activeVariableTab.identifier, cardWithColumn.id, columnId);
+    }
+
+    updateColumnStandardizedVariable(columnId, null);
+  };
+
+  // TODO: Remove if not necessary
+  if (loading) {
+    return (
+      <div className="flex justify-center p-4">
+        <CircularProgress />
+      </div>
     );
+  }
 
-    const card = termCards.find((c) => c.id === cardId);
-    if (card?.term) {
-      updateColumnIsPartOf(columnId, {
-        identifier: card.term.identifier,
-        label: card.term.label,
-      });
-    }
-  };
-
-  const removeColumnFromCard = (cardId: string, columnId: string) => {
-    setTermCards((prev) =>
-      prev.map((card) =>
-        card.id === cardId
-          ? {
-              ...card,
-              mappedColumns: card.mappedColumns.filter((id) => id !== columnId),
-            }
-          : card
-      )
-    );
-    updateColumnIsPartOf(columnId, null);
-  };
-
-  const removeCard = (cardId: string) => {
-    const card = termCards.find((c) => c.id === cardId);
-    if (card) {
-      card.mappedColumns.forEach((columnId) => {
-        updateColumnIsPartOf(columnId, null);
-      });
-    }
-
-    const newCards = termCards.filter((termCard) => termCard.id !== cardId);
-    if (newCards.length === 0) {
-      setTermCards([{ id: generateID(), term: null, mappedColumns: [] }]);
-      handlePaginationChange({} as React.ChangeEvent<unknown>, 1);
-    } else {
-      setTermCards(newCards);
-      const newTotalPages = Math.ceil(newCards.length / itemsPerPage);
-      if (currentPage > newTotalPages) {
-        handlePaginationChange({} as React.ChangeEvent<unknown>, newTotalPages);
-      }
-    }
-  };
-
-  const columnsAssigned = () => {
-    if (allMappedColumns.length === 0) return 'No columns assigned';
-    if (allMappedColumns.length === 1) return '1 column assigned';
-    return `${allMappedColumns.length} columns assigned`;
-  };
+  if (!activeVariableTab) {
+    return null;
+  }
 
   return (
     <div className="flex justify-center p-4" data-cy="multi-column-measures">
       <div className="flex flex-row gap-6 max-w-[1200px] w-full">
         <div className="flex-1 min-w-0">
-          <div className="flex flex-col items-center">
-            <div className="w-full flex flex-col gap-4 mb-4">
-              {currentItems.map((card) => (
-                <MultiColumnMeasuresCard
-                  key={card.id}
-                  card={card}
-                  mappedColumnHeaders={Object.fromEntries(
-                    card.mappedColumns.map((id) => [id, columns[id]?.header || `Column ${id}`])
-                  )}
-                  availableTerms={getAvailableTerms(
-                    terms,
-                    getAssignedTermIdentifiers(termCards, card.id)
-                  )}
-                  columnOptions={getColumnOptions(
-                    columns,
-                    assessmentToolConfigIdentifier,
-                    allMappedColumns
-                  )}
-                  onTermSelect={(term) => handleTermSelect(card.id, term)}
-                  onColumnSelect={(columnId) => handleColumnSelect(card.id, columnId)}
-                  onRemoveColumn={(columnId) => removeColumnFromCard(card.id, columnId)}
-                  onRemoveCard={() => removeCard(card.id)}
-                />
-              ))}
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            aria-label="Multi-column measures tabs"
+          >
+            {multiColumnVariables.map((variable, index) => (
+              <Tab
+                data-cy={`multi-column-measures-tab-${variable.label}`}
+                key={variable.identifier}
+                label={variable.label}
+                id={`tab-${index}`}
+              />
+            ))}
+          </Tabs>
+
+          <div className="flex flex-col">
+            <div className="w-full h-[65vh] overflow-y-auto">
+              <div className="space-y-4">
+                {currentTermCards.map((card, index) => (
+                  <div key={card.id} className="w-full">
+                    <MultiColumnMeasuresCard
+                      card={card}
+                      cardIndex={index}
+                      mappedColumnHeaders={createMappedColumnHeaders(card.mappedColumns, columns)}
+                      availableTerms={
+                        stateManager.availableTermsForVariables[activeVariableTab.identifier]?.[
+                          card.id
+                        ] ||
+                        stateManager.availableTermsForVariables[activeVariableTab.identifier]
+                          ?.null ||
+                        []
+                      }
+                      columnOptions={
+                        stateManager.columnOptionsForVariables[activeVariableTab.identifier] || []
+                      }
+                      onTermSelect={(term) => handleTermSelect(card.id, term)}
+                      onColumnSelect={(columnId) => handleColumnSelect(card.id, columnId)}
+                      onRemoveColumn={(columnId) => handleRemoveColumn(card.id, columnId)}
+                      onRemoveCard={() => handleRemoveCard(card.id)}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <Fab
-              color="primary"
-              onClick={handleAddNewCard}
-              className="mt-4"
-              data-cy="add-term-card-button"
-            >
-              <AddIcon />
-            </Fab>
+            <div className="flex justify-center mt-4">
+              <Fab color="primary" onClick={handleAddNewCard} data-cy="add-term-card-button">
+                <AddIcon />
+              </Fab>
+            </div>
           </div>
         </div>
 
@@ -184,25 +156,37 @@ function MultiColumnMeasures({
             elevation={3}
             data-cy="multi-column-measures-columns-card"
           >
-            <CardHeader className="bg-gray-50" title="Assessment: all columns" />
+            <CardHeader className="bg-gray-50" title={`${activeVariableTab.label}: all columns`} />
             <CardContent className="text-center">
               <div className="max-h-[500px] overflow-auto">
-                {assessmentToolColumns.map(({ id, header }) => (
-                  <div key={id} className="p-2 border-b">
+                {currentVariableColumns.map(({ id, header }) => (
+                  <div key={id} className="p-2 border-b flex items-center justify-between">
                     <Typography
                       sx={{
-                        color: allMappedColumns.includes(id)
+                        color: variableAllMappedColumns.includes(id)
                           ? theme.palette.primary.main
                           : 'inherit',
                       }}
                     >
                       {header}
                     </Typography>
+                    <CancelIcon
+                      sx={{
+                        fontSize: 16,
+                        color: theme.palette.grey[500],
+                        cursor: 'pointer',
+                        '&:hover': {
+                          color: theme.palette.error.main,
+                        },
+                      }}
+                      onClick={() => handleUnassignColumn(id)}
+                      data-cy={`unassign-column-${id}`}
+                    />
                   </div>
                 ))}
               </div>
               <Typography variant="body2" className="mt-8">
-                {columnsAssigned()}
+                {getColumnsAssignedText(variableAllMappedColumns.length)}
               </Typography>
             </CardContent>
           </Card>
@@ -212,5 +196,4 @@ function MultiColumnMeasures({
   );
 }
 
-MultiColumnMeasures.defaultProps = defaultProps;
 export default MultiColumnMeasures;
