@@ -9,7 +9,6 @@ import {
   Autocomplete,
   TextField,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
 import useDataStore from '~/stores/data';
 import { StandardizedVariable } from '../utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
@@ -48,24 +47,9 @@ function Categorical({
     state.isMultiColumnMeasureStandardizedVariable(standardizedVariable)
   );
   const showStandardizedTerm = standardizedVariable && !isMultiColumnMeasureStandardizedVariable;
-  const [options, setOptions] = useState<StandardizedVariable[]>([]);
 
-  const { getTermOptions } = useDataStore();
-
-  useEffect(() => {
-    if (standardizedVariable) {
-      const fetchOptions = async () => {
-        try {
-          const result = await getTermOptions(standardizedVariable);
-          setOptions(result);
-        } catch (error) {
-          // TODO: show a notif error
-        }
-      };
-
-      fetchOptions();
-    }
-  }, [standardizedVariable, getTermOptions]);
+  const termOptions = useDataStore((state) => state.termOptions);
+  const options = standardizedVariable ? termOptions[standardizedVariable.identifier] || [] : [];
 
   return (
     <TableContainer

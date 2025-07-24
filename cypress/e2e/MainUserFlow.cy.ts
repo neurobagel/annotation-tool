@@ -15,6 +15,10 @@ describe('Main user flow', () => {
     cy.contains('Welcome to the Neurobagel Annotation Tool');
     cy.get('[data-cy="next-button"]').click();
 
+    // Wait for config skeleton to disappear and dropdown to be ready
+    cy.get('[data-cy="config-card-dropdown"]', { timeout: 10000 }).should('be.visible');
+    cy.get('[data-config-loading="false"]').should('exist');
+
     // Upload view
     cy.get('[data-cy="back-button"]').should('contain', 'Landing');
     cy.get('[data-cy="next-button"]').should('contain', 'Column Annotation');
@@ -132,6 +136,10 @@ describe('Main user flow', () => {
   it('steps through the different app workflows with a partially annotated data dictionary', () => {
     cy.visit('http://localhost:5173');
     cy.get('[data-cy="next-button"]').click();
+
+    // Wait for config skeleton to disappear and dropdown to be ready
+    cy.get('[data-cy="config-card-dropdown"]', { timeout: 10000 }).should('be.visible');
+    cy.get('[data-config-loading="false"]').should('exist');
 
     // Upload view
     cy.get('[data-cy="datatable-upload-input"]').selectFile(mockDataTableFilePath, {
@@ -375,6 +383,11 @@ describe('Main user flow', () => {
   it('loads in a data dictionary from the legacy annotation tool', () => {
     cy.visit('http://localhost:5173');
     cy.get('[data-cy="next-button"]').click();
+
+    // Wait for config skeleton to disappear and dropdown to be ready
+    cy.get('[data-cy="config-card-dropdown"]', { timeout: 10000 }).should('be.visible');
+    cy.get('[data-config-loading="false"]').should('exist');
+
     cy.get('[data-cy="datatable-upload-input"]').selectFile(legacyDataTableFilePath, {
       force: true,
     });

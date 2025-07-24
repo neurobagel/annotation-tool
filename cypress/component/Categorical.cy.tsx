@@ -20,7 +20,11 @@ const props = {
 
 describe('Categorical', () => {
   beforeEach(() => {
-    useDataStore.setState({ getTermOptions: () => [{ label: 'test', identifier: 'test' }] });
+    useDataStore.setState({
+      termOptions: {
+        'nb:Diagnosis': [{ label: 'test', identifier: 'test' }],
+      },
+    });
   });
   it('renders the component correctly', () => {
     cy.mount(

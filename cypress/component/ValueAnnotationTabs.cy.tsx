@@ -30,11 +30,8 @@ describe('ValueAnnotationTabs', () => {
           },
         ],
       },
-      getTermOptions: (standardizedVariable) => {
-        if (standardizedVariable?.identifier === 'nb:Sex') {
-          return [{ identifier: 'test', label: 'test' }];
-        }
-        return [];
+      termOptions: {
+        'nb:Sex': [{ identifier: 'test', label: 'test' }],
       },
     });
   });

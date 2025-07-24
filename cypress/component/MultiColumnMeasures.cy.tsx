@@ -6,26 +6,27 @@ describe('MultiColumnMeasures', () => {
   beforeEach(() => {
     const updateColumnIsPartOfSpy = cy.spy().as('updateColumnIsPartOfSpy');
     const updateColumnStandardizedVariable = cy.spy().as('updateColumnStandardizedVariable');
-    const getTermOptionsSpy = cy.stub().returns([
-      {
-        identifier: 'someIdentifier',
-        label: 'some term',
-      },
-      {
-        identifier: 'anotherIdentifier',
-        label: 'another term',
-      },
-      {
-        identifier: 'someOtherIdentifier',
-        label: 'some other term',
-      },
-    ]);
 
     useDataStore.setState({
       updateColumnIsPartOf: updateColumnIsPartOfSpy,
       updateColumnStandardizedVariable,
-      getTermOptions: getTermOptionsSpy,
       config: mockConfig,
+      termOptions: {
+        'nb:Assessment': [
+          {
+            identifier: 'someIdentifier',
+            label: 'some term',
+          },
+          {
+            identifier: 'anotherIdentifier',
+            label: 'another term',
+          },
+          {
+            identifier: 'someOtherIdentifier',
+            label: 'some other term',
+          },
+        ],
+      },
       columns: {
         '1': {
           header: 'some column',

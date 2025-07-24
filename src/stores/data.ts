@@ -19,6 +19,7 @@ type DataStore = {
   dataTable: DataTable;
   columns: Columns;
   uploadedDataTableFileName: string | null;
+  isConfigLoading: boolean;
   setDataTable: (data: DataTable) => void;
   initializeColumns: (data: Columns) => void;
   setUploadedDataTableFileName: (fileName: string | null) => void;
@@ -67,7 +68,8 @@ type DataStore = {
   setSelectedConfig: (configName: string | null) => void;
   loadConfig: (configName: string) => Promise<void>;
   hasMultiColumnMeasures: () => boolean;
-  getTermOptions: (standardizedVariable: StandardizedVariable) => StandardizedTerm[];
+  termOptions: Record<string, StandardizedTerm[]>;
+  updateTermOptions: () => void;
   formatOptions: Record<string, TermFormat[]>;
   updateFormatOptions: () => void;
   isMultiColumnMeasureStandardizedVariable: (
@@ -104,6 +106,7 @@ const initialState = {
   dataTable: {},
   columns: {},
   uploadedDataTableFileName: null,
+  isConfigLoading: true,
   uploadedDataDictionary: {},
   uploadedDataDictionaryFileName: null,
   configOptions: [],
@@ -112,6 +115,7 @@ const initialState = {
   mappedStandardizedVariables: [],
   mappedMultiColumnMeasureStandardizedVariables: [],
   multiColumnMeasureVariableIdentifiers: new Set<string>(),
+  termOptions: {},
   formatOptions: {},
   multiColumnMeasuresStates: {},
   columnOptionsForVariables: {},
@@ -611,20 +615,24 @@ const useDataStore = create<DataStore>()(
     },
 
     loadConfig: async (configName: string) => {
+      set({ isConfigLoading: true });
       try {
         const { config: configFile, termsData } = await fetchConfig(configName);
         const mappedConfig = mapConfigFileToStoreConfig(configFile, termsData);
         set({ config: mappedConfig });
         // Update derived state when config changes
         get().updateStandardizedVariables();
+        get().updateTermOptions();
         get().updateFormatOptions();
         get().updateMappedStandardizedVariables();
         get().updateMappedMultiColumnMeasureStandardizedVariables();
         get().updateMultiColumnMeasureVariableIdentifiers();
+        set({ isConfigLoading: false });
       } catch (error) {
         // TODO: show a notif error
         // The fallback is already handled in fetchConfig, so if we get here,
         // both remote and default config failed
+        set({ isConfigLoading: false });
       }
     },
 
@@ -638,15 +646,19 @@ const useDataStore = create<DataStore>()(
       }
     },
 
-    getTermOptions: (standardizedVariable: StandardizedVariable) => {
+    updateTermOptions: () => {
       const { config } = get();
-      const matchingConfigEntry = Object.values(config).find(
-        (configEntry) => configEntry.identifier === standardizedVariable.identifier
-      );
-      if (matchingConfigEntry && matchingConfigEntry.terms) {
-        return matchingConfigEntry.terms;
-      }
-      return [];
+      const termOptions: Record<string, StandardizedTerm[]> = {};
+
+      Object.values(config).forEach((configEntry) => {
+        if (configEntry.terms) {
+          termOptions[configEntry.identifier] = configEntry.terms;
+        } else {
+          termOptions[configEntry.identifier] = [];
+        }
+      });
+
+      set({ termOptions });
     },
 
     updateFormatOptions: () => {
@@ -690,7 +702,8 @@ const useDataStore = create<DataStore>()(
 
       if (!variable) return;
 
-      const terms = get().getTermOptions(variable);
+      const { termOptions } = get();
+      const terms = termOptions[variable.identifier] || [];
       const variableColumns = get().getStandardizedVariableColumns(variable);
       const { columns } = get();
 
