@@ -15,8 +15,27 @@ const props = {
 describe('ValueAnnotationTabs', () => {
   beforeEach(() => {
     useDataStore.setState({
-      getTermOptions: () => [{ label: 'test', identifier: 'test' }],
       config: mockConfig,
+      formatOptions: {
+        'nb:Age': [
+          {
+            termURL: 'nb:FromFloat',
+            label: 'float',
+            examples: ['31.5'],
+          },
+          {
+            termURL: 'nb:FromEuro',
+            label: 'euro',
+            examples: ['31,5'],
+          },
+        ],
+      },
+      getTermOptions: (standardizedVariable) => {
+        if (standardizedVariable?.identifier === 'nb:Sex') {
+          return [{ identifier: 'test', label: 'test' }];
+        }
+        return [];
+      },
     });
   });
   it('renders the component correctly', () => {

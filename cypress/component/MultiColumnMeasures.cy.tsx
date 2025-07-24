@@ -25,6 +25,7 @@ describe('MultiColumnMeasures', () => {
       updateColumnIsPartOf: updateColumnIsPartOfSpy,
       updateColumnStandardizedVariable,
       getTermOptions: getTermOptionsSpy,
+      config: mockConfig,
       columns: {
         '1': {
           header: 'some column',
@@ -52,6 +53,12 @@ describe('MultiColumnMeasures', () => {
           },
         },
       },
+      mappedMultiColumnMeasureStandardizedVariables: [
+        {
+          identifier: 'nb:Assessment',
+          label: 'Assessment Tool',
+        },
+      ],
       multiColumnMeasuresStates: {
         'nb:Assessment': {
           terms: [
@@ -80,8 +87,29 @@ describe('MultiColumnMeasures', () => {
           ],
         },
       },
+      columnOptionsForVariables: {
+        'nb:Assessment': [
+          { id: '1', label: 'some column', disabled: true },
+          { id: '2', label: 'another column', disabled: false },
+          { id: '3', label: 'some other column', disabled: false },
+        ],
+      },
+      availableTermsForVariables: {
+        'nb:Assessment': {
+          'card-0': [
+            { identifier: 'someIdentifier', label: 'some term', disabled: true },
+            { identifier: 'anotherIdentifier', label: 'another term', disabled: false },
+            { identifier: 'someOtherIdentifier', label: 'some other term', disabled: false },
+          ],
+          null: [
+            { identifier: 'someIdentifier', label: 'some term', disabled: true },
+            { identifier: 'anotherIdentifier', label: 'another term', disabled: false },
+            { identifier: 'someOtherIdentifier', label: 'some other term', disabled: false },
+          ],
+        },
+      },
     });
-    useDataStore.setState({ config: mockConfig });
+
     cy.mount(<MultiColumnMeasures />);
   });
 
@@ -126,7 +154,7 @@ describe('MultiColumnMeasures', () => {
     cy.get('@updateColumnIsPartOfSpy').should('have.been.calledWith', '1', null);
     cy.get('[data-cy="mapped-column-1"]').should('not.exist');
   });
-  it('fires updateColumnStandardizedVariable with the appropriate payload when a column is unannotated', () => {
+  it('fires updateColumnStandardizedVariable with the appropriate payload when a column is removed from the multi-column instrument', () => {
     cy.get('[data-cy="unassign-column-1"]').click();
     cy.get('@updateColumnStandardizedVariable').should('have.been.calledWith', '1', null);
     cy.get('[data-cy="mapped-column-1"]').should('not.exist');

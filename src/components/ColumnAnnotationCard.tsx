@@ -40,8 +40,8 @@ function ColumnAnnotationCard({
   onDataTypeChange,
   onStandardizedVariableChange,
 }: ColumnAnnotationCardProps) {
-  const isMultiColumnMeasureStandardizedVariable = useDataStore(
-    (state) => state.isMultiColumnMeasureStandardizedVariable
+  const columnIsMultiColumnMeasure = useDataStore((state) =>
+    state.isMultiColumnMeasureStandardizedVariable(standardizedVariable)
   );
   const handleDataTypeChange = (
     _: React.MouseEvent<HTMLElement>,
@@ -68,7 +68,7 @@ function ColumnAnnotationCard({
     ) &&
     // Treat multi column measures differently
     // allow user to select a data type even when the standardized variable is selected
-    !isMultiColumnMeasureStandardizedVariable(standardizedVariable);
+    !columnIsMultiColumnMeasure;
 
   return (
     <Card data-cy={`${id}-column-annotation-card`} className="mx-auto w-full max-w-5xl shadow-lg">

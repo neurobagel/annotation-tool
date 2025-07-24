@@ -14,6 +14,10 @@ describe('SideColumnNavBar', () => {
       columns: props.columns,
       config: mockConfig,
     });
+
+    // Update derived state after setting up the store
+    const store = useDataStore.getState();
+    store.updateMappedStandardizedVariables();
   });
   it('renders the component correctly', () => {
     cy.mount(

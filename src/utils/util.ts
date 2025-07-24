@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { fetchConfigGitHubURL } from './constants';
 import {
   ConfigFile,
   VocabConfig,
@@ -18,9 +19,7 @@ import {
 
 export async function fetchAvailableConfigs(): Promise<string[]> {
   try {
-    const response = await axios.get(
-      'https://api.github.com/repos/neurobagel/communities/contents/'
-    );
+    const response = await axios.get(fetchConfigGitHubURL);
     const data = response.data as { type: string; name: string }[];
     const dirs = data.filter((item) => item.type === 'dir');
     return dirs.map((dir) => dir.name).sort();

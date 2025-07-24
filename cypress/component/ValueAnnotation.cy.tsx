@@ -8,6 +8,11 @@ describe('ValueAnnotation', () => {
       columns: { ...mockColumns, ...mockColumnsWithDataType },
       config: mockConfig,
     });
+
+    // Update derived state after setting up the store
+    const store = useDataStore.getState();
+    store.updateMappedStandardizedVariables();
+    store.updateMultiColumnMeasureVariableIdentifiers();
   });
   it('renders the component correctly', () => {
     cy.mount(<ValueAnnotation />);
@@ -43,6 +48,10 @@ describe('ValueAnnotation', () => {
         },
       },
     }));
+
+    // Update derived state after modifying columns
+    const store = useDataStore.getState();
+    store.updateMappedStandardizedVariables();
 
     cy.mount(<ValueAnnotation />);
     cy.get('[data-cy="side-column-nav-bar-continuous-select-button"]').click();

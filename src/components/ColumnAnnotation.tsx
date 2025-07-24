@@ -5,9 +5,7 @@ import { Column } from '../utils/internal_types';
 import ColumnAnnotationCard from './ColumnAnnotationCard';
 
 function ColumnAnnotation() {
-  const columns = useDataStore((state) => state.columns);
-  const { getStandardizedVariables } = useDataStore();
-  const standardizedVariableOptions = getStandardizedVariables();
+  const { columns, standardizedVariables } = useDataStore();
 
   const { handleDescriptionChange, handleDataTypeChange, handleStandardizedVariableChange } =
     useColumnUpdates();
@@ -31,7 +29,7 @@ function ColumnAnnotation() {
           description={column.description || null}
           dataType={column.dataType || null}
           standardizedVariable={column.standardizedVariable || null}
-          standardizedVariableOptions={standardizedVariableOptions}
+          standardizedVariableOptions={standardizedVariables}
           onDescriptionChange={handleDescriptionChange}
           onDataTypeChange={handleDataTypeChange}
           onStandardizedVariableChange={handleStandardizedVariableChange}

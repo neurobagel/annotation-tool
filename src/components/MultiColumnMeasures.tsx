@@ -25,11 +25,12 @@ import MultiColumnMeasuresCard from './MultiColumnMeasuresCard';
 function MultiColumnMeasures() {
   const theme = useTheme();
   const [activeTab, setActiveTab] = useState(0);
-  const { updateColumnStandardizedVariable } = useDataStore();
+  const updateColumnStandardizedVariable = useDataStore(
+    (state) => state.updateColumnStandardizedVariable
+  );
 
   const stateManager = useMultiColumnMeasuresState();
   const { loading, multiColumnVariables, columns } = useMultiColumnMeasuresData();
-
   const { activeVariableTab, currentVariableColumns, currentTermCards, variableAllMappedColumns } =
     useActiveVariableData(multiColumnVariables, activeTab);
 
@@ -38,28 +39,33 @@ function MultiColumnMeasures() {
   };
 
   const handleAddNewCard = () => {
-    if (!activeVariableTab) return;
-    stateManager.addTermCard(activeVariableTab.identifier);
+    if (activeVariableTab) {
+      stateManager.addTermCard(activeVariableTab.identifier);
+    }
   };
 
   const handleTermSelect = (cardId: string, term: MultiColumnMeasuresTerm | null) => {
-    if (!activeVariableTab) return;
-    stateManager.updateTermInCard(activeVariableTab.identifier, cardId, term);
+    if (activeVariableTab) {
+      stateManager.updateTermInCard(activeVariableTab.identifier, cardId, term);
+    }
   };
 
   const handleColumnSelect = (cardId: string, columnId: string | null) => {
-    if (!columnId || !activeVariableTab) return;
-    stateManager.addColumnToCard(activeVariableTab.identifier, cardId, columnId);
+    if (columnId && activeVariableTab) {
+      stateManager.addColumnToCard(activeVariableTab.identifier, cardId, columnId);
+    }
   };
 
   const handleRemoveColumn = (cardId: string, columnId: string) => {
-    if (!activeVariableTab) return;
-    stateManager.removeColumnFromCard(activeVariableTab.identifier, cardId, columnId);
+    if (activeVariableTab) {
+      stateManager.removeColumnFromCard(activeVariableTab.identifier, cardId, columnId);
+    }
   };
 
   const handleRemoveCard = (cardId: string) => {
-    if (!activeVariableTab) return;
-    stateManager.removeTermCard(activeVariableTab.identifier, cardId);
+    if (activeVariableTab) {
+      stateManager.removeTermCard(activeVariableTab.identifier, cardId);
+    }
   };
 
   const handleUnassignColumn = (columnId: string) => {
@@ -80,6 +86,10 @@ function MultiColumnMeasures() {
         <CircularProgress />
       </div>
     );
+  }
+
+  if (!activeVariableTab) {
+    return null;
   }
 
   return (
@@ -110,13 +120,17 @@ function MultiColumnMeasures() {
                       card={card}
                       cardIndex={index}
                       mappedColumnHeaders={createMappedColumnHeaders(card.mappedColumns, columns)}
-                      availableTerms={stateManager.getAvailableTermsForVariable(
-                        activeVariableTab?.identifier || '',
-                        card.id
-                      )}
-                      columnOptions={stateManager.getColumnOptionsForVariable(
-                        activeVariableTab?.identifier || ''
-                      )}
+                      availableTerms={
+                        stateManager.availableTermsForVariables[activeVariableTab.identifier]?.[
+                          card.id
+                        ] ||
+                        stateManager.availableTermsForVariables[activeVariableTab.identifier]
+                          ?.null ||
+                        []
+                      }
+                      columnOptions={
+                        stateManager.columnOptionsForVariables[activeVariableTab.identifier] || []
+                      }
                       onTermSelect={(term) => handleTermSelect(card.id, term)}
                       onColumnSelect={(columnId) => handleColumnSelect(card.id, columnId)}
                       onRemoveColumn={(columnId) => handleRemoveColumn(card.id, columnId)}
@@ -141,10 +155,7 @@ function MultiColumnMeasures() {
             elevation={3}
             data-cy="multi-column-measures-columns-card"
           >
-            <CardHeader
-              className="bg-gray-50"
-              title={`${activeVariableTab?.label || 'Variable'}: all columns`}
-            />
+            <CardHeader className="bg-gray-50" title={`${activeVariableTab.label}: all columns`} />
             <CardContent className="text-center">
               <div className="max-h-[500px] overflow-auto">
                 {currentVariableColumns.map(({ id, header }) => (

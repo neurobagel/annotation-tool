@@ -44,11 +44,10 @@ function Categorical({
   onToggleMissingValue,
   onUpdateLevelTerm,
 }: CategoricalProps) {
-  const { isMultiColumnMeasureStandardizedVariable: isMultiMeasureColumnStandardizedVariable } =
-    useDataStore();
-
-  const showStandardizedTerm =
-    standardizedVariable && !isMultiMeasureColumnStandardizedVariable(standardizedVariable);
+  const isMultiColumnMeasureStandardizedVariable = useDataStore((state) =>
+    state.isMultiColumnMeasureStandardizedVariable(standardizedVariable)
+  );
+  const showStandardizedTerm = standardizedVariable && !isMultiColumnMeasureStandardizedVariable;
   const [options, setOptions] = useState<StandardizedVariable[]>([]);
 
   const { getTermOptions } = useDataStore();

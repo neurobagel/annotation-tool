@@ -261,8 +261,10 @@ describe('data store actions', () => {
     const { result } = renderHook(() => useDataStore());
     act(() => {
       result.current.columns = mockColumns;
+      result.current.config = mockConfig;
+      result.current.updateMappedStandardizedVariables();
     });
-    expect(result.current.getMappedStandardizedVariables()).toEqual([
+    expect(result.current.mappedStandardizedVariables).toEqual([
       {
         identifier: 'nb:Age',
         label: 'Age',

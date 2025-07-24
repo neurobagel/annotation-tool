@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { describe, it, expect, vi } from 'vitest';
+import { fetchConfigGitHubURL, fetchFileGitHubURL } from './constants';
 import { mockGitHubResponse, mockConfigFile, mockTermsData, mockConfig } from './mocks';
 import { fetchAvailableConfigs, fetchConfig, mapConfigFileToStoreConfig } from './util';
 
@@ -8,14 +9,12 @@ vi.mock('axios');
 const mockedAxios = vi.mocked(axios, true);
 
 describe('fetchAvailableConfigs', () => {
-  it('should fetch available configs from GitHub successfully', async () => {
+  it('should fetch available configs from the right GitHub location and handles the (mock) response', async () => {
     mockedAxios.get.mockResolvedValueOnce({ data: mockGitHubResponse });
 
     const result = await fetchAvailableConfigs();
 
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-      'https://api.github.com/repos/neurobagel/communities/contents/'
-    );
+    expect(mockedAxios.get).toHaveBeenCalledWith(fetchConfigGitHubURL);
     expect(result).toEqual(['Neurobagel', 'OtherConfig', 'TestConfig']);
   });
 
@@ -24,9 +23,7 @@ describe('fetchAvailableConfigs', () => {
 
     const result = await fetchAvailableConfigs();
 
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-      'https://api.github.com/repos/neurobagel/communities/contents/'
-    );
+    expect(mockedAxios.get).toHaveBeenCalledWith(fetchConfigGitHubURL);
     expect(result).toEqual(['Neurobagel']);
   });
 
@@ -53,18 +50,10 @@ describe('fetchConfig', () => {
 
     const result = await fetchConfig('Neurobagel');
 
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-      'https://raw.githubusercontent.com/neurobagel/communities/main/Neurobagel/config.json'
-    );
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-      'https://raw.githubusercontent.com/neurobagel/communities/main/Neurobagel/sex.json'
-    );
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-      'https://raw.githubusercontent.com/neurobagel/communities/main/Neurobagel/diagnosis.json'
-    );
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-      'https://raw.githubusercontent.com/neurobagel/communities/main/Neurobagel/assessment.json'
-    );
+    expect(mockedAxios.get).toHaveBeenCalledWith(`${fetchFileGitHubURL}config.json`);
+    expect(mockedAxios.get).toHaveBeenCalledWith(`${fetchFileGitHubURL}sex.json`);
+    expect(mockedAxios.get).toHaveBeenCalledWith(`${fetchFileGitHubURL}diagnosis.json`);
+    expect(mockedAxios.get).toHaveBeenCalledWith(`${fetchFileGitHubURL}assessment.json`);
     expect(result.config).toEqual(mockConfigFile);
     expect(result.termsData).toEqual(mockTermsData);
   });
@@ -161,7 +150,7 @@ describe('fetchConfig', () => {
     expect(result.termsData).toEqual(mockTermsData);
   });
 
-  it('should handle terms file loading errors gracefully', async () => {
+  it('should handle file loading errors gracefully', async () => {
     const configArray = [mockConfigFile];
 
     mockedAxios.get

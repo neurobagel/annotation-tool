@@ -42,19 +42,16 @@ function Continuous({
   onToggleMissingValue,
   onUpdateFormat,
 }: ContinuousProps) {
-  const {
-    columns,
-    getFormatOptions,
-    isMultiColumnMeasureStandardizedVariable: isMultiMeasureColumnStandardizedVariable,
-  } = useDataStore();
+  const columns = useDataStore((state) => state.columns);
+  const formatOptions = useDataStore((state) => state.formatOptions);
 
-  const showFormat =
-    standardizedVariable && !isMultiMeasureColumnStandardizedVariable(standardizedVariable);
-  // Don't show units when the variable is a multi column measure and its data type is null
-  const showUnits = !(
-    isMultiMeasureColumnStandardizedVariable(standardizedVariable) &&
-    columns[columnID].dataType === null
+  const columnIsMultiColumnMeasure = useDataStore((state) =>
+    state.isMultiColumnMeasureStandardizedVariable(standardizedVariable)
   );
+
+  const showFormat = standardizedVariable && !columnIsMultiColumnMeasure;
+  // Don't show units when the variable is a multi column measure and its data type is null
+  const showUnits = !(columnIsMultiColumnMeasure && columns[columnID].dataType === null);
 
   return (
     <Paper elevation={3} className="h-full shadow-lg" data-cy={`${columnID}-continuous`}>
@@ -131,7 +128,7 @@ function Continuous({
           {showFormat && (
             <Autocomplete
               data-cy={`${columnID}-format-dropdown`}
-              options={getFormatOptions(standardizedVariable)}
+              options={formatOptions[standardizedVariable.identifier] || []}
               getOptionLabel={(option) => option.label}
               renderOption={(props, option) => (
                 // eslint-disable-next-line react/jsx-props-no-spreading
@@ -147,7 +144,7 @@ function Continuous({
                 </li>
               )}
               value={
-                getFormatOptions(standardizedVariable).find(
+                (formatOptions[standardizedVariable.identifier] || []).find(
                   (opt) => opt.termURL === format?.termURL
                 ) || null
               }

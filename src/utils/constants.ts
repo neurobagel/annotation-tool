@@ -10,3 +10,8 @@ export const steps: StepConfig[] = [
   { label: 'Value Annotation', view: View.ValueAnnotation, icon: FactCheckIcon },
   { label: 'Download', view: View.Download, icon: CloudDownloadIcon },
 ];
+
+export const fetchConfigGitHubURL = 'https://api.github.com/repos/neurobagel/communities/contents/';
+
+export const fetchFileGitHubURL =
+  'https://raw.githubusercontent.com/neurobagel/communities/main/Neurobagel/';

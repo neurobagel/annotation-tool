@@ -21,6 +21,44 @@ const props = {
 };
 
 describe('Continuous', () => {
+  beforeEach(() => {
+    useDataStore.setState({
+      formatOptions: {
+        'nb:Age': [
+          {
+            termURL: 'nb:FromFloat',
+            label: 'float',
+            examples: ['31.5'],
+          },
+          {
+            termURL: 'nb:FromInt',
+            label: 'int',
+            examples: ['31'],
+          },
+          {
+            termURL: 'nb:FromEuro',
+            label: 'euro',
+            examples: ['31,5'],
+          },
+          {
+            termURL: 'nb:FromBounded',
+            label: 'bounded',
+            examples: ['30+'],
+          },
+          {
+            termURL: 'nb:FromRange',
+            label: 'range',
+            examples: ['30-35'],
+          },
+          {
+            termURL: 'nb:FromISO8601',
+            label: 'iso8601',
+            examples: ['31Y6M'],
+          },
+        ],
+      },
+    });
+  });
   it('renders the component correctly for an annotated column', () => {
     cy.mount(
       <Continuous
