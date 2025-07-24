@@ -1,3 +1,41 @@
+# v0.2.0 (Thu Jul 24 2025)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Alyssa Dai ([@alyssadai](https://github.com/alyssadai)), for all your work!
+
+#### 💥 Breaking Changes
+
+- [ENH] Implemented configurability logic [#168](https://github.com/neurobagel/annotation-tool/pull/168) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Implemented feature complete value annotation [#130](https://github.com/neurobagel/annotation-tool/pull/130) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Implemented `MultiColumnMeasure` flow [#113](https://github.com/neurobagel/annotation-tool/pull/113) ([@rmanaem](https://github.com/rmanaem))
+
+#### 🚀 Enhancements
+
+- 🔄 synced local '.github/dependabot.yml' with remote 'template_workflows/dependabot.yml' [#97](https://github.com/neurobagel/annotation-tool/pull/97) ([@neurobagel-bot[bot]](https://github.com/neurobagel-bot[bot]))
+
+#### 🐛 Bug Fixes
+
+- [FIX] Fixed the `Assessment Tool` identifier in default config [#156](https://github.com/neurobagel/annotation-tool/pull/156) ([@rmanaem](https://github.com/rmanaem))
+- [FIX] Fixed the `undefined` label on back button to landing view [#127](https://github.com/neurobagel/annotation-tool/pull/127) ([@rmanaem](https://github.com/rmanaem))
+- [FIX] Fixed the issue with shared state between Columns in `DescriptionEditor` of `Continuous` Component [#96](https://github.com/neurobagel/annotation-tool/pull/96) ([@rmanaem](https://github.com/rmanaem))
+
+#### 🏠 Internal
+
+- [MNT] Update data dictionary schema to CLI v0.6.0 [#172](https://github.com/neurobagel/annotation-tool/pull/172) ([@alyssadai](https://github.com/alyssadai) [@rmanaem](https://github.com/rmanaem))
+
+####  🧪 Tests
+
+- [MNT] Updated and added tests to cover newly added functionalitie [#153](https://github.com/neurobagel/annotation-tool/pull/153) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 3
+
+- [@neurobagel-bot[bot]](https://github.com/neurobagel-bot[bot])
+- Alyssa Dai ([@alyssadai](https://github.com/alyssadai))
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.1.0 (Tue Mar 18 2025)
 
 :tada: This release contains work from new contributors! :tada:
