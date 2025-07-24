@@ -52,7 +52,7 @@ Variables with `data_type: null` are typically used for unique observation ident
 
 | Field Name   | Description                                                                                                                                     | Required | Type   | Example                  |
 | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------------------ |
-| `terms_file` | Path to the vocabulary JSON file containing allowed standardized term options for variable instances, relative to the configuration's directory | Yes\*    | string | `"assessmentTerms.json"` |
+| `terms_file` | Path to the vocabulary JSON file containing allowed standardized term options for variable instances, relative to the configuration's directory | Yes      | string | `"assessmentTerms.json"` |
 
 ### Format Configuration
 
