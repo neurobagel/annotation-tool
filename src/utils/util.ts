@@ -115,10 +115,6 @@ export function mapConfigFileToStoreConfig(
               ...restTermFields,
             });
           });
-          // TODO: Remove this once we have a workflow for handling Healthy control
-          if (termsFile.includes('diagnosis')) {
-            allTerms.push({ label: 'Healthy Control', identifier: 'ncit:C94342' });
-          }
         }
       });
       terms = allTerms;

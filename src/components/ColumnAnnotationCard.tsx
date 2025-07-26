@@ -115,7 +115,7 @@ function ColumnAnnotationCard({
                     sx={{ fontSize: '1.2rem' }}
                     placement="right"
                     title={
-                      'Data type is automatically determined by standardized variable selection \n' +
+                      'Data type is automatically determined by standardized variable selection. \n' +
                       ' To change the data type manually, remove the standardized variable'
                     }
                   >

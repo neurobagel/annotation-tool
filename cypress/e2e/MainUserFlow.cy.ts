@@ -91,7 +91,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="side-column-nav-bar-categorical-select-button"]').click();
     cy.get('[data-cy="4-categorical"]')
       .should('be.visible')
-      .and('contain', 'HC')
+      .and('contain', 'ADHD')
       .and('contain', 'PD');
     cy.get('[data-cy="side-column-nav-bar-sex-sex"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-age-select-button"]').click();
@@ -232,11 +232,16 @@ describe('Main user flow', () => {
     cy.get('[data-cy="3-N/A-missing-value-button"]').click();
     cy.get('[data-cy="side-column-nav-bar-diagnosis-group_dx"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-diagnosis-select-button"]').click();
-    cy.get('[data-cy="4-HC-edit-description-button"]').click();
-    cy.get('[data-cy="4-HC-description-input"]').type('Healthy control');
-    cy.get('[data-cy="4-HC-save-description-button"]').click();
-    cy.get('[data-cy="4-HC-description"]').should('contain', 'Healthy control');
-    cy.get('[data-cy="4-HC-term-dropdown"]').type('Healthy control{downArrow}{enter}');
+    cy.get('[data-cy="4-ADHD-edit-description-button"]').click();
+    cy.get('[data-cy="4-ADHD-description-input"]').type('Attention deficit hyperactivity disorder');
+    cy.get('[data-cy="4-ADHD-save-description-button"]').click();
+    cy.get('[data-cy="4-ADHD-description"]').should(
+      'contain',
+      'Attention deficit hyperactivity disorder'
+    );
+    cy.get('[data-cy="4-ADHD-term-dropdown"]').type(
+      'Attention deficit hyperactivity disorder{downArrow}{downArrow}{downArrow}{enter}'
+    );
     cy.get('[data-cy="4-PD-edit-description-button"]').click();
     cy.get('[data-cy="4-PD-description-input"]').type('Parkinsons');
     cy.get('[data-cy="4-PD-save-description-button"]').click();
@@ -318,8 +323,14 @@ describe('Main user flow', () => {
     cy.get('[data-cy="3-F-term-dropdown"] input').should('have.value', 'Female');
     cy.get('[data-cy="side-column-nav-bar-diagnosis-group_dx"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-diagnosis-select-button"]').click();
-    cy.get('[data-cy="4-HC-description"]').should('contain', 'Healthy control');
-    cy.get('[data-cy="4-HC-term-dropdown"] input').should('have.value', 'Healthy Control');
+    cy.get('[data-cy="4-ADHD-description"]').should(
+      'contain',
+      'Attention deficit hyperactivity disorder'
+    );
+    cy.get('[data-cy="4-ADHD-term-dropdown"] input').should(
+      'have.value',
+      'Attention deficit hyperactivity disorder'
+    );
     cy.get('[data-cy="4-PD-description"]').should('contain', 'Parkinsons');
     cy.get('[data-cy="4-PD-term-dropdown"] input').should(
       'have.value',
@@ -360,12 +371,16 @@ describe('Main user flow', () => {
       expect(fileContent.group_dx.Description).to.equal('');
       expect(fileContent.group_dx.Annotations.IsAbout.TermURL).to.equal('nb:Diagnosis');
       expect(fileContent.group_dx.Annotations.IsAbout.Label).to.equal('Diagnosis');
-      expect(fileContent.group_dx.Levels.HC.Description).to.equal('Healthy control');
-      expect(fileContent.group_dx.Levels.HC.TermURL).to.equal('ncit:C94342');
+      expect(fileContent.group_dx.Levels.ADHD.Description).to.equal(
+        'Attention deficit hyperactivity disorder'
+      );
+      expect(fileContent.group_dx.Levels.ADHD.TermURL).to.equal('snomed:406506008');
       expect(fileContent.group_dx.Levels.PD.Description).to.equal('Parkinsons');
       expect(fileContent.group_dx.Levels.PD.TermURL).to.equal('snomed:870288002');
-      expect(fileContent.group_dx.Annotations.Levels.HC.TermURL).to.equal('ncit:C94342');
-      expect(fileContent.group_dx.Annotations.Levels.HC.Label).to.equal('Healthy Control');
+      expect(fileContent.group_dx.Annotations.Levels.ADHD.TermURL).to.equal('snomed:406506008');
+      expect(fileContent.group_dx.Annotations.Levels.ADHD.Label).to.equal(
+        'Attention deficit hyperactivity disorder'
+      );
       expect(fileContent.group_dx.Annotations.Levels.PD.TermURL).to.equal('snomed:870288002');
       expect(fileContent.group_dx.Annotations.Levels.PD.Label).to.equal(
         'Parkinsonism caused by methanol'
@@ -497,7 +512,6 @@ describe('Main user flow', () => {
     cy.get('[data-cy="side-column-nav-bar-diagnosis-select-button"]').click();
     cy.get('[data-cy="5-categorical"]').should('be.visible');
     cy.get('[data-cy="5-categorical-table"]').should('be.visible').and('contain.text', 'missing');
-    cy.get('[data-cy="5-CTRL-term-dropdown"] input').should('have.value', 'Healthy Control');
     cy.get('[data-cy="5-PAT-term-dropdown"] input').should(
       'have.value',
       'Attention deficit hyperactivity disorder'

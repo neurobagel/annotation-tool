@@ -15,7 +15,7 @@ export const mockDataTable = {
   ],
   2: ['28.4', '24.6', '43.6', '28.4', '72.1', '56.2', '23', '22', '21', '45', '34', '65'],
   3: ['M', 'F', 'M', 'F', 'M', 'M', 'M', 'F', 'M', 'F', 'M', 'N/A'],
-  4: ['HC', 'HC', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'HC', 'PD'],
+  4: ['ADHD', 'ADHD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'ADHD', 'PD'],
   5: ['80', '90', '100', '110', '65', '87', '94', '90', '81', '66', '67', '83'],
 };
 
@@ -84,7 +84,11 @@ export const mockColumns = {
     },
     dataType: 'Categorical' as 'Categorical' | 'Continuous' | null,
     levels: {
-      HC: { description: 'Healthy Control', label: 'Healthy Control', termURL: 'ncit:C94342' },
+      ADHD: {
+        description: 'Attention deficit hyperactivity disorder',
+        label: 'Attention deficit hyperactivity disorder',
+        termURL: 'snomed:406506008',
+      },
       PD: {
         description: 'Parkinsons',
         label: 'Parkinsonism caused by methanol',
@@ -213,9 +217,9 @@ export const mockDataDictionaryWithAnnotations = {
   group_dx: {
     Description: 'Diagnosis of the participant',
     Levels: {
-      HC: {
-        Description: 'Healthy Control',
-        TermURL: 'ncit:C94342',
+      ADHD: {
+        Description: 'Attention deficit hyperactivity disorder',
+        TermURL: 'snomed:406506008',
       },
       PD: {
         Description: 'Parkinsons',
@@ -228,9 +232,9 @@ export const mockDataDictionaryWithAnnotations = {
         Label: 'Diagnosis',
       },
       Levels: {
-        HC: {
-          TermURL: 'ncit:C94342',
-          Label: 'Healthy Control',
+        ADHD: {
+          TermURL: 'snomed:406506008',
+          Label: 'Attention deficit hyperactivity disorder',
         },
         PD: {
           TermURL: 'snomed:870288002',
@@ -390,11 +394,7 @@ export const mockConfig = {
         identifier: 'snomed:1259106002',
         label: 'Alexander disease type I',
       },
-      // TODO: Remove once we have healthy control workflow
-      {
-        identifier: 'ncit:C94342',
-        label: 'Healthy Control',
-      },
+      { identifier: 'snomed:406506008', label: 'Attention deficit hyperactivity disorder' },
     ],
   },
   'nb:Assessment': {
@@ -585,6 +585,10 @@ export const mockTermsData = {
         {
           id: '1259106002',
           name: 'Alexander disease type I',
+        },
+        {
+          id: '406506008',
+          name: 'Attention deficit hyperactivity disorder',
         },
       ],
     },
