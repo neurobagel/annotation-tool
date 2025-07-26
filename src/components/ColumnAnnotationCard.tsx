@@ -43,6 +43,10 @@ function ColumnAnnotationCard({
   const columnIsMultiColumnMeasure = useDataStore((state) =>
     state.isMultiColumnMeasureStandardizedVariable(standardizedVariable)
   );
+  const mappedSingleColumnStandardizedVariables = useDataStore(
+    (state) => state.mappedSingleColumnStandardizedVariables
+  );
+
   const handleDataTypeChange = (
     _: React.MouseEvent<HTMLElement>,
     newDataType: 'Categorical' | 'Continuous' | null
@@ -135,6 +139,9 @@ function ColumnAnnotationCard({
               value={standardizedVariable?.label || ''}
               onChange={handleStandardizedVariableChange}
               options={Object.values(standardizedVariableOptions).map((value) => value.label)}
+              getOptionDisabled={(option) =>
+                mappedSingleColumnStandardizedVariables.map((value) => value.label).includes(option)
+              }
               renderInput={(params) => (
                 <TextField
                   // eslint-disable-next-line react/jsx-props-no-spreading
