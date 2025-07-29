@@ -62,9 +62,18 @@ describe('Main user flow', () => {
     cy.get('[data-cy="2-description-input"]').type('some cool new description');
     cy.get('[data-cy="2-save-description-button"]').click();
     cy.get('[data-cy="2-description"]').should('contain', 'some cool new description');
+    // Test that a single column standardized variable like "age" will be disabled once mapped to a column
+    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
+      'age{downArrow}{enter}'
+    );
+    cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').click();
+    cy.get('[role="option"]').contains('Age').should('have.attr', 'aria-disabled', 'true');
+    // Switch the column assignment to another variable and assert that age is now enabled again
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
       'participant{downArrow}{enter}'
     );
+    cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').click();
+    cy.get('[role="option"]').contains('Age').should('not.have.attr', 'aria-disabled', 'true');
     cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').type(
       'age{downArrow}{enter}'
     );

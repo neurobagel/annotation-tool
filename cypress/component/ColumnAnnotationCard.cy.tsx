@@ -1,4 +1,5 @@
 import ColumnAnnotationCard from '../../src/components/ColumnAnnotationCard';
+import useDataStore from '../../src/stores/data';
 import { mockStandardizedVariables } from '../../src/utils/mocks';
 
 const props = {
@@ -15,6 +16,12 @@ const props = {
 
 describe('ColumnAnnotationCard', () => {
   beforeEach(() => {
+    useDataStore.setState({
+      mappedSingleColumnStandardizedVariables: [
+        mockStandardizedVariables['Participant ID'],
+        mockStandardizedVariables.Sex,
+      ],
+    });
     cy.mount(
       <ColumnAnnotationCard
         id={props.id}
@@ -109,5 +116,19 @@ describe('ColumnAnnotationCard', () => {
       'age{downarrow}{enter}'
     );
     cy.get('@spy').should('have.been.calledWith', '1', { identifier: 'nb:Age', label: 'Age' });
+  });
+
+  it('Cannot assign single-column standardized variables twice', () => {
+    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').click();
+
+    // Verify that "Participant ID" and "Sex" option are disabled (should have aria-disabled="true")
+    cy.get('[role="listbox"]').should('be.visible');
+    cy.get('[role="option"]')
+      .contains('Participant ID')
+      .should('have.attr', 'aria-disabled', 'true');
+    cy.get('[role="option"]').contains('Sex').should('have.attr', 'aria-disabled', 'true');
+
+    // Verify that other options like "Age" are still enabled
+    cy.get('[role="option"]').contains('Age').should('not.have.attr', 'aria-disabled', 'true');
   });
 });
