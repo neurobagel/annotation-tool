@@ -10,6 +10,11 @@ const legacyDataDictionaryFileName = 'example_synthetic.json';
 const legacyDataDictionaryFilePath = `cypress/fixtures/examples/${legacyDataDictionaryFileName}`;
 
 describe('Main user flow', () => {
+  beforeEach(() => {
+    // Mock GitHub API requests to force fallback to local configs
+    cy.intercept('GET', '**/api.github.com/repos/**', { forceNetworkError: true });
+    cy.intercept('GET', '**/raw.githubusercontent.com/**', { forceNetworkError: true });
+  });
   it('steps through different app views and goes through the basic user flow', () => {
     cy.visit('http://localhost:5173');
     cy.contains('Welcome to the Neurobagel Annotation Tool');
@@ -182,6 +187,9 @@ describe('Main user flow', () => {
       'diagnosis{downArrow}{enter}'
     );
     cy.get('[data-cy="5-column-annotation-card-standardized-variable-dropdown"]').type(
+      'subject{downArrow}{enter}'
+    );
+    cy.get('[data-cy="6-column-annotation-card-standardized-variable-dropdown"]').type(
       'assessment{downArrow}{enter}'
     );
     cy.get('[data-cy="next-button"]').should('contain', 'Multi-Column Measures');
@@ -206,7 +214,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="multi-column-measures-card-0-columns-dropdown"]').type(
       'iq{downArrow}{enter}'
     );
-    cy.get('[data-cy="mapped-column-5').should('be.visible').and('contain', 'iq');
+    cy.get('[data-cy="mapped-column-6').should('be.visible').and('contain', 'iq');
     cy.get('[data-cy="multi-column-measures"]').should('contain.text', '1 column assigned');
     cy.get('[data-cy="next-button"]').click();
 
@@ -249,9 +257,23 @@ describe('Main user flow', () => {
     cy.get('[data-cy="4-PD-term-dropdown"]').type(
       'Parkinsonism caused by methanol{downArrow}{enter}'
     );
+    cy.get('[data-cy="side-column-nav-bar-subject group-select-button"]').click();
+    cy.get('[data-cy="5-categorical"]').should('be.visible');
+    cy.get('[data-cy="5-HC-edit-description-button"]').click();
+    cy.get('[data-cy="5-HC-description-input"]').type('Healthy Control');
+    cy.get('[data-cy="5-HC-save-description-button"]').click();
+    cy.get('[data-cy="5-HC-description"]').should('contain', 'Healthy Control');
+    cy.get('[data-cy="5-HC-term-dropdown"]').type('Healthy{downArrow}{enter}');
+    cy.get('[data-cy="5-N/A-missing-value-button"]').click();
+    cy.get('[data-cy="5-Patient-edit-description-button"]').click();
+    cy.get('[data-cy="5-Patient-description-input"]').type('Patient');
+    cy.get('[data-cy="5-Patient-save-description-button"]').click();
+    cy.get('[data-cy="5-Patient-description"]').should('contain', 'Patient');
+    cy.get('[data-cy="5-Patient-missing-value-button"]').click();
+
     cy.get('[data-cy="side-column-nav-bar-assessment tool-select-button"]').click();
-    cy.get('[data-cy="5-continuous"]').should('be.visible');
-    cy.get('[data-cy="5-continuous-table"]').should('be.visible').and('contain.text', '110');
+    cy.get('[data-cy="6-continuous"]').should('be.visible');
+    cy.get('[data-cy="6-continuous-table"]').should('be.visible').and('contain.text', '110');
     cy.get('[data-cy="next-button"]').click();
 
     // Download view
@@ -306,7 +328,7 @@ describe('Main user flow', () => {
       'contain.text',
       'Previous IQ assessment by pronunciation'
     );
-    cy.get('[data-cy="mapped-column-5').should('be.visible').and('contain', 'iq');
+    cy.get('[data-cy="mapped-column-6').should('be.visible').and('contain', 'iq');
     cy.get('[data-cy="multi-column-measures"]').should('contain.text', '1 column assigned');
     cy.get('[data-cy="next-button"]').click();
 
@@ -385,6 +407,16 @@ describe('Main user flow', () => {
       expect(fileContent.group_dx.Annotations.Levels.PD.Label).to.equal(
         'Parkinsonism caused by methanol'
       );
+
+      expect(fileContent.group.Description).to.equal('');
+      expect(fileContent.group.Annotations.IsAbout.TermURL).to.equal('nb:SubjectGroup');
+      expect(fileContent.group.Annotations.IsAbout.Label).to.equal('Subject Group');
+      expect(fileContent.group.Levels.HC.Description).to.equal('Healthy Control');
+      expect(fileContent.group.Levels.HC.TermURL).to.equal('ncit:C94342');
+      expect(fileContent.group.Annotations.Levels.HC.TermURL).to.equal('ncit:C94342');
+      expect(fileContent.group.Annotations.Levels.HC.Label).to.equal('Healthy Control');
+      expect(fileContent.group.Annotations.MissingValues).to.include('N/A');
+      expect(fileContent.group.Annotations.MissingValues).to.include('Patient');
 
       expect(fileContent.iq.Description).to.equal('');
       expect(fileContent.iq.Annotations.IsAbout.TermURL).to.equal('nb:Assessment');
