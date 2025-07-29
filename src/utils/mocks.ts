@@ -198,6 +198,9 @@ export const mockDataDictionaryWithNoDescription = {
   group_dx: {
     Description: '',
   },
+  group: {
+    Description: '',
+  },
   iq: {
     Description: '',
   },
@@ -290,6 +293,9 @@ export const mockDataDictionaryWithAnnotations = {
         },
       },
     },
+  },
+  group: {
+    Description: 'The group assignment of the participant in a study.',
   },
   iq: {
     Description: 'iq test score of the participant',
@@ -445,7 +451,6 @@ export const mockConfig = {
       { identifier: 'snomed:406506008', label: 'Attention deficit hyperactivity disorder' },
     ],
   },
-
   'nb:Assessment': {
     identifier: 'nb:Assessment',
     label: 'Assessment Tool',
