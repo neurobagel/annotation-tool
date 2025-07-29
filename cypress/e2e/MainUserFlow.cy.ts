@@ -62,7 +62,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="2-description-input"]').type('some cool new description');
     cy.get('[data-cy="2-save-description-button"]').click();
     cy.get('[data-cy="2-description"]').should('contain', 'some cool new description');
-    // Test that a single column standardized variable like "age" will be diabled once mapped to a column
+    // Test that a single column standardized variable like "age" will be disabled once mapped to a column
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
       'age{downArrow}{enter}'
     );
