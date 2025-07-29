@@ -68,7 +68,7 @@ describe('Main user flow', () => {
     );
     cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').click();
     cy.get('[role="option"]').contains('Age').should('have.attr', 'aria-disabled', 'true');
-    // Remove the column assignment to age and assert that it is now enabled
+    // Switch the column assignment to another variable and assert that age is now enabled again
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
       'participant{downArrow}{enter}'
     );
