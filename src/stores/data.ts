@@ -34,6 +34,8 @@ type DataStore = {
   updateMappedSingleColumnStandardizedVariables: () => void;
   multiColumnMeasureVariableIdentifiers: Set<string>;
   updateMultiColumnMeasureVariableIdentifiers: () => void;
+  singleColumnVariableIdentifiers: Set<string>;
+  updateSingleColumnVariableIdentifiers: () => void;
   getStandardizedVariableColumns: (
     StandardizedVariable: StandardizedVariable
   ) => { id: string; header: string }[];
@@ -118,6 +120,7 @@ const initialState = {
   mappedMultiColumnMeasureStandardizedVariables: [],
   mappedSingleColumnStandardizedVariables: [],
   multiColumnMeasureVariableIdentifiers: new Set<string>(),
+  singleColumnVariableIdentifiers: new Set<string>(),
   termOptions: {},
   formatOptions: {},
   multiColumnMeasuresStates: {},
@@ -236,22 +239,14 @@ const useDataStore = create<DataStore>()(
     },
 
     updateMappedSingleColumnStandardizedVariables: () => {
-      const { config, columns } = get();
+      const { singleColumnVariableIdentifiers, columns } = get();
       const seenIdentifiers = new Set<string>();
       const uniqueVariables: StandardizedVariable[] = [];
 
       Object.values(columns).forEach((column) => {
         const variable = column.standardizedVariable;
         if (variable && !seenIdentifiers.has(variable.identifier)) {
-          const configEntry = Object.values(config).find(
-            (item) => item.identifier === variable.identifier
-          );
-
-          // Include variables that are not multi-column measures and have can_have_multiple_columns as false
-          if (
-            configEntry?.is_multi_column_measure !== true &&
-            configEntry?.can_have_multiple_columns === false
-          ) {
+          if (singleColumnVariableIdentifiers.has(variable.identifier)) {
             seenIdentifiers.add(variable.identifier);
             uniqueVariables.push(variable);
           }
@@ -272,6 +267,22 @@ const useDataStore = create<DataStore>()(
       });
 
       set({ multiColumnMeasureVariableIdentifiers: identifiers });
+    },
+
+    updateSingleColumnVariableIdentifiers: () => {
+      const { config } = get();
+      const identifiers = new Set<string>();
+
+      Object.values(config).forEach((configEntry) => {
+        if (
+          configEntry.is_multi_column_measure !== true &&
+          configEntry.can_have_multiple_columns === false
+        ) {
+          identifiers.add(configEntry.identifier);
+        }
+      });
+
+      set({ singleColumnVariableIdentifiers: identifiers });
     },
 
     getStandardizedVariableColumns: (standardizedVariable: StandardizedVariable) =>
@@ -659,6 +670,7 @@ const useDataStore = create<DataStore>()(
         get().updateMappedMultiColumnMeasureStandardizedVariables();
         get().updateMappedSingleColumnStandardizedVariables();
         get().updateMultiColumnMeasureVariableIdentifiers();
+        get().updateSingleColumnVariableIdentifiers();
         set({ isConfigLoading: false });
       } catch (error) {
         // TODO: show a notif error

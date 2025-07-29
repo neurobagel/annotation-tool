@@ -140,7 +140,7 @@ function ColumnAnnotationCard({
               onChange={handleStandardizedVariableChange}
               options={Object.values(standardizedVariableOptions).map((value) => value.label)}
               getOptionDisabled={(option) =>
-                mappedSingleColumnStandardizedVariables.map((value) => value.label).includes(option)
+                mappedSingleColumnStandardizedVariables.map((sVar) => sVar.label).includes(option)
               }
               renderInput={(params) => (
                 <TextField

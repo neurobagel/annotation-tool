@@ -118,10 +118,10 @@ describe('ColumnAnnotationCard', () => {
     cy.get('@spy').should('have.been.calledWith', '1', { identifier: 'nb:Age', label: 'Age' });
   });
 
-  it('Disables single-column standardized variables that are already mapped to other columns', () => {
+  it('Cannot assign single-column standardized variables twice', () => {
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').click();
 
-    // Verify that "Participant ID" option is disabled (should have aria-disabled="true")
+    // Verify that "Participant ID" and "Sex" option are disabled (should have aria-disabled="true")
     cy.get('[role="listbox"]').should('be.visible');
     cy.get('[role="option"]')
       .contains('Participant ID')
