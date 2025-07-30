@@ -1,5 +1,10 @@
 import axios from 'axios';
-import { fetchConfigGitHubURL, githubRawBaseURL, defaultConfigPath } from './constants';
+import assessmentTerms from '../assets/default_config/assessment.json';
+import defaultConfigData from '../assets/default_config/config.json';
+import diagnosisTerms from '../assets/default_config/diagnosis.json';
+import sexTerms from '../assets/default_config/sex.json';
+import subjectgroupTerms from '../assets/default_config/subjectgroup.json';
+import { fetchConfigGitHubURL, githubRawBaseURL } from './constants';
 import {
   ConfigFile,
   VocabConfig,
@@ -76,7 +81,14 @@ export async function fetchConfig(
     // TODO: show a notif error
     // Fallback to default config when remote fetching fails
     try {
-      return await loadConfigFromPath(`${defaultConfigPath}config.json`);
+      const config = (defaultConfigData as ConfigFile[])[0];
+      const termsData: Record<string, VocabConfig[]> = {
+        'assessment.json': assessmentTerms as VocabConfig[],
+        'diagnosis.json': diagnosisTerms as VocabConfig[],
+        'sex.json': sexTerms as VocabConfig[],
+        'subjectgroup.json': subjectgroupTerms as VocabConfig[],
+      };
+      return { config, termsData };
     } catch (fallbackError) {
       return { config: {} as ConfigFile, termsData: {} };
     }

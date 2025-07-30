@@ -31,13 +31,13 @@ export type ConfigFileStandardizedVariable = {
   id: string;
   name: string;
   data_type?: 'Categorical' | 'Continuous' | null;
-  terms_file?: string;
-  formats?: ConfigFileTermFormat[];
+  terms_file?: string | null;
+  formats?: ConfigFileTermFormat[] | null;
   required?: boolean;
   description?: string;
   is_multi_column_measure?: boolean;
   can_have_multiple_columns?: boolean;
-  same_as?: string;
+  same_as?: string | null;
 };
 
 // The config file as it appears on disk/network (raw config)
