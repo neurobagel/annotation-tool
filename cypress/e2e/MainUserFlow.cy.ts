@@ -68,25 +68,23 @@ describe('Main user flow', () => {
     cy.get('[data-cy="2-save-description-button"]').click();
     cy.get('[data-cy="2-description"]').should('contain', 'some cool new description');
     // Test that a single column standardized variable like "age" will be disabled once mapped to a column
-    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').click();
-    cy.get('[role="option"]').contains('Age').click();
-
+    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
+      'age{downArrow}{enter}'
+    );
     cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').click();
     cy.get('[role="option"]').contains('Age').should('have.attr', 'aria-disabled', 'true');
-
-    // Close the dropdown by clicking elsewhere
-    cy.get('body').click(0, 0);
-
     // Switch the column assignment to another variable and assert that age is now enabled again
-    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').click();
-    cy.get('[role="option"]').contains('Participant').click();
-
+    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
+      'participant{downArrow}{enter}'
+    );
     cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').click();
     cy.get('[role="option"]').contains('Age').should('not.have.attr', 'aria-disabled', 'true');
-    cy.get('[role="option"]').contains('Age').click();
-
-    cy.get('[data-cy="3-column-annotation-card-standardized-variable-dropdown"]').click();
-    cy.get('[role="option"]').contains('Sex').click();
+    cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').type(
+      'age{downArrow}{enter}'
+    );
+    cy.get('[data-cy="3-column-annotation-card-standardized-variable-dropdown"]').type(
+      'sex{downArrow}{enter}'
+    );
     // Move to the 2nd page of columns using the pagination
     cy.get(':nth-child(3) > .MuiButtonBase-root').click();
     cy.get('[data-cy="4-column-annotation-card-data-type-categorical-button"]').click();
@@ -112,8 +110,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="side-column-nav-bar-sex-sex"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-age-select-button"]').click();
     cy.get('[data-cy="2-continuous"]').should('be.visible');
-    cy.get('[data-cy="2-format-dropdown"]').click();
-    cy.get('[role="option"]').contains('float').click();
+    cy.get('[data-cy="2-format-dropdown"]').type('float{downArrow}{enter}');
     cy.get('[data-cy="2-description"]').should('contain', '');
     cy.get('[data-cy="2-edit-description-button"]').click();
     cy.get('[data-cy="2-description-input"]').type('some cool unit');
