@@ -30,8 +30,12 @@ type DataStore = {
   updateMappedStandardizedVariables: () => void;
   mappedMultiColumnMeasureStandardizedVariables: StandardizedVariable[];
   updateMappedMultiColumnMeasureStandardizedVariables: () => void;
+  mappedSingleColumnStandardizedVariables: StandardizedVariable[];
+  updateMappedSingleColumnStandardizedVariables: () => void;
   multiColumnMeasureVariableIdentifiers: Set<string>;
   updateMultiColumnMeasureVariableIdentifiers: () => void;
+  singleColumnVariableIdentifiers: Set<string>;
+  updateSingleColumnVariableIdentifiers: () => void;
   getStandardizedVariableColumns: (
     StandardizedVariable: StandardizedVariable
   ) => { id: string; header: string }[];
@@ -114,7 +118,9 @@ const initialState = {
   standardizedVariables: {},
   mappedStandardizedVariables: [],
   mappedMultiColumnMeasureStandardizedVariables: [],
+  mappedSingleColumnStandardizedVariables: [],
   multiColumnMeasureVariableIdentifiers: new Set<string>(),
+  singleColumnVariableIdentifiers: new Set<string>(),
   termOptions: {},
   formatOptions: {},
   multiColumnMeasuresStates: {},
@@ -232,6 +238,24 @@ const useDataStore = create<DataStore>()(
       set({ mappedMultiColumnMeasureStandardizedVariables: uniqueVariables });
     },
 
+    updateMappedSingleColumnStandardizedVariables: () => {
+      const { singleColumnVariableIdentifiers, columns } = get();
+      const seenIdentifiers = new Set<string>();
+      const uniqueVariables: StandardizedVariable[] = [];
+
+      Object.values(columns).forEach((column) => {
+        const variable = column.standardizedVariable;
+        if (variable && !seenIdentifiers.has(variable.identifier)) {
+          if (singleColumnVariableIdentifiers.has(variable.identifier)) {
+            seenIdentifiers.add(variable.identifier);
+            uniqueVariables.push(variable);
+          }
+        }
+      });
+
+      set({ mappedSingleColumnStandardizedVariables: uniqueVariables });
+    },
+
     updateMultiColumnMeasureVariableIdentifiers: () => {
       const { config } = get();
       const identifiers = new Set<string>();
@@ -243,6 +267,22 @@ const useDataStore = create<DataStore>()(
       });
 
       set({ multiColumnMeasureVariableIdentifiers: identifiers });
+    },
+
+    updateSingleColumnVariableIdentifiers: () => {
+      const { config } = get();
+      const identifiers = new Set<string>();
+
+      Object.values(config).forEach((configEntry) => {
+        if (
+          configEntry.is_multi_column_measure !== true &&
+          configEntry.can_have_multiple_columns === false
+        ) {
+          identifiers.add(configEntry.identifier);
+        }
+      });
+
+      set({ singleColumnVariableIdentifiers: identifiers });
     },
 
     getStandardizedVariableColumns: (standardizedVariable: StandardizedVariable) =>
@@ -329,6 +369,7 @@ const useDataStore = create<DataStore>()(
       // Update mapped standardized variables when standardized variable changes
       get().updateMappedStandardizedVariables();
       get().updateMappedMultiColumnMeasureStandardizedVariables();
+      get().updateMappedSingleColumnStandardizedVariables();
     },
 
     updateColumnIsPartOf: (
@@ -588,6 +629,7 @@ const useDataStore = create<DataStore>()(
             // Update mapped standardized variables after processing data dictionary
             get().updateMappedStandardizedVariables();
             get().updateMappedMultiColumnMeasureStandardizedVariables();
+            get().updateMappedSingleColumnStandardizedVariables();
 
             resolve();
           } catch (error) {
@@ -626,7 +668,9 @@ const useDataStore = create<DataStore>()(
         get().updateFormatOptions();
         get().updateMappedStandardizedVariables();
         get().updateMappedMultiColumnMeasureStandardizedVariables();
+        get().updateMappedSingleColumnStandardizedVariables();
         get().updateMultiColumnMeasureVariableIdentifiers();
+        get().updateSingleColumnVariableIdentifiers();
         set({ isConfigLoading: false });
       } catch (error) {
         // TODO: show a notif error

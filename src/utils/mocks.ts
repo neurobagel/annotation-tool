@@ -313,7 +313,7 @@ export const mockDataDictionaryWithAnnotations = {
 };
 
 export const mockStandardizedVariables = {
-  'Subject ID': {
+  'Participant ID': {
     identifier: 'nb:ParticipantID',
     label: 'Participant ID',
   },
