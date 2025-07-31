@@ -65,13 +65,10 @@
   "group": {
     "Description": "The group assignment of the participant in a study.",
     "Levels": {
-      "ADHD": {
-        "Description": "Attention deficit hyperactivity disorder",
-        "TermURL": "snomed:406506008"
-      },
-      "PD": {
-        "Description": "Parkinsons",
-        "TermURL": "snomed:870288002"
+      "HC": {
+        "Description": "Healthy control",
+        "TermURL": "ncit:C94342",
+        "Label": "Healthy Control"
       }
     },
     "Annotations": {
@@ -85,7 +82,8 @@
           "TermURL": "ncit:C94342",
           "Label": "Healthy Control"
         }
-      }
+      },
+      "MissingValues": ["Patient", "N/A"]
     }
   },
   "iq": {

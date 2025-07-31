@@ -143,6 +143,7 @@ export const mockColumns = {
     header: 'group',
     description: 'The group assignment of the participant in a study.',
     dataType: null as 'Categorical' | 'Continuous' | null,
+    missingValues: ['Patient', 'N/A'],
   },
   6: {
     header: 'iq',

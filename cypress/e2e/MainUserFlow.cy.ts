@@ -11,7 +11,7 @@ const legacyDataDictionaryFilePath = `cypress/fixtures/examples/${legacyDataDict
 
 describe('Main user flow', () => {
   beforeEach(() => {
-    // Mock GitHub API requests to force fallback to local configs
+    // Mock failed GitHub API requests to force fallback to local configs
     cy.intercept('GET', '**/api.github.com/repos/**', { forceNetworkError: true });
     cy.intercept('GET', '**/raw.githubusercontent.com/**', { forceNetworkError: true });
   });
