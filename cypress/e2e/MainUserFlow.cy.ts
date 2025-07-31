@@ -377,7 +377,7 @@ describe('Main user flow', () => {
       expect(fileContent.participant_id.Description).to.equal('A participant ID');
       expect(fileContent.participant_id.Annotations.IsAbout.TermURL).to.equal('nb:ParticipantID');
       expect(fileContent.participant_id.Annotations.IsAbout.Label).to.equal('Participant ID');
-      expect(fileContent.participant_id.Annotations.Identifies).to.equal('participant');
+      expect(fileContent.participant_id.Annotations).to.not.have.property('identifies');
 
       expect(fileContent.age.Description).to.equal('Age of the participant');
       expect(fileContent.age.Annotations.IsAbout.TermURL).to.equal('nb:Age');

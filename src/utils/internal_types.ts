@@ -33,8 +33,6 @@ export interface DataDictionary {
         TermURL: string;
         Label: string;
       };
-      // TODO: Remove once we get rid of identifies in CLI
-      Identifies?: string;
       Format?: {
         TermURL: string;
         Label: string;

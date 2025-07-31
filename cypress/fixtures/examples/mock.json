@@ -5,8 +5,7 @@
       "IsAbout": {
         "TermURL": "nb:ParticipantID",
         "Label": "Subject ID"
-      },
-      "Identifies": "participant"
+      }
     }
   },
   "age": {
