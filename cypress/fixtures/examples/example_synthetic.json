@@ -5,8 +5,7 @@
       "IsAbout": {
         "TermURL": "nb:ParticipantID",
         "Label": "Subject Unique Identifier"
-      },
-      "Identifies": "participant"
+      }
     }
   },
   "session_id": {
