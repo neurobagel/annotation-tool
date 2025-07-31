@@ -10,6 +10,11 @@ const legacyDataDictionaryFileName = 'example_synthetic.json';
 const legacyDataDictionaryFilePath = `cypress/fixtures/examples/${legacyDataDictionaryFileName}`;
 
 describe('Main user flow', () => {
+  beforeEach(() => {
+    // Mock failed GitHub API requests to force fallback to local configs
+    cy.intercept('GET', '**/api.github.com/repos/**', { forceNetworkError: true });
+    cy.intercept('GET', '**/raw.githubusercontent.com/**', { forceNetworkError: true });
+  });
   it('steps through different app views and goes through the basic user flow', () => {
     cy.visit('http://localhost:5173');
     cy.contains('Welcome to the Neurobagel Annotation Tool');
@@ -103,7 +108,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="side-column-nav-bar-categorical-select-button"]').click();
     cy.get('[data-cy="4-categorical"]')
       .should('be.visible')
-      .and('contain', 'HC')
+      .and('contain', 'ADHD')
       .and('contain', 'PD');
     cy.get('[data-cy="side-column-nav-bar-sex-sex"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-age-select-button"]').click();
@@ -192,6 +197,9 @@ describe('Main user flow', () => {
     );
     cy.get('[data-cy="5-column-annotation-card"]').scrollIntoView();
     cy.get('[data-cy="5-column-annotation-card-standardized-variable-dropdown"]').type(
+      'subject{downArrow}{enter}'
+    );
+    cy.get('[data-cy="6-column-annotation-card-standardized-variable-dropdown"]').type(
       'assessment{downArrow}{enter}'
     );
     cy.get('[data-cy="next-button"]').should('contain', 'Multi-Column Measures');
@@ -216,7 +224,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="multi-column-measures-card-0-columns-dropdown"]').type(
       'iq{downArrow}{enter}'
     );
-    cy.get('[data-cy="mapped-column-5').should('be.visible').and('contain', 'iq');
+    cy.get('[data-cy="mapped-column-6').should('be.visible').and('contain', 'iq');
     cy.get('[data-cy="multi-column-measures"]').should('contain.text', '1 column assigned');
     cy.get('[data-cy="next-button"]').click();
 
@@ -237,17 +245,36 @@ describe('Main user flow', () => {
     cy.get('[data-cy="3-N/A-missing-value-button"]').click();
     cy.get('[data-cy="side-column-nav-bar-diagnosis-group_dx"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-diagnosis-select-button"]').click();
-    cy.get('[data-cy="4-HC-description"]').should('be.visible');
-    cy.get('[data-cy="4-HC-description"]').type('Healthy control');
-    cy.get('[data-cy="4-HC-term-dropdown"]').type('Healthy control{downArrow}{enter}');
-    cy.get('[data-cy="4-PD-description"]').should('be.visible');
+    cy.get('[data-cy="4-ADHD-description"]').type('Attention deficit hyperactivity disorder');
+    cy.get('[data-cy="4-ADHD-description"]').should(
+      'contain',
+      'Attention deficit hyperactivity disorder'
+    );
+    cy.get('[data-cy="4-ADHD-term-dropdown"]').type(
+      'Attention deficit hyperactivity disorder{downArrow}{downArrow}{downArrow}{enter}'
+    );
     cy.get('[data-cy="4-PD-description"]').type('Parkinsons');
+    cy.get('[data-cy="4-PD-description"]').should('contain', 'Parkinsons');
     cy.get('[data-cy="4-PD-term-dropdown"]').type(
       'Parkinsonism caused by methanol{downArrow}{enter}'
     );
+    cy.get('[data-cy="side-column-nav-bar-subject group-select-button"]').click();
+    cy.get('[data-cy="5-categorical"]').should('be.visible');
+    cy.get('[data-cy="5-HC-description"]').type('Healthy Control');
+    cy.get('[data-cy="5-HC-description"]').should('contain', 'Healthy Control');
+    cy.get('[data-cy="5-HC-term-dropdown"]').type('Healthy{downArrow}{enter}');
+    cy.get('[data-cy="5-N/A-missing-value-button"]').click();
+    cy.get('[data-cy="5-Patient-description"]').type('Patient');
+    cy.get('[data-cy="5-Patient-description"]').should('contain', 'Patient');
+    // TODO: We have to put this wait here because the description debounce save will break if we click the
+    // missing value button before the description is finished saving. This is a bug!
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(1000);
+    cy.get('[data-cy="5-Patient-missing-value-button"]').click();
+
     cy.get('[data-cy="side-column-nav-bar-assessment tool-select-button"]').click();
-    cy.get('[data-cy="5-continuous"]').should('be.visible');
-    cy.get('[data-cy="5-continuous-table"]').should('be.visible').and('contain.text', '110');
+    cy.get('[data-cy="6-continuous"]').should('be.visible');
+    cy.get('[data-cy="6-continuous-table"]').should('be.visible').and('contain.text', '110');
     cy.get('[data-cy="next-button"]').click();
 
     // Download view
@@ -303,7 +330,7 @@ describe('Main user flow', () => {
       'contain.text',
       'Previous IQ assessment by pronunciation'
     );
-    cy.get('[data-cy="mapped-column-5').should('be.visible').and('contain', 'iq');
+    cy.get('[data-cy="mapped-column-6').should('be.visible').and('contain', 'iq');
     cy.get('[data-cy="multi-column-measures"]').should('contain.text', '1 column assigned');
     cy.get('[data-cy="next-button"]').click();
 
@@ -320,8 +347,14 @@ describe('Main user flow', () => {
     cy.get('[data-cy="3-F-term-dropdown"] input').should('have.value', 'Female');
     cy.get('[data-cy="side-column-nav-bar-diagnosis-group_dx"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-diagnosis-select-button"]').click();
-    cy.get('[data-cy="4-HC-description"]').should('contain', 'Healthy control');
-    cy.get('[data-cy="4-HC-term-dropdown"] input').should('have.value', 'Healthy Control');
+    cy.get('[data-cy="4-ADHD-description"]').should(
+      'contain',
+      'Attention deficit hyperactivity disorder'
+    );
+    cy.get('[data-cy="4-ADHD-term-dropdown"] input').should(
+      'have.value',
+      'Attention deficit hyperactivity disorder'
+    );
     cy.get('[data-cy="4-PD-description"]').should('contain', 'Parkinsons');
     cy.get('[data-cy="4-PD-term-dropdown"] input').should(
       'have.value',
@@ -362,16 +395,30 @@ describe('Main user flow', () => {
       expect(fileContent.group_dx.Description).to.equal('');
       expect(fileContent.group_dx.Annotations.IsAbout.TermURL).to.equal('nb:Diagnosis');
       expect(fileContent.group_dx.Annotations.IsAbout.Label).to.equal('Diagnosis');
-      expect(fileContent.group_dx.Levels.HC.Description).to.equal('Healthy control');
-      expect(fileContent.group_dx.Levels.HC.TermURL).to.equal('ncit:C94342');
+      expect(fileContent.group_dx.Levels.ADHD.Description).to.equal(
+        'Attention deficit hyperactivity disorder'
+      );
+      expect(fileContent.group_dx.Levels.ADHD.TermURL).to.equal('snomed:406506008');
       expect(fileContent.group_dx.Levels.PD.Description).to.equal('Parkinsons');
       expect(fileContent.group_dx.Levels.PD.TermURL).to.equal('snomed:870288002');
-      expect(fileContent.group_dx.Annotations.Levels.HC.TermURL).to.equal('ncit:C94342');
-      expect(fileContent.group_dx.Annotations.Levels.HC.Label).to.equal('Healthy Control');
+      expect(fileContent.group_dx.Annotations.Levels.ADHD.TermURL).to.equal('snomed:406506008');
+      expect(fileContent.group_dx.Annotations.Levels.ADHD.Label).to.equal(
+        'Attention deficit hyperactivity disorder'
+      );
       expect(fileContent.group_dx.Annotations.Levels.PD.TermURL).to.equal('snomed:870288002');
       expect(fileContent.group_dx.Annotations.Levels.PD.Label).to.equal(
         'Parkinsonism caused by methanol'
       );
+
+      expect(fileContent.group.Description).to.equal('');
+      expect(fileContent.group.Annotations.IsAbout.TermURL).to.equal('nb:SubjectGroup');
+      expect(fileContent.group.Annotations.IsAbout.Label).to.equal('Subject Group');
+      expect(fileContent.group.Levels.HC.Description).to.equal('Healthy Control');
+      expect(fileContent.group.Levels.HC.TermURL).to.equal('ncit:C94342');
+      expect(fileContent.group.Annotations.Levels.HC.TermURL).to.equal('ncit:C94342');
+      expect(fileContent.group.Annotations.Levels.HC.Label).to.equal('Healthy Control');
+      expect(fileContent.group.Annotations.MissingValues).to.include('N/A');
+      expect(fileContent.group.Annotations.MissingValues).to.include('Patient');
 
       expect(fileContent.iq.Description).to.equal('');
       expect(fileContent.iq.Annotations.IsAbout.TermURL).to.equal('nb:Assessment');
@@ -499,7 +546,6 @@ describe('Main user flow', () => {
     cy.get('[data-cy="side-column-nav-bar-diagnosis-select-button"]').click();
     cy.get('[data-cy="5-categorical"]').should('be.visible');
     cy.get('[data-cy="5-categorical-table"]').should('be.visible').and('contain.text', 'missing');
-    cy.get('[data-cy="5-CTRL-term-dropdown"] input').should('have.value', 'Healthy Control');
     cy.get('[data-cy="5-PAT-term-dropdown"] input').should(
       'have.value',
       'Attention deficit hyperactivity disorder'

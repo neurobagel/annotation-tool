@@ -67,7 +67,7 @@ export interface StandardizedVariableConfig extends StandardizedVariable {
   description?: string;
   is_multi_column_measure?: boolean;
   can_have_multiple_columns?: boolean;
-  same_as?: string;
+  same_as?: string | null;
 }
 
 export interface StandardizedVaribleCollection {

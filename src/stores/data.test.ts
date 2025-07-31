@@ -3,7 +3,14 @@ import fs from 'fs';
 import { produce } from 'immer';
 import path from 'path';
 import { beforeEach, describe, it, expect } from 'vitest';
-import { mockDataTable, mockInitialColumns, mockColumns, mockConfig } from '~/utils/mocks';
+import {
+  mockDataTable,
+  mockDataTableWithEmptyLine,
+  mockInitialColumns,
+  mockInitialColumnsWithEmptyLine,
+  mockColumns,
+  mockConfig,
+} from '~/utils/mocks';
 import { Columns } from '../utils/internal_types';
 import useDataStore from './data';
 
@@ -44,8 +51,8 @@ describe('data store actions', () => {
       await result.current.processDataTableFile(dataTableFile);
     });
 
-    expect(result.current.dataTable).toEqual(mockDataTable);
-    expect(result.current.columns).toEqual(mockInitialColumns);
+    expect(result.current.dataTable).toEqual(mockDataTableWithEmptyLine);
+    expect(result.current.columns).toEqual(mockInitialColumnsWithEmptyLine);
     expect(result.current.uploadedDataTableFileName).toEqual('mock_with_empty_line.tsv');
   });
   it('processes a data table file and update dataTable, columns, and uploadedDataTableFileName', async () => {
