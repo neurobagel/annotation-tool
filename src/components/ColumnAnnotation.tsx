@@ -1,7 +1,5 @@
-import Pagination from '@mui/material/Pagination';
-import { useColumnUpdates, usePagination } from '../hooks';
+import { useColumnUpdates } from '../hooks';
 import useDataStore from '../stores/data';
-import { Column } from '../utils/internal_types';
 import ColumnAnnotationCard from './ColumnAnnotationCard';
 
 function ColumnAnnotation() {
@@ -12,39 +10,26 @@ function ColumnAnnotation() {
 
   const columnsArray = Object.entries(columns);
 
-  const {
-    currentPage,
-    currentItems: currentColumns,
-    totalPages,
-    handlePaginationChange,
-  } = usePagination<[string, Column]>(columnsArray, 3);
-
   return (
-    <div className="flex flex-col items-center gap-4">
-      {currentColumns.map(([columnId, column]) => (
-        <ColumnAnnotationCard
-          key={columnId}
-          id={columnId}
-          header={column.header}
-          description={column.description || null}
-          dataType={column.dataType || null}
-          standardizedVariable={column.standardizedVariable || null}
-          standardizedVariableOptions={standardizedVariables}
-          onDescriptionChange={handleDescriptionChange}
-          onDataTypeChange={handleDataTypeChange}
-          onStandardizedVariableChange={handleStandardizedVariableChange}
-        />
+    <div
+      className="flex flex-col items-center gap-6 w-full max-h-[70vh] overflow-y-auto px-4 py-4"
+      data-cy="column-annotation-container"
+    >
+      {columnsArray.map(([columnId, column]) => (
+        <div key={columnId} className="w-full flex-shrink-0 min-h-fit">
+          <ColumnAnnotationCard
+            id={columnId}
+            header={column.header}
+            description={column.description || null}
+            dataType={column.dataType || null}
+            standardizedVariable={column.standardizedVariable || null}
+            standardizedVariableOptions={standardizedVariables}
+            onDescriptionChange={handleDescriptionChange}
+            onDataTypeChange={handleDataTypeChange}
+            onStandardizedVariableChange={handleStandardizedVariableChange}
+          />
+        </div>
       ))}
-
-      <div className="my-4" data-cy="column-annotation-pagination">
-        <Pagination
-          count={totalPages}
-          page={currentPage}
-          onChange={handlePaginationChange}
-          color="primary"
-          shape="rounded"
-        />
-      </div>
     </div>
   );
 }
