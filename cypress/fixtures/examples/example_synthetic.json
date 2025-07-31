@@ -52,8 +52,7 @@
   "pheno_group": {
     "Description": "Group variable",
     "Levels": {
-      "PAT": "Patient",
-      "CTRL": "Control subject"
+      "PAT": "Patient"
     },
     "Annotations": {
       "IsAbout": {
@@ -64,10 +63,6 @@
         "PAT": {
           "TermURL": "snomed:406506008",
           "Label": "Attention deficit hyperactivity disorder"
-        },
-        "CTRL": {
-          "TermURL": "ncit:C94342",
-          "Label": "Healthy Control"
         }
       },
       "MissingValues": ["NA"]
