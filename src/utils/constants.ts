@@ -15,4 +15,4 @@ export const fetchConfigGitHubURL = 'https://api.github.com/repos/neurobagel/com
 
 export const githubRawBaseURL = 'https://raw.githubusercontent.com/neurobagel/communities/main/';
 
-export const defaultConfigPath = '/src/assets/default_config/';
+export const defaultConfigPath = '/default_config/';
