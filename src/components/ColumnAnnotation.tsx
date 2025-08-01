@@ -12,11 +12,11 @@ function ColumnAnnotation() {
 
   return (
     <div
-      className="flex flex-col items-center gap-6 w-full max-h-[70vh] overflow-y-auto px-4 py-4"
+      className="flex flex-col items-center gap-6 h-[70vh] overflow-auto"
       data-cy="column-annotation-container"
     >
       {columnsArray.map(([columnId, column]) => (
-        <div key={columnId} className="w-full flex-shrink-0 min-h-fit">
+        <div key={columnId} className="w-full">
           <ColumnAnnotationCard
             id={columnId}
             header={column.header}
