@@ -1,7 +1,5 @@
-import EditIcon from '@mui/icons-material/Edit';
-import SaveIcon from '@mui/icons-material/Save';
-import { Fab, TextField, Typography } from '@mui/material';
-import { useState } from 'react';
+import { TextField, Typography } from '@mui/material';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 const defaultProps = {
   label: null,
@@ -23,66 +21,69 @@ function DescriptionEditor({
   columnID,
   levelValue,
 }: DescriptionEditorProps) {
-  const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [editedDescription, setEditedDescription] = useState<string | null>(description);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const dataCy = levelValue ? `${columnID}-${levelValue}` : columnID;
 
-  const handleEditDescription = () => {
-    setIsEditingDescription(true);
+  // Update local state when description prop changes
+  useEffect(() => {
+    setEditedDescription(description);
+  }, [description]);
+
+  // Debounced save function
+  const debouncedSave = useCallback(
+    (value: string | null) => {
+      setSaveStatus('saving');
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => {
+        onDescriptionChange(columnID, value);
+        setSaveStatus('saved');
+        setTimeout(() => setSaveStatus('idle'), 1500);
+      }, 500);
+    },
+    [columnID, onDescriptionChange]
+  );
+
+  const handleDescriptionChange = (value: string) => {
+    const newValue = value.trim() === '' ? null : value;
+    setEditedDescription(newValue);
+    debouncedSave(newValue);
   };
 
-  const handleSaveDescription = () => {
-    setIsEditingDescription(false);
-    onDescriptionChange(columnID, editedDescription);
-  };
+  return (
+    <div className="flex flex-col gap-2">
+      {label && (
+        <Typography variant="subtitle1" className="font-bold text-gray-700">
+          {label}
+        </Typography>
+      )}
 
-  return isEditingDescription ? (
-    <div className="flex flex-col items-center gap-4 md:flex-row">
       <TextField
-        data-cy={`${dataCy}-description-input`}
+        data-cy={`${dataCy}-description`}
         fullWidth
         multiline
         rows={3}
         value={editedDescription || ''}
-        onChange={(e) => setEditedDescription(e.target.value)}
+        onChange={(e) => handleDescriptionChange(e.target.value)}
         variant="outlined"
-        label={label || 'Description'}
-        className="flex-1"
+        placeholder="Click to add description..."
+        helperText={(() => {
+          if (saveStatus === 'saving') return 'Saving...';
+          if (saveStatus === 'saved') return 'Saved';
+          return '';
+        })()}
+        slotProps={{
+          formHelperText: {
+            sx: {
+              color: saveStatus === 'saved' ? 'success.main' : 'text.secondary',
+              fontSize: '0.75rem',
+            },
+          },
+        }}
       />
-      <Fab
-        data-cy={`${dataCy}-save-description-button`}
-        color="secondary"
-        onClick={handleSaveDescription}
-        size="small"
-        sx={{ width: '36px', height: '36px' }}
-        className="mt-4 md:mt-0"
-      >
-        <SaveIcon fontSize="small" />
-      </Fab>
-    </div>
-  ) : (
-    <div className="flex flex-col items-center gap-4 md:flex-row">
-      <div className="flex-1">
-        {label && (
-          <Typography variant="subtitle1" className="mb-2 font-bold text-gray-700">
-            {label}
-          </Typography>
-        )}
-
-        <Typography data-cy={`${dataCy}-description`} variant="body1" className="text-gray-700">
-          {description || 'No description provided.'}
-        </Typography>
-      </div>
-      <Fab
-        data-cy={`${dataCy}-edit-description-button`}
-        color="primary"
-        onClick={handleEditDescription}
-        size="small"
-        sx={{ width: '36px', height: '36px' }}
-        className="mt-4 md:mt-0"
-      >
-        <EditIcon fontSize="small" />
-      </Fab>
     </div>
   );
 }
