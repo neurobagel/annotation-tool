@@ -26,12 +26,15 @@ function DescriptionEditor({
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const dataCy = levelValue ? `${columnID}-${levelValue}` : columnID;
 
-  // Update local state when description prop changes
   useEffect(() => {
     setEditedDescription(description);
   }, [description]);
 
-  // Debounced save function
+  /* 
+  This function ensures that we only update the description after the user stops typing
+  When a user types, start a timer before storing the current value. 
+  If they type again before the timer expires, create a new timer and begin waiting again.
+  */
   const debouncedSave = useCallback(
     (value: string | null) => {
       setSaveStatus('saving');
