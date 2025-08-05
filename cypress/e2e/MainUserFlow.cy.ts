@@ -52,16 +52,10 @@ describe('Main user flow', () => {
     cy.get('[data-cy="3-column-annotation-card"]').should('be.visible');
     cy.get('[data-cy="column-annotation-pagination"]').should('be.visible');
     cy.get('[data-cy="1-column-annotation-card-data-type-continuous-button"]').click();
-    cy.get('[data-cy="1-description"]').should('contain', '');
-    cy.get('[data-cy="1-edit-description-button"]').click();
-    cy.get('[data-cy="1-description-input"]').should('be.visible');
-    cy.get('[data-cy="1-description-input"]').type('A participant ID');
-    cy.get('[data-cy="1-save-description-button"]').click();
-    cy.get('[data-cy="2-description"]').should('contain', '');
-    cy.get('[data-cy="2-edit-description-button"]').click();
-    cy.get('[data-cy="2-description-input"]').type('some cool new description');
-    cy.get('[data-cy="2-save-description-button"]').click();
-    cy.get('[data-cy="2-description"]').should('contain', 'some cool new description');
+    cy.get('[data-cy="1-description"]').should('be.visible');
+    cy.get('[data-cy="1-description"]').type('A participant ID');
+    cy.get('[data-cy="2-description"]').should('be.visible');
+    cy.get('[data-cy="2-description"]').type('some cool new description');
     // Test that a single column standardized variable like "age" will be disabled once mapped to a column
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
       'age{downArrow}{enter}'
@@ -81,7 +75,7 @@ describe('Main user flow', () => {
       'sex{downArrow}{enter}'
     );
     // Move to the 2nd page of columns using the pagination
-    cy.get(':nth-child(3) > .MuiButtonBase-root').click();
+    cy.get('[data-cy="column-annotation-pagination"] :nth-child(3) > .MuiButtonBase-root').click();
     cy.get('[data-cy="4-column-annotation-card-data-type-categorical-button"]').click();
     cy.get('[data-cy="next-button"]').click();
 
@@ -106,10 +100,8 @@ describe('Main user flow', () => {
     cy.get('[data-cy="side-column-nav-bar-age-select-button"]').click();
     cy.get('[data-cy="2-continuous"]').should('be.visible');
     cy.get('[data-cy="2-format-dropdown"]').type('float{downArrow}{enter}');
-    cy.get('[data-cy="2-description"]').should('contain', '');
-    cy.get('[data-cy="2-edit-description-button"]').click();
-    cy.get('[data-cy="2-description-input"]').type('some cool unit');
-    cy.get('[data-cy="2-save-description-button"]').click();
+    cy.get('[data-cy="2-description"]').should('be.visible');
+    cy.get('[data-cy="2-description"]').type('some cool unit');
     cy.get('[data-cy="side-column-nav-bar-sex-select-button"]').click();
     cy.get('[data-cy="3-categorical"]')
       .should('be.visible')
@@ -178,15 +170,13 @@ describe('Main user flow', () => {
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
       'participant ID{downArrow}{enter}'
     );
-    cy.get('[data-cy="2-edit-description-button"]').click();
-    cy.get('[data-cy="2-description-input"]').clear();
-    cy.get('[data-cy="2-description-input"]').type('Age of the participant');
-    cy.get('[data-cy="2-save-description-button"]').click();
-    cy.get('[data-cy="2-description"]').should('contain', 'Age of the participant');
+    cy.get('[data-cy="2-description"]').should('be.visible');
+    cy.get('[data-cy="2-description"] textarea').first().clear();
+    cy.get('[data-cy="2-description"]').type('Age of the participant');
     cy.get('[data-cy="2-column-annotation-card-data-type"').should('contain', 'Continuous');
     cy.get('[data-cy="3-column-annotation-card-data-type"').should('contain', 'Categorical');
     // Move to the 2nd page of columns using the pagination
-    cy.get(':nth-child(3) > .MuiButtonBase-root').click();
+    cy.get('[data-cy="column-annotation-pagination"] :nth-child(3) > .MuiButtonBase-root').click();
     cy.get('[data-cy="4-column-annotation-card-standardized-variable-dropdown"]').type(
       'diagnosis{downArrow}{enter}'
     );
@@ -222,34 +212,25 @@ describe('Main user flow', () => {
     // Value Annotation view
     cy.get('[data-cy="side-column-nav-bar-age-age"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-age-select-button"]').click();
-    cy.get('[data-cy="2-edit-description-button"]').click();
-    cy.get('[data-cy="2-description-input"]').clear();
-    cy.get('[data-cy="2-description-input"]').type('Years');
-    cy.get('[data-cy="2-save-description-button"]').click();
+    cy.get('[data-cy="2-description"]').should('be.visible');
+    cy.get('[data-cy="2-description"] textarea').first().clear();
+    cy.get('[data-cy="2-description"]').type('Years');
     cy.get('[data-cy="side-column-nav-bar-sex-sex"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-sex-select-button"]').click();
-    cy.get('[data-cy="3-M-edit-description-button"]').click();
-    cy.get('[data-cy="3-M-description-input"]').type('Male');
-    cy.get('[data-cy="3-M-save-description-button"]').click();
-    cy.get('[data-cy="3-M-description"]').should('contain', 'Male');
+    cy.get('[data-cy="3-M-description"]').should('be.visible');
+    cy.get('[data-cy="3-M-description"]').type('Male');
     cy.get('[data-cy="3-M-term-dropdown"]').type('Male{downArrow}{enter}');
-    cy.get('[data-cy="3-F-edit-description-button"]').click();
-    cy.get('[data-cy="3-F-description-input"]').type('Female');
-    cy.get('[data-cy="3-F-save-description-button"]').click();
-    cy.get('[data-cy="3-F-description"]').should('contain', 'Female');
+    cy.get('[data-cy="3-F-description"]').should('be.visible');
+    cy.get('[data-cy="3-F-description"]').type('Female');
     cy.get('[data-cy="3-F-term-dropdown"]').type('Female{downArrow}{enter}');
     cy.get('[data-cy="3-N/A-missing-value-button"]').click();
     cy.get('[data-cy="side-column-nav-bar-diagnosis-group_dx"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-diagnosis-select-button"]').click();
-    cy.get('[data-cy="4-HC-edit-description-button"]').click();
-    cy.get('[data-cy="4-HC-description-input"]').type('Healthy control');
-    cy.get('[data-cy="4-HC-save-description-button"]').click();
-    cy.get('[data-cy="4-HC-description"]').should('contain', 'Healthy control');
+    cy.get('[data-cy="4-HC-description"]').should('be.visible');
+    cy.get('[data-cy="4-HC-description"]').type('Healthy control');
     cy.get('[data-cy="4-HC-term-dropdown"]').type('Healthy control{downArrow}{enter}');
-    cy.get('[data-cy="4-PD-edit-description-button"]').click();
-    cy.get('[data-cy="4-PD-description-input"]').type('Parkinsons');
-    cy.get('[data-cy="4-PD-save-description-button"]').click();
-    cy.get('[data-cy="4-PD-description"]').should('contain', 'Parkinsons');
+    cy.get('[data-cy="4-PD-description"]').should('be.visible');
+    cy.get('[data-cy="4-PD-description"]').type('Parkinsons');
     cy.get('[data-cy="4-PD-term-dropdown"]').type(
       'Parkinsonism caused by methanol{downArrow}{enter}'
     );
@@ -295,12 +276,12 @@ describe('Main user flow', () => {
 
     // Column Annotation view
     cy.get('[data-cy="2-description"]').should('contain', 'Age of the participant');
-    cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown').click();
+    cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').click();
     cy.get('[data-cy="2-column-annotation-card-data-type"').should('contain', 'Continuous');
     cy.get('[data-cy="3-column-annotation-card-data-type"]').should('contain', 'Categorical');
     cy.get('[data-cy="1-column-annotation-card-data-type"]').should('contain', 'Not applicable');
     // Move to the 2nd page of columns using the pagination
-    cy.get(':nth-child(3) > .MuiButtonBase-root').click();
+    cy.get('[data-cy="column-annotation-pagination"] :nth-child(3) > .MuiButtonBase-root').click();
     cy.get('[data-cy="4-column-annotation-card-data-type"]').should('contain', 'Categorical');
     cy.get('[data-cy="next-button"]').click();
 
