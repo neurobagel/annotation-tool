@@ -46,7 +46,6 @@ describe('Categorical', () => {
       .and('contain', 'Description');
     cy.get('[data-cy="3-F"]').should('be.visible').and('contain', 'F');
     cy.get('[data-cy="3-F-description"]').should('be.visible').and('contain', 'Female');
-    cy.get('[data-cy="3-F-edit-description-button"]').should('be.visible');
   });
   it('fires the onUpdateDescription event handler with the appropriate payload when the description is changed', () => {
     const spy = cy.spy().as('spy');
@@ -62,10 +61,9 @@ describe('Categorical', () => {
         onUpdateLevelTerm={props.onUpdateLevelTerm}
       />
     );
-    cy.get('[data-cy="3-F-edit-description-button"]').click();
-    cy.get('[data-cy="3-F-description-input"]').clear();
-    cy.get('[data-cy="3-F-description-input"]').type('new description');
-    cy.get('[data-cy="3-F-save-description-button"]').click();
+    cy.get('[data-cy="3-F-description"]').should('be.visible');
+    cy.get('[data-cy="3-F-description"] textarea').first().clear();
+    cy.get('[data-cy="3-F-description"]').type('new description');
     cy.get('@spy').should('have.been.calledWith', '3', 'F', 'new description');
   });
   it('fires the onUpdateLevelTerm event handler with the appropriate payload when the level term is changed', () => {

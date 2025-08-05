@@ -55,13 +55,11 @@ describe('ValueAnnotation', () => {
 
     cy.mount(<ValueAnnotation />);
     cy.get('[data-cy="side-column-nav-bar-continuous-select-button"]').click();
-    cy.get('[data-cy="1-edit-description-button"]').click();
-    cy.get('[data-cy="1-description-input"]').clear();
-    cy.get('[data-cy="1-description-input"]').type('Years');
-    cy.get('[data-cy="1-save-description-button"]').click();
+    cy.get('[data-cy="1-description"]').should('be.visible');
+    cy.get('[data-cy="1-description"] textarea').first().clear();
+    cy.get('[data-cy="1-description"]').type('Years');
     cy.get('[data-cy="2-tab"]').click();
-    cy.get('[data-cy="2-description"]').should('contain', '');
-    cy.get('[data-cy="2-edit-description-button"]').click();
-    cy.get('[data-cy="2-description-input"]').should('not.contain', 'Years');
+    cy.get('[data-cy="2-description"]').should('be.visible');
+    cy.get('[data-cy="2-description"]').should('not.contain', 'Years');
   });
 });
