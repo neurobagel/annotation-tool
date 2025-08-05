@@ -215,7 +215,6 @@ export const mockDataDictionaryWithAnnotations = {
         TermURL: 'nb:ParticipantID',
         Label: 'Participant ID',
       },
-      Identifies: 'participant',
     },
   },
   age: {
