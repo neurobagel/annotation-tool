@@ -11,10 +11,8 @@ export const steps: StepConfig[] = [
   { label: 'Download', view: View.Download, icon: CloudDownloadIcon },
 ];
 
-export const fetchConfigGitHubURL =
-  'https://api.github.com/repos/neurobagel/communities/contents/configs';
+export const fetchConfigGitHubURL = 'https://api.github.com/repos/neurobagel/communities/contents/';
 
-export const githubRawBaseURL =
-  'https://raw.githubusercontent.com/neurobagel/communities/main/configs/';
+export const githubRawBaseURL = 'https://raw.githubusercontent.com/neurobagel/communities/main/';
 
 export const defaultConfigPath = '/src/assets/default_config/';
