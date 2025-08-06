@@ -15,17 +15,26 @@ describe('DescriptionEditor', () => {
         columnID={props.id}
       />
     );
-    cy.get('[data-cy="1-description"]').should('be.visible').and('contain', 'Sample description');
-    cy.get('[data-cy="1-edit-description-button"]').should('be.visible');
-    cy.get('[data-cy="1-edit-description-button"]').click();
-    cy.get('[data-cy="1-save-description-button"]').should('be.visible');
-    cy.get('[data-cy="1-description-input"]')
+    cy.get('[data-cy="1-description"] textarea')
       .should('be.visible')
-      .and('contain', 'Sample description');
-    cy.get('[data-cy="1-save-description-button"]').click();
-    cy.get('[data-cy="1-description-input"]').should('not.exist');
+      .and('have.value', 'Sample description');
   });
-  it('fires the onDescriptionChange event handler with the appropriate payload when the save button is clicked', () => {
+
+  it('shows placeholder when no description is provided', () => {
+    cy.mount(
+      <DescriptionEditor
+        description={null}
+        onDescriptionChange={props.onDescriptionChange}
+        columnID={props.id}
+      />
+    );
+    cy.get('[data-cy="1-description"] textarea')
+      .should('be.visible')
+      .and('have.attr', 'placeholder', 'Click to add description...')
+      .and('have.value', '');
+  });
+
+  it('auto-saves changes after typing', () => {
     const spy = cy.spy().as('spy');
     cy.mount(
       <DescriptionEditor
@@ -34,10 +43,25 @@ describe('DescriptionEditor', () => {
         columnID={props.id}
       />
     );
-    cy.get('[data-cy="1-edit-description-button"]').click();
-    cy.get('[data-cy="1-description-input"]').clear();
-    cy.get('[data-cy="1-description-input"]').type('new description');
-    cy.get('[data-cy="1-save-description-button"]').click();
+
+    cy.get('[data-cy="1-description"] textarea').first().clear();
+    cy.get('[data-cy="1-description"]').type('new description');
+    cy.contains('Saving...').should('be.visible');
+    cy.contains('Saved').should('be.visible');
     cy.get('@spy').should('have.been.calledWith', '1', 'new description');
+  });
+
+  it('handles empty input by converting to null', () => {
+    const spy = cy.spy().as('spy');
+    cy.mount(
+      <DescriptionEditor
+        description={props.description}
+        onDescriptionChange={spy}
+        columnID={props.id}
+      />
+    );
+
+    cy.get('[data-cy="1-description"] textarea').first().clear();
+    cy.get('@spy').should('have.been.calledWith', '1', null);
   });
 });
