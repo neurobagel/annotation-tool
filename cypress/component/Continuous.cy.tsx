@@ -113,10 +113,9 @@ describe('Continuous', () => {
         onUpdateFormat={props.onUpdateFormat}
       />
     );
-    cy.get('[data-cy="1-edit-description-button"]').click();
-    cy.get('[data-cy="1-description-input"]').clear();
-    cy.get('[data-cy="1-description-input"]').type('new units');
-    cy.get('[data-cy="1-save-description-button"]').click();
+    cy.get('[data-cy="1-description"]').should('be.visible');
+    cy.get('[data-cy="1-description"] textarea').first().clear();
+    cy.get('[data-cy="1-description"]').type('new units');
     cy.get('@spy').should('have.been.calledWith', '1', 'new units');
   });
   it('fires the onToggleMissingValue event handler with the appropriate payload when the missing value button is clicked', () => {
