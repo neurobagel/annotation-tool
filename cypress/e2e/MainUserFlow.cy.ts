@@ -51,6 +51,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="1-column-annotation-card"]').should('be.visible');
     cy.get('[data-cy="2-column-annotation-card"]').should('be.visible');
     cy.get('[data-cy="1-column-annotation-card-data-type-continuous-button"]').click();
+    cy.get('[data-cy="1-description"]').scrollIntoView();
     cy.get('[data-cy="1-description"]').should('be.visible');
     cy.get('[data-cy="1-description"]').type('A participant ID');
     cy.get('[data-cy="2-description"]').should('be.visible');

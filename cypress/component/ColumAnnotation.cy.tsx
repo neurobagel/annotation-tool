@@ -44,6 +44,7 @@ describe('ColumnAnnotation', () => {
     cy.get('[data-cy="1-column-annotation-card-data-type-categorical-button"]')
       .should('be.visible')
       .and('have.class', 'Mui-selected');
+    cy.get('[data-cy="2-column-annotation-card"]').scrollIntoView();
     cy.get('[data-cy="2-column-annotation-card"]').should('be.visible');
     cy.get('[data-cy="2-description"]')
       .should('be.visible')
