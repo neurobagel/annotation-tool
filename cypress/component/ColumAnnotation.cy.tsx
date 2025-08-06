@@ -75,10 +75,9 @@ describe('ColumnAnnotation', () => {
   });
   it('edits the description', () => {
     cy.mount(<ColumnAnnotation />);
-    cy.get('[data-cy="1-edit-description-button"]').click();
-    cy.get('[data-cy="1-description-input"]').clear();
-    cy.get('[data-cy="1-description-input"]').type('new description');
-    cy.get('[data-cy="1-save-description-button"]').click();
+    cy.get('[data-cy="1-description"]').should('be.visible');
+    cy.get('[data-cy="1-description"] textarea').first().clear();
+    cy.get('[data-cy="1-description"]').type('new description');
     cy.get('[data-cy="1-description"]').should('contain', 'new description');
   });
   it('toggles the data type between categorical and continuous', () => {

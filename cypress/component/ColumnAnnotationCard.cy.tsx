@@ -41,12 +41,6 @@ describe('ColumnAnnotationCard', () => {
       .should('be.visible')
       .and('contain', 'some header');
     cy.get('[data-cy="1-description"]').should('be.visible').and('contain', 'some description');
-    cy.get('[data-cy="1-edit-description-button"]').should('be.visible');
-    cy.get('[data-cy="1-edit-description-button"]').click();
-    cy.get('[data-cy="1-description-input"]')
-      .should('be.visible')
-      .and('contain', 'some description');
-    cy.get('[data-cy="1-save-description-button"]').should('be.visible');
     cy.get('[data-cy="1-column-annotation-card-data-type"]').should('be.visible');
     cy.get('[data-cy="1-column-annotation-card-data-type-categorical-button"]')
       .should('be.visible')
@@ -58,7 +52,7 @@ describe('ColumnAnnotationCard', () => {
       .should('be.visible')
       .and('have.value', 'Participant ID');
   });
-  it('Fires the onDescriptionChange event handler with the appropriate payload when the save button is clicked', () => {
+  it('Fires the onDescriptionChange event handler with the appropriate payload when description is auto-saved', () => {
     const spy = cy.spy().as('spy');
     cy.mount(
       <ColumnAnnotationCard
@@ -73,10 +67,9 @@ describe('ColumnAnnotationCard', () => {
         onStandardizedVariableChange={props.onStandardizedVariableChange}
       />
     );
-    cy.get('[data-cy="1-edit-description-button"]').click();
-    cy.get('[data-cy="1-description-input"]').clear();
-    cy.get('[data-cy="1-description-input"]').type('new description');
-    cy.get('[data-cy="1-save-description-button"]').click();
+    cy.get('[data-cy="1-description"]').should('be.visible');
+    cy.get('[data-cy="1-description"] textarea').first().clear();
+    cy.get('[data-cy="1-description"]').type('new description');
     cy.get('@spy').should('have.been.calledWith', '1', 'new description');
   });
   it('Fires the onDataTypeChange event handler with the appropriate payload when the data type is toggled', () => {
