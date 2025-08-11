@@ -404,7 +404,7 @@ describe('Main user flow', () => {
       'Age'
     );
     // Move to the 2nd page of columns using the pagination
-    cy.get(':nth-child(3) > .MuiButtonBase-root').click();
+    cy.get('[data-cy="pagination"] :nth-child(3) > .MuiButtonBase-root').click();
     cy.get('[data-cy="4-description"]').should('contain', 'Sex');
     cy.get('[data-cy="4-column-annotation-card-data-type"]').should('contain', 'Categorical');
     cy.get('[data-cy="4-column-annotation-card-standardized-variable-dropdown"] input').should(
