@@ -51,7 +51,7 @@ function App() {
   const content = determineView();
 
   return (
-    <div className="flex min-h-screen flex-col overflow-x-hidden">
+    <div className="flex min-h-screen flex-col overflow-x-hidden mt-20">
       {currentView !== View.Landing && (
         <>
           <AppTitle

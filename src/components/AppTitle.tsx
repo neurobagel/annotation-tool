@@ -15,7 +15,7 @@ function AppTitle({ title, githubUrl, docsUrl }: AppTitleProps) {
   };
 
   return (
-    <AppBar position="static" color="default" data-cy="app-title">
+    <AppBar position="fixed" color="default" data-cy="app-title">
       <Toolbar>
         <img src={logo} alt="Neurobagel Logo" style={{ height: '45px', width: 'auto' }} />
 
