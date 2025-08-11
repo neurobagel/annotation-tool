@@ -15,6 +15,9 @@ describe('Main user flow', () => {
     cy.contains('Welcome to the Neurobagel Annotation Tool');
     cy.get('[data-cy="next-button"]').click();
 
+    // Check the app title and documentation link are there
+    cy.get('[data-cy="app-title"]').should('contain', 'Neurobagel Annotation Tool');
+
     // Wait for config skeleton to disappear and dropdown to be ready
     cy.get('[data-cy="config-card-dropdown"]', { timeout: 10000 }).should('be.visible');
     cy.get('[data-config-loading="false"]').should('exist');
