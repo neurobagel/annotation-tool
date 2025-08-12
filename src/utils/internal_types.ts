@@ -33,8 +33,6 @@ export interface DataDictionary {
         TermURL: string;
         Label: string;
       };
-      // TODO: Remove once we get rid of identifies in CLI
-      Identifies?: string;
       Format?: {
         TermURL: string;
         Label: string;
@@ -67,7 +65,7 @@ export interface StandardizedVariableConfig extends StandardizedVariable {
   description?: string;
   is_multi_column_measure?: boolean;
   can_have_multiple_columns?: boolean;
-  same_as?: string;
+  same_as?: string | null;
 }
 
 export interface StandardizedVaribleCollection {
