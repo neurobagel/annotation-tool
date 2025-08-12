@@ -52,7 +52,8 @@ describe('ValueAnnotationTabs', () => {
     cy.get('[data-cy="2-tab"]').should('be.visible').and('contain', 'age');
     cy.get('[data-cy="3-tab"]').should('be.visible').and('contain', 'sex');
     cy.get('[data-cy="4-tab"]').should('be.visible').and('contain', 'group_dx');
-    cy.get('[data-cy="5-tab"]').should('be.visible').and('contain', 'iq');
+    cy.get('[data-cy="5-tab"]').should('be.visible').and('contain', 'group');
+    cy.get('[data-cy="6-tab"]').should('be.visible').and('contain', 'iq');
   });
   it('fires onUpdateDescription with the appropriate payload when the description is updated', () => {
     const spy = cy.spy().as('spy');

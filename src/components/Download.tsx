@@ -24,7 +24,6 @@ function Download() {
 
   const uploadedDataTableFileName = useDataStore((state) => state.uploadedDataTableFileName);
   const columns = useDataStore((state) => state.columns);
-  const config = useDataStore((state) => state.config);
   const reset = useDataStore((state) => state.reset);
 
   const setCurrentView = useViewStore((state) => state.setCurrentView);
@@ -87,14 +86,6 @@ function Download() {
               );
             }
 
-            const configEntry = Object.values(config).find(
-              (configItem) => configItem.identifier === column.standardizedVariable?.identifier
-            );
-            // TODO: Remove once we get rid of identifies in CLI
-            if (configEntry?.label.includes('ID')) {
-              dictionaryEntry.Annotations.Identifies = configEntry.label.slice(0, -3).toLowerCase();
-            }
-
             if (column.isPartOf?.termURL && column.isPartOf?.label) {
               dictionaryEntry.Annotations.IsPartOf = {
                 TermURL: column.isPartOf.termURL,
@@ -121,7 +112,7 @@ function Download() {
         }
         return dictAcc;
       }, {} as DataDictionary),
-    [columns, config]
+    [columns]
   );
 
   const { isValid: schemaValid, errors: schemaErrors } = useMemo(() => {

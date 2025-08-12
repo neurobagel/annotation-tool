@@ -171,14 +171,9 @@
           "title": "Missingvalues",
           "type": "array",
           "uniqueItems": true
-        },
-        "Identifies": {
-          "description": "For identifier columns, the type of observation uniquely identified by this column.",
-          "title": "Identifies",
-          "type": "string"
         }
       },
-      "required": ["IsAbout", "Identifies"],
+      "required": ["IsAbout"],
       "title": "IdentifierNeurobagel",
       "type": "object"
     },

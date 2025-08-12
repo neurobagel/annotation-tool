@@ -15,11 +15,54 @@ export const mockDataTable = {
   ],
   2: ['28.4', '24.6', '43.6', '28.4', '72.1', '56.2', '23', '22', '21', '45', '34', '65'],
   3: ['M', 'F', 'M', 'F', 'M', 'M', 'M', 'F', 'M', 'F', 'M', 'N/A'],
-  4: ['HC', 'HC', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'HC', 'PD'],
+  4: ['ADHD', 'ADHD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'ADHD', 'PD'],
+  5: ['HC', 'HC', 'HC', 'HC', 'HC', 'N/A', 'HC', 'HC', 'Patient', 'HC', 'HC', 'HC'],
+  6: ['80', '90', '100', '110', '65', '87', '94', '90', '81', '66', '67', '83'],
+};
+
+export const mockDataTableWithEmptyLine = {
+  1: [
+    'sub-718211',
+    'sub-718213',
+    'sub-718216',
+    'sub-718217',
+    'sub-718218',
+    'sub-718219',
+    'sub-718220',
+    'sub-718221',
+    'sub-718222',
+    'sub-718223',
+    'sub-718224',
+    'sub-718225',
+  ],
+  2: ['28.4', '24.6', '43.6', '28.4', '72.1', '56.2', '23', '22', '21', '45', '34', '65'],
+  3: ['M', 'F', 'M', 'F', 'M', 'M', 'M', 'F', 'M', 'F', 'M', 'N/A'],
+  4: ['ADHD', 'ADHD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'ADHD', 'PD'],
   5: ['80', '90', '100', '110', '65', '87', '94', '90', '81', '66', '67', '83'],
 };
 
 export const mockInitialColumns = {
+  1: {
+    header: 'participant_id',
+  },
+  2: {
+    header: 'age',
+  },
+  3: {
+    header: 'sex',
+  },
+  4: {
+    header: 'group_dx',
+  },
+  5: {
+    header: 'group',
+  },
+  6: {
+    header: 'iq',
+  },
+};
+
+export const mockInitialColumnsWithEmptyLine = {
   1: {
     header: 'participant_id',
   },
@@ -84,7 +127,11 @@ export const mockColumns = {
     },
     dataType: 'Categorical' as 'Categorical' | 'Continuous' | null,
     levels: {
-      HC: { description: 'Healthy Control', label: 'Healthy Control', termURL: 'ncit:C94342' },
+      ADHD: {
+        description: 'Attention deficit hyperactivity disorder',
+        label: 'Attention deficit hyperactivity disorder',
+        termURL: 'snomed:406506008',
+      },
       PD: {
         description: 'Parkinsons',
         label: 'Parkinsonism caused by methanol',
@@ -93,6 +140,12 @@ export const mockColumns = {
     },
   },
   5: {
+    header: 'group',
+    description: 'The group assignment of the participant in a study.',
+    dataType: null as 'Categorical' | 'Continuous' | null,
+    missingValues: ['Patient', 'N/A'],
+  },
+  6: {
     header: 'iq',
     description: 'iq test score of the participant',
     standardizedVariable: {
@@ -146,6 +199,9 @@ export const mockDataDictionaryWithNoDescription = {
   group_dx: {
     Description: '',
   },
+  group: {
+    Description: '',
+  },
   iq: {
     Description: '',
   },
@@ -159,7 +215,6 @@ export const mockDataDictionaryWithAnnotations = {
         TermURL: 'nb:ParticipantID',
         Label: 'Participant ID',
       },
-      Identifies: 'participant',
     },
   },
   age: {
@@ -213,9 +268,9 @@ export const mockDataDictionaryWithAnnotations = {
   group_dx: {
     Description: 'Diagnosis of the participant',
     Levels: {
-      HC: {
-        Description: 'Healthy Control',
-        TermURL: 'ncit:C94342',
+      ADHD: {
+        Description: 'Attention deficit hyperactivity disorder',
+        TermURL: 'snomed:406506008',
       },
       PD: {
         Description: 'Parkinsons',
@@ -228,9 +283,9 @@ export const mockDataDictionaryWithAnnotations = {
         Label: 'Diagnosis',
       },
       Levels: {
-        HC: {
-          TermURL: 'ncit:C94342',
-          Label: 'Healthy Control',
+        ADHD: {
+          TermURL: 'snomed:406506008',
+          Label: 'Attention deficit hyperactivity disorder',
         },
         PD: {
           TermURL: 'snomed:870288002',
@@ -238,6 +293,9 @@ export const mockDataDictionaryWithAnnotations = {
         },
       },
     },
+  },
+  group: {
+    Description: 'The group assignment of the participant in a study.',
   },
   iq: {
     Description: 'iq test score of the participant',
@@ -390,11 +448,7 @@ export const mockConfig = {
         identifier: 'snomed:1259106002',
         label: 'Alexander disease type I',
       },
-      // TODO: Remove once we have healthy control workflow
-      {
-        identifier: 'ncit:C94342',
-        label: 'Healthy Control',
-      },
+      { identifier: 'snomed:406506008', label: 'Attention deficit hyperactivity disorder' },
     ],
   },
   'nb:Assessment': {
@@ -585,6 +639,10 @@ export const mockTermsData = {
         {
           id: '1259106002',
           name: 'Alexander disease type I',
+        },
+        {
+          id: '406506008',
+          name: 'Attention deficit hyperactivity disorder',
         },
       ],
     },
