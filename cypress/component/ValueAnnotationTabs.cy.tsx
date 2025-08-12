@@ -69,10 +69,9 @@ describe('ValueAnnotationTabs', () => {
       />
     );
     cy.get('[data-cy="3-tab"]').click();
-    cy.get('[data-cy="3-M-edit-description-button"]').click();
-    cy.get('[data-cy="3-M-description-input"]').clear();
-    cy.get('[data-cy="3-M-description-input"]').type('new units');
-    cy.get('[data-cy="3-M-save-description-button"]').click();
+    cy.get('[data-cy="3-M-description"]').should('be.visible');
+    cy.get('[data-cy="3-M-description"]').first().clear();
+    cy.get('[data-cy="3-M-description"]').type('new units');
     cy.get('@spy').should('have.been.calledWith', '3', 'M', 'new units');
   });
   it('fires onUpdateUnits with the appropriate payload when the units field is updated', () => {
@@ -89,9 +88,8 @@ describe('ValueAnnotationTabs', () => {
       />
     );
     cy.get('[data-cy="2-tab"]').click();
-    cy.get('[data-cy="2-edit-description-button"]').click();
-    cy.get('[data-cy="2-description-input"]').type('new units');
-    cy.get('[data-cy="2-save-description-button"]').click();
+    cy.get('[data-cy="2-description"]').should('be.visible');
+    cy.get('[data-cy="2-description"]').type('new units');
     cy.get('@spy').should('have.been.calledWith', '2', 'new units');
   });
   it('fires onToggleMissingValue with the appropriate payload when the missing value button is clicked', () => {
