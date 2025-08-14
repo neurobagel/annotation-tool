@@ -179,8 +179,8 @@ describe('Main user flow', () => {
     cy.get('[data-cy="2-description"]').should('be.visible');
     cy.get('[data-cy="2-description"] textarea').first().clear();
     cy.get('[data-cy="2-description"]').type('Age of the participant');
-    cy.get('[data-cy="2-column-annotation-card-data-type"').should('contain', 'Continuous');
-    cy.get('[data-cy="3-column-annotation-card-data-type"').should('contain', 'Categorical');
+    cy.get('[data-cy="2-column-annotation-card-data-type"]').should('contain', 'Continuous');
+    cy.get('[data-cy="3-column-annotation-card-data-type"]').should('contain', 'Categorical');
     // Move to the 2nd page of columns using the pagination
     cy.get('[data-cy="column-annotation-pagination"] :nth-child(3) > .MuiButtonBase-root').click();
     cy.get('[data-cy="4-column-annotation-card-standardized-variable-dropdown"]').type(
@@ -214,7 +214,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="multi-column-measures-card-0-columns-dropdown"]').type(
       'iq{downArrow}{enter}'
     );
-    cy.get('[data-cy="mapped-column-6').should('be.visible').and('contain', 'iq');
+    cy.get('[data-cy="mapped-column-6"]').should('be.visible').and('contain', 'iq');
     cy.get('[data-cy="multi-column-measures"]').should('contain.text', '1 column assigned');
     cy.get('[data-cy="next-button"]').click();
 
@@ -305,7 +305,7 @@ describe('Main user flow', () => {
     // Column Annotation view
     cy.get('[data-cy="2-description"]').should('contain', 'Age of the participant');
     cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').click();
-    cy.get('[data-cy="2-column-annotation-card-data-type"').should('contain', 'Continuous');
+    cy.get('[data-cy="2-column-annotation-card-data-type"]').should('contain', 'Continuous');
     cy.get('[data-cy="3-column-annotation-card-data-type"]').should('contain', 'Categorical');
     cy.get('[data-cy="1-column-annotation-card-data-type"]').should('contain', 'Not applicable');
     // Move to the 2nd page of columns using the pagination
@@ -319,7 +319,7 @@ describe('Main user flow', () => {
       'contain.text',
       'Previous IQ assessment by pronunciation'
     );
-    cy.get('[data-cy="mapped-column-6').should('be.visible').and('contain', 'iq');
+    cy.get('[data-cy="mapped-column-6"]').should('be.visible').and('contain', 'iq');
     cy.get('[data-cy="multi-column-measures"]').should('contain.text', '1 column assigned');
     cy.get('[data-cy="next-button"]').click();
 
