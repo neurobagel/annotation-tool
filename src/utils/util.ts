@@ -18,6 +18,7 @@ import {
   MultiColumnMeasuresTermCard,
   StandardizedTerm,
   TermFormat,
+  DataDictionary,
 } from './internal_types';
 
 // Utility functions for store
@@ -173,4 +174,90 @@ export function createMappedColumnHeaders(
   columns: Columns
 ): Record<string, string> {
   return Object.fromEntries(mappedColumns.map((id) => [id, columns[id]?.header || `Column ${id}`]));
+}
+
+// Helper function to create a data dictionary
+export function getDataDictionary(columns: Columns): DataDictionary {
+  return Object.entries(columns).reduce<DataDictionary>((dictAcc, [_columnKey, column]) => {
+    if (column.header) {
+      const dictionaryEntry: DataDictionary[string] = {
+        Description: column.description || '',
+      };
+
+      // Description of levels always included for the BIDS section
+      if (column.dataType === 'Categorical' && column.levels) {
+        dictionaryEntry.Levels = Object.entries(column.levels).reduce(
+          (levelsObj, [levelKey, levelValue]) => ({
+            ...levelsObj,
+            [levelKey]: {
+              Description: levelValue.description || '',
+            },
+          }),
+          {} as { [key: string]: { Description: string } }
+        );
+      }
+
+      if (column.dataType === 'Continuous' && column.units !== undefined) {
+        dictionaryEntry.Units = column.units;
+      }
+
+      if (column.standardizedVariable) {
+        dictionaryEntry.Annotations = {
+          IsAbout: {
+            TermURL: column.standardizedVariable.identifier,
+            Label: column.standardizedVariable.label,
+          },
+        };
+
+        // Add term url to Levels under BIDS section only for a categorical column with a standardized variable
+        if (column.dataType === 'Categorical' && column.levels) {
+          dictionaryEntry.Levels = Object.entries(column.levels).reduce(
+            (updatedLevels, [levelKey, levelValue]) => ({
+              ...updatedLevels,
+              [levelKey]: {
+                ...updatedLevels[levelKey],
+                ...(levelValue.termURL ? { TermURL: levelValue.termURL } : {}),
+              },
+            }),
+            dictionaryEntry.Levels || {}
+          );
+
+          dictionaryEntry.Annotations.Levels = Object.entries(column.levels).reduce(
+            (termsObj, [levelKey, levelValue]) => ({
+              ...termsObj,
+              [levelKey]: {
+                TermURL: levelValue.termURL || '',
+                Label: levelValue.label || '',
+              },
+            }),
+            {} as { [key: string]: { TermURL: string; Label: string } }
+          );
+        }
+
+        if (column.isPartOf?.termURL && column.isPartOf?.label) {
+          dictionaryEntry.Annotations.IsPartOf = {
+            TermURL: column.isPartOf.termURL,
+            Label: column.isPartOf.label,
+          };
+        }
+
+        if (column.missingValues && column.dataType !== null) {
+          dictionaryEntry.Annotations.MissingValues = column.missingValues;
+        }
+
+        if (column.dataType === 'Continuous' && column.format) {
+          dictionaryEntry.Annotations.Format = {
+            TermURL: column.format?.termURL || '',
+            Label: column.format?.label || '',
+          };
+        }
+      }
+
+      return {
+        ...dictAcc,
+        [column.header]: dictionaryEntry,
+      };
+    }
+    return dictAcc;
+  }, {} as DataDictionary);
 }
