@@ -9,54 +9,24 @@ import {
   FormControlLabel,
   Link,
 } from '@mui/material';
-import Ajv from 'ajv';
-import { useState, useMemo } from 'react';
-import { getDataDictionary } from '~/utils/util';
+import { useState } from 'react';
 import emoji from '../assets/download-emoji.png';
-import schema from '../assets/neurobagel_data_dictionary.schema.json';
+import { useDataDictionary, useSchemaValidation } from '../hooks';
 import useDataStore from '../stores/data';
 import useViewStore from '../stores/view';
-import { DataDictionary, View } from '../utils/internal_types';
+import { View } from '../utils/internal_types';
 import DataDictionaryPreview from './DataDictionaryPreview';
-
-function useDataDictionary(): DataDictionary {
-  const columns = useDataStore((state) => state.columns);
-  return useMemo(() => getDataDictionary(columns), [columns]);
-}
 
 function Download() {
   const [dictionaryCollapsed, setDictionaryCollapsed] = useState(false);
   const [forceAllowDownload, setForceAllowDownload] = useState(false);
 
   const uploadedDataTableFileName = useDataStore((state) => state.uploadedDataTableFileName);
-  // const columns = useDataStore((state) => state.columns);
   const reset = useDataStore((state) => state.reset);
-  const dataDictionary: DataDictionary = useDataDictionary();
   const setCurrentView = useViewStore((state) => state.setCurrentView);
 
-  const { isValid: schemaValid, errors: schemaErrors } = useMemo(() => {
-    const ajv = new Ajv({ allErrors: true });
-    const validate = ajv.compile(schema);
-    const isValid = validate(dataDictionary);
-
-    if (!isValid) {
-      /*
-      Since Ajv uses JSON Pointer format for instance path
-      we need to slice the leading slash off of the instance path
-      */
-      const errors =
-        validate.errors?.map((error) => {
-          const pathSegments = error.instancePath.slice(1).split('/');
-          return pathSegments[0];
-        }) || [];
-
-      const uniqueErrors = Array.from(new Set(errors));
-
-      return { isValid: false, errors: uniqueErrors };
-    }
-
-    return { isValid: true, errors: [] };
-  }, [dataDictionary]);
+  const dataDictionary = useDataDictionary();
+  const { schemaValid, schemaErrors } = useSchemaValidation(dataDictionary);
 
   const handleDownload = () => {
     const blob = new Blob([JSON.stringify(dataDictionary, null, 2)], {

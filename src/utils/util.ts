@@ -176,7 +176,6 @@ export function createMappedColumnHeaders(
   return Object.fromEntries(mappedColumns.map((id) => [id, columns[id]?.header || `Column ${id}`]));
 }
 
-// Helper function to create a data dictionary
 export function getDataDictionary(columns: Columns): DataDictionary {
   return Object.entries(columns).reduce<DataDictionary>((dictAcc, [_columnKey, column]) => {
     if (column.header) {

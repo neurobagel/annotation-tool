@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import Ajv from 'ajv';
+import { useState, useEffect, useMemo } from 'react';
+import schema from './assets/neurobagel_data_dictionary.schema.json';
 import useDataStore from './stores/data';
-import { StandardizedVariable } from './utils/internal_types';
-import { getAllMappedColumns } from './utils/util';
+import { StandardizedVariable, DataDictionary } from './utils/internal_types';
+import { getAllMappedColumns, getDataDictionary } from './utils/util';
 
 export const useColumnUpdates = () => {
   const updateColumnDescription = useDataStore((state) => state.updateColumnDescription);
@@ -162,4 +164,35 @@ export function useActiveVariableData(
     currentTermCards,
     variableAllMappedColumns,
   };
+}
+
+export function useDataDictionary(): DataDictionary {
+  const columns = useDataStore((state) => state.columns);
+  return useMemo(() => getDataDictionary(columns), [columns]);
+}
+
+export function useSchemaValidation(dataDictionary: DataDictionary) {
+  return useMemo(() => {
+    const ajv = new Ajv({ allErrors: true });
+    const validate = ajv.compile(schema);
+    const isValid = validate(dataDictionary);
+
+    if (!isValid) {
+      /*
+      Since Ajv uses JSON Pointer format for instance path
+      we need to slice the leading slash off of the instance path
+      */
+      const errors =
+        validate.errors?.map((error) => {
+          const pathSegments = error.instancePath.slice(1).split('/');
+          return pathSegments[0];
+        }) || [];
+
+      const uniqueErrors = Array.from(new Set(errors));
+
+      return { schemaValid: false, schemaErrors: uniqueErrors };
+    }
+
+    return { schemaValid: true, schemaErrors: [] };
+  }, [dataDictionary]);
 }
