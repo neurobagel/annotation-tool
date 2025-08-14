@@ -18,3 +18,10 @@ export const githubRawBaseURL =
   'https://raw.githubusercontent.com/neurobagel/communities/main/configs/';
 
 export const defaultConfigPath = '/default_config/';
+
+export const VariableTypeToBIDSTypeMapping = {
+  continuous: 'continuous',
+  categorical: 'categorical',
+  collections: null,
+  identifier: null,
+};
