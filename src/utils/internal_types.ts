@@ -58,7 +58,7 @@ export interface StandardizedVariable {
 }
 
 export interface StandardizedVariableConfig extends StandardizedVariable {
-  variable_type?: 'Categorical' | 'Continuous' | null;
+  data_type?: 'Categorical' | 'Continuous' | null;
   terms?: StandardizedTerm[] | null;
   formats?: TermFormat[];
   required?: boolean;

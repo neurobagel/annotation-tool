@@ -206,10 +206,7 @@ const useDataStore = create<DataStore>()(
           );
           // Filter out variables with null data_type e.g., Subject ID, Session ID
           // but keep multi column measures in
-          if (
-            configEntry?.variable_type !== null ||
-            configEntry?.is_multi_column_measure === true
-          ) {
+          if (configEntry?.data_type !== null || configEntry?.is_multi_column_measure === true) {
             seenIdentifiers.add(variable.identifier);
             uniqueVariables.push(variable);
           }
@@ -366,7 +363,7 @@ const useDataStore = create<DataStore>()(
         const configEntry = Object.values(get().config).find(
           (config) => config.identifier === standardizedVariable.identifier
         );
-        dataType = configEntry?.variable_type || null;
+        dataType = configEntry?.data_type || null;
       }
 
       // Call updateColumnDataType with the found data_type
@@ -543,7 +540,7 @@ const useDataStore = create<DataStore>()(
                         identifier: matchingConfig.identifier,
                         label: matchingConfig.label,
                       };
-                      dataType = matchingConfig.variable_type ?? null;
+                      dataType = matchingConfig.data_type ?? null;
                     }
                   } else {
                     // Question: here we are removing standardizedVariable if there is no match
