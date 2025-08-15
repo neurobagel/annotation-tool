@@ -5,6 +5,7 @@ import useDataStore from './stores/data';
 import { StandardizedVariable, DataDictionary } from './utils/internal_types';
 import { getAllMappedColumns, getDataDictionary } from './utils/util';
 
+// TODO: figure out who calls this to determine whether it will write to BIDSType or VariableType
 export const useColumnUpdates = () => {
   const updateColumnDescription = useDataStore((state) => state.updateColumnDescription);
   const updateColumnDataType = useDataStore((state) => state.updateColumnDataType);

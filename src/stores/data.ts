@@ -206,7 +206,10 @@ const useDataStore = create<DataStore>()(
           );
           // Filter out variables with null data_type e.g., Subject ID, Session ID
           // but keep multi column measures in
-          if (configEntry?.data_type !== null || configEntry?.is_multi_column_measure === true) {
+          if (
+            configEntry?.variable_type !== null ||
+            configEntry?.is_multi_column_measure === true
+          ) {
             seenIdentifiers.add(variable.identifier);
             uniqueVariables.push(variable);
           }
@@ -301,6 +304,8 @@ const useDataStore = create<DataStore>()(
       }));
     },
 
+    // TODO: this function will in the future write to BIDSType.
+    // It should also be renamed to updateBIDSType
     updateColumnDataType: (columnID: string, dataType: 'Categorical' | 'Continuous' | null) => {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
@@ -334,6 +339,7 @@ const useDataStore = create<DataStore>()(
       }));
     },
 
+    // TODO: this function will in the future write to VariableType - and should be renamed
     // This function is used to set the data type of a column that has been mapped to a standardized column
     updateColumnStandardizedVariable: (
       columnID: string,
@@ -360,7 +366,7 @@ const useDataStore = create<DataStore>()(
         const configEntry = Object.values(get().config).find(
           (config) => config.identifier === standardizedVariable.identifier
         );
-        dataType = configEntry?.data_type || null;
+        dataType = configEntry?.variable_type || null;
       }
 
       // Call updateColumnDataType with the found data_type
@@ -432,6 +438,8 @@ const useDataStore = create<DataStore>()(
       }));
     },
 
+    // TODO: This function will in the future read from BIDSType
+    // I also want to check who is calling this function, in case that changes what it should read from
     updateColumnMissingValues: (columnID: string, value: string, isMissing: boolean) => {
       set((state) => {
         const column = state.columns[columnID];
@@ -481,6 +489,8 @@ const useDataStore = create<DataStore>()(
     setDataDictionary: (data: DataDictionary) => set({ uploadedDataDictionary: data }),
     setUploadedDataDictionaryFileName: (fileName: string | null) =>
       set({ uploadedDataDictionaryFileName: fileName }),
+    // TODO: This function should be factored out of the store
+    // TODO: This function will in the future write to BIDSType instead of dataType
     processDataDictionaryFile: async (file: File) =>
       new Promise<void>((resolve, reject) => {
         const reader = new FileReader();
@@ -533,7 +543,7 @@ const useDataStore = create<DataStore>()(
                         identifier: matchingConfig.identifier,
                         label: matchingConfig.label,
                       };
-                      dataType = matchingConfig.data_type ?? null;
+                      dataType = matchingConfig.variable_type ?? null;
                     }
                   } else {
                     // Question: here we are removing standardizedVariable if there is no match
