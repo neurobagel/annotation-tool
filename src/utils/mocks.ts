@@ -88,7 +88,7 @@ export const mockColumns = {
       identifier: 'nb:ParticipantID',
       label: 'Participant ID',
     },
-    dataType: null as 'Categorical' | 'Continuous' | null,
+    bidsType: null as 'Categorical' | 'Continuous' | null,
   },
   2: {
     header: 'age',
@@ -97,7 +97,7 @@ export const mockColumns = {
       identifier: 'nb:Age',
       label: 'Age',
     },
-    dataType: 'Continuous' as 'Categorical' | 'Continuous' | null,
+    bidsType: 'Continuous' as 'Categorical' | 'Continuous' | null,
     format: {
       termURL: 'nb:FromFloat',
       label: 'float',
@@ -111,7 +111,7 @@ export const mockColumns = {
       identifier: 'nb:Sex',
       label: 'Sex',
     },
-    dataType: 'Categorical' as 'Categorical' | 'Continuous' | null,
+    bidsType: 'Categorical' as 'Categorical' | 'Continuous' | null,
     levels: {
       F: { description: '' },
       M: { description: '' },
@@ -125,7 +125,7 @@ export const mockColumns = {
       identifier: 'nb:Diagnosis',
       label: 'Diagnosis',
     },
-    dataType: 'Categorical' as 'Categorical' | 'Continuous' | null,
+    bidsType: 'Categorical' as 'Categorical' | 'Continuous' | null,
     levels: {
       ADHD: {
         description: 'Attention deficit hyperactivity disorder',
@@ -142,7 +142,7 @@ export const mockColumns = {
   5: {
     header: 'group',
     description: 'The group assignment of the participant in a study.',
-    dataType: null as 'Categorical' | 'Continuous' | null,
+    bidsType: null as 'Categorical' | 'Continuous' | null,
     missingValues: ['Patient', 'N/A'],
   },
   6: {
@@ -152,7 +152,7 @@ export const mockColumns = {
       identifier: 'nb:Assessment',
       label: 'Assessment Tool',
     },
-    dataType: null as 'Categorical' | 'Continuous' | null,
+    bidsType: null as 'Categorical' | 'Continuous' | null,
     isPartOf: {
       termURL: 'snomed:273712001',
       label: 'Previous IQ assessment by pronunciation',
@@ -163,14 +163,14 @@ export const mockColumns = {
 export const mockColumnsWithDataType = {
   1: {
     header: 'some_continuous_column',
-    dataType: 'Continuous' as 'Categorical' | 'Continuous' | null,
+    bidsType: 'Continuous' as 'Categorical' | 'Continuous' | null,
   },
   2: {
     header: 'age',
   },
   3: {
     header: 'sex',
-    dataType: 'Categorical' as 'Categorical' | 'Continuous' | null,
+    bidsType: 'Categorical' as 'Categorical' | 'Continuous' | null,
   },
 };
 
