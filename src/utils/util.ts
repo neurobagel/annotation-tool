@@ -184,7 +184,7 @@ export function getDataDictionary(columns: Columns): DataDictionary {
       };
 
       // Description of levels always included for the BIDS section
-      if (column.dataType === 'Categorical' && column.levels) {
+      if (column.bidsType === 'Categorical' && column.levels) {
         dictionaryEntry.Levels = Object.entries(column.levels).reduce(
           (levelsObj, [levelKey, levelValue]) => ({
             ...levelsObj,
@@ -196,7 +196,7 @@ export function getDataDictionary(columns: Columns): DataDictionary {
         );
       }
 
-      if (column.dataType === 'Continuous' && column.units !== undefined) {
+      if (column.bidsType === 'Continuous' && column.units !== undefined) {
         dictionaryEntry.Units = column.units;
       }
 
@@ -209,7 +209,7 @@ export function getDataDictionary(columns: Columns): DataDictionary {
         };
 
         // Add term url to Levels under BIDS section only for a categorical column with a standardized variable
-        if (column.dataType === 'Categorical' && column.levels) {
+        if (column.bidsType === 'Categorical' && column.levels) {
           dictionaryEntry.Levels = Object.entries(column.levels).reduce(
             (updatedLevels, [levelKey, levelValue]) => ({
               ...updatedLevels,
@@ -240,11 +240,11 @@ export function getDataDictionary(columns: Columns): DataDictionary {
           };
         }
 
-        if (column.missingValues && column.dataType !== null) {
+        if (column.missingValues && column.bidsType !== null) {
           dictionaryEntry.Annotations.MissingValues = column.missingValues;
         }
 
-        if (column.dataType === 'Continuous' && column.format) {
+        if (column.bidsType === 'Continuous' && column.format) {
           dictionaryEntry.Annotations.Format = {
             TermURL: column.format?.termURL || '',
             Label: column.format?.label || '',

@@ -5,7 +5,7 @@ export type DataTable = {
 export type Column = {
   header: string;
   description?: string | null;
-  dataType?: 'Categorical' | 'Continuous' | null;
+  bidsType?: 'Categorical' | 'Continuous' | null;
   standardizedVariable?: StandardizedVariable | null;
   isPartOf?: {
     termURL?: string;

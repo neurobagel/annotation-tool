@@ -76,7 +76,7 @@ function ValueAnnotationTabs({
             >
               {selectedColumnId === columnId && (
                 <div className="h-full">
-                  {column.dataType === 'Categorical' ? (
+                  {column.bidsType === 'Categorical' ? (
                     <Categorical
                       columnID={columnId}
                       uniqueValues={uniqueValues}

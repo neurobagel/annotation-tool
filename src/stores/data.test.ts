@@ -118,10 +118,10 @@ describe('data store actions', () => {
       result.current.updateColumnDataType('1', 'Continuous');
       result.current.updateColumnDataType('3', 'Categorical');
     });
-    expect(result.current.columns['1'].dataType).toEqual('Continuous');
+    expect(result.current.columns['1'].bidsType).toEqual('Continuous');
     expect(result.current.columns['1'].levels).toBeUndefined();
     expect(result.current.columns['1'].units).toEqual('');
-    expect(result.current.columns['3'].dataType).toEqual('Categorical');
+    expect(result.current.columns['3'].bidsType).toEqual('Categorical');
     expect(result.current.columns['3'].levels).toBeDefined();
     expect(result.current.columns['3'].levels).toEqual({
       F: { description: '' },
@@ -155,7 +155,7 @@ describe('data store actions', () => {
       identifier: 'nb:Assessment',
       label: 'Assessment Tool',
     });
-    expect(result.current.columns['1'].dataType).toEqual(null);
+    expect(result.current.columns['1'].bidsType).toEqual(null);
     expect(result.current.columns['1'].units).toBeUndefined();
     act(() => {
       result.current.updateColumnStandardizedVariable('1', {
@@ -167,7 +167,7 @@ describe('data store actions', () => {
       identifier: 'nb:Age',
       label: 'Age',
     });
-    expect(result.current.columns['1'].dataType).toEqual('Continuous');
+    expect(result.current.columns['1'].bidsType).toEqual('Continuous');
     expect(result.current.columns['1'].levels).toBeUndefined();
     expect(result.current.columns['1'].units).toEqual('');
   });

@@ -58,8 +58,8 @@ function ValueAnnotation() {
 
     const unknownDataTypeColumns = selectedColumnIds.filter(
       (id) =>
-        filteredColumns[id].dataType !== 'Categorical' &&
-        filteredColumns[id].dataType !== 'Continuous' &&
+        filteredColumns[id].bidsType !== 'Categorical' &&
+        filteredColumns[id].bidsType !== 'Continuous' &&
         // Treat multi column measure columns differently
         !multiColumnMeasureVariableIdentifiers.has(
           filteredColumns[id].standardizedVariable?.identifier || ''
