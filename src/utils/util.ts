@@ -19,6 +19,8 @@ import {
   StandardizedTerm,
   TermFormat,
   DataDictionary,
+  VariableType,
+  BIDSType,
 } from './internal_types';
 
 // Utility functions for store
@@ -156,6 +158,21 @@ export function mapConfigFileToStoreConfig(
   });
 
   return config;
+}
+
+export function mapVariableTypeToBIDSType(variableType: VariableType): BIDSType {
+  switch (variableType) {
+    case 'Continuous':
+      return 'Continuous';
+    case 'Categorical':
+      return 'Categorical';
+    case 'Collection':
+      return null;
+    case 'Identifier':
+      return null;
+    default:
+      return null;
+  }
 }
 
 // Utility functions for MultiColumnMeasures component

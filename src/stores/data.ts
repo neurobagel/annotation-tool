@@ -8,13 +8,19 @@ import {
   DataDictionary,
   StandardizedVaribleCollection,
   StandardizedVariable,
+  BIDSType,
   VariableType,
   Config,
   StandardizedTerm,
   TermFormat,
   MultiColumnMeasuresTermCard,
 } from '../utils/internal_types';
-import { fetchAvailableConfigs, fetchConfig, mapConfigFileToStoreConfig } from '../utils/util';
+import {
+  fetchAvailableConfigs,
+  fetchConfig,
+  mapConfigFileToStoreConfig,
+  mapVariableTypeToBIDSType,
+} from '../utils/util';
 
 type DataStore = {
   dataTable: DataTable;
@@ -208,7 +214,10 @@ const useDataStore = create<DataStore>()(
           );
           // Filter out variables with null data_type e.g., Subject ID, Session ID
           // but keep multi column measures in
-          if (configEntry?.data_type !== null || configEntry?.is_multi_column_measure === true) {
+          if (
+            configEntry?.variable_type !== null ||
+            configEntry?.is_multi_column_measure === true
+          ) {
             seenIdentifiers.add(variable.identifier);
             uniqueVariables.push(variable);
           }
@@ -369,19 +378,17 @@ const useDataStore = create<DataStore>()(
         }),
       }));
 
-      let bidsType: 'Categorical' | 'Continuous' | null = null;
-      let variableType: VariableType = null;
       if (standardizedVariable) {
         const configEntry = Object.values(get().config).find(
           (config) => config.identifier === standardizedVariable.identifier
         );
-        bidsType = configEntry?.data_type || null;
-        variableType = configEntry?.variable_type || null;
-      }
+        const variableType: VariableType = configEntry?.variable_type || null;
+        const bidsType: BIDSType = mapVariableTypeToBIDSType(variableType);
 
-      // Call updateColumnDataType with the found data_type
-      get().updateColumnDataType(columnID, bidsType);
-      get().updateColumnVariableType(columnID, variableType);
+        // Call updateColumnDataType with the found data_type
+        get().updateColumnDataType(columnID, bidsType);
+        get().updateColumnVariableType(columnID, variableType);
+      }
 
       // Update mapped standardized variables when standardized variable changes
       get().updateMappedStandardizedVariables();
@@ -544,19 +551,22 @@ const useDataStore = create<DataStore>()(
                     );
 
                     if (matchingConfig) {
-                      /* 
-                            NOTE: Here we read the standardized variable from the config
-                             and essentially use the config identifier and label internally for the 
-                            standardized variable
-                            This causes a mismatch between what the user uploaded and what we store
-                            and they will eventually receive at the end i.e., we're overwriting their 
-                            dictionary according to our config
-                            */
+                      /*
+                              NOTE: Here we read the standardized variable from the config
+                               and essentially use the config identifier and label internally for the
+                              standardized variable
+                              This causes a mismatch between what the user uploaded and what we store
+                              and they will eventually receive at the end i.e., we're overwriting their
+                              dictionary according to our config
+                              */
                       draft[internalColumnID].standardizedVariable = {
                         identifier: matchingConfig.identifier,
                         label: matchingConfig.label,
                       };
-                      bidsType = matchingConfig.data_type ?? null;
+
+                      if (matchingConfig.variable_type) {
+                        bidsType = mapVariableTypeToBIDSType(matchingConfig.variable_type);
+                      }
                     }
                   } else {
                     // Question: here we are removing standardizedVariable if there is no match
