@@ -80,6 +80,10 @@ export async function fetchConfig(
 ): Promise<{ config: ConfigFile; termsData: Record<string, VocabConfig[]> }> {
   try {
     return await loadConfigFromPath(`${githubRawBaseURL}${selectedConfig}/config.json`);
+    // TODO : remove this testing / dev mock and use the real fetch
+    // throw new Error(
+    //   `Simulated fetch error for ${selectedConfig} and ${githubRawBaseURL}${selectedConfig}/config.json`
+    // );
   } catch (error) {
     // TODO: show a notif error
     // Fallback to default config when remote fetching fails
@@ -160,6 +164,9 @@ export function mapConfigFileToStoreConfig(
   return config;
 }
 
+// TODO: revisit this function. For now it is here because of type safety
+// If there is a way for us to encode this mapping in an Object and still
+// make typescript happy, then we should do that.
 export function mapVariableTypeToBIDSType(variableType: VariableType): BIDSType {
   switch (variableType) {
     case 'Continuous':

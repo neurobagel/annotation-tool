@@ -8,7 +8,7 @@
       {
         "name": "Participant ID",
         "id": "ParticipantID",
-        "variable_type": null,
+        "variable_type": "Identifier",
         "terms_file": null,
         "formats": null,
         "required": true,
@@ -20,7 +20,7 @@
       {
         "name": "Session ID",
         "id": "SessionID",
-        "variable_type": null,
+        "variable_type": "Identifier",
         "terms_file": null,
         "formats": null,
         "required": false,
@@ -99,7 +99,7 @@
       {
         "name": "Assessment Tool",
         "id": "Assessment",
-        "variable_type": null,
+        "variable_type": "Collection",
         "terms_file": "assessment.json",
         "formats": null,
         "required": false,
