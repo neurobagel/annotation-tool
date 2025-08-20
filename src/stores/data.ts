@@ -527,7 +527,7 @@ const useDataStore = create<DataStore>()(
               // have detected the column Type change
               dataTypeUpdates: [] as Array<{
                 columnId: string;
-                bidsType: 'Categorical' | 'Continuous' | null;
+                bidsType: BIDSType;
               }>,
             };
 
@@ -540,7 +540,7 @@ const useDataStore = create<DataStore>()(
                 if (!matchingColumn) return accumulator;
 
                 const [internalColumnID] = matchingColumn;
-                let bidsType: 'Categorical' | 'Continuous' | null = null;
+                let bidsType: BIDSType = null;
 
                 const newColumns = produce(accumulator.columns, (draft) => {
                   draft[internalColumnID].description = columnData.Description;
