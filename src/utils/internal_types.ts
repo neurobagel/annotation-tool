@@ -7,6 +7,7 @@ export type Column = {
   description?: string | null;
   bidsType?: 'Categorical' | 'Continuous' | null;
   standardizedVariable?: StandardizedVariable | null;
+  mappedVariableType?: VariableType | null;
   isPartOf?: {
     termURL?: string;
     label?: string;
@@ -59,6 +60,7 @@ export interface StandardizedVariable {
 
 export interface StandardizedVariableConfig extends StandardizedVariable {
   data_type?: 'Categorical' | 'Continuous' | null;
+  variable_type?: VariableType;
   terms?: StandardizedTerm[] | null;
   formats?: TermFormat[];
   required?: boolean;
@@ -68,6 +70,7 @@ export interface StandardizedVariableConfig extends StandardizedVariable {
   same_as?: string | null;
 }
 
+// TODO: fix the typo in this interface ("varible")
 export interface StandardizedVaribleCollection {
   [key: string]: StandardizedVariable;
 }
@@ -122,3 +125,5 @@ export type ConfigLoaderOptions = {
   excludeDefault?: boolean;
   defaultConfigName?: string;
 };
+
+export type VariableType = 'Continuous' | 'Categorical' | 'Collection' | 'Identifier';
