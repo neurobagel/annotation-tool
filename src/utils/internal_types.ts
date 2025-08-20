@@ -34,6 +34,7 @@ export interface DataDictionary {
         TermURL: string;
         Label: string;
       };
+      variableType?: VariableType;
       Format?: {
         TermURL: string;
         Label: string;
