@@ -126,4 +126,4 @@ export type ConfigLoaderOptions = {
   defaultConfigName?: string;
 };
 
-export type VariableType = 'Continuous' | 'Categorical' | 'Collection' | 'Identifier';
+export type VariableType = 'Continuous' | 'Categorical' | 'Collection' | 'Identifier' | null;

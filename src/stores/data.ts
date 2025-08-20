@@ -8,6 +8,7 @@ import {
   DataDictionary,
   StandardizedVaribleCollection,
   StandardizedVariable,
+  VariableType,
   Config,
   StandardizedTerm,
   TermFormat,
@@ -41,6 +42,7 @@ type DataStore = {
   ) => { id: string; header: string }[];
   updateColumnDescription: (columnID: string, description: string | null) => void;
   updateColumnDataType: (columnID: string, dataType: 'Categorical' | 'Continuous' | null) => void;
+  updateColumnVariableType: (columnID: string, mappedVariableType: VariableType) => void;
   updateColumnStandardizedVariable: (
     columnID: string,
     standardizedVariable: StandardizedVariable | null
@@ -336,6 +338,15 @@ const useDataStore = create<DataStore>()(
       }));
     },
 
+    // TODO: move this action to a hook
+    updateColumnVariableType: (columnID: string, mappedVariableType: VariableType) => {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          draft[columnID].mappedVariableType = mappedVariableType;
+        }),
+      }));
+    },
+
     // TODO: this function will in the future write to VariableType - and should be renamed
     // This function is used to set the data type of a column that has been mapped to a standardized column
     updateColumnStandardizedVariable: (
@@ -359,15 +370,18 @@ const useDataStore = create<DataStore>()(
       }));
 
       let bidsType: 'Categorical' | 'Continuous' | null = null;
+      let variableType: VariableType = null;
       if (standardizedVariable) {
         const configEntry = Object.values(get().config).find(
           (config) => config.identifier === standardizedVariable.identifier
         );
         bidsType = configEntry?.data_type || null;
+        variableType = configEntry?.variable_type || null;
       }
 
       // Call updateColumnDataType with the found data_type
       get().updateColumnDataType(columnID, bidsType);
+      get().updateColumnVariableType(columnID, variableType);
 
       // Update mapped standardized variables when standardized variable changes
       get().updateMappedStandardizedVariables();
