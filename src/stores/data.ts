@@ -202,27 +202,14 @@ const useDataStore = create<DataStore>()(
     },
 
     updateMappedStandardizedVariables: () => {
-      const { config, columns } = get();
-      const seenIdentifiers = new Set<string>();
-      const uniqueVariables: StandardizedVariable[] = [];
+      const { columns } = get();
+      const allVariables = Object.values(columns)
+        .map((column) => column.standardizedVariable)
+        .filter((variable): variable is StandardizedVariable => !!variable);
 
-      Object.values(columns).forEach((column) => {
-        const variable = column.standardizedVariable;
-        if (variable && !seenIdentifiers.has(variable.identifier)) {
-          const configEntry = Object.values(config).find(
-            (configItem) => configItem.identifier === variable.identifier
-          );
-          // Filter out variables with null data_type e.g., Subject ID, Session ID
-          // but keep multi column measures in
-          if (
-            configEntry?.variable_type !== null ||
-            configEntry?.is_multi_column_measure === true
-          ) {
-            seenIdentifiers.add(variable.identifier);
-            uniqueVariables.push(variable);
-          }
-        }
-      });
+      const uniqueVariables = Array.from(
+        new Map(allVariables.map((v) => [v.identifier, v])).values()
+      );
 
       set({ mappedStandardizedVariables: uniqueVariables });
     },
