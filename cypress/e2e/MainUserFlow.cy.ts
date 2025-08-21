@@ -20,6 +20,9 @@ describe('Main user flow', () => {
     cy.contains('Welcome to the Neurobagel Annotation Tool');
     cy.get('[data-cy="next-button"]').click();
 
+    // Check the app title and documentation link are there
+    cy.get('[data-cy="app-title"]').should('contain', 'Neurobagel Annotation Tool');
+
     // Wait for config skeleton to disappear and dropdown to be ready
     cy.get('[data-cy="config-card-dropdown"]', { timeout: 10000 }).should('be.visible');
     cy.get('[data-config-loading="false"]').should('exist');
@@ -449,7 +452,7 @@ describe('Main user flow', () => {
       'Age'
     );
     // Move to the 2nd page of columns using the pagination
-    cy.get(':nth-child(3) > .MuiButtonBase-root').click();
+    cy.get('[data-cy="pagination"] :nth-child(3) > .MuiButtonBase-root').click();
     cy.get('[data-cy="4-description"]').should('contain', 'Sex');
     cy.get('[data-cy="4-column-annotation-card-data-type"]').should('contain', 'Categorical');
     cy.get('[data-cy="4-column-annotation-card-standardized-variable-dropdown"] input').should(
