@@ -51,7 +51,10 @@ function App() {
   const content = determineView();
 
   return (
-    <div className="flex min-h-screen flex-col overflow-x-hidden mt-20">
+    <div
+      className="flex min-h-screen flex-col overflow-x-hidden"
+      style={{ marginTop: 'var(--appbar-height)' }}
+    >
       {currentView !== View.Landing && (
         <>
           <AppTitle
