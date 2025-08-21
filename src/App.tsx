@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import AppTitle from './components/AppTitle';
 import ColumnAnnotation from './components/ColumnAnnotation';
 import Download from './components/Download';
 import Landing from './components/Landing';
@@ -50,8 +51,20 @@ function App() {
   const content = determineView();
 
   return (
-    <div className="flex min-h-screen flex-col overflow-x-hidden">
-      {currentView !== View.Landing && <NavStepper currentView={currentView} />}
+    <div
+      className="flex min-h-screen flex-col overflow-x-hidden"
+      style={{ marginTop: 'var(--appbar-height)' }}
+    >
+      {currentView !== View.Landing && (
+        <>
+          <AppTitle
+            title="Neurobagel Annotation Tool"
+            githubUrl="https://github.com/neurobagel/annotation-tool"
+            docsUrl="https://neurobagel.org/user_guide/annotation_tool/"
+          />
+          <NavStepper currentView={currentView} />
+        </>
+      )}
 
       {content}
 
