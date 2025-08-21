@@ -15,9 +15,6 @@ function ValueAnnotation() {
     updateColumnFormat,
     updateColumnLevelTerm,
   } = useDataStore();
-  const multiColumnMeasureVariableIdentifiers = useDataStore(
-    (state) => state.multiColumnMeasureVariableIdentifiers
-  );
   const [selectedColumnIds, setSelectedColumnIds] = useState<string[]>([]);
 
   const handleSelect = (params: {
@@ -57,13 +54,7 @@ function ValueAnnotation() {
     }
 
     const unknownDataTypeColumns = selectedColumnIds.filter(
-      (id) =>
-        filteredColumns[id].bidsType !== 'Categorical' &&
-        filteredColumns[id].bidsType !== 'Continuous' &&
-        // Treat multi column measure columns differently
-        !multiColumnMeasureVariableIdentifiers.has(
-          filteredColumns[id].standardizedVariable?.identifier || ''
-        )
+      (id) => !filteredColumns[id].bidsType && !filteredColumns[id].mappedVariableType
     );
 
     if (unknownDataTypeColumns.length !== 0) {
