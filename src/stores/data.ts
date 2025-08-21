@@ -515,6 +515,7 @@ const useDataStore = create<DataStore>()(
               dataTypeUpdates: [] as Array<{
                 columnId: string;
                 bidsType: BIDSType;
+                variableType: VariableType;
               }>,
             };
 
@@ -528,6 +529,7 @@ const useDataStore = create<DataStore>()(
 
                 const [internalColumnID] = matchingColumn;
                 let bidsType: BIDSType = null;
+                let variableType: VariableType = null;
 
                 const newColumns = produce(accumulator.columns, (draft) => {
                   draft[internalColumnID].description = columnData.Description;
@@ -552,7 +554,8 @@ const useDataStore = create<DataStore>()(
                       };
 
                       if (matchingConfig.variable_type) {
-                        bidsType = mapVariableTypeToBIDSType(matchingConfig.variable_type);
+                        variableType = matchingConfig.variable_type;
+                        bidsType = mapVariableTypeToBIDSType(variableType);
                       }
                     }
                   } else {
@@ -629,7 +632,7 @@ const useDataStore = create<DataStore>()(
                   columns: newColumns,
                   dataTypeUpdates: [
                     ...accumulator.dataTypeUpdates,
-                    { columnId: internalColumnID, bidsType },
+                    { columnId: internalColumnID, bidsType, variableType },
                   ],
                 };
               },
@@ -642,8 +645,9 @@ const useDataStore = create<DataStore>()(
               uploadedDataDictionaryFileName: file.name,
             });
 
-            updates.dataTypeUpdates.forEach(({ columnId, bidsType }) => {
+            updates.dataTypeUpdates.forEach(({ columnId, bidsType, variableType }) => {
               get().updateColumnDataType(columnId, bidsType);
+              get().updateColumnVariableType(columnId, variableType);
             });
 
             // Update mapped standardized variables after processing data dictionary

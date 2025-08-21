@@ -230,7 +230,7 @@ export function getDataDictionary(columns: Columns): DataDictionary {
             TermURL: column.standardizedVariable.identifier,
             Label: column.standardizedVariable.label,
           },
-          variableType: column.mappedVariableType || null,
+          VariableType: column.mappedVariableType || null,
         };
 
         // Add term url to Levels under BIDS section only for a categorical column with a standardized variable
