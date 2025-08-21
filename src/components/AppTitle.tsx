@@ -17,12 +17,7 @@ function AppTitle({ title, githubUrl, docsUrl }: AppTitleProps) {
   return (
     <AppBar position="fixed" color="default" data-cy="app-title">
       <Toolbar>
-        <Box
-          component="img"
-          src={logo}
-          alt="Neurobagel Logo"
-          sx={{ height: 45, width: 'auto' }}
-        />
+        <Box component="img" src={logo} alt="Neurobagel Logo" sx={{ height: 45, width: 'auto' }} />
 
         <Typography variant="h6" component="h1" sx={{ flexGrow: 1, margin: 1 }}>
           {title}
