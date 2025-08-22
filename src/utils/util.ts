@@ -18,6 +18,9 @@ import {
   MultiColumnMeasuresTermCard,
   StandardizedTerm,
   TermFormat,
+  DataDictionary,
+  VariableType,
+  BIDSType,
 } from './internal_types';
 
 // Utility functions for store
@@ -77,6 +80,10 @@ export async function fetchConfig(
 ): Promise<{ config: ConfigFile; termsData: Record<string, VocabConfig[]> }> {
   try {
     return await loadConfigFromPath(`${githubRawBaseURL}${selectedConfig}/config.json`);
+    // TODO : remove this testing / dev mock and use the real fetch
+    // throw new Error(
+    //   `Simulated fetch error for ${selectedConfig} and ${githubRawBaseURL}${selectedConfig}/config.json`
+    // );
   } catch (error) {
     // TODO: show a notif error
     // Fallback to default config when remote fetching fails
@@ -157,6 +164,24 @@ export function mapConfigFileToStoreConfig(
   return config;
 }
 
+// TODO: revisit this function. For now it is here because of type safety
+// If there is a way for us to encode this mapping in an Object and still
+// make typescript happy, then we should do that.
+export function mapVariableTypeToBIDSType(variableType: VariableType): BIDSType {
+  switch (variableType) {
+    case 'Continuous':
+      return 'Continuous';
+    case 'Categorical':
+      return 'Categorical';
+    case 'Collection':
+      return null;
+    case 'Identifier':
+      return null;
+    default:
+      return null;
+  }
+}
+
 // Utility functions for MultiColumnMeasures component
 
 export const getAllMappedColumns = (termCards: MultiColumnMeasuresTermCard[]) =>
@@ -173,4 +198,90 @@ export function createMappedColumnHeaders(
   columns: Columns
 ): Record<string, string> {
   return Object.fromEntries(mappedColumns.map((id) => [id, columns[id]?.header || `Column ${id}`]));
+}
+
+export function getDataDictionary(columns: Columns): DataDictionary {
+  return Object.entries(columns).reduce<DataDictionary>((dictAcc, [_columnKey, column]) => {
+    if (column.header) {
+      const dictionaryEntry: DataDictionary[string] = {
+        Description: column.description || '',
+      };
+
+      // Description of levels always included for the BIDS section
+      if (column.bidsType === 'Categorical' && column.levels) {
+        dictionaryEntry.Levels = Object.entries(column.levels).reduce(
+          (levelsObj, [levelKey, levelValue]) => ({
+            ...levelsObj,
+            [levelKey]: {
+              Description: levelValue.description || '',
+            },
+          }),
+          {} as { [key: string]: { Description: string } }
+        );
+      }
+
+      if (column.bidsType === 'Continuous' && column.units !== undefined) {
+        dictionaryEntry.Units = column.units;
+      }
+
+      if (column.standardizedVariable) {
+        dictionaryEntry.Annotations = {
+          IsAbout: {
+            TermURL: column.standardizedVariable.identifier,
+            Label: column.standardizedVariable.label,
+          },
+          VariableType: column.mappedVariableType || null,
+        };
+
+        // Add term url to Levels under BIDS section only for a categorical column with a standardized variable
+        if (column.bidsType === 'Categorical' && column.levels) {
+          dictionaryEntry.Levels = Object.entries(column.levels).reduce(
+            (updatedLevels, [levelKey, levelValue]) => ({
+              ...updatedLevels,
+              [levelKey]: {
+                ...updatedLevels[levelKey],
+                ...(levelValue.termURL ? { TermURL: levelValue.termURL } : {}),
+              },
+            }),
+            dictionaryEntry.Levels || {}
+          );
+
+          dictionaryEntry.Annotations.Levels = Object.entries(column.levels).reduce(
+            (termsObj, [levelKey, levelValue]) => ({
+              ...termsObj,
+              [levelKey]: {
+                TermURL: levelValue.termURL || '',
+                Label: levelValue.label || '',
+              },
+            }),
+            {} as { [key: string]: { TermURL: string; Label: string } }
+          );
+        }
+
+        if (column.isPartOf?.termURL && column.isPartOf?.label) {
+          dictionaryEntry.Annotations.IsPartOf = {
+            TermURL: column.isPartOf.termURL,
+            Label: column.isPartOf.label,
+          };
+        }
+
+        if (column.missingValues && column.bidsType !== null) {
+          dictionaryEntry.Annotations.MissingValues = column.missingValues;
+        }
+
+        if (column.bidsType === 'Continuous' && column.format) {
+          dictionaryEntry.Annotations.Format = {
+            TermURL: column.format?.termURL || '',
+            Label: column.format?.label || '',
+          };
+        }
+      }
+
+      return {
+        ...dictAcc,
+        [column.header]: dictionaryEntry,
+      };
+    }
+    return dictAcc;
+  }, {} as DataDictionary);
 }

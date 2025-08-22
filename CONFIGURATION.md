@@ -79,7 +79,7 @@ For an example `formats` field, see the `"Age"` variable in the Example Configur
       {
         "name": "Participant ID",
         "id": "ParticipantID",
-        "data_type": null,
+        "variable_type": null,
         "terms_file": null,
         "formats": null,
         "required": true,
@@ -91,7 +91,7 @@ For an example `formats` field, see the `"Age"` variable in the Example Configur
       {
         "name": "Age",
         "id": "Age",
-        "data_type": "Continuous",
+        "variable_type": "Continuous",
         "terms_file": null,
         "formats": [
           {
@@ -114,7 +114,7 @@ For an example `formats` field, see the `"Age"` variable in the Example Configur
       {
         "name": "Assessment tool",
         "id": "Assessment",
-        "data_type": null,
+        "variable_type": null,
         "terms_file": "assessmentsTerms.json",
         "formats": null,
         "required": false,
@@ -126,7 +126,7 @@ For an example `formats` field, see the `"Age"` variable in the Example Configur
       {
         "name": "Diagnosis",
         "id": "Diagnosis",
-        "data_type": "Categorical",
+        "variable_type": "Categorical",
         "terms_file": "diagnosisTerms.json",
         "formats": null,
         "required": false,

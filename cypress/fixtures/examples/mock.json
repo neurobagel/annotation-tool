@@ -5,7 +5,8 @@
       "IsAbout": {
         "TermURL": "nb:ParticipantID",
         "Label": "Subject ID"
-      }
+      },
+      "VariableType": "Identifier"
     }
   },
   "age": {
@@ -18,7 +19,8 @@
       "Format": {
         "TermURL": "nb:FromFloat",
         "Label": "float"
-      }
+      },
+      "VariableType": "Continuous"
     }
   },
   "sex": {
@@ -27,7 +29,8 @@
       "IsAbout": {
         "TermURL": "nb:Sex",
         "Label": "Sex"
-      }
+      },
+      "VariableType": "Categorical"
     }
   },
   "group_dx": {
@@ -58,7 +61,8 @@
           "TermURL": "snomed:870288002",
           "Label": "Parkinsonism caused by methanol"
         }
-      }
+      },
+      "VariableType": "Collection"
     }
   },
   "group": {
@@ -75,6 +79,7 @@
         "TermURL": "nb:SubjectGroup",
         "Label": "Subject group"
       },
+      "VariableType": "Collection",
       "Levels": {
         "HC": {
           "Description": "Healthy control",
@@ -92,6 +97,7 @@
         "TermURL": "nb:Assessment",
         "Label": "Assessment Tool"
       },
+      "VariableType": "Collection",
       "IsPartOf": {
         "TermURL": "snomed:273712001",
         "Label": "Previous IQ assessment by pronunciation"

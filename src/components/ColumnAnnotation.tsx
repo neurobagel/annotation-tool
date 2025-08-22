@@ -27,7 +27,7 @@ function ColumnAnnotation() {
           id={columnId}
           header={column.header}
           description={column.description || null}
-          dataType={column.dataType || null}
+          dataType={column.bidsType || null}
           standardizedVariable={column.standardizedVariable || null}
           standardizedVariableOptions={standardizedVariables}
           onDescriptionChange={handleDescriptionChange}
