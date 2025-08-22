@@ -224,6 +224,7 @@ export const mockDataDictionaryWithAnnotations = {
         TermURL: 'nb:ParticipantID',
         Label: 'Participant ID',
       },
+      VariableType: 'Identifier' as VariableType,
     },
   },
   age: {
@@ -237,6 +238,7 @@ export const mockDataDictionaryWithAnnotations = {
         TermURL: 'nb:FromFloat',
         Label: 'float',
       },
+      VariableType: 'Continuous' as VariableType,
     },
     Units: '',
   },
@@ -272,6 +274,7 @@ export const mockDataDictionaryWithAnnotations = {
           Label: '',
         },
       },
+      VariableType: 'Categorical' as VariableType,
     },
   },
   group_dx: {
@@ -291,6 +294,7 @@ export const mockDataDictionaryWithAnnotations = {
         TermURL: 'nb:Diagnosis',
         Label: 'Diagnosis',
       },
+      VariableType: 'Categorical' as VariableType,
       Levels: {
         ADHD: {
           TermURL: 'snomed:406506008',
@@ -317,6 +321,7 @@ export const mockDataDictionaryWithAnnotations = {
         TermURL: 'snomed:273712001',
         Label: 'Previous IQ assessment by pronunciation',
       },
+      VariableType: 'Collection' as VariableType,
     },
   },
 };

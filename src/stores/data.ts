@@ -512,6 +512,7 @@ const useDataStore = create<DataStore>()(
               columns: { ...currentColumns },
               // TODO: Something is incorrect here. this section is not type safe - it should
               // have detected the column Type change
+              // additional note: I am not sure we actually need variableType here
               dataTypeUpdates: [] as Array<{
                 columnId: string;
                 bidsType: BIDSType;
