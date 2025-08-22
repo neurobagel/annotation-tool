@@ -548,15 +548,17 @@ const useDataStore = create<DataStore>()(
                               and they will eventually receive at the end i.e., we're overwriting their
                               dictionary according to our config
                               */
+                      if (matchingConfig.variable_type) {
+                        variableType = matchingConfig.variable_type;
+                        bidsType = mapVariableTypeToBIDSType(variableType);
+                      }
+
                       draft[internalColumnID].standardizedVariable = {
                         identifier: matchingConfig.identifier,
                         label: matchingConfig.label,
                       };
 
-                      if (matchingConfig.variable_type) {
-                        variableType = matchingConfig.variable_type;
-                        bidsType = mapVariableTypeToBIDSType(variableType);
-                      }
+                      draft[internalColumnID].mappedVariableType = variableType;
                     }
                   } else {
                     // Question: here we are removing standardizedVariable if there is no match

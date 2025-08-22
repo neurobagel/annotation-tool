@@ -1,3 +1,6 @@
+import { ConfigFile } from '~/utils/external_types';
+import { Config, VariableType, BIDSType } from './internal_types';
+
 export const mockDataTable = {
   1: [
     'sub-718211',
@@ -88,7 +91,8 @@ export const mockColumns = {
       identifier: 'nb:ParticipantID',
       label: 'Participant ID',
     },
-    bidsType: null as 'Categorical' | 'Continuous' | null,
+    bidsType: null as BIDSType,
+    mappedVariableType: 'Identifier' as VariableType,
   },
   2: {
     header: 'age',
@@ -97,7 +101,8 @@ export const mockColumns = {
       identifier: 'nb:Age',
       label: 'Age',
     },
-    bidsType: 'Continuous' as 'Categorical' | 'Continuous' | null,
+    bidsType: 'Continuous' as BIDSType,
+    mappedVariableType: 'Continuous' as VariableType,
     format: {
       termURL: 'nb:FromFloat',
       label: 'float',
@@ -111,7 +116,8 @@ export const mockColumns = {
       identifier: 'nb:Sex',
       label: 'Sex',
     },
-    bidsType: 'Categorical' as 'Categorical' | 'Continuous' | null,
+    bidsType: 'Categorical' as BIDSType,
+    mappedVariableType: 'Categorical' as VariableType,
     levels: {
       F: { description: '' },
       M: { description: '' },
@@ -125,7 +131,8 @@ export const mockColumns = {
       identifier: 'nb:Diagnosis',
       label: 'Diagnosis',
     },
-    bidsType: 'Categorical' as 'Categorical' | 'Continuous' | null,
+    bidsType: 'Categorical' as BIDSType,
+    mappedVariableType: 'Categorical' as VariableType,
     levels: {
       ADHD: {
         description: 'Attention deficit hyperactivity disorder',
@@ -142,7 +149,8 @@ export const mockColumns = {
   5: {
     header: 'group',
     description: 'The group assignment of the participant in a study.',
-    bidsType: null as 'Categorical' | 'Continuous' | null,
+    bidsType: null as BIDSType,
+    mappedVariableType: null as VariableType,
     missingValues: ['Patient', 'N/A'],
   },
   6: {
@@ -152,7 +160,8 @@ export const mockColumns = {
       identifier: 'nb:Assessment',
       label: 'Assessment Tool',
     },
-    bidsType: null as 'Categorical' | 'Continuous' | null,
+    bidsType: null as BIDSType,
+    mappedVariableType: 'Collection' as VariableType,
     isPartOf: {
       termURL: 'snomed:273712001',
       label: 'Previous IQ assessment by pronunciation',
@@ -339,11 +348,11 @@ export const mockStandardizedVariables = {
   },
 };
 
-export const mockConfig = {
+export const mockConfig: Config = {
   'nb:ParticipantID': {
     identifier: 'nb:ParticipantID',
     label: 'Participant ID',
-    data_type: null as 'Categorical' | 'Continuous' | null,
+    variable_type: 'Identifier' as VariableType,
     required: true,
     description: 'Unique participant identifier.',
     is_multi_column_measure: false,
@@ -353,7 +362,7 @@ export const mockConfig = {
   'nb:SessionID': {
     identifier: 'nb:SessionID',
     label: 'Session ID',
-    data_type: null as 'Categorical' | 'Continuous' | null,
+    variable_type: 'Identifier' as VariableType,
     required: false,
     description: 'Unique session identifier.',
     is_multi_column_measure: false,
@@ -363,7 +372,7 @@ export const mockConfig = {
   'nb:Age': {
     identifier: 'nb:Age',
     label: 'Age',
-    data_type: 'Continuous' as 'Categorical' | 'Continuous' | null,
+    variable_type: 'Continuous' as VariableType,
     required: false,
     description: 'The age of the participant.',
     is_multi_column_measure: false,
@@ -405,7 +414,7 @@ export const mockConfig = {
   'nb:Sex': {
     identifier: 'nb:Sex',
     label: 'Sex',
-    data_type: 'Categorical' as 'Categorical' | 'Continuous' | null,
+    variable_type: 'Categorical' as VariableType,
     required: false,
     description: 'The sex of the participant.',
     is_multi_column_measure: false,
@@ -429,7 +438,7 @@ export const mockConfig = {
   'nb:Diagnosis': {
     identifier: 'nb:Diagnosis',
     label: 'Diagnosis',
-    data_type: 'Categorical' as 'Categorical' | 'Continuous' | null,
+    variable_type: 'Categorical' as VariableType,
     required: false,
     description: 'Participant diagnosis information',
     is_multi_column_measure: false,
@@ -454,7 +463,7 @@ export const mockConfig = {
   'nb:Assessment': {
     identifier: 'nb:Assessment',
     label: 'Assessment Tool',
-    data_type: null as 'Categorical' | 'Continuous' | null,
+    variable_type: 'Collection' as VariableType,
     required: false,
     description: 'A cognitive or clinical rating scale, instrument, or assessment tool.',
     is_multi_column_measure: true,
@@ -486,7 +495,7 @@ export const mockGitHubResponse = [
   { type: 'dir', name: 'TestConfig' },
 ];
 
-export const mockConfigFile = {
+export const mockConfigFile: ConfigFile = {
   vocabulary_name: 'Neurobagel Phenotypic Variables',
   namespace_prefix: 'nb',
   namespace_url: 'http://neurobagel.org/vocab/',
@@ -495,7 +504,7 @@ export const mockConfigFile = {
     {
       name: 'Participant ID',
       id: 'ParticipantID',
-      data_type: null as 'Categorical' | 'Continuous' | null,
+      variable_type: 'Identifier' as VariableType,
       terms_file: undefined,
       formats: undefined,
       required: true,
@@ -507,7 +516,7 @@ export const mockConfigFile = {
     {
       name: 'Session ID',
       id: 'SessionID',
-      data_type: null as 'Categorical' | 'Continuous' | null,
+      variable_type: 'Identifier' as VariableType,
       terms_file: undefined,
       formats: undefined,
       required: false,
@@ -519,7 +528,7 @@ export const mockConfigFile = {
     {
       name: 'Age',
       id: 'Age',
-      data_type: 'Continuous' as 'Categorical' | 'Continuous' | null,
+      variable_type: 'Continuous' as VariableType,
       terms_file: undefined,
       formats: [
         {
@@ -562,7 +571,7 @@ export const mockConfigFile = {
     {
       name: 'Sex',
       id: 'Sex',
-      data_type: 'Categorical' as 'Categorical' | 'Continuous' | null,
+      variable_type: 'Categorical' as VariableType,
       terms_file: 'sex.json',
       formats: undefined,
       required: false,
@@ -574,7 +583,7 @@ export const mockConfigFile = {
     {
       name: 'Diagnosis',
       id: 'Diagnosis',
-      data_type: 'Categorical' as 'Categorical' | 'Continuous' | null,
+      variable_type: 'Categorical' as VariableType,
       terms_file: 'diagnosis.json',
       formats: undefined,
       required: false,
@@ -586,7 +595,7 @@ export const mockConfigFile = {
     {
       name: 'Assessment Tool',
       id: 'Assessment',
-      data_type: null as 'Categorical' | 'Continuous' | null,
+      variable_type: 'Collection' as VariableType,
       terms_file: 'assessment.json',
       formats: undefined,
       required: false,

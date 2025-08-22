@@ -80,10 +80,12 @@ describe('data store actions', () => {
       type: 'application/json',
     });
 
+    // Load the data dictionary file
     await act(async () => {
       await result.current.processDataDictionaryFile(dataDictionaryFile);
     });
 
+    // Now I expect all to have been handled, including the variableType
     expect(result.current.columns).toEqual(mockColumns);
     expect(result.current.uploadedDataDictionaryFileName).toEqual('mock.json');
 
@@ -155,7 +157,7 @@ describe('data store actions', () => {
       identifier: 'nb:Assessment',
       label: 'Assessment Tool',
     });
-    expect(result.current.columns['1'].bidsType).toEqual(null);
+    expect(result.current.columns['1'].mappedVariableType).toEqual('Collection');
     expect(result.current.columns['1'].units).toBeUndefined();
     act(() => {
       result.current.updateColumnStandardizedVariable('1', {
@@ -167,7 +169,7 @@ describe('data store actions', () => {
       identifier: 'nb:Age',
       label: 'Age',
     });
-    expect(result.current.columns['1'].bidsType).toEqual('Continuous');
+    expect(result.current.columns['1'].mappedVariableType).toEqual('Continuous');
     expect(result.current.columns['1'].levels).toBeUndefined();
     expect(result.current.columns['1'].units).toEqual('');
   });
@@ -272,6 +274,10 @@ describe('data store actions', () => {
       result.current.updateMappedStandardizedVariables();
     });
     expect(result.current.mappedStandardizedVariables).toEqual([
+      {
+        identifier: 'nb:ParticipantID',
+        label: 'Participant ID',
+      },
       {
         identifier: 'nb:Age',
         label: 'Age',
