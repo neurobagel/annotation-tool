@@ -105,31 +105,29 @@ export function useMultiColumnMeasuresState() {
 }
 
 export function useMultiColumnMeasuresData() {
-  const [loading, setLoading] = useState(true);
-
   const columns = useDataStore((state) => state.columns);
-  const multiColumnVariables = useDataStore(
-    (state) => state.mappedMultiColumnMeasureStandardizedVariables
+  const config = useDataStore((state) => state.config);
+
+  const multiColumnVariables = Object.values(config).filter(
+    (variable) =>
+      variable.variable_type === 'Collection' &&
+      Object.entries(columns).some(
+        ([_, column]) => column.standardizedVariable?.identifier === variable.identifier
+      )
   );
+
   const initializeMultiColumnMeasuresState = useDataStore(
     (state) => state.initializeMultiColumnMeasuresState
   );
 
   useEffect(() => {
-    if (multiColumnVariables.length === 0) {
-      setLoading(false);
-      return;
-    }
-
+    // TODO remove this together with all state handling for Term cards in the store
     multiColumnVariables.forEach((variable) => {
       initializeMultiColumnMeasuresState(variable.identifier);
     });
-
-    setLoading(false);
   }, [multiColumnVariables, initializeMultiColumnMeasuresState]);
 
   return {
-    loading,
     multiColumnVariables,
     columns,
   };

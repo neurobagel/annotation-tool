@@ -137,9 +137,11 @@ const initialState = {
 };
 
 const useDataStore = create<DataStore>()(
+  // TODO: add devtools on the export, not here
   devtools((set, get) => ({
     // Data table
     ...initialState,
+    // TODO: remove - this seems unused
     setDataTable: (data: DataTable) => set({ dataTable: data }),
     setUploadedDataTableFileName: (fileName: string | null) =>
       set({ uploadedDataTableFileName: fileName }),
