@@ -43,6 +43,7 @@ function ColumnAnnotation() {
           onChange={handlePaginationChange}
           color="primary"
           shape="rounded"
+          data-cy="pagination"
         />
       </div>
     </div>
