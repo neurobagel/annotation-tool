@@ -17,12 +17,25 @@ describe('ColumnAnnotation', () => {
           dataType: 'Continuous',
           standardizedVariable: null,
         },
+        3: {
+          header: 'third column',
+          description: 'This is third column',
+          dataType: 'Categorical',
+          standardizedVariable: null,
+        },
+        4: {
+          header: 'fourth column',
+          description: 'This is fourth column',
+          dataType: 'Continuous',
+          standardizedVariable: null,
+        },
       },
     });
   });
 
   it('renders the component correctly', () => {
     cy.mount(<ColumnAnnotation />);
+    cy.get('[data-cy="column-annotation-container"]').should('be.visible');
     cy.get('[data-cy="1-column-annotation-card"]').should('be.visible');
     cy.get('[data-cy="1-description"]').should('be.visible').and('contain', 'This is some column');
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"] input')
@@ -31,6 +44,7 @@ describe('ColumnAnnotation', () => {
     cy.get('[data-cy="1-column-annotation-card-data-type-categorical-button"]')
       .should('be.visible')
       .and('have.class', 'Mui-selected');
+    cy.get('[data-cy="2-column-annotation-card"]').scrollIntoView();
     cy.get('[data-cy="2-column-annotation-card"]').should('be.visible');
     cy.get('[data-cy="2-description"]')
       .should('be.visible')
@@ -41,6 +55,24 @@ describe('ColumnAnnotation', () => {
     cy.get('[data-cy="2-column-annotation-card-data-type-continuous-button"]')
       .should('be.visible')
       .and('have.class', 'Mui-selected');
+  });
+
+  it('allows scrolling to access all column cards', () => {
+    cy.mount(<ColumnAnnotation />);
+    cy.get('[data-cy="column-annotation-container"]').should('be.visible');
+
+    // Initially visible cards
+    cy.get('[data-cy="1-column-annotation-card"]').should('be.visible');
+    cy.get('[data-cy="2-column-annotation-card"]').should('be.visible');
+
+    // Scroll to bottom to access remaining cards
+    cy.get('[data-cy="column-annotation-container"]').scrollTo('bottom');
+    cy.get('[data-cy="3-column-annotation-card"]').should('be.visible');
+    cy.get('[data-cy="4-column-annotation-card"]').should('be.visible');
+
+    // Scroll back to top
+    cy.get('[data-cy="column-annotation-container"]').scrollTo('top');
+    cy.get('[data-cy="1-column-annotation-card"]').should('be.visible');
   });
   it('edits the description', () => {
     cy.mount(<ColumnAnnotation />);
