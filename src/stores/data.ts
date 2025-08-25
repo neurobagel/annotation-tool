@@ -6,7 +6,7 @@ import {
   DataTable,
   Columns,
   DataDictionary,
-  StandardizedVaribleCollection,
+  StandardizedVariableCollection,
   StandardizedVariable,
   VariableType,
   Config,
@@ -25,7 +25,7 @@ type DataStore = {
   initializeColumns: (data: Columns) => void;
   setUploadedDataTableFileName: (fileName: string | null) => void;
   processDataTableFile: (file: File) => Promise<void>;
-  standardizedVariables: StandardizedVaribleCollection;
+  standardizedVariables: StandardizedVariableCollection;
   updateStandardizedVariables: () => void;
   mappedStandardizedVariables: StandardizedVariable[];
   updateMappedStandardizedVariables: () => void;

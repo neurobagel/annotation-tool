@@ -69,8 +69,7 @@ export interface StandardizedVariableConfig extends StandardizedVariable {
   same_as?: string | null;
 }
 
-// TODO: fix the typo in this interface ("varible")
-export interface StandardizedVaribleCollection {
+export interface StandardizedVariableCollection {
   [key: string]: StandardizedVariable;
 }
 

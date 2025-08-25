@@ -78,7 +78,7 @@ export async function fetchConfig(
 ): Promise<{ config: ConfigFile; termsData: Record<string, VocabConfig[]> }> {
   try {
     // TODO: remove this way to break the link
-    return await loadConfigFromPath(`${githubRawBaseURL}${selectedConfig}/config.json/a`);
+    return await loadConfigFromPath(`${githubRawBaseURL}${selectedConfig}/config.json`);
   } catch (error) {
     // TODO: show a notif error
     // Fallback to default config when remote fetching fails
