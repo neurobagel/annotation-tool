@@ -13,6 +13,13 @@ describe('Main user flow', () => {
   it('steps through different app views and goes through the basic user flow', () => {
     cy.visit('http://localhost:5173');
     cy.contains('Welcome to the Neurobagel Annotation Tool');
+
+    // Check for no vertical scrollbar on landing page
+    cy.window().then((win) => {
+      const hasVerticalScrollbar = win.document.documentElement.scrollHeight > win.innerHeight;
+      cy.wrap(hasVerticalScrollbar).should('be.false');
+    });
+
     cy.get('[data-cy="next-button"]').click();
 
     // Wait for config skeleton to disappear and dropdown to be ready
