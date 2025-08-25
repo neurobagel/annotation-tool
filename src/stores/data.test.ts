@@ -275,10 +275,6 @@ describe('data store actions', () => {
     });
     expect(result.current.mappedStandardizedVariables).toEqual([
       {
-        identifier: 'nb:ParticipantID',
-        label: 'Participant ID',
-      },
-      {
         identifier: 'nb:Age',
         label: 'Age',
       },
