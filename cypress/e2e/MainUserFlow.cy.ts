@@ -92,6 +92,7 @@ describe('Main user flow', () => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
     });
     cy.get('[data-cy="side-column-nav-bar-annotated"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar"]').should('not.contain', 'Participant id');
     cy.get('[data-cy="side-column-nav-bar-unannotated"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-continuous"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-categorical"]').should('be.visible');

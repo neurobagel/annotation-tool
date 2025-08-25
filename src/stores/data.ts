@@ -209,10 +209,7 @@ const useDataStore = create<DataStore>()(
           );
           // Filter out variables with null data_type e.g., Subject ID, Session ID
           // but keep multi column measures in
-          if (
-            configEntry?.variable_type !== null ||
-            configEntry?.is_multi_column_measure === true
-          ) {
+          if (configEntry?.variable_type !== 'Identifier') {
             seenIdentifiers.add(variable.identifier);
             uniqueVariables.push(variable);
           }
