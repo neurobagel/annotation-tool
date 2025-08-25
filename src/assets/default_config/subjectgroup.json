@@ -1,0 +1,9 @@
+[
+  {
+    "namespace_prefix": "ncit",
+    "namespace_url": "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#",
+    "vocabulary_name": "Neurobagel vocabulary of Subejct Group terms",
+    "version": "1.0.0",
+    "terms": [{ "name": "Healthy Control", "id": "C94342" }]
+  }
+]

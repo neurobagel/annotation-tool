@@ -5,8 +5,7 @@
       "IsAbout": {
         "TermURL": "nb:ParticipantID",
         "Label": "Subject ID"
-      },
-      "Identifies": "participant"
+      }
     }
   },
   "age": {
@@ -34,9 +33,9 @@
   "group_dx": {
     "Description": "Diagnosis of the participant",
     "Levels": {
-      "HC": {
-        "Description": "Healthy Control",
-        "TermURL": "ncit:C94342"
+      "ADHD": {
+        "Description": "Attention deficit hyperactivity disorder",
+        "TermURL": "snomed:406506008"
       },
       "PD": {
         "Description": "Parkinsons",
@@ -49,10 +48,10 @@
         "Label": "Diagnosis"
       },
       "Levels": {
-        "HC": {
-          "Description": "Healthy Control",
-          "TermURL": "ncit:C94342",
-          "Label": "Healthy Control"
+        "ADHD": {
+          "Description": "Attention deficit hyperactivity disorder",
+          "TermURL": "snomed:406506008",
+          "Label": "Attention deficit hyperactivity disorder"
         },
         "PD": {
           "Description": "Parkinsons",
@@ -60,6 +59,30 @@
           "Label": "Parkinsonism caused by methanol"
         }
       }
+    }
+  },
+  "group": {
+    "Description": "The group assignment of the participant in a study.",
+    "Levels": {
+      "HC": {
+        "Description": "Healthy control",
+        "TermURL": "ncit:C94342",
+        "Label": "Healthy Control"
+      }
+    },
+    "Annotations": {
+      "IsAbout": {
+        "TermURL": "nb:SubjectGroup",
+        "Label": "Subject group"
+      },
+      "Levels": {
+        "HC": {
+          "Description": "Healthy control",
+          "TermURL": "ncit:C94342",
+          "Label": "Healthy Control"
+        }
+      },
+      "MissingValues": ["Patient", "N/A"]
     }
   },
   "iq": {
