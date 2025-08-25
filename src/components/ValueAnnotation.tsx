@@ -54,7 +54,7 @@ function ValueAnnotation() {
     }
 
     const unknownDataTypeColumns = selectedColumnIds.filter(
-      (id) => !filteredColumns[id].bidsType && !filteredColumns[id].mappedVariableType
+      (id) => !filteredColumns[id].variableType
     );
 
     if (unknownDataTypeColumns.length !== 0) {

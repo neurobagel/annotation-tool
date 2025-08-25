@@ -8,19 +8,13 @@ import {
   DataDictionary,
   StandardizedVaribleCollection,
   StandardizedVariable,
-  BIDSType,
   VariableType,
   Config,
   StandardizedTerm,
   TermFormat,
   MultiColumnMeasuresTermCard,
 } from '../utils/internal_types';
-import {
-  fetchAvailableConfigs,
-  fetchConfig,
-  mapConfigFileToStoreConfig,
-  mapVariableTypeToBIDSType,
-} from '../utils/util';
+import { fetchAvailableConfigs, fetchConfig, mapConfigFileToStoreConfig } from '../utils/util';
 
 type DataStore = {
   dataTable: DataTable;
@@ -47,8 +41,7 @@ type DataStore = {
     StandardizedVariable: StandardizedVariable
   ) => { id: string; header: string }[];
   updateColumnDescription: (columnID: string, description: string | null) => void;
-  updateColumnDataType: (columnID: string, dataType: 'Categorical' | 'Continuous' | null) => void;
-  updateColumnVariableType: (columnID: string, mappedVariableType: VariableType) => void;
+  updateColumnVariableType: (columnID: string, variableType: VariableType) => void;
   updateColumnStandardizedVariable: (
     columnID: string,
     standardizedVariable: StandardizedVariable | null
@@ -301,14 +294,12 @@ const useDataStore = create<DataStore>()(
       }));
     },
 
-    // TODO: this function will in the future write to BIDSType.
-    // It should also be renamed to updateBIDSType
-    updateColumnDataType: (columnID: string, dataType: 'Categorical' | 'Continuous' | null) => {
+    updateColumnVariableType: (columnID: string, variableType: VariableType) => {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
-          draft[columnID].bidsType = dataType;
+          draft[columnID].variableType = variableType;
 
-          if (dataType === 'Categorical') {
+          if (variableType === 'Categorical') {
             const columnData = state.dataTable[columnID];
             const uniqueValues = Array.from(new Set(columnData));
 
@@ -323,7 +314,7 @@ const useDataStore = create<DataStore>()(
 
               delete draft[columnID].units;
             }
-          } else if (dataType === 'Continuous') {
+          } else if (variableType === 'Continuous') {
             if (draft[columnID].units === undefined) {
               draft[columnID].units = '';
             }
@@ -332,15 +323,6 @@ const useDataStore = create<DataStore>()(
             delete draft[columnID].levels;
             delete draft[columnID].units;
           }
-        }),
-      }));
-    },
-
-    // TODO: move this action to a hook
-    updateColumnVariableType: (columnID: string, mappedVariableType: VariableType) => {
-      set((state) => ({
-        columns: produce(state.columns, (draft) => {
-          draft[columnID].mappedVariableType = mappedVariableType;
         }),
       }));
     },
@@ -372,10 +354,8 @@ const useDataStore = create<DataStore>()(
           (config) => config.identifier === standardizedVariable.identifier
         );
         const variableType: VariableType = configEntry?.variable_type || null;
-        const bidsType: BIDSType = mapVariableTypeToBIDSType(variableType);
 
-        // Call updateColumnDataType with the found data_type
-        get().updateColumnDataType(columnID, bidsType);
+        // Call updateColumnVariableType with the found data_type
         get().updateColumnVariableType(columnID, variableType);
       }
 
@@ -445,8 +425,6 @@ const useDataStore = create<DataStore>()(
       }));
     },
 
-    // TODO: This function will in the future read from BIDSType
-    // I also want to check who is calling this function, in case that changes what it should read from
     updateColumnMissingValues: (columnID: string, value: string, isMissing: boolean) => {
       set((state) => {
         const column = state.columns[columnID];
@@ -461,7 +439,7 @@ const useDataStore = create<DataStore>()(
           draft.columns[columnID].missingValues =
             newMissingValues.length > 0 ? newMissingValues : [];
 
-          if (column.bidsType === 'Categorical' && column.levels) {
+          if (column.variableType === 'Categorical' && column.levels) {
             if (isMissing) {
               // Remove from levels when marking as missing
               const { [value]: removedLevel, ...remainingLevels } = column.levels;
@@ -497,7 +475,6 @@ const useDataStore = create<DataStore>()(
     setUploadedDataDictionaryFileName: (fileName: string | null) =>
       set({ uploadedDataDictionaryFileName: fileName }),
     // TODO: This function should be factored out of the store
-    // TODO: This function will in the future write to BIDSType instead of dataType
     processDataDictionaryFile: async (file: File) =>
       new Promise<void>((resolve, reject) => {
         const reader = new FileReader();
@@ -512,12 +489,9 @@ const useDataStore = create<DataStore>()(
 
             const initialUpdates = {
               columns: { ...currentColumns },
-              // TODO: Something is incorrect here. this section is not type safe - it should
-              // have detected the column Type change
-              // additional note: I am not sure we actually need variableType here
+
               dataTypeUpdates: [] as Array<{
                 columnId: string;
-                bidsType: BIDSType;
                 variableType: VariableType;
               }>,
             };
@@ -531,7 +505,6 @@ const useDataStore = create<DataStore>()(
                 if (!matchingColumn) return accumulator;
 
                 const [internalColumnID] = matchingColumn;
-                let bidsType: BIDSType = null;
                 let variableType: VariableType = null;
 
                 const newColumns = produce(accumulator.columns, (draft) => {
@@ -553,7 +526,6 @@ const useDataStore = create<DataStore>()(
                               */
                       if (matchingConfig.variable_type) {
                         variableType = matchingConfig.variable_type;
-                        bidsType = mapVariableTypeToBIDSType(variableType);
                       }
 
                       draft[internalColumnID].standardizedVariable = {
@@ -561,7 +533,7 @@ const useDataStore = create<DataStore>()(
                         label: matchingConfig.label,
                       };
 
-                      draft[internalColumnID].mappedVariableType = variableType;
+                      draft[internalColumnID].variableType = variableType;
                     }
                   } else {
                     // Question: here we are removing standardizedVariable if there is no match
@@ -587,7 +559,7 @@ const useDataStore = create<DataStore>()(
 
                   // Get term info from Annotations.Levels if available and merge it with the info from the root Levels
                   if (columnData.Levels) {
-                    draft[internalColumnID].bidsType = 'Categorical';
+                    draft[internalColumnID].variableType = 'Categorical';
                     draft[internalColumnID].levels = Object.entries(columnData.Levels).reduce(
                       (levelsAcc, [levelKey, levelValue]) => {
                         const levelObj: {
@@ -617,7 +589,7 @@ const useDataStore = create<DataStore>()(
                   }
 
                   if (columnData.Units !== undefined) {
-                    draft[internalColumnID].bidsType = 'Continuous';
+                    draft[internalColumnID].variableType = 'Continuous';
                     draft[internalColumnID].units = columnData.Units;
                   }
 
@@ -637,7 +609,7 @@ const useDataStore = create<DataStore>()(
                   columns: newColumns,
                   dataTypeUpdates: [
                     ...accumulator.dataTypeUpdates,
-                    { columnId: internalColumnID, bidsType, variableType },
+                    { columnId: internalColumnID, variableType },
                   ],
                 };
               },
@@ -650,8 +622,7 @@ const useDataStore = create<DataStore>()(
               uploadedDataDictionaryFileName: file.name,
             });
 
-            updates.dataTypeUpdates.forEach(({ columnId, bidsType, variableType }) => {
-              get().updateColumnDataType(columnId, bidsType);
+            updates.dataTypeUpdates.forEach(({ columnId, variableType }) => {
               get().updateColumnVariableType(columnId, variableType);
             });
 

@@ -117,13 +117,13 @@ describe('data store actions', () => {
     const { result } = renderHook(() => useDataStore());
     act(() => {
       result.current.dataTable = mockDataTable;
-      result.current.updateColumnDataType('1', 'Continuous');
-      result.current.updateColumnDataType('3', 'Categorical');
+      result.current.updateColumnVariableType('1', 'Continuous');
+      result.current.updateColumnVariableType('3', 'Categorical');
     });
-    expect(result.current.columns['1'].bidsType).toEqual('Continuous');
+    expect(result.current.columns['1'].variableType).toEqual('Continuous');
     expect(result.current.columns['1'].levels).toBeUndefined();
     expect(result.current.columns['1'].units).toEqual('');
-    expect(result.current.columns['3'].bidsType).toEqual('Categorical');
+    expect(result.current.columns['3'].variableType).toEqual('Categorical');
     expect(result.current.columns['3'].levels).toBeDefined();
     expect(result.current.columns['3'].levels).toEqual({
       F: { description: '' },
@@ -157,7 +157,7 @@ describe('data store actions', () => {
       identifier: 'nb:Assessment',
       label: 'Assessment Tool',
     });
-    expect(result.current.columns['1'].mappedVariableType).toEqual('Collection');
+    expect(result.current.columns['1'].variableType).toEqual('Collection');
     expect(result.current.columns['1'].units).toBeUndefined();
     act(() => {
       result.current.updateColumnStandardizedVariable('1', {
@@ -169,7 +169,7 @@ describe('data store actions', () => {
       identifier: 'nb:Age',
       label: 'Age',
     });
-    expect(result.current.columns['1'].mappedVariableType).toEqual('Continuous');
+    expect(result.current.columns['1'].variableType).toEqual('Continuous');
     expect(result.current.columns['1'].levels).toBeUndefined();
     expect(result.current.columns['1'].units).toEqual('');
   });
@@ -216,7 +216,7 @@ describe('data store actions', () => {
   it('updates the description for a level of a categorical column', () => {
     const { result } = renderHook(() => useDataStore());
     act(() => {
-      result.current.updateColumnDataType('3', 'Categorical');
+      result.current.updateColumnVariableType('3', 'Categorical');
       result.current.updateColumnLevelDescription('3', 'F', 'some description');
     });
     expect(result.current.columns['3'].levels).toEqual({
@@ -228,7 +228,7 @@ describe('data store actions', () => {
   it('updates the units field of a column', () => {
     const { result } = renderHook(() => useDataStore());
     act(() => {
-      result.current.updateColumnDataType('1', 'Continuous');
+      result.current.updateColumnVariableType('1', 'Continuous');
       result.current.updateColumnUnits('1', 'some units');
     });
     expect(result.current.columns['1'].units).toEqual('some units');
@@ -237,7 +237,7 @@ describe('data store actions', () => {
     const { result } = renderHook(() => useDataStore());
     act(() => {
       // Set 3rd column as categorical to test that setting a value as missing updates the levels
-      result.current.updateColumnDataType('3', 'Categorical');
+      result.current.updateColumnVariableType('3', 'Categorical');
       result.current.updateColumnMissingValues('1', 'some value', true);
     });
     expect(result.current.columns['3'].levels).toEqual({

@@ -5,9 +5,8 @@ export type DataTable = {
 export type Column = {
   header: string;
   description?: string | null;
-  bidsType?: BIDSType;
+  variableType?: VariableType;
   standardizedVariable?: StandardizedVariable | null;
-  mappedVariableType?: VariableType | null;
   isPartOf?: {
     termURL?: string;
     label?: string;
@@ -127,4 +126,3 @@ export type ConfigLoaderOptions = {
 };
 
 export type VariableType = 'Continuous' | 'Categorical' | 'Collection' | 'Identifier' | null;
-export type BIDSType = 'Continuous' | 'Categorical' | null;

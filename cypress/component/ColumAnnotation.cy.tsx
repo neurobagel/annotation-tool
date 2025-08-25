@@ -8,13 +8,13 @@ describe('ColumnAnnotation', () => {
         1: {
           header: 'some column',
           description: 'This is some column',
-          bidsType: 'Categorical',
+          variableType: 'Categorical',
           standardizedVariable: { identifier: 'somevar', label: 'some variable' },
         },
         2: {
           header: 'another column',
           description: 'This is another column',
-          bidsType: 'Continuous',
+          variableType: 'Continuous',
           standardizedVariable: null,
         },
       },

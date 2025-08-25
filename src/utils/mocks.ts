@@ -1,5 +1,5 @@
 import { ConfigFile } from '~/utils/external_types';
-import { Config, VariableType, BIDSType } from './internal_types';
+import { Config, VariableType, Columns } from './internal_types';
 
 export const mockDataTable = {
   1: [
@@ -83,7 +83,7 @@ export const mockInitialColumnsWithEmptyLine = {
   },
 };
 
-export const mockColumns = {
+export const mockColumns: Columns = {
   1: {
     header: 'participant_id',
     description: 'A participant ID',
@@ -91,8 +91,7 @@ export const mockColumns = {
       identifier: 'nb:ParticipantID',
       label: 'Participant ID',
     },
-    bidsType: null as BIDSType,
-    mappedVariableType: 'Identifier' as VariableType,
+    variableType: 'Identifier' as VariableType,
   },
   2: {
     header: 'age',
@@ -101,8 +100,7 @@ export const mockColumns = {
       identifier: 'nb:Age',
       label: 'Age',
     },
-    bidsType: 'Continuous' as BIDSType,
-    mappedVariableType: 'Continuous' as VariableType,
+    variableType: 'Continuous' as VariableType,
     format: {
       termURL: 'nb:FromFloat',
       label: 'float',
@@ -116,8 +114,7 @@ export const mockColumns = {
       identifier: 'nb:Sex',
       label: 'Sex',
     },
-    bidsType: 'Categorical' as BIDSType,
-    mappedVariableType: 'Categorical' as VariableType,
+    variableType: 'Categorical' as VariableType,
     levels: {
       F: { description: '' },
       M: { description: '' },
@@ -131,8 +128,7 @@ export const mockColumns = {
       identifier: 'nb:Diagnosis',
       label: 'Diagnosis',
     },
-    bidsType: 'Categorical' as BIDSType,
-    mappedVariableType: 'Categorical' as VariableType,
+    variableType: 'Categorical' as VariableType,
     levels: {
       ADHD: {
         description: 'Attention deficit hyperactivity disorder',
@@ -149,8 +145,7 @@ export const mockColumns = {
   5: {
     header: 'group',
     description: 'The group assignment of the participant in a study.',
-    bidsType: null as BIDSType,
-    mappedVariableType: null as VariableType,
+    variableType: null as VariableType,
     missingValues: ['Patient', 'N/A'],
   },
   6: {
@@ -160,8 +155,7 @@ export const mockColumns = {
       identifier: 'nb:Assessment',
       label: 'Assessment Tool',
     },
-    bidsType: null as BIDSType,
-    mappedVariableType: 'Collection' as VariableType,
+    variableType: 'Collection' as VariableType,
     isPartOf: {
       termURL: 'snomed:273712001',
       label: 'Previous IQ assessment by pronunciation',
@@ -172,14 +166,14 @@ export const mockColumns = {
 export const mockColumnsWithDataType = {
   1: {
     header: 'some_continuous_column',
-    bidsType: 'Continuous' as 'Categorical' | 'Continuous' | null,
+    variableType: 'Continuous' as VariableType,
   },
   2: {
     header: 'age',
   },
   3: {
     header: 'sex',
-    bidsType: 'Categorical' as 'Categorical' | 'Continuous' | null,
+    variableType: 'Categorical' as VariableType,
   },
 };
 

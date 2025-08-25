@@ -19,8 +19,6 @@ import {
   StandardizedTerm,
   TermFormat,
   DataDictionary,
-  VariableType,
-  BIDSType,
 } from './internal_types';
 
 // Utility functions for store
@@ -79,11 +77,8 @@ export async function fetchConfig(
   selectedConfig: string
 ): Promise<{ config: ConfigFile; termsData: Record<string, VocabConfig[]> }> {
   try {
-    return await loadConfigFromPath(`${githubRawBaseURL}${selectedConfig}/config.json`);
-    // TODO : remove this testing / dev mock and use the real fetch
-    // throw new Error(
-    //   `Simulated fetch error for ${selectedConfig} and ${githubRawBaseURL}${selectedConfig}/config.json`
-    // );
+    // TODO: remove this way to break the link
+    return await loadConfigFromPath(`${githubRawBaseURL}${selectedConfig}/config.json/a`);
   } catch (error) {
     // TODO: show a notif error
     // Fallback to default config when remote fetching fails
@@ -164,24 +159,6 @@ export function mapConfigFileToStoreConfig(
   return config;
 }
 
-// TODO: revisit this function. For now it is here because of type safety
-// If there is a way for us to encode this mapping in an Object and still
-// make typescript happy, then we should do that.
-export function mapVariableTypeToBIDSType(variableType: VariableType): BIDSType {
-  switch (variableType) {
-    case 'Continuous':
-      return 'Continuous';
-    case 'Categorical':
-      return 'Categorical';
-    case 'Collection':
-      return null;
-    case 'Identifier':
-      return null;
-    default:
-      return null;
-  }
-}
-
 // Utility functions for MultiColumnMeasures component
 
 export const getAllMappedColumns = (termCards: MultiColumnMeasuresTermCard[]) =>
@@ -208,7 +185,7 @@ export function getDataDictionary(columns: Columns): DataDictionary {
       };
 
       // Description of levels always included for the BIDS section
-      if (column.bidsType === 'Categorical' && column.levels) {
+      if (column.variableType === 'Categorical' && column.levels) {
         dictionaryEntry.Levels = Object.entries(column.levels).reduce(
           (levelsObj, [levelKey, levelValue]) => ({
             ...levelsObj,
@@ -220,7 +197,7 @@ export function getDataDictionary(columns: Columns): DataDictionary {
         );
       }
 
-      if (column.bidsType === 'Continuous' && column.units !== undefined) {
+      if (column.variableType === 'Continuous' && column.units !== undefined) {
         dictionaryEntry.Units = column.units;
       }
 
@@ -230,11 +207,11 @@ export function getDataDictionary(columns: Columns): DataDictionary {
             TermURL: column.standardizedVariable.identifier,
             Label: column.standardizedVariable.label,
           },
-          VariableType: column.mappedVariableType || null,
+          VariableType: column.variableType,
         };
 
         // Add term url to Levels under BIDS section only for a categorical column with a standardized variable
-        if (column.bidsType === 'Categorical' && column.levels) {
+        if (column.variableType === 'Categorical' && column.levels) {
           dictionaryEntry.Levels = Object.entries(column.levels).reduce(
             (updatedLevels, [levelKey, levelValue]) => ({
               ...updatedLevels,
@@ -265,11 +242,11 @@ export function getDataDictionary(columns: Columns): DataDictionary {
           };
         }
 
-        if (column.missingValues && column.bidsType !== null) {
+        if (column.missingValues && column.variableType !== null) {
           dictionaryEntry.Annotations.MissingValues = column.missingValues;
         }
 
-        if (column.bidsType === 'Continuous' && column.format) {
+        if (column.variableType === 'Continuous' && column.format) {
           dictionaryEntry.Annotations.Format = {
             TermURL: column.format?.termURL || '',
             Label: column.format?.label || '',

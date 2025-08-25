@@ -307,7 +307,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').click();
     cy.get('[data-cy="2-column-annotation-card-data-type"]').should('contain', 'Continuous');
     cy.get('[data-cy="3-column-annotation-card-data-type"]').should('contain', 'Categorical');
-    cy.get('[data-cy="1-column-annotation-card-data-type"]').should('contain', 'Not applicable');
+    cy.get('[data-cy="1-column-annotation-card-data-type"]').should('contain', 'Identifier');
     // Move to the 2nd page of columns using the pagination
     cy.get('[data-cy="column-annotation-pagination"] :nth-child(3) > .MuiButtonBase-root').click();
     cy.get('[data-cy="4-column-annotation-card-data-type"]').should('contain', 'Categorical');
@@ -436,7 +436,7 @@ describe('Main user flow', () => {
 
     // Column Annotation view
     cy.get('[data-cy="1-description"]').should('contain', 'A participant ID');
-    cy.get('[data-cy="1-column-annotation-card-data-type"]').should('contain', 'Not applicable');
+    cy.get('[data-cy="1-column-annotation-card-data-type"]').should('contain', 'Identifier');
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"] input').should(
       'have.value',
       'Participant ID'

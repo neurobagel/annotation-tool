@@ -59,10 +59,10 @@ function ColumnTypeCollapse({
       dataType
         ? ([_, column]) =>
             (column.standardizedVariable === null || column.standardizedVariable === undefined) &&
-            column.bidsType === dataType
+            column.variableType === dataType
         : ([_, column]) =>
             (column.standardizedVariable === null || column.standardizedVariable === undefined) &&
-            (column.bidsType === undefined || column.bidsType === null)
+            (column.variableType === undefined || column.variableType === null)
     );
     labelToDisplay = dataType ? dataType.toLocaleLowerCase() : 'other';
   }

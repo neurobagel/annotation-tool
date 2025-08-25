@@ -8,7 +8,7 @@ import { getAllMappedColumns, getDataDictionary } from './utils/util';
 // TODO: figure out who calls this to determine whether it will write to BIDSType or VariableType
 export const useColumnUpdates = () => {
   const updateColumnDescription = useDataStore((state) => state.updateColumnDescription);
-  const updateColumnDataType = useDataStore((state) => state.updateColumnDataType);
+  const updateColumnVariableType = useDataStore((state) => state.updateColumnVariableType);
   const updateColumnStandardizedVariable = useDataStore(
     (state) => state.updateColumnStandardizedVariable
   );
@@ -17,11 +17,11 @@ export const useColumnUpdates = () => {
     updateColumnDescription(columnId, newDescription);
   };
 
-  const handleDataTypeChange = (
+  const handleVariableTypeChange = (
     columnId: string,
-    newDataType: 'Categorical' | 'Continuous' | null
+    newVariableType: 'Categorical' | 'Continuous' | null
   ) => {
-    updateColumnDataType(columnId, newDataType);
+    updateColumnVariableType(columnId, newVariableType);
   };
 
   const handleStandardizedVariableChange = (
@@ -33,7 +33,7 @@ export const useColumnUpdates = () => {
 
   return {
     handleDescriptionChange,
-    handleDataTypeChange,
+    handleVariableTypeChange,
     handleStandardizedVariableChange,
   };
 };
