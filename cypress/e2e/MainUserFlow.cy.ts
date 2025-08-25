@@ -13,6 +13,13 @@ describe('Main user flow', () => {
   it('steps through different app views and goes through the basic user flow', () => {
     cy.visit('http://localhost:5173');
     cy.contains('Welcome to the Neurobagel Annotation Tool');
+
+    // Check for no vertical scrollbar on landing page
+    cy.window().then((win) => {
+      const hasVerticalScrollbar = win.document.documentElement.scrollHeight > win.innerHeight;
+      cy.wrap(hasVerticalScrollbar).should('be.false');
+    });
+
     cy.get('[data-cy="next-button"]').click();
 
     // Wait for config skeleton to disappear and dropdown to be ready
@@ -47,11 +54,11 @@ describe('Main user flow', () => {
     cy.get('[data-cy="Column Annotation-step"]').within(() => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
     });
+    cy.get('[data-cy="column-annotation-container"]').should('be.visible');
     cy.get('[data-cy="1-column-annotation-card"]').should('be.visible');
     cy.get('[data-cy="2-column-annotation-card"]').should('be.visible');
-    cy.get('[data-cy="3-column-annotation-card"]').should('be.visible');
-    cy.get('[data-cy="column-annotation-pagination"]').should('be.visible');
     cy.get('[data-cy="1-column-annotation-card-data-type-continuous-button"]').click();
+    cy.get('[data-cy="1-description"]').scrollIntoView();
     cy.get('[data-cy="1-description"]').should('be.visible');
     cy.get('[data-cy="1-description"]').type('A participant ID');
     cy.get('[data-cy="2-description"]').should('be.visible');
@@ -71,11 +78,13 @@ describe('Main user flow', () => {
     cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').type(
       'age{downArrow}{enter}'
     );
+    // Scroll to make the 3rd column annotation card visible
+    cy.get('[data-cy="3-column-annotation-card"]').scrollIntoView();
     cy.get('[data-cy="3-column-annotation-card-standardized-variable-dropdown"]').type(
       'sex{downArrow}{enter}'
     );
-    // Move to the 2nd page of columns using the pagination
-    cy.get('[data-cy="column-annotation-pagination"] :nth-child(3) > .MuiButtonBase-root').click();
+    // Scroll to make the 4th column annotation card visible
+    cy.get('[data-cy="4-column-annotation-card"]').scrollIntoView();
     cy.get('[data-cy="4-column-annotation-card-data-type-categorical-button"]').click();
     cy.get('[data-cy="next-button"]').click();
 
@@ -175,11 +184,13 @@ describe('Main user flow', () => {
     cy.get('[data-cy="2-description"]').type('Age of the participant');
     cy.get('[data-cy="2-column-annotation-card-data-type"').should('contain', 'Continuous');
     cy.get('[data-cy="3-column-annotation-card-data-type"').should('contain', 'Categorical');
-    // Move to the 2nd page of columns using the pagination
-    cy.get('[data-cy="column-annotation-pagination"] :nth-child(3) > .MuiButtonBase-root').click();
+
+    // Scroll to access the 4th and 5th column annotation cards
+    cy.get('[data-cy="4-column-annotation-card"]').scrollIntoView();
     cy.get('[data-cy="4-column-annotation-card-standardized-variable-dropdown"]').type(
       'diagnosis{downArrow}{enter}'
     );
+    cy.get('[data-cy="5-column-annotation-card"]').scrollIntoView();
     cy.get('[data-cy="5-column-annotation-card-standardized-variable-dropdown"]').type(
       'assessment{downArrow}{enter}'
     );
@@ -280,8 +291,9 @@ describe('Main user flow', () => {
     cy.get('[data-cy="2-column-annotation-card-data-type"').should('contain', 'Continuous');
     cy.get('[data-cy="3-column-annotation-card-data-type"]').should('contain', 'Categorical');
     cy.get('[data-cy="1-column-annotation-card-data-type"]').should('contain', 'Not applicable');
-    // Move to the 2nd page of columns using the pagination
-    cy.get('[data-cy="column-annotation-pagination"] :nth-child(3) > .MuiButtonBase-root').click();
+
+    // Scroll to access the 4th column annotation card
+    cy.get('[data-cy="4-column-annotation-card"]').scrollIntoView();
     cy.get('[data-cy="4-column-annotation-card-data-type"]').should('contain', 'Categorical');
     cy.get('[data-cy="next-button"]').click();
 
@@ -400,8 +412,8 @@ describe('Main user flow', () => {
       'have.value',
       'Age'
     );
-    // Move to the 2nd page of columns using the pagination
-    cy.get(':nth-child(3) > .MuiButtonBase-root').click();
+    // Scroll to access the 4th column annotation card
+    cy.get('[data-cy="4-column-annotation-card"]').scrollIntoView();
     cy.get('[data-cy="4-description"]').should('contain', 'Sex');
     cy.get('[data-cy="4-column-annotation-card-data-type"]').should('contain', 'Categorical');
     cy.get('[data-cy="4-column-annotation-card-standardized-variable-dropdown"] input').should(
@@ -420,8 +432,8 @@ describe('Main user flow', () => {
       'have.value',
       'Assessment Tool'
     );
-    // Move to the 3rd page of columns using the pagination
-    cy.get(':nth-child(4) > .MuiButtonBase-root').click();
+    // Scroll to access the 7th and 8th column annotation cards
+    cy.get('[data-cy="7-column-annotation-card"]').scrollIntoView();
     cy.get('[data-cy="7-description"]').should('contain', 'item 2 scores for tool1');
     cy.get('[data-cy="7-column-annotation-card-data-type"]').should('contain', 'Continuous');
     cy.get('[data-cy="7-column-annotation-card-standardized-variable-dropdown"] input').should(
