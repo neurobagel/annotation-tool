@@ -80,12 +80,10 @@ describe('data store actions', () => {
       type: 'application/json',
     });
 
-    // Load the data dictionary file
     await act(async () => {
       await result.current.processDataDictionaryFile(dataDictionaryFile);
     });
 
-    // Now I expect all to have been handled, including the variableType
     expect(result.current.columns).toEqual(mockColumns);
     expect(result.current.uploadedDataDictionaryFileName).toEqual('mock.json');
 

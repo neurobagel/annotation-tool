@@ -14,7 +14,6 @@ interface SideColumnNavBarProps {
 }
 
 function SideColumnNavBar({ columns, onSelect, selectedColumnId }: SideColumnNavBarProps) {
-  // TODO: replace this with a smarter selector that will also filter out identifier variables
   const mappedStandardizedVariables = useDataStore((state) => state.mappedStandardizedVariables);
 
   return (
