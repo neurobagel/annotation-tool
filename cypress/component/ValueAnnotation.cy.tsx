@@ -45,7 +45,7 @@ describe('ValueAnnotation', () => {
         ...state.columns,
         2: {
           ...state.columns[2],
-          dataType: 'Continuous',
+          variableType: 'Continuous',
         },
       },
     }));
