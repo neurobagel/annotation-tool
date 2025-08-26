@@ -77,7 +77,6 @@ export async function fetchConfig(
   selectedConfig: string
 ): Promise<{ config: ConfigFile; termsData: Record<string, VocabConfig[]> }> {
   try {
-    // TODO: remove this way to break the link
     return await loadConfigFromPath(`${githubRawBaseURL}${selectedConfig}/config.json`);
   } catch (error) {
     // TODO: show a notif error

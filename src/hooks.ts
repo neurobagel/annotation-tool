@@ -5,7 +5,6 @@ import useDataStore from './stores/data';
 import { StandardizedVariable, DataDictionary } from './utils/internal_types';
 import { getAllMappedColumns, getDataDictionary } from './utils/util';
 
-// TODO: figure out who calls this to determine whether it will write to BIDSType or VariableType
 export const useColumnUpdates = () => {
   const updateColumnDescription = useDataStore((state) => state.updateColumnDescription);
   const updateColumnVariableType = useDataStore((state) => state.updateColumnVariableType);
@@ -122,6 +121,8 @@ export function useMultiColumnMeasuresData() {
 
   useEffect(() => {
     // TODO remove this together with all state handling for Term cards in the store
+    // Things like "is this a multi-column variable" should be derived from the state directly
+    // via a getter and not have to be initialized and stored separately with these side effect functions.
     multiColumnVariables.forEach((variable) => {
       initializeMultiColumnMeasuresState(variable.identifier);
     });
