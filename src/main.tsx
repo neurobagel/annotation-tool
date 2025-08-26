@@ -1,3 +1,4 @@
+import CssBaseline from '@mui/material/CssBaseline';
 import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -8,6 +9,7 @@ import NBTheme from './theme';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
+    <CssBaseline />
     {/* CSS injection order for MUI and tailwind: https://mui.com/material-ui/guides/interoperability/#tailwind-css */}
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={NBTheme}>
