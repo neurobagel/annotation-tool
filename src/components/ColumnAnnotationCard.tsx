@@ -11,14 +11,14 @@ import {
   Tooltip,
 } from '@mui/material';
 import useDataStore from '~/stores/data';
-import { StandardizedVariable, Config } from '../utils/internal_types';
+import { StandardizedVariable, Config, VariableType } from '../utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
 
 interface ColumnAnnotationCardProps {
   id: string;
   header: string;
   description: string | null;
-  dataType: 'Categorical' | 'Continuous' | null;
+  variableType: VariableType;
   standardizedVariable: StandardizedVariable | null;
   standardizedVariableOptions: Config;
   onDescriptionChange: (columnId: string, newDescription: string | null) => void;
@@ -33,7 +33,7 @@ function ColumnAnnotationCard({
   id,
   header,
   description,
-  dataType,
+  variableType,
   standardizedVariable,
   standardizedVariableOptions,
   onDescriptionChange,
@@ -47,6 +47,8 @@ function ColumnAnnotationCard({
     (state) => state.mappedSingleColumnStandardizedVariables
   );
 
+  // TODO: think of what to call this, since it doesn't receive
+  // VariableType in the strict sense - it's more like a BIDSType
   const handleDataTypeChange = (
     _: React.MouseEvent<HTMLElement>,
     newDataType: 'Categorical' | 'Continuous' | null
@@ -94,7 +96,7 @@ function ColumnAnnotationCard({
               {!isDataTypePredefined ? (
                 <ToggleButtonGroup
                   data-cy={`${id}-column-annotation-card-data-type`}
-                  value={dataType}
+                  value={variableType}
                   onChange={handleDataTypeChange}
                   exclusive
                   color="primary"
@@ -114,12 +116,12 @@ function ColumnAnnotationCard({
                 </ToggleButtonGroup>
               ) : (
                 <Typography variant="body1" data-cy={`${id}-column-annotation-card-data-type`}>
-                  {dataType || 'Not applicable'}{' '}
+                  {variableType}
                   <Tooltip
                     sx={{ fontSize: '1.2rem' }}
                     placement="right"
                     title={
-                      'Data type is automatically determined by standardized variable selection \n' +
+                      'Data type is automatically determined by standardized variable selection. \n' +
                       ' To change the data type manually, remove the standardized variable'
                     }
                   >

@@ -22,7 +22,7 @@ describe('ValueAnnotation', () => {
     cy.get('[data-cy="side-column-nav-bar-diagnosis-select-button"]').click();
     cy.get('[data-cy="4-categorical"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-assessment tool-select-button"]').click();
-    cy.get('[data-cy="5-continuous"]').should('be.visible');
+    cy.get('[data-cy="6-continuous"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-categorical-select-button"]').click();
     cy.get('[data-cy="3-categorical"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-continuous-select-button"]').click();
@@ -30,8 +30,9 @@ describe('ValueAnnotation', () => {
     cy.get('[data-cy="side-column-nav-bar-other-select-button"]').click();
     cy.get('[data-cy="other"]')
       .should('be.visible')
-      .and('contain', 'The following column do not have an assigned data type')
-      .and('contain', 'age');
+      .and('contain', 'The following columns do not have an assigned data type')
+      .and('contain', 'age')
+      .and('contain', 'group');
   });
   it('asserts that there is no shared state between EditDescription components in Continuous component', () => {
     /*
@@ -44,7 +45,7 @@ describe('ValueAnnotation', () => {
         ...state.columns,
         2: {
           ...state.columns[2],
-          dataType: 'Continuous',
+          variableType: 'Continuous',
         },
       },
     }));

@@ -1,3 +1,30 @@
+# v0.3.0 (Wed Aug 27 2025)
+
+#### 💥 Breaking Changes
+
+- [ENH] Encode column data type in output dictionary [#220](https://github.com/neurobagel/annotation-tool/pull/220) ([@surchs](https://github.com/surchs))
+- [MNT] Removed hard-coded logic for `identifies` key [#197](https://github.com/neurobagel/annotation-tool/pull/197) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Added `subject group` to the config and updated codebase [#186](https://github.com/neurobagel/annotation-tool/pull/186) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Implemented logic to allow multi-column annotation based on config [#187](https://github.com/neurobagel/annotation-tool/pull/187) ([@rmanaem](https://github.com/rmanaem))
+
+#### 🚀 Enhancements
+
+- [ENH] Add App bar [#212](https://github.com/neurobagel/annotation-tool/pull/212) ([@surchs](https://github.com/surchs))
+- [ENH] Releasing `subject group` and `identifies` breaking change [#213](https://github.com/neurobagel/annotation-tool/pull/213) ([@rmanaem](https://github.com/rmanaem) [@surchs](https://github.com/surchs))
+- [MNT] Replaced pagination with scrolling in `Column Annotation` step [#198](https://github.com/neurobagel/annotation-tool/pull/198) ([@rmanaem](https://github.com/rmanaem) [@surchs](https://github.com/surchs))
+- [MNT] Refactored `DescriptionEditor` component to auto-save [#201](https://github.com/neurobagel/annotation-tool/pull/201) ([@rmanaem](https://github.com/rmanaem))
+
+#### 🐛 Bug Fixes
+
+- [FIX] Updated `constants` to fetch from `configs` directory of communities [#206](https://github.com/neurobagel/annotation-tool/pull/206) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 2
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+- Sebastian Urchs ([@surchs](https://github.com/surchs))
+
+---
+
 # v0.2.0 (Thu Jul 24 2025)
 
 :tada: This release contains work from a new contributor! :tada:

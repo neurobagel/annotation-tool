@@ -9,13 +9,12 @@ import {
   FormControlLabel,
   Link,
 } from '@mui/material';
-import Ajv from 'ajv';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import emoji from '../assets/download-emoji.png';
-import schema from '../assets/neurobagel_data_dictionary.schema.json';
+import { useDataDictionary, useSchemaValidation } from '../hooks';
 import useDataStore from '../stores/data';
 import useViewStore from '../stores/view';
-import { DataDictionary, View } from '../utils/internal_types';
+import { View } from '../utils/internal_types';
 import DataDictionaryPreview from './DataDictionaryPreview';
 
 function Download() {
@@ -23,130 +22,11 @@ function Download() {
   const [forceAllowDownload, setForceAllowDownload] = useState(false);
 
   const uploadedDataTableFileName = useDataStore((state) => state.uploadedDataTableFileName);
-  const columns = useDataStore((state) => state.columns);
-  const config = useDataStore((state) => state.config);
   const reset = useDataStore((state) => state.reset);
-
   const setCurrentView = useViewStore((state) => state.setCurrentView);
 
-  const dataDictionary = useMemo(
-    () =>
-      Object.entries(columns).reduce((dictAcc, [_columnKey, column]) => {
-        if (column.header) {
-          const dictionaryEntry: DataDictionary[string] = {
-            Description: column.description || '',
-          };
-
-          // Description of levels always included for the BIDS section
-          if (column.dataType === 'Categorical' && column.levels) {
-            dictionaryEntry.Levels = Object.entries(column.levels).reduce(
-              (levelsObj, [levelKey, levelValue]) => ({
-                ...levelsObj,
-                [levelKey]: {
-                  Description: levelValue.description || '',
-                },
-              }),
-              {} as { [key: string]: { Description: string } }
-            );
-          }
-
-          if (column.dataType === 'Continuous' && column.units !== undefined) {
-            dictionaryEntry.Units = column.units;
-          }
-
-          if (column.standardizedVariable) {
-            dictionaryEntry.Annotations = {
-              IsAbout: {
-                TermURL: column.standardizedVariable.identifier,
-                Label: column.standardizedVariable.label,
-              },
-            };
-
-            // Add term url to Levels under BIDS section only for a categorical column with a standardized variable
-            if (column.dataType === 'Categorical' && column.levels) {
-              dictionaryEntry.Levels = Object.entries(column.levels).reduce(
-                (updatedLevels, [levelKey, levelValue]) => ({
-                  ...updatedLevels,
-                  [levelKey]: {
-                    ...updatedLevels[levelKey],
-                    ...(levelValue.termURL ? { TermURL: levelValue.termURL } : {}),
-                  },
-                }),
-                dictionaryEntry.Levels || {}
-              );
-
-              dictionaryEntry.Annotations.Levels = Object.entries(column.levels).reduce(
-                (termsObj, [levelKey, levelValue]) => ({
-                  ...termsObj,
-                  [levelKey]: {
-                    TermURL: levelValue.termURL || '',
-                    Label: levelValue.label || '',
-                  },
-                }),
-                {} as { [key: string]: { TermURL: string; Label: string } }
-              );
-            }
-
-            const configEntry = Object.values(config).find(
-              (configItem) => configItem.identifier === column.standardizedVariable?.identifier
-            );
-            // TODO: Remove once we get rid of identifies in CLI
-            if (configEntry?.label.includes('ID')) {
-              dictionaryEntry.Annotations.Identifies = configEntry.label.slice(0, -3).toLowerCase();
-            }
-
-            if (column.isPartOf?.termURL && column.isPartOf?.label) {
-              dictionaryEntry.Annotations.IsPartOf = {
-                TermURL: column.isPartOf.termURL,
-                Label: column.isPartOf.label,
-              };
-            }
-
-            if (column.missingValues && column.dataType !== null) {
-              dictionaryEntry.Annotations.MissingValues = column.missingValues;
-            }
-
-            if (column.dataType === 'Continuous' && column.format) {
-              dictionaryEntry.Annotations.Format = {
-                TermURL: column.format?.termURL || '',
-                Label: column.format?.label || '',
-              };
-            }
-          }
-
-          return {
-            ...dictAcc,
-            [column.header]: dictionaryEntry,
-          };
-        }
-        return dictAcc;
-      }, {} as DataDictionary),
-    [columns, config]
-  );
-
-  const { isValid: schemaValid, errors: schemaErrors } = useMemo(() => {
-    const ajv = new Ajv({ allErrors: true });
-    const validate = ajv.compile(schema);
-    const isValid = validate(dataDictionary);
-
-    if (!isValid) {
-      /*
-      Since Ajv uses JSON Pointer format for instance path
-      we need to slice the leading slash off of the instance path
-      */
-      const errors =
-        validate.errors?.map((error) => {
-          const pathSegments = error.instancePath.slice(1).split('/');
-          return pathSegments[0];
-        }) || [];
-
-      const uniqueErrors = Array.from(new Set(errors));
-
-      return { isValid: false, errors: uniqueErrors };
-    }
-
-    return { isValid: true, errors: [] };
-  }, [dataDictionary]);
+  const dataDictionary = useDataDictionary();
+  const { schemaValid, schemaErrors } = useSchemaValidation(dataDictionary);
 
   const handleDownload = () => {
     const blob = new Blob([JSON.stringify(dataDictionary, null, 2)], {

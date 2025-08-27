@@ -6,7 +6,7 @@
         "TermURL": "nb:ParticipantID",
         "Label": "Subject ID"
       },
-      "Identifies": "participant"
+      "VariableType": "Identifier"
     }
   },
   "age": {
@@ -19,7 +19,8 @@
       "Format": {
         "TermURL": "nb:FromFloat",
         "Label": "float"
-      }
+      },
+      "VariableType": "Continuous"
     }
   },
   "sex": {
@@ -28,15 +29,16 @@
       "IsAbout": {
         "TermURL": "nb:Sex",
         "Label": "Sex"
-      }
+      },
+      "VariableType": "Categorical"
     }
   },
   "group_dx": {
     "Description": "Diagnosis of the participant",
     "Levels": {
-      "HC": {
-        "Description": "Healthy Control",
-        "TermURL": "ncit:C94342"
+      "ADHD": {
+        "Description": "Attention deficit hyperactivity disorder",
+        "TermURL": "snomed:406506008"
       },
       "PD": {
         "Description": "Parkinsons",
@@ -49,17 +51,43 @@
         "Label": "Diagnosis"
       },
       "Levels": {
-        "HC": {
-          "Description": "Healthy Control",
-          "TermURL": "ncit:C94342",
-          "Label": "Healthy Control"
+        "ADHD": {
+          "Description": "Attention deficit hyperactivity disorder",
+          "TermURL": "snomed:406506008",
+          "Label": "Attention deficit hyperactivity disorder"
         },
         "PD": {
           "Description": "Parkinsons",
           "TermURL": "snomed:870288002",
           "Label": "Parkinsonism caused by methanol"
         }
+      },
+      "VariableType": "Collection"
+    }
+  },
+  "group": {
+    "Description": "The group assignment of the participant in a study.",
+    "Levels": {
+      "HC": {
+        "Description": "Healthy control",
+        "TermURL": "ncit:C94342",
+        "Label": "Healthy Control"
       }
+    },
+    "Annotations": {
+      "IsAbout": {
+        "TermURL": "nb:SubjectGroup",
+        "Label": "Subject group"
+      },
+      "VariableType": "Collection",
+      "Levels": {
+        "HC": {
+          "Description": "Healthy control",
+          "TermURL": "ncit:C94342",
+          "Label": "Healthy Control"
+        }
+      },
+      "MissingValues": ["Patient", "N/A"]
     }
   },
   "iq": {
@@ -69,6 +97,7 @@
         "TermURL": "nb:Assessment",
         "Label": "Assessment Tool"
       },
+      "VariableType": "Collection",
       "IsPartOf": {
         "TermURL": "snomed:273712001",
         "Label": "Previous IQ assessment by pronunciation"
