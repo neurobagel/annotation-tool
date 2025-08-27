@@ -29,6 +29,9 @@ describe('Main user flow', () => {
 
     // Check the app title and documentation link are there
     cy.get('[data-cy="app-title"]').should('contain', 'Neurobagel Annotation Tool');
+    // Also check that the nav bar is not hidden behind the app title
+    // Using click here triggers a check for whether the element is covered by another element
+    cy.get('[data-cy="nav-stepper"]').click();
 
     // Wait for config skeleton to disappear and dropdown to be ready
     cy.get('[data-cy="config-card-dropdown"]', { timeout: 10000 }).should('be.visible');
