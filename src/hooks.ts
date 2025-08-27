@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
+import Ajv from 'ajv';
+import { useState, useEffect, useMemo } from 'react';
+import schema from './assets/neurobagel_data_dictionary.schema.json';
 import useDataStore from './stores/data';
-import { StandardizedVariable } from './utils/internal_types';
-import { getAllMappedColumns } from './utils/util';
+import { StandardizedVariable, DataDictionary } from './utils/internal_types';
+import { getAllMappedColumns, getDataDictionary } from './utils/util';
 
 export const useColumnUpdates = () => {
   const updateColumnDescription = useDataStore((state) => state.updateColumnDescription);
-  const updateColumnDataType = useDataStore((state) => state.updateColumnDataType);
+  const updateColumnVariableType = useDataStore((state) => state.updateColumnVariableType);
   const updateColumnStandardizedVariable = useDataStore(
     (state) => state.updateColumnStandardizedVariable
   );
@@ -14,11 +16,11 @@ export const useColumnUpdates = () => {
     updateColumnDescription(columnId, newDescription);
   };
 
-  const handleDataTypeChange = (
+  const handleVariableTypeChange = (
     columnId: string,
-    newDataType: 'Categorical' | 'Continuous' | null
+    newVariableType: 'Categorical' | 'Continuous' | null
   ) => {
-    updateColumnDataType(columnId, newDataType);
+    updateColumnVariableType(columnId, newVariableType);
   };
 
   const handleStandardizedVariableChange = (
@@ -30,7 +32,7 @@ export const useColumnUpdates = () => {
 
   return {
     handleDescriptionChange,
-    handleDataTypeChange,
+    handleVariableTypeChange,
     handleStandardizedVariableChange,
   };
 };
@@ -102,31 +104,31 @@ export function useMultiColumnMeasuresState() {
 }
 
 export function useMultiColumnMeasuresData() {
-  const [loading, setLoading] = useState(true);
-
   const columns = useDataStore((state) => state.columns);
-  const multiColumnVariables = useDataStore(
-    (state) => state.mappedMultiColumnMeasureStandardizedVariables
+  const config = useDataStore((state) => state.config);
+
+  const multiColumnVariables = Object.values(config).filter(
+    (variable) =>
+      variable.variable_type === 'Collection' &&
+      Object.entries(columns).some(
+        ([_, column]) => column.standardizedVariable?.identifier === variable.identifier
+      )
   );
+
   const initializeMultiColumnMeasuresState = useDataStore(
     (state) => state.initializeMultiColumnMeasuresState
   );
 
   useEffect(() => {
-    if (multiColumnVariables.length === 0) {
-      setLoading(false);
-      return;
-    }
-
+    // TODO remove this together with all state handling for Term cards in the store
+    // Things like "is this a multi-column variable" should be derived from the state directly
+    // via a getter and not have to be initialized and stored separately with these side effect functions.
     multiColumnVariables.forEach((variable) => {
       initializeMultiColumnMeasuresState(variable.identifier);
     });
-
-    setLoading(false);
   }, [multiColumnVariables, initializeMultiColumnMeasuresState]);
 
   return {
-    loading,
     multiColumnVariables,
     columns,
   };
@@ -162,4 +164,35 @@ export function useActiveVariableData(
     currentTermCards,
     variableAllMappedColumns,
   };
+}
+
+export function useDataDictionary(): DataDictionary {
+  const columns = useDataStore((state) => state.columns);
+  return useMemo(() => getDataDictionary(columns), [columns]);
+}
+
+export function useSchemaValidation(dataDictionary: DataDictionary) {
+  return useMemo(() => {
+    const ajv = new Ajv({ allErrors: true });
+    const validate = ajv.compile(schema);
+    const isValid = validate(dataDictionary);
+
+    if (!isValid) {
+      /*
+      Since Ajv uses JSON Pointer format for instance path
+      we need to slice the leading slash off of the instance path
+      */
+      const errors =
+        validate.errors?.map((error) => {
+          const pathSegments = error.instancePath.slice(1).split('/');
+          return pathSegments[0];
+        }) || [];
+
+      const uniqueErrors = Array.from(new Set(errors));
+
+      return { schemaValid: false, schemaErrors: uniqueErrors };
+    }
+
+    return { schemaValid: true, schemaErrors: [] };
+  }, [dataDictionary]);
 }

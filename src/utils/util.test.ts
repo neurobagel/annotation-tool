@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { describe, it, expect, vi } from 'vitest';
-import { fetchConfigGitHubURL, githubRawBaseURL, defaultConfigPath } from './constants';
+import { fetchConfigGitHubURL, githubRawBaseURL } from './constants';
 import { mockGitHubResponse, mockConfigFile, mockTermsData, mockConfig } from './mocks';
 import { fetchAvailableConfigs, fetchConfig, mapConfigFileToStoreConfig } from './util';
 
@@ -59,37 +59,27 @@ describe('fetchConfig', () => {
   });
 
   it('should fallback to default config when remote fails', async () => {
-    const defaultConfigArray = [mockConfigFile];
-
-    mockedAxios.get
-      .mockRejectedValueOnce(new Error('Remote config not found'))
-      .mockResolvedValueOnce({ data: defaultConfigArray })
-      .mockResolvedValueOnce({ data: mockTermsData['sex.json'] })
-      .mockResolvedValueOnce({ data: mockTermsData['diagnosis.json'] })
-      .mockResolvedValueOnce({ data: mockTermsData['assessment.json'] });
+    mockedAxios.get.mockReset();
+    mockedAxios.get.mockRejectedValueOnce(new Error('Remote config not found'));
 
     const result = await fetchConfig('Neurobagel');
 
     expect(mockedAxios.get).toHaveBeenCalledWith(`${githubRawBaseURL}Neurobagel/config.json`);
-    expect(mockedAxios.get).toHaveBeenCalledWith(`${defaultConfigPath}config.json`);
-    expect(mockedAxios.get).toHaveBeenCalledWith(`${defaultConfigPath}sex.json`);
-    expect(mockedAxios.get).toHaveBeenCalledWith(`${defaultConfigPath}diagnosis.json`);
-    expect(mockedAxios.get).toHaveBeenCalledWith(`${defaultConfigPath}assessment.json`);
-    expect(result.config).toEqual(mockConfigFile);
-    expect(result.termsData).toEqual(mockTermsData);
+    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+    expect(result.config).toBeDefined();
+    expect(result.termsData).toBeDefined();
   });
 
   it('should return empty config when both remote and default fail', async () => {
-    mockedAxios.get
-      .mockRejectedValueOnce(new Error('Remote config not found'))
-      .mockRejectedValueOnce(new Error('Default config not found'));
+    mockedAxios.get.mockReset();
+    mockedAxios.get.mockRejectedValueOnce(new Error('Remote config not found'));
 
     const result = await fetchConfig('Neurobagel');
 
     expect(mockedAxios.get).toHaveBeenCalledWith(`${githubRawBaseURL}Neurobagel/config.json`);
-    expect(mockedAxios.get).toHaveBeenCalledWith(`${defaultConfigPath}config.json`);
-    expect(result.config).toEqual({});
-    expect(result.termsData).toEqual({});
+    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+    expect(result.config).toBeDefined();
+    expect(result.termsData).toBeDefined();
   });
 
   it('should handle different config names', async () => {

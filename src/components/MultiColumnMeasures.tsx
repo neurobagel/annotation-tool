@@ -1,15 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
 import CancelIcon from '@mui/icons-material/Cancel';
-import {
-  Fab,
-  Card,
-  CardContent,
-  CardHeader,
-  Typography,
-  Tabs,
-  Tab,
-  CircularProgress,
-} from '@mui/material';
+import { Fab, Card, CardContent, CardHeader, Typography, Tabs, Tab } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useState } from 'react';
 import {
@@ -30,7 +21,7 @@ function MultiColumnMeasures() {
   );
 
   const stateManager = useMultiColumnMeasuresState();
-  const { loading, multiColumnVariables, columns } = useMultiColumnMeasuresData();
+  const { multiColumnVariables, columns } = useMultiColumnMeasuresData();
   const { activeVariableTab, currentVariableColumns, currentTermCards, variableAllMappedColumns } =
     useActiveVariableData(multiColumnVariables, activeTab);
 
@@ -79,15 +70,6 @@ function MultiColumnMeasures() {
 
     updateColumnStandardizedVariable(columnId, null);
   };
-
-  // TODO: Remove if not necessary
-  if (loading) {
-    return (
-      <div className="flex justify-center p-4">
-        <CircularProgress />
-      </div>
-    );
-  }
 
   if (!activeVariableTab) {
     return null;

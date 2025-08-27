@@ -1,3 +1,4 @@
+import { VariableType } from '~/utils/internal_types';
 import ColumnAnnotationCard from '../../src/components/ColumnAnnotationCard';
 import useDataStore from '../../src/stores/data';
 import { mockStandardizedVariables } from '../../src/utils/mocks';
@@ -6,7 +7,7 @@ const props = {
   id: '1',
   header: 'some header',
   description: 'some description',
-  dataType: 'Categorical' as 'Categorical' | 'Continuous' | null,
+  variableType: 'Categorical' as VariableType,
   standardizedVariable: { identifier: 'participant_id', label: 'Participant ID' },
   standardizedVariableOptions: mockStandardizedVariables,
   onDescriptionChange: () => {},
@@ -27,7 +28,7 @@ describe('ColumnAnnotationCard', () => {
         id={props.id}
         header={props.header}
         description={props.description}
-        dataType={props.dataType}
+        variableType={props.variableType}
         standardizedVariable={props.standardizedVariable}
         standardizedVariableOptions={props.standardizedVariableOptions}
         onDescriptionChange={props.onDescriptionChange}
@@ -59,7 +60,7 @@ describe('ColumnAnnotationCard', () => {
         id={props.id}
         header={props.header}
         description={props.description}
-        dataType={props.dataType}
+        variableType={props.variableType}
         standardizedVariable={props.standardizedVariable}
         standardizedVariableOptions={props.standardizedVariableOptions}
         onDescriptionChange={spy}
@@ -79,7 +80,7 @@ describe('ColumnAnnotationCard', () => {
         id={props.id}
         header={props.header}
         description={props.description}
-        dataType={props.dataType}
+        variableType={props.variableType}
         standardizedVariable={props.standardizedVariable}
         standardizedVariableOptions={props.standardizedVariableOptions}
         onDescriptionChange={props.onDescriptionChange}
@@ -97,7 +98,7 @@ describe('ColumnAnnotationCard', () => {
         id={props.id}
         header={props.header}
         description={props.description}
-        dataType={props.dataType}
+        variableType={props.variableType}
         standardizedVariable={props.standardizedVariable}
         standardizedVariableOptions={props.standardizedVariableOptions}
         onDescriptionChange={props.onDescriptionChange}

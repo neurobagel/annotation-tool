@@ -51,7 +51,7 @@ function Continuous({
 
   const showFormat = standardizedVariable && !columnIsMultiColumnMeasure;
   // Don't show units when the variable is a multi column measure and its data type is null
-  const showUnits = !(columnIsMultiColumnMeasure && columns[columnID].dataType === null);
+  const showUnits = !(columnIsMultiColumnMeasure && columns[columnID].variableType === null);
 
   return (
     <Paper elevation={3} className="h-full shadow-lg" data-cy={`${columnID}-continuous`}>

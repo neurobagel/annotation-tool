@@ -5,7 +5,7 @@ import ColumnAnnotationCard from './ColumnAnnotationCard';
 function ColumnAnnotation() {
   const { columns, standardizedVariables } = useDataStore();
 
-  const { handleDescriptionChange, handleDataTypeChange, handleStandardizedVariableChange } =
+  const { handleDescriptionChange, handleVariableTypeChange, handleStandardizedVariableChange } =
     useColumnUpdates();
 
   const columnsArray = Object.entries(columns);
@@ -21,11 +21,11 @@ function ColumnAnnotation() {
             id={columnId}
             header={column.header}
             description={column.description || null}
-            dataType={column.dataType || null}
+            variableType={column.variableType || null}
             standardizedVariable={column.standardizedVariable || null}
             standardizedVariableOptions={standardizedVariables}
             onDescriptionChange={handleDescriptionChange}
-            onDataTypeChange={handleDataTypeChange}
+            onDataTypeChange={handleVariableTypeChange}
             onStandardizedVariableChange={handleStandardizedVariableChange}
           />
         </div>
