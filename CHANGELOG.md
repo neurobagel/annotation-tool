@@ -1,3 +1,15 @@
+# v0.3.1 (Thu Aug 28 2025)
+
+#### 🐛 Bug Fixes
+
+- [FIX] nav-bar hidden behind top App bar [#228](https://github.com/neurobagel/annotation-tool/pull/228) ([@surchs](https://github.com/surchs))
+
+#### Authors: 1
+
+- Sebastian Urchs ([@surchs](https://github.com/surchs))
+
+---
+
 # v0.3.0 (Wed Aug 27 2025)
 
 #### 💥 Breaking Changes
