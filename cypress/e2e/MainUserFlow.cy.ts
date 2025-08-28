@@ -80,6 +80,7 @@ describe('Main user flow', () => {
     );
     cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').click();
     cy.get('[role="option"]').contains('Age').should('have.attr', 'aria-disabled', 'true');
+
     // Switch the column assignment to another variable and assert that age is now enabled again
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
       'participant{downArrow}{enter}'
@@ -97,6 +98,13 @@ describe('Main user flow', () => {
     // Scroll to make the 4th column annotation card visible
     cy.get('[data-cy="4-column-annotation-card"]').scrollIntoView();
     cy.get('[data-cy="4-column-annotation-card-data-type-categorical-button"]').click();
+
+    // Scroll to make the 5th column annotation card visible
+    cy.get('[data-cy="5-column-annotation-card-data-type-categorical-button"]').click();
+    cy.get('[data-cy="5-column-annotation-card-standardized-variable-dropdown"]').type(
+      'diag{downArrow}{enter}'
+    );
+
     cy.get('[data-cy="next-button"]').click();
 
     // Value Annotation view
@@ -202,9 +210,10 @@ describe('Main user flow', () => {
     cy.get('[data-cy="4-column-annotation-card-standardized-variable-dropdown"]').type(
       'diagnosis{downArrow}{enter}'
     );
+    // We are now labeling a column about "healthy control" as about "diagnosis"
     cy.get('[data-cy="5-column-annotation-card"]').scrollIntoView();
     cy.get('[data-cy="5-column-annotation-card-standardized-variable-dropdown"]').type(
-      'subject{downArrow}{enter}'
+      'diagnosis{downArrow}{enter}'
     );
     cy.get('[data-cy="6-column-annotation-card-standardized-variable-dropdown"]').type(
       'assessment{downArrow}{enter}'
@@ -241,6 +250,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="2-description"]').should('be.visible');
     cy.get('[data-cy="2-description"] textarea').first().clear();
     cy.get('[data-cy="2-description"]').type('Years');
+
     cy.get('[data-cy="side-column-nav-bar-sex-sex"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-sex-select-button"]').click();
     cy.get('[data-cy="3-M-description"]').should('be.visible');
@@ -250,6 +260,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="3-F-description"]').type('Female');
     cy.get('[data-cy="3-F-term-dropdown"]').type('Female{downArrow}{enter}');
     cy.get('[data-cy="3-N/A-missing-value-button"]').click();
+
     cy.get('[data-cy="side-column-nav-bar-diagnosis-group_dx"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-diagnosis-select-button"]').click();
     cy.get('[data-cy="4-ADHD-description"]').type('Attention deficit hyperactivity disorder');
@@ -265,7 +276,8 @@ describe('Main user flow', () => {
     cy.get('[data-cy="4-PD-term-dropdown"]').type(
       'Parkinsonism caused by methanol{downArrow}{enter}'
     );
-    cy.get('[data-cy="side-column-nav-bar-subject group-select-button"]').click();
+
+    cy.get('[data-cy="5-tab"]').click();
     cy.get('[data-cy="5-categorical"]').should('be.visible');
     cy.get('[data-cy="5-HC-description"]').type('Healthy Control');
     cy.get('[data-cy="5-HC-description"]').should('contain', 'Healthy Control');
@@ -417,9 +429,10 @@ describe('Main user flow', () => {
         'Parkinsonism caused by methanol'
       );
 
+      // This whole block needs to be changed now
       expect(fileContent.group.Description).to.equal('');
-      expect(fileContent.group.Annotations.IsAbout.TermURL).to.equal('nb:SubjectGroup');
-      expect(fileContent.group.Annotations.IsAbout.Label).to.equal('Subject Group');
+      expect(fileContent.group.Annotations.IsAbout.TermURL).to.equal('nb:Diagnosis');
+      expect(fileContent.group.Annotations.IsAbout.Label).to.equal('Diagnosis');
       expect(fileContent.group.Levels.HC.Description).to.equal('Healthy Control');
       expect(fileContent.group.Levels.HC.TermURL).to.equal('ncit:C94342');
       expect(fileContent.group.Annotations.Levels.HC.TermURL).to.equal('ncit:C94342');
