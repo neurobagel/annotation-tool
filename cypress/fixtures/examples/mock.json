@@ -76,8 +76,8 @@
     },
     "Annotations": {
       "IsAbout": {
-        "TermURL": "nb:SubjectGroup",
-        "Label": "Subject group"
+        "TermURL": "nb:Diagnosis",
+        "Label": "Diagnosis"
       },
       "VariableType": "Collection",
       "Levels": {
