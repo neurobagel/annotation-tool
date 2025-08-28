@@ -1,3 +1,4 @@
+import { useTheme } from '@mui/material/styles';
 import { useEffect } from 'react';
 import AppTitle from './components/AppTitle';
 import ColumnAnnotation from './components/ColumnAnnotation';
@@ -16,6 +17,9 @@ function App() {
   const currentView = useViewStore((state) => state.currentView);
   const setCurrentView = useViewStore((state) => state.setCurrentView);
   const hasMultiColumnMeasures = useDataStore((state) => state.hasMultiColumnMeasures());
+
+  const theme = useTheme();
+  const appBarHeight = theme.mixins.toolbar.minHeight || 64;
 
   const { backView, nextView, backLabel, nextLabel, className } = getNavigationProps(
     currentView,
@@ -52,8 +56,11 @@ function App() {
 
   return (
     <div
-      className="flex min-h-screen flex-col overflow-x-hidden"
-      style={{ marginTop: 'var(--appbar-height)' }}
+      className="flex flex-col overflow-x-hidden"
+      style={{
+        minHeight: `calc(100vh - ${appBarHeight}px)`,
+        marginTop: appBarHeight,
+      }}
     >
       {currentView !== View.Landing && (
         <>
