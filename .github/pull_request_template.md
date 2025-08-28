@@ -34,6 +34,7 @@ _This section is for the PR reviewer_
 - [ ] PR links to GitHub issue with mention `Closes #XXXX`
 - [ ] Tests pass
 - [ ] Checks pass
+- [ ] If the PR changes the default [Neurobagel `config.json` or any of the term files](https://github.com/neurobagel/communities/tree/main/configs/Neurobagel), make sure their respective counterparts in [neurobagel communities repo](https://github.com/neurobagel/communities) have been updated accordingly.
 
 For new features:
 - [ ] Tests have been added
