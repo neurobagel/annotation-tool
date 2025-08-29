@@ -145,7 +145,14 @@ export const mockColumns: Columns = {
   5: {
     header: 'group',
     description: 'The group assignment of the participant in a study.',
-    variableType: null as VariableType,
+    variableType: 'Categorical' as VariableType,
+    levels: {
+      HC: { description: 'Healthy control', label: 'Healthy Control', termURL: 'ncit:C94342' },
+    },
+    standardizedVariable: {
+      identifier: 'nb:Diagnosis',
+      label: 'Diagnosis',
+    },
     missingValues: ['Patient', 'N/A'],
   },
   6: {
