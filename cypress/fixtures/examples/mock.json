@@ -76,10 +76,10 @@
     },
     "Annotations": {
       "IsAbout": {
-        "TermURL": "nb:SubjectGroup",
-        "Label": "Subject group"
+        "TermURL": "nb:Diagnosis",
+        "Label": "Diagnosis"
       },
-      "VariableType": "Collection",
+      "VariableType": "Categorical",
       "Levels": {
         "HC": {
           "Description": "Healthy control",

@@ -107,18 +107,6 @@
         "is_multi_column_measure": true,
         "can_have_multiple_columns": true,
         "same_as": null
-      },
-      {
-        "name": "Subject Group",
-        "id": "SubjectGroup",
-        "variable_type": "Categorical",
-        "terms_file": "subjectgroup.json",
-        "formats": null,
-        "required": false,
-        "description": "The group assignment of the participant in a study.",
-        "is_multi_column_measure": false,
-        "can_have_multiple_columns": false,
-        "same_as": null
       }
     ]
   }
