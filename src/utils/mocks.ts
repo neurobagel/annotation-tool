@@ -310,6 +310,26 @@ export const mockDataDictionaryWithAnnotations = {
   },
   group: {
     Description: 'The group assignment of the participant in a study.',
+    Levels: {
+      HC: {
+        Description: 'Healthy control',
+        TermURL: 'ncit:C94342',
+      },
+    },
+    Annotations: {
+      IsAbout: {
+        TermURL: 'nb:Diagnosis',
+        Label: 'Diagnosis',
+      },
+      VariableType: 'Categorical' as VariableType,
+      Levels: {
+        HC: {
+          TermURL: 'ncit:C94342',
+          Label: 'Healthy Control',
+        },
+      },
+      MissingValues: ['Patient', 'N/A'],
+    },
   },
   iq: {
     Description: 'iq test score of the participant',
