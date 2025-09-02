@@ -429,7 +429,6 @@ describe('Main user flow', () => {
         'Parkinsonism caused by methanol'
       );
 
-      // This whole block needs to be changed now
       expect(fileContent.group.Description).to.equal('');
       expect(fileContent.group.Annotations.IsAbout.TermURL).to.equal('nb:Diagnosis');
       expect(fileContent.group.Annotations.IsAbout.Label).to.equal('Diagnosis');
