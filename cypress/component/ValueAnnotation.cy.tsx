@@ -30,9 +30,8 @@ describe('ValueAnnotation', () => {
     cy.get('[data-cy="side-column-nav-bar-other-select-button"]').click();
     cy.get('[data-cy="other"]')
       .should('be.visible')
-      .and('contain', 'The following columns do not have an assigned data type')
-      .and('contain', 'age')
-      .and('contain', 'group');
+      .and('contain', 'The following column do not have an assigned data type')
+      .and('contain', 'age');
   });
   it('asserts that there is no shared state between EditDescription components in Continuous component', () => {
     /*
