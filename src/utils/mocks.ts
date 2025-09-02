@@ -145,7 +145,14 @@ export const mockColumns: Columns = {
   5: {
     header: 'group',
     description: 'The group assignment of the participant in a study.',
-    variableType: null as VariableType,
+    variableType: 'Categorical' as VariableType,
+    levels: {
+      HC: { description: 'Healthy control', label: 'Healthy Control', termURL: 'ncit:C94342' },
+    },
+    standardizedVariable: {
+      identifier: 'nb:Diagnosis',
+      label: 'Diagnosis',
+    },
     missingValues: ['Patient', 'N/A'],
   },
   6: {
@@ -303,6 +310,26 @@ export const mockDataDictionaryWithAnnotations = {
   },
   group: {
     Description: 'The group assignment of the participant in a study.',
+    Levels: {
+      HC: {
+        Description: 'Healthy control',
+        TermURL: 'ncit:C94342',
+      },
+    },
+    Annotations: {
+      IsAbout: {
+        TermURL: 'nb:Diagnosis',
+        Label: 'Diagnosis',
+      },
+      VariableType: 'Categorical' as VariableType,
+      Levels: {
+        HC: {
+          TermURL: 'ncit:C94342',
+          Label: 'Healthy Control',
+        },
+      },
+      MissingValues: ['Patient', 'N/A'],
+    },
   },
   iq: {
     Description: 'iq test score of the participant',
