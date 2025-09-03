@@ -1,7 +1,7 @@
 import Upload from '../../src/components/Upload';
 
 const props = {
-  disableConfig: 'true',
+  disableConfig: true,
 };
 
 describe('Upload', () => {
@@ -11,7 +11,7 @@ describe('Upload', () => {
     cy.get('[data-cy="config-card"]').should('be.visible');
   });
   it('should not render ConfigCard when disableConfig is false', () => {
-    cy.mount(<Upload disableConfig="false" />);
+    cy.mount(<Upload disableConfig={false} />);
     cy.contains('Upload');
     cy.get('[data-cy="config-card"]').should('not.exist');
   });

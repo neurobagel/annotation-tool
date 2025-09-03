@@ -6,7 +6,7 @@ import DataTablePreview from './DataTablePreview';
 import UploadCard from './UploadCard';
 
 interface UploadProps {
-  disableConfig: string;
+  disableConfig: boolean;
 }
 
 function Upload({ disableConfig }: UploadProps) {
@@ -51,7 +51,7 @@ function Upload({ disableConfig }: UploadProps) {
 
   return (
     <div className="flex flex-col items-center gap-8" data-config-loading={isConfigLoading}>
-      {disableConfig.toLowerCase() === 'true' ? (
+      {disableConfig ? (
         <ConfigCard
           title="Configuration"
           options={configOptions}

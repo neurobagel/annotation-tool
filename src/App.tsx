@@ -21,7 +21,7 @@ function App() {
   const theme = useTheme();
   const appBarHeight = theme.mixins.toolbar.minHeight || 64;
 
-  const disableConfig = import.meta.env.NB_DISABLE_CONFIG || 'true';
+  const disableConfig = (import.meta.env.NB_DISABLE_CONFIG ?? 'true').toLowerCase() === 'true';
 
   const { backView, nextView, backLabel, nextLabel, className } = getNavigationProps(
     currentView,
