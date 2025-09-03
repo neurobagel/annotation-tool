@@ -5,7 +5,11 @@ import DataDictionaryPreview from './DataDictionaryPreview';
 import DataTablePreview from './DataTablePreview';
 import UploadCard from './UploadCard';
 
-function Upload() {
+interface UploadProps {
+  disableConfig: boolean;
+}
+
+function Upload({ disableConfig }: UploadProps) {
   const processDataTableFile = useDataStore((state) => state.processDataTableFile);
   const processDataDictionaryFile = useDataStore((state) => state.processDataDictionaryFile);
   const dataTable = useDataStore((state) => state.dataTable);
@@ -47,13 +51,15 @@ function Upload() {
 
   return (
     <div className="flex flex-col items-center gap-8" data-config-loading={isConfigLoading}>
-      <ConfigCard
-        title="Configuration"
-        options={configOptions}
-        value={selectedConfig}
-        isLoading={isConfigLoading}
-        onChange={(value) => setSelectedConfig(value)}
-      />
+      {disableConfig ? (
+        <ConfigCard
+          title="Configuration"
+          options={configOptions}
+          value={selectedConfig}
+          isLoading={isConfigLoading}
+          onChange={(value) => setSelectedConfig(value)}
+        />
+      ) : null}
       <UploadCard
         id="datatable"
         title="Data Table"
