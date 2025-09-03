@@ -1,3 +1,20 @@
+# v0.3.2 (Wed Sep 03 2025)
+
+#### 🚀 Enhancements
+
+- [MNT] Implemented switch for displaying config card [#238](https://github.com/neurobagel/annotation-tool/pull/238) ([@rmanaem](https://github.com/rmanaem))
+
+#### 🏠 Internal
+
+- [REF] Update fallback config to remove subjectGroup [#233](https://github.com/neurobagel/annotation-tool/pull/233) ([@surchs](https://github.com/surchs))
+
+#### Authors: 2
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+- Sebastian Urchs ([@surchs](https://github.com/surchs))
+
+---
+
 # v0.3.1 (Thu Aug 28 2025)
 
 #### 🐛 Bug Fixes
