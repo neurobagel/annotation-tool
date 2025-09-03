@@ -32,6 +32,7 @@ export default defineConfig({
       forceBuildInstrument: true,
     }),
   ],
+  envPrefix: 'NB_',
   resolve: {
     alias: {
       '~': resolve(__dirname, 'src'),

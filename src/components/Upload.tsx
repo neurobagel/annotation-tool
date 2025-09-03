@@ -27,6 +27,8 @@ function Upload() {
 
   const isDataTableEmpty = Object.keys(dataTable).length === 0;
 
+  const disableConfigDropdown = import.meta.env.NB_DISABLE_CONFIG_DROPDOWN.toLowerCase() === 'true';
+
   const handleFileUpload = (file: File) => {
     setUploadedDataTableFileName(file.name);
     processDataTableFile(file);
@@ -49,6 +51,7 @@ function Upload() {
     <div className="flex flex-col items-center gap-8" data-config-loading={isConfigLoading}>
       <ConfigCard
         title="Configuration"
+        disableDropdown={disableConfigDropdown}
         options={configOptions}
         value={selectedConfig}
         isLoading={isConfigLoading}
