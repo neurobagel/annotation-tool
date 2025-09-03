@@ -27,7 +27,8 @@ function Upload() {
 
   const isDataTableEmpty = Object.keys(dataTable).length === 0;
 
-  const disableConfigDropdown = import.meta.env.NB_DISABLE_CONFIG_DROPDOWN.toLowerCase() === 'true';
+  const disableConfigDropdown =
+    import.meta.env.NB_DISABLE_CONFIG_DROPDOWN?.toLowerCase() === 'true';
 
   const handleFileUpload = (file: File) => {
     setUploadedDataTableFileName(file.name);
