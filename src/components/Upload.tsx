@@ -5,7 +5,11 @@ import DataDictionaryPreview from './DataDictionaryPreview';
 import DataTablePreview from './DataTablePreview';
 import UploadCard from './UploadCard';
 
-function Upload() {
+interface UploadProps {
+  disableConfig: string;
+}
+
+function Upload({ disableConfig }: UploadProps) {
   const processDataTableFile = useDataStore((state) => state.processDataTableFile);
   const processDataDictionaryFile = useDataStore((state) => state.processDataDictionaryFile);
   const dataTable = useDataStore((state) => state.dataTable);
@@ -27,9 +31,6 @@ function Upload() {
 
   const isDataTableEmpty = Object.keys(dataTable).length === 0;
 
-  const disableConfigDropdown =
-    import.meta.env.NB_DISABLE_CONFIG_DROPDOWN?.toLowerCase() === 'true';
-
   const handleFileUpload = (file: File) => {
     setUploadedDataTableFileName(file.name);
     processDataTableFile(file);
@@ -50,14 +51,15 @@ function Upload() {
 
   return (
     <div className="flex flex-col items-center gap-8" data-config-loading={isConfigLoading}>
-      <ConfigCard
-        title="Configuration"
-        disableDropdown={disableConfigDropdown}
-        options={configOptions}
-        value={selectedConfig}
-        isLoading={isConfigLoading}
-        onChange={(value) => setSelectedConfig(value)}
-      />
+      {disableConfig.toLowerCase() === 'true' ? (
+        <ConfigCard
+          title="Configuration"
+          options={configOptions}
+          value={selectedConfig}
+          isLoading={isConfigLoading}
+          onChange={(value) => setSelectedConfig(value)}
+        />
+      ) : null}
       <UploadCard
         id="datatable"
         title="Data Table"

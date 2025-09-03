@@ -10,21 +10,13 @@ import {
 
 interface ConfigCardProps {
   title: string;
-  disableDropdown: boolean;
   options: string[];
   value: string | null;
   onChange: (value: string | null) => void;
   isLoading: boolean;
 }
 
-function ConfigCard({
-  title,
-  disableDropdown,
-  options,
-  value,
-  onChange,
-  isLoading,
-}: ConfigCardProps) {
+function ConfigCard({ title, options, value, onChange, isLoading }: ConfigCardProps) {
   return (
     <div className="mx-auto w-full max-w-[1024px] rounded-3xl shadow-lg">
       <Card
@@ -43,7 +35,6 @@ function ConfigCard({
               </div>
             ) : (
               <Autocomplete
-                disabled={disableDropdown}
                 data-cy="config-card-dropdown"
                 options={options}
                 value={value}

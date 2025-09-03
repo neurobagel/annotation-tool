@@ -21,6 +21,8 @@ function App() {
   const theme = useTheme();
   const appBarHeight = theme.mixins.toolbar.minHeight || 64;
 
+  const disableConfig = import.meta.env.NB_DISABLE_CONFIG || 'true';
+
   const { backView, nextView, backLabel, nextLabel, className } = getNavigationProps(
     currentView,
     hasMultiColumnMeasures
@@ -37,7 +39,7 @@ function App() {
       case View.Landing:
         return <Landing />;
       case View.Upload:
-        return <Upload />;
+        return <Upload disableConfig={disableConfig} />;
       case View.ColumnAnnotation:
         return <ColumnAnnotation />;
       case View.MultiColumnMeasures:

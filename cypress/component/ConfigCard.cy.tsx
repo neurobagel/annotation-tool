@@ -2,7 +2,6 @@ import ConfigCard from '../../src/components/ConfigCard';
 
 const props = {
   title: 'Configuration',
-  disableDropdown: false,
   options: ['Neurobagel', 'some config', 'another config'],
   value: 'Neurobagel',
   onChange: () => {},
@@ -14,7 +13,6 @@ describe('ConfigCard', () => {
     cy.mount(
       <ConfigCard
         title={props.title}
-        disableDropdown={props.disableDropdown}
         options={props.options}
         value={props.value}
         onChange={props.onChange}
@@ -36,7 +34,6 @@ describe('ConfigCard', () => {
     cy.mount(
       <ConfigCard
         title={props.title}
-        disableDropdown={props.disableDropdown}
         options={props.options}
         value={props.value}
         onChange={spy}
@@ -45,18 +42,5 @@ describe('ConfigCard', () => {
     );
     cy.get('[data-cy="config-card-dropdown"]').type('some con{downarrow}{enter}');
     cy.get('@spy').should('have.been.calledWith', 'some config');
-  });
-  it('should disable the dropdown when the disableDropdown prop is true', () => {
-    cy.mount(
-      <ConfigCard
-        title={props.title}
-        disableDropdown
-        options={props.options}
-        value={props.value}
-        onChange={props.onChange}
-        isLoading={props.isLoading}
-      />
-    );
-    cy.get('[data-cy="config-card-dropdown"] input').should('be.disabled');
   });
 });
