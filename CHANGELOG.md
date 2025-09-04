@@ -1,3 +1,15 @@
+# v0.3.3 (Thu Sep 04 2025)
+
+#### 🐛 Bug Fixes
+
+- [FIX] `configCard` visibility bug [#239](https://github.com/neurobagel/annotation-tool/pull/239) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.3.2 (Wed Sep 03 2025)
 
 #### 🚀 Enhancements
