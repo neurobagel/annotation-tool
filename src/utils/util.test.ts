@@ -2,11 +2,32 @@ import axios from 'axios';
 import { describe, it, expect, vi } from 'vitest';
 import { fetchConfigGitHubURL, githubRawBaseURL } from './constants';
 import { mockGitHubResponse, mockConfigFile, mockTermsData, mockConfig } from './mocks';
-import { fetchAvailableConfigs, fetchConfig, mapConfigFileToStoreConfig } from './util';
+import {
+  parseTsvContent,
+  fetchAvailableConfigs,
+  fetchConfig,
+  mapConfigFileToStoreConfig,
+} from './util';
 
 // Mock axios
 vi.mock('axios');
 const mockedAxios = vi.mocked(axios, true);
+
+describe('parseTsvContent', () => {
+  it('should parse TSV content correctly', () => {
+    const tsvContent = `Column1\tColumn2\tColumn3
+Value1\t\t
+Value2\t\tValue3`;
+    const result = parseTsvContent(tsvContent);
+    expect(result).toEqual({
+      headers: ['Column1', 'Column2', 'Column3'],
+      data: [
+        ['Value1', '', ''],
+        ['Value2', '', 'Value3'],
+      ],
+    });
+  });
+});
 
 describe('fetchAvailableConfigs', () => {
   it('should fetch available configs from the right GitHub location and handles the (mock) response', async () => {

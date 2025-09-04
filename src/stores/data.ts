@@ -14,7 +14,12 @@ import {
   TermFormat,
   MultiColumnMeasuresTermCard,
 } from '../utils/internal_types';
-import { fetchAvailableConfigs, fetchConfig, mapConfigFileToStoreConfig } from '../utils/util';
+import {
+  parseTsvContent,
+  fetchAvailableConfigs,
+  fetchConfig,
+  mapConfigFileToStoreConfig,
+} from '../utils/util';
 
 type DataStore = {
   dataTable: DataTable;
@@ -145,13 +150,7 @@ const useDataStore = create<DataStore>()(
 
         reader.onload = (e) => {
           const content = e.target?.result as string;
-          const rows = content
-            .split('\n')
-            .map((row) => row.trim())
-            .filter((row) => row !== '')
-            .map((row) => row.split('\t'));
-          const headers = rows[0];
-          const data = rows.slice(1);
+          const { headers, data } = parseTsvContent(content);
 
           // Transform data into column-based structure
           const columnData: DataTable = {};

@@ -22,6 +22,16 @@ import {
 
 // Utility functions for store
 
+export function parseTsvContent(content: string): { headers: string[]; data: string[][] } {
+  const rows = content
+    .split('\n')
+    .filter((row) => row !== '')
+    .map((row) => row.split('\t'));
+  const headers = rows[0];
+  const data = rows.slice(1);
+  return { headers, data };
+}
+
 export async function fetchAvailableConfigs(): Promise<string[]> {
   try {
     const response = await axios.get(fetchConfigGitHubURL);
