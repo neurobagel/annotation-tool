@@ -51,7 +51,7 @@ function Upload({ disableConfig }: UploadProps) {
 
   return (
     <div className="flex flex-col items-center gap-8" data-config-loading={isConfigLoading}>
-      {disableConfig ? (
+      {disableConfig ? null : (
         <ConfigCard
           title="Configuration"
           options={configOptions}
@@ -59,7 +59,7 @@ function Upload({ disableConfig }: UploadProps) {
           isLoading={isConfigLoading}
           onChange={(value) => setSelectedConfig(value)}
         />
-      ) : null}
+      )}
       <UploadCard
         id="datatable"
         title="Data Table"

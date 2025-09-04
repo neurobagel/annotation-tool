@@ -20,6 +20,10 @@ jobs:
         with:
           node-version: 20
 
+      - name: Create .env file
+        run: |
+          echo -e "NB_DISABLE_CONFIG=false" > .env
+
       - name: build
         run: npm install && npm run build
 
