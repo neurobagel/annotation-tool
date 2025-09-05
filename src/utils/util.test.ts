@@ -14,7 +14,7 @@ vi.mock('axios');
 const mockedAxios = vi.mocked(axios, true);
 
 describe('parseTsvContent', () => {
-  it('should parse TSV content correctly', () => {
+  it('parses rows of empty values correctly as string', () => {
     const tsvContent = `Column1\tColumn2\tColumn3
 Value1\t\t
 Value2\t\tValue3`;
