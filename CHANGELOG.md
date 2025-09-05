@@ -1,3 +1,15 @@
+# v0.3.4 (Fri Sep 05 2025)
+
+#### 🐛 Bug Fixes
+
+- [FIX] Fixed processing empty values of the datatable [#242](https://github.com/neurobagel/annotation-tool/pull/242) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.3.3 (Thu Sep 04 2025)
 
 #### 🐛 Bug Fixes
