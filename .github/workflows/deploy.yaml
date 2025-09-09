@@ -38,7 +38,7 @@ jobs:
       #     sed -i 's|<!-- REPLACE_ME_NB_ANNOTATE_HEADER_SCRIPT_REPLACE_ME -->|'"${add_script}"'|' index.html
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           cache: 'npm'
       - name: Install dependencies
