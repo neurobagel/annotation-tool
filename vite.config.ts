@@ -49,6 +49,7 @@ export default defineConfig({
       nycrcPath: './.nycrc.json',
       forceBuildInstrument: true,
     }),
+    injectAnalytics(),
   ],
   envPrefix: 'NB_',
   resolve: {
