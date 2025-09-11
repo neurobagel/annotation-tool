@@ -411,11 +411,6 @@ export const mockConfig: Config = {
         examples: ['31.5'],
       },
       {
-        termURL: 'nb:FromInt',
-        label: 'int',
-        examples: ['31'],
-      },
-      {
         termURL: 'nb:FromEuro',
         label: 'euro',
         examples: ['31,5'],
@@ -561,11 +556,6 @@ export const mockConfigFile: ConfigFile = {
           id: 'FromFloat',
           name: 'float',
           examples: ['31.5'],
-        },
-        {
-          id: 'FromInt',
-          name: 'int',
-          examples: ['31'],
         },
         {
           id: 'FromEuro',

@@ -222,11 +222,6 @@ describe('mapConfigFileToStoreConfig', () => {
               name: 'float',
               examples: ['31.5'],
             },
-            {
-              id: 'FromInt',
-              name: 'int',
-              examples: ['31'],
-            },
           ],
           required: false,
           description: 'The age of the participant.',
@@ -254,11 +249,6 @@ describe('mapConfigFileToStoreConfig', () => {
             termURL: 'nb:FromFloat',
             label: 'float',
             examples: ['31.5'],
-          },
-          {
-            termURL: 'nb:FromInt',
-            label: 'int',
-            examples: ['31'],
           },
         ],
       },
