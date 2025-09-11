@@ -31,11 +31,6 @@ describe('Continuous', () => {
             examples: ['31.5'],
           },
           {
-            termURL: 'nb:FromInt',
-            label: 'int',
-            examples: ['31'],
-          },
-          {
             termURL: 'nb:FromEuro',
             label: 'euro',
             examples: ['31,5'],
