@@ -39,7 +39,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          GHPAGES_BUILD: true
+          NB_ANALYTICS: true
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

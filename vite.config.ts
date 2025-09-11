@@ -10,7 +10,7 @@ const injectAnalytics = () => ({
   transformIndexHtml: {
     order: 'post',
     handler(html) {
-      if (!process.env.GHPAGES_BUILD) {
+      if (!process.env.NB_ANALYTICS) {
         return html;
       }
 
