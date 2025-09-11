@@ -5,6 +5,24 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import istanbul from 'vite-plugin-istanbul';
 
+const injectAnalytics = () => ({
+  name: 'inject-analytics',
+  transformIndexHtml: {
+    order: 'post',
+    handler(html) {
+      if (!process.env.NB_ANALYTICS) {
+        return html;
+      }
+
+      const snippet = `
+      <script async src="https://w.appzi.io/w.js?token=YVTHd"></script>
+      <script defer data-domain="annotate.neurobagel.org" src="https://plausible.neurobagel.org/js/script.js"></script>`;
+
+      return html.replace('</head>', `${snippet}</head>`);
+    },
+  },
+});
+
 // https://vitejs.dev/config/
 export default defineConfig({
   // This setting fixes the preview port to the same
