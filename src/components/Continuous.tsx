@@ -1,3 +1,4 @@
+import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import {
   Paper,
   Table,
@@ -9,6 +10,7 @@ import {
   Autocomplete,
   TextField,
 } from '@mui/material';
+import { useState, useMemo } from 'react';
 import useDataStore from '~/stores/data';
 import { StandardizedVariable, TermFormat } from '~/utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
@@ -53,6 +55,16 @@ function Continuous({
   // Don't show units when the variable is a multi column measure and its data type is null
   const showUnits = !(columnIsMultiColumnMeasure && columns[columnID].variableType === null);
 
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const sortedValues = useMemo(
+    () =>
+      [...uniqueValues].sort((a, b) =>
+        sortDir === 'asc' ? a.localeCompare(b) : b.localeCompare(a)
+      ),
+    [uniqueValues, sortDir]
+  );
+
   return (
     <Paper elevation={3} className="h-full shadow-lg" data-cy={`${columnID}-continuous`}>
       <div className="flex h-full">
@@ -72,9 +84,16 @@ function Continuous({
                       fontWeight: 'bold',
                       color: 'primary.main',
                       width: standardizedVariable ? '70%' : '',
+                      cursor: 'pointer',
                     }}
+                    onClick={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
                   >
                     Value
+                    {sortDir === 'asc' ? (
+                      <ArrowUpward fontSize="inherit" sx={{ ml: 0.5, verticalAlign: 'middle' }} />
+                    ) : (
+                      <ArrowDownward fontSize="inherit" sx={{ ml: 0.5, verticalAlign: 'middle' }} />
+                    )}
                   </TableCell>
                   {standardizedVariable && (
                     <TableCell
@@ -87,7 +106,7 @@ function Continuous({
                 </TableRow>
               </TableHead>
               <TableBody>
-                {uniqueValues.map((value, index) => (
+                {sortedValues.map((value, index) => (
                   // eslint-disable-next-line react/no-array-index-key
                   <TableRow key={`${columnID}-${value}-${index}`}>
                     <TableCell align="left" data-cy={`${columnID}-${value}-${index}-value`}>
