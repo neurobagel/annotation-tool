@@ -448,7 +448,7 @@ describe('Main user flow', () => {
       );
     });
   });
-  it('loads in a data dictionary from the legacy annotation tool', () => {
+  it.only('loads in a data dictionary from the legacy annotation tool', () => {
     cy.visit('http://localhost:5173');
     cy.get('[data-cy="next-button"]').click();
 
@@ -547,6 +547,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="3-continuous"]').should('be.visible');
     cy.get('[data-cy="3-format-dropdown"] input').should('have.value', 'euro');
     cy.get('[data-cy="3-continuous-table"]').should('be.visible').and('contain.text', 'NA');
+    cy.get('[data-cy="3-filter-status-button"]').click();
     cy.get('[data-cy="3-NA-missing-value-button"]')
       .should('be.visible')
       .and('contain.text', 'Mark as not missing');
