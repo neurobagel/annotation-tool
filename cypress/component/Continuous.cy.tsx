@@ -150,4 +150,33 @@ describe('Continuous', () => {
     cy.get('[data-cy="1-format-dropdown"]').type('float{downarrow}{enter}');
     cy.get('@spy').should('have.been.calledWith', '1', { termURL: 'nb:FromFloat', label: 'float' });
   });
+  it('sorts and filters the values', () => {
+    cy.mount(
+      <Continuous
+        columnID={props.columnID}
+        units={props.units}
+        uniqueValues={props.uniqueValues}
+        missingValues={['3', '4']}
+        format={props.format}
+        standardizedVariable={props.standardizedVariable}
+        onUpdateUnits={props.onUpdateUnits}
+        onToggleMissingValue={props.onToggleMissingValue}
+        onUpdateFormat={props.onUpdateFormat}
+      />
+    );
+    // column id 1-value 1-index 0
+    cy.get('[data-cy="1-1-0-value"]').should('contain', '1');
+    cy.get('[data-cy="1-sort-values-button"]').click();
+    // After sorting column id 1-value 5-index 0
+    cy.get('[data-cy="1-5-0-value"]').should('contain', '5');
+    cy.get('[data-cy="1-filter-status-button"]').click();
+    cy.get('[data-cy="1-1-0-value"]').should('not.exist');
+    cy.get('[data-cy="1-5-0-value"]').should('not.exist');
+    cy.get('[data-cy="1-4-0-value"]').should('contain', '4');
+    cy.get('[data-cy="1-sort-values-button"]').click();
+    cy.get('[data-cy="1-3-0-value"]').should('contain', '3');
+    cy.get('[data-cy="1-filter-status-button"]').click();
+    cy.get('[data-cy="1-1-0-value"]').should('be.visible').and('contain', '1');
+    cy.get('[data-cy="1-5-0-value"]').should('be.visible');
+  });
 });

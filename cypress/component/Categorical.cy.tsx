@@ -3,12 +3,12 @@ import useDataStore from '../../src/stores/data';
 
 const props = {
   columnID: '3',
-  uniqueValues: ['F', 'M'],
+  uniqueValues: ['F', 'M', 'N/A', 'Missing'],
   levels: {
     F: { description: 'Female' },
     M: { description: 'Male' },
   },
-  missingValues: [],
+  missingValues: ['N/A', 'Missing'],
   standardizedVariable: {
     identifier: 'nb:Diagnosis',
     label: 'Diagnosis',
@@ -85,5 +85,44 @@ describe('Categorical', () => {
       identifier: 'test',
       label: 'test',
     });
+  });
+  it('sorts and filters the values', () => {
+    cy.mount(
+      <Categorical
+        columnID={props.columnID}
+        uniqueValues={props.uniqueValues}
+        missingValues={props.missingValues}
+        standardizedVariable={props.standardizedVariable}
+        levels={props.levels}
+        onUpdateDescription={props.onUpdateDescription}
+        onToggleMissingValue={props.onToggleMissingValue}
+        onUpdateLevelTerm={props.onUpdateLevelTerm}
+      />
+    );
+    // First value should be F when sorted ascending
+    cy.get('[data-cy="3-categorical-table"] tbody tr:first-child td:first-child').should(
+      'contain',
+      'F'
+    );
+    cy.get('[data-cy="3-sort-values-button"]').click();
+    // After sorting descending, first value should be N/A
+    cy.get('[data-cy="3-categorical-table"] tbody tr:first-child td:first-child').should(
+      'contain',
+      'N/A'
+    );
+    cy.get('[data-cy="3-filter-status-button"]').click();
+    cy.get('[data-cy="3-F"]').should('not.exist');
+    cy.get('[data-cy="3-M"]').should('not.exist');
+    cy.get('[data-cy="3-sort-values-button"]').click();
+    cy.get('[data-cy="3-categorical-table"] tbody tr:first-child td:first-child').should(
+      'contain',
+      'Missing'
+    );
+    cy.get('[data-cy="3-filter-status-button"]').click();
+    cy.get('[data-cy="3-F"]').should('be.visible');
+    cy.get('[data-cy="3-categorical-table"] tbody tr:first-child td:first-child').should(
+      'contain',
+      'F'
+    );
   });
 });

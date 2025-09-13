@@ -1,4 +1,4 @@
-import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
+import { ArrowUpward, ArrowDownward, FilterList } from '@mui/icons-material';
 import {
   Paper,
   Table,
@@ -9,6 +9,8 @@ import {
   TableRow,
   Autocomplete,
   TextField,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
 import { useState, useMemo } from 'react';
 import useDataStore from '~/stores/data';
@@ -56,6 +58,7 @@ function Continuous({
   const showUnits = !(columnIsMultiColumnMeasure && columns[columnID].variableType === null);
 
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [filterMissing, setFilterMissing] = useState(false);
 
   const sortedValues = useMemo(
     () =>
@@ -63,6 +66,11 @@ function Continuous({
         sortDir === 'asc' ? a.localeCompare(b) : b.localeCompare(a)
       ),
     [uniqueValues, sortDir]
+  );
+
+  const visibleValues = useMemo(
+    () => (filterMissing ? sortedValues.filter((v) => missingValues.includes(v)) : sortedValues),
+    [sortedValues, filterMissing, missingValues]
   );
 
   return (
@@ -79,6 +87,7 @@ function Continuous({
               <TableHead>
                 <TableRow className="bg-blue-50">
                   <TableCell
+                    data-cy={`${columnID}-sort-values-button`}
                     align="left"
                     sx={{
                       fontWeight: 'bold',
@@ -101,12 +110,22 @@ function Continuous({
                       sx={{ fontWeight: 'bold', color: 'primary.main', width: '30%' }}
                     >
                       Status
+                      <Tooltip title={filterMissing ? 'Show all values' : 'Show only missing'}>
+                        <IconButton
+                          data-cy={`${columnID}-filter-status-button`}
+                          size="small"
+                          color={filterMissing ? 'primary' : 'default'}
+                          onClick={() => setFilterMissing((f) => !f)}
+                        >
+                          <FilterList fontSize="inherit" />
+                        </IconButton>
+                      </Tooltip>
                     </TableCell>
                   )}
                 </TableRow>
               </TableHead>
               <TableBody>
-                {sortedValues.map((value, index) => (
+                {visibleValues.map((value, index) => (
                   // eslint-disable-next-line react/no-array-index-key
                   <TableRow key={`${columnID}-${value}-${index}`}>
                     <TableCell align="left" data-cy={`${columnID}-${value}-${index}-value`}>

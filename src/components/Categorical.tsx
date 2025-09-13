@@ -1,3 +1,4 @@
+import { ArrowUpward, ArrowDownward, FilterList } from '@mui/icons-material';
 import {
   Paper,
   Table,
@@ -8,7 +9,10 @@ import {
   TableRow,
   Autocomplete,
   TextField,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
+import { useState, useMemo } from 'react';
 import useDataStore from '~/stores/data';
 import { StandardizedVariable } from '../utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
@@ -51,6 +55,22 @@ function Categorical({
   const termOptions = useDataStore((state) => state.termOptions);
   const options = standardizedVariable ? termOptions[standardizedVariable.identifier] || [] : [];
 
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [filterMissing, setFilterMissing] = useState(false);
+
+  const sortedValues = useMemo(
+    () =>
+      [...uniqueValues].sort((a, b) =>
+        sortDir === 'asc' ? a.localeCompare(b) : b.localeCompare(a)
+      ),
+    [uniqueValues, sortDir]
+  );
+
+  const visibleValues = useMemo(
+    () => (filterMissing ? sortedValues.filter((v) => missingValues.includes(v)) : sortedValues),
+    [sortedValues, filterMissing, missingValues]
+  );
+
   return (
     <TableContainer
       id={`${columnID}-table-container`}
@@ -63,8 +83,18 @@ function Categorical({
       <Table stickyHeader className="min-w-[768px]" data-cy={`${columnID}-categorical-table`}>
         <TableHead data-cy={`${columnID}-categorical-table-head`}>
           <TableRow className="bg-blue-50">
-            <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+            <TableCell
+              data-cy={`${columnID}-sort-values-button`}
+              align="left"
+              sx={{ fontWeight: 'bold', color: 'primary.main', cursor: 'pointer' }}
+              onClick={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
+            >
               Value
+              {sortDir === 'asc' ? (
+                <ArrowUpward fontSize="inherit" sx={{ ml: 0.5, verticalAlign: 'middle' }} />
+              ) : (
+                <ArrowDownward fontSize="inherit" sx={{ ml: 0.5, verticalAlign: 'middle' }} />
+              )}
             </TableCell>
             <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
               Description
@@ -76,13 +106,23 @@ function Categorical({
             )}
             {standardizedVariable && (
               <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                Missing Value
+                Status
+                <Tooltip title={filterMissing ? 'Show all values' : 'Show only missing'}>
+                  <IconButton
+                    data-cy={`${columnID}-filter-status-button`}
+                    size="small"
+                    color={filterMissing ? 'primary' : 'default'}
+                    onClick={() => setFilterMissing((f) => !f)}
+                  >
+                    <FilterList fontSize="inherit" />
+                  </IconButton>
+                </Tooltip>
               </TableCell>
             )}
           </TableRow>
         </TableHead>
         <TableBody>
-          {uniqueValues.map((value) => (
+          {visibleValues.map((value) => (
             <TableRow key={`${columnID}-${value}`} data-cy={`${columnID}-${value}`}>
               <TableCell align="left">{value}</TableCell>
               <TableCell align="left">
