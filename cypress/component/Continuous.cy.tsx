@@ -177,6 +177,6 @@ describe('Continuous', () => {
     cy.get('[data-cy="1-3-0-value"]').should('contain', '3');
     cy.get('[data-cy="1-filter-status-button"]').click();
     cy.get('[data-cy="1-1-0-value"]').should('be.visible').and('contain', '1');
-    cy.get('[data-cy="1-5-0-value"]').should('be.visible');
+    cy.get('[data-cy="1-5-4-value"]').should('be.visible');
   });
 });
