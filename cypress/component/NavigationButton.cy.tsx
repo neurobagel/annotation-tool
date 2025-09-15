@@ -39,4 +39,18 @@ describe('NavigationButton', () => {
 
     cy.get('@setCurrentViewSpy').should('have.been.calledWith', props.nextView);
   });
+  it('should disable buttons when disable props are true', () => {
+    cy.mount(
+      <NavigationButton
+        backView={props.backView}
+        nextView={props.nextView}
+        backLabel="Back"
+        nextLabel="Next"
+        disableBack
+        disableNext
+      />
+    );
+    cy.get('[data-cy="back-button"]').should('be.disabled');
+    cy.get('[data-cy="next-button"]').should('be.disabled');
+  });
 });

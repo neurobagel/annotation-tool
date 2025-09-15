@@ -5,6 +5,8 @@ import { View } from '../utils/internal_types';
 const defaultProps = {
   backLabel: 'Back',
   nextLabel: 'Next',
+  disableBack: false,
+  disableNext: false,
   styleClassName: '',
 };
 
@@ -13,12 +15,16 @@ function NavigationButton({
   nextView,
   backLabel,
   nextLabel,
+  disableBack,
+  disableNext,
   styleClassName,
 }: {
   backView: View | undefined;
   nextView: View | undefined;
   backLabel?: string;
   nextLabel?: string;
+  disableBack?: boolean;
+  disableNext?: boolean;
   styleClassName?: string;
 }) {
   const setCurrentView = useViewStore((state) => state.setCurrentView);
@@ -38,12 +44,22 @@ function NavigationButton({
   return (
     <div className={`flex flex-row justify-between ${styleClassName}`}>
       {backView && (
-        <Button data-cy="back-button" variant="contained" onClick={handleBack}>
+        <Button
+          data-cy="back-button"
+          disabled={disableBack}
+          variant="contained"
+          onClick={handleBack}
+        >
           {backLabel}
         </Button>
       )}
       {nextView && (
-        <Button data-cy="next-button" variant="contained" onClick={handleNext}>
+        <Button
+          data-cy="next-button"
+          disabled={disableNext}
+          variant="contained"
+          onClick={handleNext}
+        >
           {nextLabel}
         </Button>
       )}

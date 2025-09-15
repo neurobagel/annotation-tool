@@ -39,7 +39,7 @@ describe('Main user flow', () => {
 
     // Upload view
     cy.get('[data-cy="back-button"]').should('contain', 'Landing');
-    cy.get('[data-cy="next-button"]').should('contain', 'Column Annotation');
+    cy.get('[data-cy="next-button"]').should('contain', 'Column Annotation').and('be.disabled');
     cy.get('[data-cy="nav-stepper"]').should('be.visible');
     cy.get('[data-cy="Upload-step"]').within(() => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
