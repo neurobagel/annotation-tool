@@ -18,6 +18,8 @@ function App() {
   const setCurrentView = useViewStore((state) => state.setCurrentView);
   const hasMultiColumnMeasures = useDataStore((state) => state.hasMultiColumnMeasures());
 
+  const disableUploadNextButton = useDataStore((state) => state.uploadedDataTableFileName == null);
+
   const theme = useTheme();
   const appBarHeight = theme.mixins.toolbar.minHeight || 64;
 
@@ -80,6 +82,7 @@ function App() {
       {currentView !== View.Landing && (
         <div className="mt-auto">
           <NavigationButton
+            disableNext={disableUploadNextButton}
             backView={backView}
             nextView={nextView}
             backLabel={backLabel}
