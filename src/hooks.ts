@@ -196,3 +196,25 @@ export function useSchemaValidation(dataDictionary: DataDictionary) {
     return { schemaValid: true, schemaErrors: [] };
   }, [dataDictionary]);
 }
+
+export function useSortedFilteredValues(
+  uniqueValues: string[],
+  missingValues: string[],
+  sortDir: 'asc' | 'desc',
+  filterMissing: boolean
+) {
+  const sortedValues = useMemo(
+    () =>
+      [...uniqueValues].sort((a, b) =>
+        sortDir === 'asc' ? a.localeCompare(b) : b.localeCompare(a)
+      ),
+    [uniqueValues, sortDir]
+  );
+
+  const visibleValues = useMemo(
+    () => (filterMissing ? sortedValues.filter((v) => missingValues.includes(v)) : sortedValues),
+    [sortedValues, filterMissing, missingValues]
+  );
+
+  return { sortedValues, visibleValues };
+}

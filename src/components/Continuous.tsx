@@ -1,4 +1,3 @@
-import { ArrowUpward, ArrowDownward, FilterList } from '@mui/icons-material';
 import {
   Paper,
   Table,
@@ -9,14 +8,14 @@ import {
   TableRow,
   Autocomplete,
   TextField,
-  IconButton,
-  Tooltip,
 } from '@mui/material';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
+import { useSortedFilteredValues } from '~/hooks';
 import useDataStore from '~/stores/data';
 import { StandardizedVariable, TermFormat } from '~/utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueButton from './MissingValueButton';
+import { ValueSortCell, StatusFilterCell } from './TableCells';
 
 interface ContinuousProps {
   columnID: string;
@@ -60,17 +59,11 @@ function Continuous({
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
   const [filterMissing, setFilterMissing] = useState(false);
 
-  const sortedValues = useMemo(
-    () =>
-      [...uniqueValues].sort((a, b) =>
-        sortDir === 'asc' ? a.localeCompare(b) : b.localeCompare(a)
-      ),
-    [uniqueValues, sortDir]
-  );
-
-  const visibleValues = useMemo(
-    () => (filterMissing ? sortedValues.filter((v) => missingValues.includes(v)) : sortedValues),
-    [sortedValues, filterMissing, missingValues]
+  const { visibleValues } = useSortedFilteredValues(
+    uniqueValues,
+    missingValues,
+    sortDir,
+    filterMissing
   );
 
   return (
@@ -86,41 +79,19 @@ function Continuous({
             <Table stickyHeader>
               <TableHead>
                 <TableRow className="bg-blue-50">
-                  <TableCell
-                    data-cy={`${columnID}-sort-values-button`}
-                    align="left"
-                    sx={{
-                      fontWeight: 'bold',
-                      color: 'primary.main',
-                      width: standardizedVariable ? '70%' : '',
-                      cursor: 'pointer',
-                    }}
-                    onClick={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
-                  >
-                    Value
-                    {sortDir === 'asc' ? (
-                      <ArrowUpward fontSize="inherit" sx={{ ml: 0.5, verticalAlign: 'middle' }} />
-                    ) : (
-                      <ArrowDownward fontSize="inherit" sx={{ ml: 0.5, verticalAlign: 'middle' }} />
-                    )}
-                  </TableCell>
+                  <ValueSortCell
+                    sortDir={sortDir}
+                    onToggle={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
+                    width={standardizedVariable ? '70%' : undefined}
+                    dataCy={`${columnID}-sort-values-button`}
+                  />
                   {standardizedVariable && (
-                    <TableCell
-                      align="left"
-                      sx={{ fontWeight: 'bold', color: 'primary.main', width: '30%' }}
-                    >
-                      Status
-                      <Tooltip title={filterMissing ? 'Show all values' : 'Show only missing'}>
-                        <IconButton
-                          data-cy={`${columnID}-filter-status-button`}
-                          size="small"
-                          color={filterMissing ? 'primary' : 'default'}
-                          onClick={() => setFilterMissing((f) => !f)}
-                        >
-                          <FilterList fontSize="inherit" />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
+                    <StatusFilterCell
+                      filterMissing={filterMissing}
+                      onToggle={() => setFilterMissing((f) => !f)}
+                      width="30%"
+                      dataCy={`${columnID}-filter-status-button`}
+                    />
                   )}
                 </TableRow>
               </TableHead>

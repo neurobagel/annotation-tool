@@ -448,7 +448,7 @@ describe('Main user flow', () => {
       );
     });
   });
-  it.only('loads in a data dictionary from the legacy annotation tool', () => {
+  it('loads in a data dictionary from the legacy annotation tool', () => {
     cy.visit('http://localhost:5173');
     cy.get('[data-cy="next-button"]').click();
 

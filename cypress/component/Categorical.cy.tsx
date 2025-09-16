@@ -86,7 +86,7 @@ describe('Categorical', () => {
       label: 'test',
     });
   });
-  it('sorts and filters the values', () => {
+  it('alphabetically sorts and filters the values', () => {
     cy.mount(
       <Categorical
         columnID={props.columnID}
@@ -105,10 +105,14 @@ describe('Categorical', () => {
       'F'
     );
     cy.get('[data-cy="3-sort-values-button"]').click();
-    // After sorting descending, first value should be N/A
+    // After sorting descending, first value should be N/A and the last value should be "F"
     cy.get('[data-cy="3-categorical-table"] tbody tr:first-child td:first-child').should(
       'contain',
       'N/A'
+    );
+    cy.get('[data-cy="3-categorical-table"] tbody tr:last-child td:first-child').should(
+      'contain',
+      'F'
     );
     cy.get('[data-cy="3-filter-status-button"]').click();
     cy.get('[data-cy="3-F"]').should('not.exist');
