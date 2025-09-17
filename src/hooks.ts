@@ -1,4 +1,5 @@
 import Ajv from 'ajv';
+import naturalCompare from 'natural-compare-lite';
 import { useState, useEffect, useMemo } from 'react';
 import schema from './assets/neurobagel_data_dictionary.schema.json';
 import useDataStore from './stores/data';
@@ -206,7 +207,7 @@ export function useSortedFilteredValues(
   const sortedValues = useMemo(
     () =>
       [...uniqueValues].sort((a, b) =>
-        sortDir === 'asc' ? a.localeCompare(b) : b.localeCompare(a)
+        sortDir === 'asc' ? naturalCompare(a, b) : naturalCompare(b, a)
       ),
     [uniqueValues, sortDir]
   );
