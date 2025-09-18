@@ -1,4 +1,7 @@
 import {
+  List,
+  ListItem,
+  ListItemText,
   Paper,
   Table,
   TableBody,
@@ -12,6 +15,7 @@ import {
 import useDataStore from '~/stores/data';
 import { StandardizedVariable } from '../utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
+import Instruction from './Instruction';
 import MissingValueButton from './MissingValueButton';
 
 interface CategoricalProps {
@@ -52,81 +56,110 @@ function Categorical({
   const options = standardizedVariable ? termOptions[standardizedVariable.identifier] || [] : [];
 
   return (
-    <TableContainer
-      id={`${columnID}-table-container`}
-      component={Paper}
-      elevation={3}
-      className="h-full shadow-lg overflow-auto"
-      style={{ maxHeight: '500px' }}
-      data-cy={`${columnID}-categorical`}
-    >
-      <Table stickyHeader className="min-w-[768px]" data-cy={`${columnID}-categorical-table`}>
-        <TableHead data-cy={`${columnID}-categorical-table-head`}>
-          <TableRow className="bg-blue-50">
-            <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-              Value
-            </TableCell>
-            <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-              Description
-            </TableCell>
-            {showStandardizedTerm && (
+    <>
+      <Instruction className="mb-2">
+        <List dense sx={{ listStyleType: 'disc', pl: 4 }}>
+          <ListItem sx={{ display: 'list-item' }}>
+            <ListItemText primary="Enter a description for each observed value." />
+          </ListItem>
+          {showStandardizedTerm ? (
+            <ListItem sx={{ display: 'list-item' }}>
+              <ListItemText primary="Map values to standardized terms to enable harmonized queries." />
+            </ListItem>
+          ) : (
+            <ListItem sx={{ display: 'list-item' }}>
+              <ListItemText primary="Standardized term mapping is unavailable for this column." />
+            </ListItem>
+          )}
+          {standardizedVariable ? (
+            <ListItem sx={{ display: 'list-item' }}>
+              <ListItemText primary="Mark which values represent missing data." />
+            </ListItem>
+          ) : (
+            <ListItem sx={{ display: 'list-item' }}>
+              <ListItemText primary="Missing value tagging becomes available once a standardized variable is selected." />
+            </ListItem>
+          )}
+        </List>
+      </Instruction>
+      <TableContainer
+        id={`${columnID}-table-container`}
+        component={Paper}
+        elevation={3}
+        className="h-full shadow-lg overflow-auto"
+        style={{ maxHeight: '500px' }}
+        data-cy={`${columnID}-categorical`}
+      >
+        <Table stickyHeader className="min-w-[768px]" data-cy={`${columnID}-categorical-table`}>
+          <TableHead data-cy={`${columnID}-categorical-table-head`}>
+            <TableRow className="bg-blue-50">
               <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                Standardized Term
+                Value
               </TableCell>
-            )}
-            {standardizedVariable && (
               <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                Missing Value
-              </TableCell>
-            )}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {uniqueValues.map((value) => (
-            <TableRow key={`${columnID}-${value}`} data-cy={`${columnID}-${value}`}>
-              <TableCell align="left">{value}</TableCell>
-              <TableCell align="left">
-                <DescriptionEditor
-                  columnID={columnID}
-                  levelValue={value}
-                  description={levels[value]?.description || ''}
-                  onDescriptionChange={(id, description) => {
-                    onUpdateDescription(id, value, description || '');
-                  }}
-                />
+                Description
               </TableCell>
               {showStandardizedTerm && (
-                <TableCell align="left">
-                  <Autocomplete
-                    data-cy={`${columnID}-${value}-term-dropdown`}
-                    options={options}
-                    getOptionLabel={(option) => option.label}
-                    value={options.find((opt) => opt.identifier === levels[value]?.termURL) || null}
-                    onChange={(_, newValue) => {
-                      onUpdateLevelTerm(columnID, value, newValue);
-                    }}
-                    renderInput={(params) => (
-                      // eslint-disable-next-line react/jsx-props-no-spreading
-                      <TextField {...params} variant="standard" size="small" fullWidth />
-                    )}
-                  />
+                <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                  Standardized Term
                 </TableCell>
               )}
               {standardizedVariable && (
-                <TableCell align="left">
-                  <MissingValueButton
-                    value={value}
-                    columnId={columnID}
-                    missingValues={missingValues}
-                    onToggleMissingValue={onToggleMissingValue}
-                  />
+                <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                  Missing Value
                 </TableCell>
               )}
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {uniqueValues.map((value) => (
+              <TableRow key={`${columnID}-${value}`} data-cy={`${columnID}-${value}`}>
+                <TableCell align="left">{value}</TableCell>
+                <TableCell align="left">
+                  <DescriptionEditor
+                    columnID={columnID}
+                    levelValue={value}
+                    description={levels[value]?.description || ''}
+                    onDescriptionChange={(id, description) => {
+                      onUpdateDescription(id, value, description || '');
+                    }}
+                  />
+                </TableCell>
+                {showStandardizedTerm && (
+                  <TableCell align="left">
+                    <Autocomplete
+                      data-cy={`${columnID}-${value}-term-dropdown`}
+                      options={options}
+                      getOptionLabel={(option) => option.label}
+                      value={
+                        options.find((opt) => opt.identifier === levels[value]?.termURL) || null
+                      }
+                      onChange={(_, newValue) => {
+                        onUpdateLevelTerm(columnID, value, newValue);
+                      }}
+                      renderInput={(params) => (
+                        // eslint-disable-next-line react/jsx-props-no-spreading
+                        <TextField {...params} variant="standard" size="small" fullWidth />
+                      )}
+                    />
+                  </TableCell>
+                )}
+                {standardizedVariable && (
+                  <TableCell align="left">
+                    <MissingValueButton
+                      value={value}
+                      columnId={columnID}
+                      missingValues={missingValues}
+                      onToggleMissingValue={onToggleMissingValue}
+                    />
+                  </TableCell>
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
   );
 }
 

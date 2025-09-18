@@ -1,7 +1,8 @@
-import { Paper, Typography, List, ListItem } from '@mui/material';
+import { Paper, Typography, List, ListItem, ListItemText } from '@mui/material';
 import { useState } from 'react';
 import useDataStore from '../stores/data';
 import { Columns } from '../utils/internal_types';
+import Instruction from './Instruction';
 import SideColumnNavBar from './SideColumnNavBar';
 import ValueAnnotationTabs from './ValueAnnotationTabs';
 
@@ -64,12 +65,14 @@ function ValueAnnotation() {
           elevation={3}
           className="flex h-full items-center justify-center shadow-lg"
         >
-          <Typography variant="h6">
-            {`The following column${unknownDataTypeColumns.length > 1 ? 's' : ''} do not have an assigned data type:`}
-            <List>
+          <Typography variant="h6" component="div">
+            {`The following column${
+              unknownDataTypeColumns.length > 1 ? 's' : ''
+            } do not have an assigned data type:`}
+            <List dense sx={{ listStyleType: 'disc', pl: 4 }}>
               {unknownDataTypeColumns.map((columnId) => (
-                <ListItem key={columnId}>
-                  <Typography>{filteredColumns[columnId].header}</Typography>
+                <ListItem key={columnId} sx={{ display: 'list-item' }}>
+                  <ListItemText primary={filteredColumns[columnId].header} />
                 </ListItem>
               ))}
             </List>
@@ -98,7 +101,38 @@ function ValueAnnotation() {
         onSelect={handleSelect}
         selectedColumnId={selectedColumnIds[0] || null}
       />
-      <div className="flex-1">{renderContent()}</div>
+      <div className="flex-1">
+        <div className="mb-2">
+          <Instruction>
+            <List dense sx={{ listStyleType: 'disc', pl: 4 }}>
+              <ListItem sx={{ display: 'list-item' }}>
+                <ListItemText primary="Select one or more columns from the left to annotate their values." />
+              </ListItem>
+              <ListItem sx={{ display: 'list-item' }}>
+                <ListItemText
+                  primary={
+                    <>
+                      For <b>Categorical</b> columns: review unique values, mark missing values, and
+                      map levels to terms where applicable.
+                    </>
+                  }
+                />
+              </ListItem>
+              <ListItem sx={{ display: 'list-item' }}>
+                <ListItemText
+                  primary={
+                    <>
+                      For <b>Continuous</b> columns: set units, define missing values, and specify
+                      the numeric format if needed.
+                    </>
+                  }
+                />
+              </ListItem>
+            </List>
+          </Instruction>
+        </div>
+        {renderContent()}
+      </div>
     </div>
   );
 }

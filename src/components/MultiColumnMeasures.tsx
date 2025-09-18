@@ -1,6 +1,17 @@
 import AddIcon from '@mui/icons-material/Add';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { Fab, Card, CardContent, CardHeader, Typography, Tabs, Tab } from '@mui/material';
+import {
+  Fab,
+  Card,
+  CardContent,
+  CardHeader,
+  Typography,
+  Tabs,
+  Tab,
+  List,
+  ListItem,
+  ListItemText,
+} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useState } from 'react';
 import {
@@ -11,6 +22,7 @@ import {
 import useDataStore from '../stores/data';
 import { MultiColumnMeasuresTerm } from '../utils/internal_types';
 import { getColumnsAssignedText, createMappedColumnHeaders } from '../utils/util';
+import Instruction from './Instruction';
 import MultiColumnMeasuresCard from './MultiColumnMeasuresCard';
 
 function MultiColumnMeasures() {
@@ -79,6 +91,19 @@ function MultiColumnMeasures() {
     <div className="flex justify-center p-4" data-cy="multi-column-measures">
       <div className="flex flex-row gap-6 max-w-[1200px] w-full">
         <div className="flex-1 min-w-0">
+          <Instruction className="mb-2">
+            <List dense sx={{ listStyleType: 'disc', pl: 4 }}>
+              <ListItem sx={{ display: 'list-item' }}>
+                <ListItemText primary="Use the tabs to choose a multi‑column assessment (e.g., questionnaire, test)." />
+              </ListItem>
+              <ListItem sx={{ display: 'list-item' }}>
+                <ListItemText primary="For each card, pick a term and map all relevant columns. Add more cards if needed." />
+              </ListItem>
+              <ListItem sx={{ display: 'list-item' }}>
+                <ListItemText primary="Columns already mapped will appear highlighted and can be unassigned from the right." />
+              </ListItem>
+            </List>
+          </Instruction>
           <Tabs
             value={activeTab}
             onChange={handleTabChange}

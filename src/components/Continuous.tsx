@@ -1,4 +1,7 @@
 import {
+  List,
+  ListItem,
+  ListItemText,
   Paper,
   Table,
   TableBody,
@@ -12,6 +15,7 @@ import {
 import useDataStore from '~/stores/data';
 import { StandardizedVariable, TermFormat } from '~/utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
+import Instruction from './Instruction';
 import MissingValueButton from './MissingValueButton';
 
 interface ContinuousProps {
@@ -57,6 +61,39 @@ function Continuous({
     <Paper elevation={3} className="h-full shadow-lg" data-cy={`${columnID}-continuous`}>
       <div className="flex h-full">
         <div className="w-3/5 flex flex-col">
+          <div className="p-2">
+            <Instruction className="mb-2">
+              <List dense sx={{ listStyleType: 'disc', pl: 4 }}>
+                {showUnits ? (
+                  <ListItem sx={{ display: 'list-item' }}>
+                    <ListItemText primary="Set appropriate units to clarify the scale of measurement." />
+                  </ListItem>
+                ) : (
+                  <ListItem sx={{ display: 'list-item' }}>
+                    <ListItemText primary="Units are controlled by the selected assessment and may be hidden." />
+                  </ListItem>
+                )}
+                {standardizedVariable ? (
+                  <ListItem sx={{ display: 'list-item' }}>
+                    <ListItemText primary="Mark any values that represent missing data." />
+                  </ListItem>
+                ) : (
+                  <ListItem sx={{ display: 'list-item' }}>
+                    <ListItemText primary="Missing value tagging becomes available once a standardized variable is selected." />
+                  </ListItem>
+                )}
+                {showFormat ? (
+                  <ListItem sx={{ display: 'list-item' }}>
+                    <ListItemText primary="Choose a numeric format (with examples) that matches your data." />
+                  </ListItem>
+                ) : (
+                  <ListItem sx={{ display: 'list-item' }}>
+                    <ListItemText primary="Format selection is not applicable for this column." />
+                  </ListItem>
+                )}
+              </List>
+            </Instruction>
+          </div>
           <TableContainer
             id={`${columnID}-table-container`}
             className="flex-1 overflow-auto"

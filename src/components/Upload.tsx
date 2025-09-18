@@ -1,8 +1,10 @@
+import { List, ListItem, ListItemText } from '@mui/material';
 import { useEffect } from 'react';
 import useDataStore from '../stores/data';
 import ConfigCard from './ConfigCard';
 import DataDictionaryPreview from './DataDictionaryPreview';
 import DataTablePreview from './DataTablePreview';
+import Instruction from './Instruction';
 import UploadCard from './UploadCard';
 
 interface UploadProps {
@@ -51,6 +53,42 @@ function Upload({ disableConfig }: UploadProps) {
 
   return (
     <div className="flex flex-col items-center gap-8" data-config-loading={isConfigLoading}>
+      <div className="w-full max-w-[1024px]">
+        <Instruction className="mb-2">
+          <List dense sx={{ listStyleType: 'disc', pl: 4 }}>
+            <ListItem sx={{ display: 'list-item' }}>
+              <ListItemText
+                primary={
+                  <>
+                    Upload a tabular phenotypic <code>.tsv</code> file. This is required and enables
+                    all subsequent steps.
+                  </>
+                }
+              />
+            </ListItem>
+            <ListItem sx={{ display: 'list-item' }}>
+              <ListItemText
+                primary={
+                  <>
+                    Optionally upload an existing data dictionary <code>.json</code> to continue or
+                    refine prior work.
+                  </>
+                }
+              />
+            </ListItem>
+            <ListItem sx={{ display: 'list-item' }}>
+              <ListItemText
+                primary={
+                  <>
+                    If configuration is enabled, select a config preset first to tailor standardized
+                    variables and rules.
+                  </>
+                }
+              />
+            </ListItem>
+          </List>
+        </Instruction>
+      </div>
       {disableConfig ? null : (
         <ConfigCard
           title="Configuration"
