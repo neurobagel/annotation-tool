@@ -150,7 +150,7 @@ describe('Continuous', () => {
     cy.get('[data-cy="1-format-dropdown"]').type('float{downarrow}{enter}');
     cy.get('@spy').should('have.been.calledWith', '1', { termURL: 'nb:FromFloat', label: 'float' });
   });
-  it.only('sorts and filters the values', () => {
+  it('sorts and filters the values', () => {
     cy.mount(
       <Continuous
         columnID={props.columnID}
@@ -164,22 +164,29 @@ describe('Continuous', () => {
         onUpdateFormat={props.onUpdateFormat}
       />
     );
-    // column id 1-value 1-index 0
-    cy.get('[data-cy="1-1-0-value"]').should('contain', '1');
-    cy.get('[data-cy="1-99-5-value"]').should('contain', '99');
+    // Helper function to get the value of a specific row
+    const rowValue = (rowIdx: number) =>
+      cy.get(`[data-cy="${props.columnID}-continuous-table"] tbody tr:eq(${rowIdx}) td:eq(0)`);
+
+    // initial ascending order
+    rowValue(0).should('contain', '1');
+    rowValue(5).should('contain', '99');
+
+    // switch to descending
     cy.get('[data-cy="1-sort-values-button"]').click();
-    // After sorting, column id 1-value 5-index 0
-    cy.get('[data-cy="1-99-0-value"]').should('contain', '99');
-    cy.get('[data-cy="1-1-5-value"]').should('contain', '1');
-    cy.get('[data-cy="1-2-4-value"]').should('contain', '2');
+    rowValue(0).should('contain', '99');
+    rowValue(5).should('contain', '1');
+
+    // show only missing
     cy.get('[data-cy="1-filter-status-button"]').click();
-    cy.get('[data-cy="1-1-5-value"]').should('not.exist');
-    cy.get('[data-cy="1-2-4-value"]').should('not.exist');
-    cy.get('[data-cy="1-22-0-value"]').should('contain', '22');
+    rowValue(0).should('contain', '22');
+    rowValue(1).should('contain', '9');
+    cy.get('tbody tr').should('have.length', 2);
+
+    // back to ascending + all rows
     cy.get('[data-cy="1-sort-values-button"]').click();
-    cy.get('[data-cy="1-9-0-value"]').should('contain', '9');
     cy.get('[data-cy="1-filter-status-button"]').click();
-    cy.get('[data-cy="1-1-0-value"]').should('be.visible').and('contain', '1');
-    cy.get('[data-cy="1-99-5-value"]').should('be.visible').and('contain', '99');
+    rowValue(0).should('contain', '1');
+    rowValue(5).should('contain', '99');
   });
 });

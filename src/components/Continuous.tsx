@@ -15,7 +15,8 @@ import useDataStore from '~/stores/data';
 import { StandardizedVariable, TermFormat } from '~/utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueButton from './MissingValueButton';
-import { ValueSortCell, StatusFilterCell } from './TableCells';
+import StatusFilterCell from './StatusFilterCell';
+import ValueSortCell from './ValueSortCell';
 
 interface ContinuousProps {
   columnID: string;

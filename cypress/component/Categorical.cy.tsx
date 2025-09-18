@@ -99,34 +99,30 @@ describe('Categorical', () => {
         onUpdateLevelTerm={props.onUpdateLevelTerm}
       />
     );
-    // First value should be F when sorted ascending
-    cy.get('[data-cy="3-categorical-table"] tbody tr:first-child td:first-child').should(
-      'contain',
-      'F'
-    );
+    // Helper function to get the value of a specific row
+    const rowValue = (rowIdx: number) =>
+      cy.get(`[data-cy="${props.columnID}-categorical-table"] tbody tr:eq(${rowIdx}) td:eq(0)`);
+
+    // initial ascending order
+    rowValue(0).should('contain', 'F');
+    rowValue(3).should('contain', 'N/A');
+
+    // switch to descending
     cy.get('[data-cy="3-sort-values-button"]').click();
-    // After sorting descending, first value should be N/A and the last value should be "F"
-    cy.get('[data-cy="3-categorical-table"] tbody tr:first-child td:first-child').should(
-      'contain',
-      'N/A'
-    );
-    cy.get('[data-cy="3-categorical-table"] tbody tr:last-child td:first-child').should(
-      'contain',
-      'F'
-    );
+    rowValue(0).should('contain', 'N/A');
+    rowValue(3).should('contain', 'F');
+
+    // show only missing
     cy.get('[data-cy="3-filter-status-button"]').click();
-    cy.get('[data-cy="3-F"]').should('not.exist');
-    cy.get('[data-cy="3-M"]').should('not.exist');
+    rowValue(0).should('contain', 'N/A');
+    rowValue(1).should('contain', 'Missing');
+    cy.get('tbody tr').should('have.length', 2);
+
+    // back to ascending + all rows
     cy.get('[data-cy="3-sort-values-button"]').click();
-    cy.get('[data-cy="3-categorical-table"] tbody tr:first-child td:first-child').should(
-      'contain',
-      'Missing'
-    );
     cy.get('[data-cy="3-filter-status-button"]').click();
-    cy.get('[data-cy="3-F"]').should('be.visible');
-    cy.get('[data-cy="3-categorical-table"] tbody tr:first-child td:first-child').should(
-      'contain',
-      'F'
-    );
+    rowValue(0).should('contain', 'F');
+    rowValue(3).should('contain', 'N/A');
+    cy.get('tbody tr').should('have.length', 4);
   });
 });
