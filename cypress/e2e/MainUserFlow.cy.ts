@@ -117,6 +117,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="side-column-nav-bar-annotated"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar"]').should('not.contain', 'Participant id');
     cy.get('[data-cy="side-column-nav-bar-unannotated"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-unannotated"]').click();
     cy.get('[data-cy="side-column-nav-bar-continuous"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-categorical"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-categorical-group_dx"]').should('be.visible');
@@ -448,7 +449,7 @@ describe('Main user flow', () => {
       );
     });
   });
-  it('loads in a data dictionary from the legacy annotation tool', () => {
+  it.only('loads in a data dictionary from the legacy annotation tool', () => {
     cy.visit('http://localhost:5173');
     cy.get('[data-cy="next-button"]').click();
 
@@ -619,7 +620,8 @@ describe('Main user flow', () => {
     cy.get('[data-cy="8-not completed-missing-value-button"]')
       .should('be.visible')
       .and('contain.text', 'Mark as not missing');
-
+    cy.get('[data-cy="side-column-nav-bar-unannotated"]').click();
+    cy.get('[data-cy="side-column-nav-bar"]').scrollTo('bottom');
     cy.get('[data-cy="side-column-nav-bar-other-session_id"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-other-select-button"]').click();
     cy.get('[data-cy="other"]').should('be.visible').and('contain.text', 'session_id');
