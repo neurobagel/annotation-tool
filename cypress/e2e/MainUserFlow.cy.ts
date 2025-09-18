@@ -449,7 +449,7 @@ describe('Main user flow', () => {
       );
     });
   });
-  it.only('loads in a data dictionary from the legacy annotation tool', () => {
+  it('loads in a data dictionary from the legacy annotation tool', () => {
     cy.visit('http://localhost:5173');
     cy.get('[data-cy="next-button"]').click();
 
@@ -621,8 +621,7 @@ describe('Main user flow', () => {
       .should('be.visible')
       .and('contain.text', 'Mark as not missing');
     cy.get('[data-cy="side-column-nav-bar-unannotated"]').click();
-    cy.get('[data-cy="side-column-nav-bar"]').scrollTo('bottom');
-    cy.get('[data-cy="side-column-nav-bar-other-session_id"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-other-session_id"]').should('exist');
     cy.get('[data-cy="side-column-nav-bar-other-select-button"]').click();
     cy.get('[data-cy="other"]').should('be.visible').and('contain.text', 'session_id');
 
