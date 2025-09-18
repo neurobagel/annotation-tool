@@ -9,10 +9,14 @@ import {
   Autocomplete,
   TextField,
 } from '@mui/material';
+import { useState } from 'react';
+import { useSortedFilteredValues } from '~/hooks';
 import useDataStore from '~/stores/data';
-import { StandardizedVariable } from '../utils/internal_types';
+import { StandardizedVariable } from '~/utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueButton from './MissingValueButton';
+import StatusFilterCell from './StatusFilterCell';
+import ValueSortCell from './ValueSortCell';
 
 interface CategoricalProps {
   columnID: string;
@@ -51,6 +55,16 @@ function Categorical({
   const termOptions = useDataStore((state) => state.termOptions);
   const options = standardizedVariable ? termOptions[standardizedVariable.identifier] || [] : [];
 
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [filterMissing, setFilterMissing] = useState(false);
+
+  const { visibleValues } = useSortedFilteredValues(
+    uniqueValues,
+    missingValues,
+    sortDir,
+    filterMissing
+  );
+
   return (
     <TableContainer
       id={`${columnID}-table-container`}
@@ -63,9 +77,11 @@ function Categorical({
       <Table stickyHeader className="min-w-[768px]" data-cy={`${columnID}-categorical-table`}>
         <TableHead data-cy={`${columnID}-categorical-table-head`}>
           <TableRow className="bg-blue-50">
-            <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-              Value
-            </TableCell>
+            <ValueSortCell
+              sortDir={sortDir}
+              onToggle={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
+              dataCy={`${columnID}-sort-values-button`}
+            />
             <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
               Description
             </TableCell>
@@ -75,14 +91,16 @@ function Categorical({
               </TableCell>
             )}
             {standardizedVariable && (
-              <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                Missing Value
-              </TableCell>
+              <StatusFilterCell
+                filterMissing={filterMissing}
+                onToggle={() => setFilterMissing((f) => !f)}
+                dataCy={`${columnID}-filter-status-button`}
+              />
             )}
           </TableRow>
         </TableHead>
         <TableBody>
-          {uniqueValues.map((value) => (
+          {visibleValues.map((value) => (
             <TableRow key={`${columnID}-${value}`} data-cy={`${columnID}-${value}`}>
               <TableCell align="left">{value}</TableCell>
               <TableCell align="left">
