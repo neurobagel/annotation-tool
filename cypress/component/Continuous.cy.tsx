@@ -70,9 +70,7 @@ describe('Continuous', () => {
     );
     cy.get('[data-cy="1-description"]').should('be.visible').and('contain', 'some units');
     cy.get('[data-cy="1-1-0-value"]').should('be.visible').and('contain', '1');
-    cy.get('[data-cy="1-3-missing-value-button"]')
-      .should('be.visible')
-      .and('contain', 'Mark as missing');
+    cy.get('[data-cy="1-3-missing-value-checkbox"]').should('be.visible');
     cy.get('[data-cy="1-format-dropdown"]').should('be.visible');
   });
   it('renders the component correctly for a unannotated column', () => {
@@ -90,7 +88,7 @@ describe('Continuous', () => {
       />
     );
     cy.get('[data-cy="1-description"]').should('be.visible').and('contain', 'some units');
-    cy.get('[data-cy="1-3-missing-value-button"]').should('not.exist');
+    cy.get('[data-cy="1-3-missing-value-checkbox"]').should('not.exist');
     cy.get('[data-cy="1-format-dropdown"]').should('not.exist');
     cy.get('[data-cy="1-continuous-table"]').should('be.visible');
   });
@@ -128,7 +126,7 @@ describe('Continuous', () => {
         onUpdateFormat={props.onUpdateFormat}
       />
     );
-    cy.get('[data-cy="1-3-missing-value-button"]').click();
+    cy.get('[data-cy="1-3-missing-value-checkbox"]').click();
     cy.get('@spy').should('have.been.calledWith', '1', '3', true);
   });
   it('fires the onUpdateFormat event handler with the appropriate payload when the format is changed', () => {
@@ -177,15 +175,15 @@ describe('Continuous', () => {
     rowValue(0).should('contain', '99');
     rowValue(5).should('contain', '1');
 
-    // show only missing
-    cy.get('[data-cy="1-filter-status-button"]').click();
+    // show missing at the top
+    cy.get('[data-cy="1-sort-status-button"]').click();
     rowValue(0).should('contain', '22');
     rowValue(1).should('contain', '9');
-    cy.get('tbody tr').should('have.length', 2);
+    cy.get('tbody tr').should('have.length', 6);
 
-    // back to ascending + all rows
+    // back to ascending and missing where they belong
     cy.get('[data-cy="1-sort-values-button"]').click();
-    cy.get('[data-cy="1-filter-status-button"]').click();
+    cy.get('[data-cy="1-sort-status-button"]').click();
     rowValue(0).should('contain', '1');
     rowValue(5).should('contain', '99');
   });

@@ -14,8 +14,8 @@ import { useSortedFilteredValues } from '~/hooks';
 import useDataStore from '~/stores/data';
 import { StandardizedVariable, TermFormat } from '~/utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
-import MissingValueButton from './MissingValueButton';
-import StatusFilterCell from './StatusFilterCell';
+import MissingValueCheckbox from './MissingValueCheckbox';
+import StatusSortCell from './StatusSortCell';
 import ValueSortCell from './ValueSortCell';
 
 interface ContinuousProps {
@@ -83,15 +83,15 @@ function Continuous({
                   <ValueSortCell
                     sortDir={sortDir}
                     onToggle={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
-                    width={standardizedVariable ? '70%' : undefined}
+                    width={standardizedVariable ? '60%' : undefined}
                     dataCy={`${columnID}-sort-values-button`}
                   />
                   {standardizedVariable && (
-                    <StatusFilterCell
+                    <StatusSortCell
                       filterMissing={filterMissing}
                       onToggle={() => setFilterMissing((f) => !f)}
-                      width="30%"
-                      dataCy={`${columnID}-filter-status-button`}
+                      width="40%"
+                      dataCy={`${columnID}-sort-status-button`}
                     />
                   )}
                 </TableRow>
@@ -104,8 +104,8 @@ function Continuous({
                       {value}
                     </TableCell>
                     {standardizedVariable && (
-                      <TableCell align="left">
-                        <MissingValueButton
+                      <TableCell align="center">
+                        <MissingValueCheckbox
                           // eslint-disable-next-line react/no-array-index-key
                           key={`${columnID}-${value}-${index}-missingbutton`}
                           value={value}

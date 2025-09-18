@@ -112,17 +112,16 @@ describe('Categorical', () => {
     rowValue(0).should('contain', 'N/A');
     rowValue(3).should('contain', 'F');
 
-    // show only missing
-    cy.get('[data-cy="3-filter-status-button"]').click();
+    // show missing at the top
+    cy.get('[data-cy="3-sort-status-button"]').click();
     rowValue(0).should('contain', 'N/A');
     rowValue(1).should('contain', 'Missing');
-    cy.get('tbody tr').should('have.length', 2);
+    cy.get('tbody tr').should('have.length', 4);
 
-    // back to ascending + all rows
+    // back to ascending and missing where they belong
     cy.get('[data-cy="3-sort-values-button"]').click();
-    cy.get('[data-cy="3-filter-status-button"]').click();
+    cy.get('[data-cy="3-sort-status-button"]').click();
     rowValue(0).should('contain', 'F');
     rowValue(3).should('contain', 'N/A');
-    cy.get('tbody tr').should('have.length', 4);
   });
 });
