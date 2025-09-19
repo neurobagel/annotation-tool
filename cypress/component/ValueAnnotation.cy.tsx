@@ -23,6 +23,7 @@ describe('ValueAnnotation', () => {
     cy.get('[data-cy="4-categorical"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-assessment tool-select-button"]').click();
     cy.get('[data-cy="6-continuous"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-unannotated"]').click();
     cy.get('[data-cy="side-column-nav-bar-categorical-select-button"]').click();
     cy.get('[data-cy="3-categorical"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-continuous-select-button"]').click();
@@ -54,6 +55,7 @@ describe('ValueAnnotation', () => {
     store.updateMappedStandardizedVariables();
 
     cy.mount(<ValueAnnotation />);
+    cy.get('[data-cy="side-column-nav-bar-unannotated"]').click();
     cy.get('[data-cy="side-column-nav-bar-continuous-select-button"]').click();
     cy.get('[data-cy="1-description"]').should('be.visible');
     cy.get('[data-cy="1-description"] textarea').first().clear();

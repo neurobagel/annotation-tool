@@ -3,8 +3,8 @@ import codeCoverageTask from '@cypress/code-coverage/task.js';
 import { defineConfig } from 'cypress';
 
 export default defineConfig({
-  viewportWidth: 1280,
-  viewportHeight: 720,
+  viewportWidth: 1920,
+  viewportHeight: 1080,
   e2e: {
     experimentalStudio: true,
     baseUrl: 'http://localhost:5173',

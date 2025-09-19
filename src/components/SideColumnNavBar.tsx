@@ -17,7 +17,11 @@ function SideColumnNavBar({ columns, onSelect, selectedColumnId }: SideColumnNav
   const mappedStandardizedVariables = useDataStore((state) => state.mappedStandardizedVariables);
 
   return (
-    <Paper className="w-full max-w-80 p-4" elevation={3} data-cy="side-column-nav-bar">
+    <Paper
+      className="w-full max-w-80 p-4 overflow-y-auto"
+      elevation={3}
+      data-cy="side-column-nav-bar"
+    >
       <ExpandableSection title="annotated">
         <List>
           {mappedStandardizedVariables.map((standardizedVariable) => (
@@ -34,7 +38,7 @@ function SideColumnNavBar({ columns, onSelect, selectedColumnId }: SideColumnNav
         </List>
       </ExpandableSection>
 
-      <ExpandableSection title="unannotated">
+      <ExpandableSection title="unannotated" defaultExpanded={false}>
         <List>
           {['Categorical', 'Continuous', null].map((dataType) => (
             <ListItem key={`unannotated-${dataType || 'other'}`} sx={{ paddingLeft: 2 }}>
