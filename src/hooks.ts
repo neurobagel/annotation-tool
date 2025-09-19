@@ -202,20 +202,22 @@ export function useSortedFilteredValues(
   uniqueValues: string[],
   missingValues: string[],
   sortDir: 'asc' | 'desc',
-  filterMissing: boolean
+  sortMissing: boolean
 ) {
-  const sortedValues = useMemo(
-    () =>
-      [...uniqueValues].sort((a, b) =>
-        sortDir === 'asc' ? naturalCompare(a, b) : naturalCompare(b, a)
-      ),
-    [uniqueValues, sortDir]
-  );
+  const sortedValues = useMemo(() => {
+    const naturalOrder = [...uniqueValues].sort((a, b) =>
+      sortDir === 'asc' ? naturalCompare(a, b) : naturalCompare(b, a)
+    );
 
-  const visibleValues = useMemo(
-    () => (filterMissing ? sortedValues.filter((v) => missingValues.includes(v)) : sortedValues),
-    [sortedValues, filterMissing, missingValues]
-  );
+    if (!sortMissing) {
+      return naturalOrder;
+    }
 
-  return { sortedValues, visibleValues };
+    const missing = naturalOrder.filter((v) => missingValues.includes(v));
+    const regular = naturalOrder.filter((v) => !missingValues.includes(v));
+
+    return [...missing, ...regular];
+  }, [uniqueValues, missingValues, sortDir, sortMissing]);
+
+  return { sortedValues, visibleValues: sortedValues };
 }

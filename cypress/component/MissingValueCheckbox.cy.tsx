@@ -1,4 +1,4 @@
-import MissingValueButton from '../../src/components/MissingValueButton';
+import MissingValueCheckbox from '../../src/components/MissingValueCheckbox';
 
 const props = {
   value: 'some value',
@@ -10,16 +10,14 @@ const props = {
 describe('MissingValueButton', () => {
   it('renders the component correctly', () => {
     cy.mount(
-      <MissingValueButton
+      <MissingValueCheckbox
         value={props.value}
         columnId={props.columnId}
         missingValues={props.missingValues}
         onToggleMissingValue={props.onToggleMissingValue}
       />
     );
-    cy.get('[data-cy="1-some value-missing-value-button"]')
-      .should('be.visible')
-      .and('contain', 'Mark as missing');
+    cy.get('[data-cy="1-some value-missing-value-checkbox"]').should('be.visible');
   });
 
   describe('onToggleMissingValue behavior', () => {
@@ -27,22 +25,22 @@ describe('MissingValueButton', () => {
       {
         description: 'when value is not marked as missing',
         missingValues: [''],
-        expectedButtonText: 'Mark as missing',
+        expectedCheckboxState: 'not.be.checked',
         expectedCallArgs: ['1', 'some value', true],
       },
       {
         description: 'when value is already marked as missing',
         missingValues: ['some value'],
-        expectedButtonText: 'Mark as not missing',
+        expectedCheckboxState: 'be.checked',
         expectedCallArgs: ['1', 'some value', false],
       },
     ];
 
-    testCases.forEach(({ description, missingValues, expectedButtonText, expectedCallArgs }) => {
+    testCases.forEach(({ description, missingValues, expectedCheckboxState, expectedCallArgs }) => {
       it(`fires correct payload ${description}`, () => {
         const spy = cy.spy().as('spy');
         cy.mount(
-          <MissingValueButton
+          <MissingValueCheckbox
             value={props.value}
             columnId={props.columnId}
             missingValues={missingValues}
@@ -50,9 +48,10 @@ describe('MissingValueButton', () => {
           />
         );
 
-        cy.get('[data-cy="1-some value-missing-value-button"]')
-          .should('contain.text', expectedButtonText, { matchCase: false })
-          .click();
+        cy.get('[data-cy="1-some value-missing-value-checkbox"]').click();
+        cy.get('[data-cy="1-some value-missing-value-checkbox"] input').should(
+          expectedCheckboxState
+        );
 
         cy.get('@spy').should('have.been.calledWith', ...expectedCallArgs);
       });

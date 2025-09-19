@@ -14,8 +14,8 @@ import { useSortedFilteredValues } from '~/hooks';
 import useDataStore from '~/stores/data';
 import { StandardizedVariable } from '~/utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
-import MissingValueButton from './MissingValueButton';
-import StatusFilterCell from './StatusFilterCell';
+import MissingValueCheckbox from './MissingValueCheckbox';
+import StatusSortCell from './StatusSortCell';
 import ValueSortCell from './ValueSortCell';
 
 interface CategoricalProps {
@@ -91,10 +91,11 @@ function Categorical({
               </TableCell>
             )}
             {standardizedVariable && (
-              <StatusFilterCell
+              <StatusSortCell
                 filterMissing={filterMissing}
                 onToggle={() => setFilterMissing((f) => !f)}
-                dataCy={`${columnID}-filter-status-button`}
+                width="25%"
+                dataCy={`${columnID}-sort-status-button`}
               />
             )}
           </TableRow>
@@ -131,8 +132,8 @@ function Categorical({
                 </TableCell>
               )}
               {standardizedVariable && (
-                <TableCell align="left">
-                  <MissingValueButton
+                <TableCell align="center">
+                  <MissingValueCheckbox
                     value={value}
                     columnId={columnID}
                     missingValues={missingValues}
