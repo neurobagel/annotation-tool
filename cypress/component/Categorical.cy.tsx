@@ -3,12 +3,12 @@ import useDataStore from '../../src/stores/data';
 
 const props = {
   columnID: '3',
-  uniqueValues: ['F', 'M'],
+  uniqueValues: ['F', 'M', 'N/A', 'Missing'],
   levels: {
     F: { description: 'Female' },
     M: { description: 'Male' },
   },
-  missingValues: [],
+  missingValues: ['N/A', 'Missing'],
   standardizedVariable: {
     identifier: 'nb:Diagnosis',
     label: 'Diagnosis',
@@ -85,5 +85,44 @@ describe('Categorical', () => {
       identifier: 'test',
       label: 'test',
     });
+  });
+  it('alphabetically sorts and filters the values', () => {
+    cy.mount(
+      <Categorical
+        columnID={props.columnID}
+        uniqueValues={props.uniqueValues}
+        missingValues={props.missingValues}
+        standardizedVariable={props.standardizedVariable}
+        levels={props.levels}
+        onUpdateDescription={props.onUpdateDescription}
+        onToggleMissingValue={props.onToggleMissingValue}
+        onUpdateLevelTerm={props.onUpdateLevelTerm}
+      />
+    );
+    // Helper function to get the value of a specific row
+    const rowValue = (rowIdx: number) =>
+      cy.get(`[data-cy="${props.columnID}-categorical-table"] tbody tr:eq(${rowIdx}) td:eq(0)`);
+
+    // initial ascending order
+    rowValue(0).should('contain', 'F');
+    rowValue(3).should('contain', 'N/A');
+
+    // switch to descending
+    cy.get('[data-cy="3-sort-values-button"]').click();
+    rowValue(0).should('contain', 'N/A');
+    rowValue(3).should('contain', 'F');
+
+    // show only missing
+    cy.get('[data-cy="3-filter-status-button"]').click();
+    rowValue(0).should('contain', 'N/A');
+    rowValue(1).should('contain', 'Missing');
+    cy.get('tbody tr').should('have.length', 2);
+
+    // back to ascending + all rows
+    cy.get('[data-cy="3-sort-values-button"]').click();
+    cy.get('[data-cy="3-filter-status-button"]').click();
+    rowValue(0).should('contain', 'F');
+    rowValue(3).should('contain', 'N/A');
+    cy.get('tbody tr').should('have.length', 4);
   });
 });

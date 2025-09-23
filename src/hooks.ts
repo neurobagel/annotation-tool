@@ -1,4 +1,5 @@
 import Ajv from 'ajv';
+import naturalCompare from 'natural-compare-lite';
 import { useState, useEffect, useMemo } from 'react';
 import schema from './assets/neurobagel_data_dictionary.schema.json';
 import useDataStore from './stores/data';
@@ -195,4 +196,26 @@ export function useSchemaValidation(dataDictionary: DataDictionary) {
 
     return { schemaValid: true, schemaErrors: [] };
   }, [dataDictionary]);
+}
+
+export function useSortedFilteredValues(
+  uniqueValues: string[],
+  missingValues: string[],
+  sortDir: 'asc' | 'desc',
+  filterMissing: boolean
+) {
+  const sortedValues = useMemo(
+    () =>
+      [...uniqueValues].sort((a, b) =>
+        sortDir === 'asc' ? naturalCompare(a, b) : naturalCompare(b, a)
+      ),
+    [uniqueValues, sortDir]
+  );
+
+  const visibleValues = useMemo(
+    () => (filterMissing ? sortedValues.filter((v) => missingValues.includes(v)) : sortedValues),
+    [sortedValues, filterMissing, missingValues]
+  );
+
+  return { sortedValues, visibleValues };
 }

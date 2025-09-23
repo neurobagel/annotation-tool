@@ -12,11 +12,15 @@ import {
   Autocomplete,
   TextField,
 } from '@mui/material';
+import { useState } from 'react';
+import { useSortedFilteredValues } from '~/hooks';
 import useDataStore from '~/stores/data';
-import { StandardizedVariable } from '../utils/internal_types';
+import { StandardizedVariable } from '~/utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
 import Instruction from './Instruction';
 import MissingValueButton from './MissingValueButton';
+import StatusFilterCell from './StatusFilterCell';
+import ValueSortCell from './ValueSortCell';
 
 interface CategoricalProps {
   columnID: string;
@@ -55,9 +59,19 @@ function Categorical({
   const termOptions = useDataStore((state) => state.termOptions);
   const options = standardizedVariable ? termOptions[standardizedVariable.identifier] || [] : [];
 
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [filterMissing, setFilterMissing] = useState(false);
+
+  const { visibleValues } = useSortedFilteredValues(
+    uniqueValues,
+    missingValues,
+    sortDir,
+    filterMissing
+  );
+
   return (
     <>
-      <Instruction className="mb-2">
+    <Instruction className="mb-2">
         <List dense sx={{ listStyleType: 'disc', pl: 4 }}>
           <ListItem sx={{ display: 'list-item' }}>
             <ListItemText primary="Enter a description for each observed value." />
@@ -82,83 +96,85 @@ function Categorical({
           )}
         </List>
       </Instruction>
-      <TableContainer
-        id={`${columnID}-table-container`}
-        component={Paper}
-        elevation={3}
-        className="h-full shadow-lg overflow-auto"
-        style={{ maxHeight: '500px' }}
-        data-cy={`${columnID}-categorical`}
-      >
-        <Table stickyHeader className="min-w-[768px]" data-cy={`${columnID}-categorical-table`}>
-          <TableHead data-cy={`${columnID}-categorical-table-head`}>
-            <TableRow className="bg-blue-50">
+    <TableContainer
+      id={`${columnID}-table-container`}
+      component={Paper}
+      elevation={3}
+      className="h-full shadow-lg overflow-auto"
+      style={{ maxHeight: '500px' }}
+      data-cy={`${columnID}-categorical`}
+    >
+      <Table stickyHeader className="min-w-[768px]" data-cy={`${columnID}-categorical-table`}>
+        <TableHead data-cy={`${columnID}-categorical-table-head`}>
+          <TableRow className="bg-blue-50">
+            <ValueSortCell
+              sortDir={sortDir}
+              onToggle={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
+              dataCy={`${columnID}-sort-values-button`}
+            />
+            <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+              Description
+            </TableCell>
+            {showStandardizedTerm && (
               <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                Value
+                Standardized Term
               </TableCell>
-              <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                Description
+            )}
+            {standardizedVariable && (
+              <StatusFilterCell
+                filterMissing={filterMissing}
+                onToggle={() => setFilterMissing((f) => !f)}
+                dataCy={`${columnID}-filter-status-button`}
+              />
+            )}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {visibleValues.map((value) => (
+            <TableRow key={`${columnID}-${value}`} data-cy={`${columnID}-${value}`}>
+              <TableCell align="left">{value}</TableCell>
+              <TableCell align="left">
+                <DescriptionEditor
+                  columnID={columnID}
+                  levelValue={value}
+                  description={levels[value]?.description || ''}
+                  onDescriptionChange={(id, description) => {
+                    onUpdateDescription(id, value, description || '');
+                  }}
+                />
               </TableCell>
               {showStandardizedTerm && (
-                <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                  Standardized Term
+                <TableCell align="left">
+                  <Autocomplete
+                    data-cy={`${columnID}-${value}-term-dropdown`}
+                    options={options}
+                    getOptionLabel={(option) => option.label}
+                    value={options.find((opt) => opt.identifier === levels[value]?.termURL) || null}
+                    onChange={(_, newValue) => {
+                      onUpdateLevelTerm(columnID, value, newValue);
+                    }}
+                    renderInput={(params) => (
+                      // eslint-disable-next-line react/jsx-props-no-spreading
+                      <TextField {...params} variant="standard" size="small" fullWidth />
+                    )}
+                  />
                 </TableCell>
               )}
               {standardizedVariable && (
-                <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                  Missing Value
+                <TableCell align="left">
+                  <MissingValueButton
+                    value={value}
+                    columnId={columnID}
+                    missingValues={missingValues}
+                    onToggleMissingValue={onToggleMissingValue}
+                  />
                 </TableCell>
               )}
             </TableRow>
-          </TableHead>
-          <TableBody>
-            {uniqueValues.map((value) => (
-              <TableRow key={`${columnID}-${value}`} data-cy={`${columnID}-${value}`}>
-                <TableCell align="left">{value}</TableCell>
-                <TableCell align="left">
-                  <DescriptionEditor
-                    columnID={columnID}
-                    levelValue={value}
-                    description={levels[value]?.description || ''}
-                    onDescriptionChange={(id, description) => {
-                      onUpdateDescription(id, value, description || '');
-                    }}
-                  />
-                </TableCell>
-                {showStandardizedTerm && (
-                  <TableCell align="left">
-                    <Autocomplete
-                      data-cy={`${columnID}-${value}-term-dropdown`}
-                      options={options}
-                      getOptionLabel={(option) => option.label}
-                      value={
-                        options.find((opt) => opt.identifier === levels[value]?.termURL) || null
-                      }
-                      onChange={(_, newValue) => {
-                        onUpdateLevelTerm(columnID, value, newValue);
-                      }}
-                      renderInput={(params) => (
-                        // eslint-disable-next-line react/jsx-props-no-spreading
-                        <TextField {...params} variant="standard" size="small" fullWidth />
-                      )}
-                    />
-                  </TableCell>
-                )}
-                {standardizedVariable && (
-                  <TableCell align="left">
-                    <MissingValueButton
-                      value={value}
-                      columnId={columnID}
-                      missingValues={missingValues}
-                      onToggleMissingValue={onToggleMissingValue}
-                    />
-                  </TableCell>
-                )}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
     </>
   );
 }

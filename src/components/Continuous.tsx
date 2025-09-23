@@ -12,11 +12,15 @@ import {
   Autocomplete,
   TextField,
 } from '@mui/material';
+import { useState } from 'react';
+import { useSortedFilteredValues } from '~/hooks';
 import useDataStore from '~/stores/data';
 import { StandardizedVariable, TermFormat } from '~/utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
 import Instruction from './Instruction';
 import MissingValueButton from './MissingValueButton';
+import StatusFilterCell from './StatusFilterCell';
+import ValueSortCell from './ValueSortCell';
 
 interface ContinuousProps {
   columnID: string;
@@ -56,6 +60,16 @@ function Continuous({
   const showFormat = standardizedVariable && !columnIsMultiColumnMeasure;
   // Don't show units when the variable is a multi column measure and its data type is null
   const showUnits = !(columnIsMultiColumnMeasure && columns[columnID].variableType === null);
+
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [filterMissing, setFilterMissing] = useState(false);
+
+  const { visibleValues } = useSortedFilteredValues(
+    uniqueValues,
+    missingValues,
+    sortDir,
+    filterMissing
+  );
 
   return (
     <Paper elevation={3} className="h-full shadow-lg" data-cy={`${columnID}-continuous`}>
@@ -103,28 +117,24 @@ function Continuous({
             <Table stickyHeader>
               <TableHead>
                 <TableRow className="bg-blue-50">
-                  <TableCell
-                    align="left"
-                    sx={{
-                      fontWeight: 'bold',
-                      color: 'primary.main',
-                      width: standardizedVariable ? '70%' : '',
-                    }}
-                  >
-                    Value
-                  </TableCell>
+                  <ValueSortCell
+                    sortDir={sortDir}
+                    onToggle={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
+                    width={standardizedVariable ? '70%' : undefined}
+                    dataCy={`${columnID}-sort-values-button`}
+                  />
                   {standardizedVariable && (
-                    <TableCell
-                      align="left"
-                      sx={{ fontWeight: 'bold', color: 'primary.main', width: '30%' }}
-                    >
-                      Status
-                    </TableCell>
+                    <StatusFilterCell
+                      filterMissing={filterMissing}
+                      onToggle={() => setFilterMissing((f) => !f)}
+                      width="30%"
+                      dataCy={`${columnID}-filter-status-button`}
+                    />
                   )}
                 </TableRow>
               </TableHead>
               <TableBody>
-                {uniqueValues.map((value, index) => (
+                {visibleValues.map((value, index) => (
                   // eslint-disable-next-line react/no-array-index-key
                   <TableRow key={`${columnID}-${value}-${index}`}>
                     <TableCell align="left" data-cy={`${columnID}-${value}-${index}-value`}>

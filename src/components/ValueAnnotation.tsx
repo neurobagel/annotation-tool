@@ -95,7 +95,10 @@ function ValueAnnotation() {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl space-x-4 p-4">
+    <div
+      className="mx-auto flex w-full  max-h-[calc(100vh-250px)]
+  max-w-7xl space-x-4 p-4"
+    >
       <SideColumnNavBar
         columns={columns}
         onSelect={handleSelect}

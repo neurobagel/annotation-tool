@@ -117,6 +117,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="side-column-nav-bar-annotated"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar"]').should('not.contain', 'Participant id');
     cy.get('[data-cy="side-column-nav-bar-unannotated"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-unannotated"]').click();
     cy.get('[data-cy="side-column-nav-bar-continuous"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-categorical"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-categorical-group_dx"]').should('be.visible');
@@ -547,6 +548,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="3-continuous"]').should('be.visible');
     cy.get('[data-cy="3-format-dropdown"] input').should('have.value', 'euro');
     cy.get('[data-cy="3-continuous-table"]').should('be.visible').and('contain.text', 'NA');
+    cy.get('[data-cy="3-filter-status-button"]').click();
     cy.get('[data-cy="3-NA-missing-value-button"]')
       .should('be.visible')
       .and('contain.text', 'Mark as not missing');
@@ -618,8 +620,8 @@ describe('Main user flow', () => {
     cy.get('[data-cy="8-not completed-missing-value-button"]')
       .should('be.visible')
       .and('contain.text', 'Mark as not missing');
-
-    cy.get('[data-cy="side-column-nav-bar-other-session_id"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-unannotated"]').click();
+    cy.get('[data-cy="side-column-nav-bar-other-session_id"]').should('exist');
     cy.get('[data-cy="side-column-nav-bar-other-select-button"]').click();
     cy.get('[data-cy="other"]').should('be.visible').and('contain.text', 'session_id');
 
