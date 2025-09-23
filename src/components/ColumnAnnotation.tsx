@@ -18,26 +18,73 @@ function ColumnAnnotation() {
       data-cy="column-annotation-container"
     >
       <div className="w-full max-w-5xl">
-        <Instruction className="mb-2">
+        <Instruction title="Column Annotation" className="mb-2">
           <List dense sx={{ listStyleType: 'disc', pl: 4 }}>
             <ListItem sx={{ display: 'list-item' }}>
-              <ListItemText primary="Provide a clear description for each column to help downstream users." />
+              <ListItemText primary="On this page you provide more information on each column in your phenotypic table." />
             </ListItem>
             <ListItem sx={{ display: 'list-item' }}>
               <ListItemText
                 primary={
                   <>
-                    Select the data type: <b>Categorical</b> (finite set of values) or{' '}
-                    <b>Continuous</b> (numeric/scale).
+                    <strong>Provide a text description</strong> to explain to others what
+                    information is in the column. To add a description, just type in the
+                    “Description” field.
                   </>
                 }
               />
             </ListItem>
             <ListItem sx={{ display: 'list-item' }}>
-              <ListItemText primary="Map the column to a standardized variable when possible to enable harmonization." />
+              <ListItemText
+                primary={
+                  <>
+                    <strong>Map the column to a standardized variable</strong>. This step allows us
+                    to later harmonize your data with that of other users of the tool. To map the
+                    column, select the variable that matches the content of the column from the
+                    dropdown.
+                  </>
+                }
+              />
             </ListItem>
             <ListItem sx={{ display: 'list-item' }}>
-              <ListItemText primary="Multi‑column measures will be finalized in the next step." />
+              <ListItemText
+                primary={
+                  <>
+                    <strong>Manually set the data type</strong> (categorical or continuous) of the
+                    column. If you have not mapped the column to a standardized variable, you can
+                    manually set the data type by clicking the corresponding button on the column
+                    card. This will allow you to provide additional descriptions for the values in
+                    this column later.
+                  </>
+                }
+              />
+            </ListItem>
+            <ListItem sx={{ display: 'list-item' }}>
+              <ListItemText
+                primary={
+                  <>
+                    <strong>Note:</strong> “Assessment tool” is a special standardized variable that
+                    is meant for any column that is about an Assessment (e.g. a Questionnaire or a
+                    Task). That means you will likely map many columns to “Assessment tool”, even if
+                    they represent different assessments. You will be able to map these columns to
+                    specific assessments in a later step.
+                  </>
+                }
+              />
+            </ListItem>
+            <ListItem sx={{ display: 'list-item' }}>
+              <ListItemText
+                primary={
+                  <>
+                    It is likely that you will not find a fitting standardized variable for every
+                    column in your table. In this case, just consider adding a description for this
+                    column to provide human readable context on its contents.
+                  </>
+                }
+              />
+            </ListItem>
+            <ListItem sx={{ display: 'list-item' }}>
+              <ListItemText primary="When you have reviewed all columns, you can move on to the next step." />
             </ListItem>
           </List>
         </Instruction>

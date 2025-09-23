@@ -1,42 +1,70 @@
+import CloseIcon from '@mui/icons-material/Close';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { Card, CardContent, CardHeader, Collapse, Typography } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, IconButton, Button, keyframes } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { useState } from 'react';
 
-const defaultProps = {
-  defaultExpanded: false,
-  className: '',
-};
+const animation = keyframes`
+  0%    { transform: rotate( 0deg); }
+  8%    { transform: rotate( 0deg); } /* short hold */
+  20%   { transform: rotate(-18deg); }
+  36%   { transform: rotate( 18deg); }
+  52%   { transform: rotate(-12deg); }
+  66%   { transform: rotate( 6deg); }
+  78%   { transform: rotate(-3deg); }
+  88%   { transform: rotate( 0deg); }
+  100%  { transform: rotate( 0deg); }
+`;
+
+const AnimatedIcon = styled(InfoOutlinedIcon)(({ theme }) => ({
+  animation: `${animation} 1.5s ease-in-out infinite`,
+  transformOrigin: '50% 15%',
+  color: theme.palette.primary.main,
+}));
 
 interface InstructionProps {
+  title: string;
   children: React.ReactNode;
-  defaultExpanded?: boolean;
   className?: string;
 }
 
-function Instruction({ children, defaultExpanded = false, className }: InstructionProps) {
-  const [expanded, setExpanded] = useState<boolean>(defaultExpanded);
+const defaultProps = {
+  className: '',
+};
+
+function Instruction({ title, children, className }: InstructionProps) {
+  const [open, setOpen] = useState(false);
 
   return (
-    <Card elevation={0} className={`border border-gray-200 ${className || ''}`}>
-      <CardHeader
-        avatar={<InfoOutlinedIcon color="primary" />}
-        title={
-          <Typography variant="subtitle1" className="font-semibold">
-            Instructions
-          </Typography>
-        }
-        onClick={() => setExpanded(!expanded)}
-        className="cursor-pointer select-none"
-        aria-expanded={expanded}
-        role="button"
-      />
-      <Collapse in={expanded} timeout={400} unmountOnExit>
-        <CardContent>{children}</CardContent>
-      </Collapse>
-    </Card>
+    <>
+      <Button
+        variant="outlined"
+        startIcon={<AnimatedIcon />}
+        onClick={() => setOpen(true)}
+        className={className}
+        data-cy="instruction-button"
+      >
+        How to use this page
+      </Button>
+
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        maxWidth="md"
+        fullWidth
+        data-cy="instruction-dialog"
+      >
+        <DialogTitle className="flex justify-between items-center">
+          {title}
+          <IconButton onClick={() => setOpen(false)} data-cy="instruction-close">
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers>{children}</DialogContent>
+      </Dialog>
+    </>
   );
 }
 
 Instruction.defaultProps = defaultProps;
-
 export default Instruction;

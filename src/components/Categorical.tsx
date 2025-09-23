@@ -1,7 +1,4 @@
 import {
-  List,
-  ListItem,
-  ListItemText,
   Paper,
   Table,
   TableBody,
@@ -17,7 +14,6 @@ import { useSortedFilteredValues } from '~/hooks';
 import useDataStore from '~/stores/data';
 import { StandardizedVariable } from '~/utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
-import Instruction from './Instruction';
 import MissingValueButton from './MissingValueButton';
 import StatusFilterCell from './StatusFilterCell';
 import ValueSortCell from './ValueSortCell';
@@ -70,32 +66,6 @@ function Categorical({
   );
 
   return (
-    <>
-    <Instruction className="mb-2">
-        <List dense sx={{ listStyleType: 'disc', pl: 4 }}>
-          <ListItem sx={{ display: 'list-item' }}>
-            <ListItemText primary="Enter a description for each observed value." />
-          </ListItem>
-          {showStandardizedTerm ? (
-            <ListItem sx={{ display: 'list-item' }}>
-              <ListItemText primary="Map values to standardized terms to enable harmonized queries." />
-            </ListItem>
-          ) : (
-            <ListItem sx={{ display: 'list-item' }}>
-              <ListItemText primary="Standardized term mapping is unavailable for this column." />
-            </ListItem>
-          )}
-          {standardizedVariable ? (
-            <ListItem sx={{ display: 'list-item' }}>
-              <ListItemText primary="Mark which values represent missing data." />
-            </ListItem>
-          ) : (
-            <ListItem sx={{ display: 'list-item' }}>
-              <ListItemText primary="Missing value tagging becomes available once a standardized variable is selected." />
-            </ListItem>
-          )}
-        </List>
-      </Instruction>
     <TableContainer
       id={`${columnID}-table-container`}
       component={Paper}
@@ -175,7 +145,6 @@ function Categorical({
         </TableBody>
       </Table>
     </TableContainer>
-    </>
   );
 }
 

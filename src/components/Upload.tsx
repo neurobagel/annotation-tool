@@ -54,14 +54,20 @@ function Upload({ disableConfig }: UploadProps) {
   return (
     <div className="flex flex-col items-center gap-8" data-config-loading={isConfigLoading}>
       <div className="w-full max-w-[1024px]">
-        <Instruction className="mb-2">
+        <Instruction title="Upload" className="mb-2">
           <List dense sx={{ listStyleType: 'disc', pl: 4 }}>
             <ListItem sx={{ display: 'list-item' }}>
               <ListItemText
                 primary={
+                  <>Here you load the tabular data, that you want to annotate, into the app.</>
+                }
+              />
+            </ListItem>
+            <ListItem sx={{ display: 'list-item' }}>
+              <ListItemText
+                primary={
                   <>
-                    Upload a tabular phenotypic <code>.tsv</code> file. This is required and enables
-                    all subsequent steps.
+                    <strong>[required]</strong> Upload a tabular phenotypic <code>.tsv</code> file.
                   </>
                 }
               />
@@ -70,8 +76,10 @@ function Upload({ disableConfig }: UploadProps) {
               <ListItemText
                 primary={
                   <>
-                    Optionally upload an existing data dictionary <code>.json</code> to continue or
-                    refine prior work.
+                    <strong>[optional]</strong> Upload a data dictionary for your tabular file to
+                    give you more context during the annotation. This could be a BIDS data
+                    dictionary or a data dictionary you have generated in a previous session with
+                    the Neurobagel annotator.
                   </>
                 }
               />
@@ -80,8 +88,8 @@ function Upload({ disableConfig }: UploadProps) {
               <ListItemText
                 primary={
                   <>
-                    If configuration is enabled, select a config preset first to tailor standardized
-                    variables and rules.
+                    When you have uploaded your files, you can look at a preview to check that all
+                    looks good. And then you can navigate to the next step.
                   </>
                 }
               />
