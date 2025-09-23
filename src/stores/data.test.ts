@@ -14,20 +14,30 @@ import {
 import { Columns } from '../utils/internal_types';
 import useDataStore from './data';
 
+const mockDataTableFile = (file: string) => {
+  const dataTableFilePath = path.resolve(__dirname, `../../cypress/fixtures/examples/${file}`);
+  const dataTableFileContent = fs.readFileSync(dataTableFilePath, 'utf-8');
+  return new File([dataTableFileContent], file, {
+    type: 'text/tab-separated-values',
+  });
+};
+
+const mockDataDictionaryFile = (file: string) => {
+  const dataDictionaryFilePath = path.resolve(__dirname, `../../cypress/fixtures/examples/${file}`);
+  const dataDictionaryFileContent = fs.readFileSync(dataDictionaryFilePath, 'utf-8');
+  return new File([dataDictionaryFileContent], file, {
+    type: 'application/json',
+  });
+};
+
 describe('data store actions', () => {
   beforeEach(async () => {
     const { result } = renderHook(() => useDataStore());
 
     result.current.reset();
 
-    const dataTableFilePath = path.resolve(__dirname, '../../cypress/fixtures/examples/mock.tsv');
-    const dataTableFileContent = fs.readFileSync(dataTableFilePath, 'utf-8');
-    const dataTableFile = new File([dataTableFileContent], 'mock.tsv', {
-      type: 'text/tab-separated-values',
-    });
-
     await act(async () => {
-      await result.current.processDataTableFile(dataTableFile);
+      await result.current.processDataTableFile(mockDataTableFile('mock.tsv'));
     });
 
     result.current.config = mockConfig;
@@ -38,17 +48,8 @@ describe('data store actions', () => {
     // Override the beforeEach setup for this test
     result.current.reset();
 
-    const dataTableFilePath = path.resolve(
-      __dirname,
-      '../../cypress/fixtures/examples/mock_with_empty_line.tsv'
-    );
-    const dataTableFileContent = fs.readFileSync(dataTableFilePath, 'utf-8');
-    const dataTableFile = new File([dataTableFileContent], 'mock_with_empty_line.tsv', {
-      type: 'text/tab-separated-values',
-    });
-
     await act(async () => {
-      await result.current.processDataTableFile(dataTableFile);
+      await result.current.processDataTableFile(mockDataTableFile('mock_with_empty_line.tsv'));
     });
 
     expect(result.current.dataTable).toEqual(mockDataTableWithEmptyLine);
@@ -71,17 +72,8 @@ describe('data store actions', () => {
       result.current.initializeColumns(mockInitialColumns);
     });
 
-    const dataDictionaryFilePath = path.resolve(
-      __dirname,
-      '../../cypress/fixtures/examples/mock.json'
-    );
-    const dataDictionaryFileContent = fs.readFileSync(dataDictionaryFilePath, 'utf-8');
-    const dataDictionaryFile = new File([dataDictionaryFileContent], 'mock.json', {
-      type: 'application/json',
-    });
-
     await act(async () => {
-      await result.current.processDataDictionaryFile(dataDictionaryFile);
+      await result.current.processDataDictionaryFile(mockDataDictionaryFile('mock.json'));
     });
 
     expect(result.current.columns).toEqual(mockColumns);
@@ -97,7 +89,7 @@ describe('data store actions', () => {
     expect(result.current.columns['1'].description).toEqual('some description');
 
     await act(async () => {
-      await result.current.processDataDictionaryFile(dataDictionaryFile);
+      await result.current.processDataDictionaryFile(mockDataDictionaryFile('mock.json'));
     });
     expect(result.current.columns).toEqual(mockColumns);
     expect(result.current.uploadedDataDictionaryFileName).toEqual('mock.json');
@@ -289,5 +281,25 @@ describe('data store actions', () => {
         label: 'Assessment Tool',
       },
     ]);
+  });
+  it('resets the store and therefore existing annotations in the store when processDataTableFile is called', async () => {
+    const { result } = renderHook(() => useDataStore());
+    // Mock some existing annotations
+    act(() => {
+      result.current.updateColumnStandardizedVariable('1', {
+        identifier: 'nb:Assessment',
+        label: 'Assessment Tool',
+      });
+    });
+    expect(result.current.columns['1'].standardizedVariable).toEqual({
+      identifier: 'nb:Assessment',
+      label: 'Assessment Tool',
+    });
+    expect(result.current.columns['1'].variableType).toEqual('Collection');
+    await act(async () => {
+      await result.current.processDataTableFile(mockDataTableFile('mock.tsv'));
+    });
+    expect(result.current.columns['1'].standardizedVariable).toBeUndefined();
+    expect(result.current.columns['1'].variableType).toBeUndefined();
   });
 });

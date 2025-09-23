@@ -116,7 +116,7 @@ const initialState = {
   dataTable: {},
   columns: {},
   uploadedDataTableFileName: null,
-  isConfigLoading: true,
+  isConfigLoading: false,
   uploadedDataDictionary: {},
   uploadedDataDictionaryFileName: null,
   configOptions: [],
@@ -139,6 +139,7 @@ const useDataStore = create<DataStore>()(
   devtools((set, get) => ({
     // Data table
     ...initialState,
+    reset: () => set(initialState),
     // TODO: remove - this seems unused
     setDataTable: (data: DataTable) => set({ dataTable: data }),
     setUploadedDataTableFileName: (fileName: string | null) =>
@@ -150,6 +151,9 @@ const useDataStore = create<DataStore>()(
 
         reader.onload = (e) => {
           const content = e.target?.result as string;
+
+          get().reset();
+
           const { headers, data } = parseTsvContent(content);
 
           // Transform data into column-based structure
@@ -985,8 +989,6 @@ const useDataStore = create<DataStore>()(
         },
       }));
     },
-
-    reset: () => set(initialState),
   }))
 );
 
