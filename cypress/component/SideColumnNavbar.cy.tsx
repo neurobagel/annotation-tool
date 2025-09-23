@@ -36,6 +36,9 @@ describe('SideColumnNavBar', () => {
     cy.get('[data-cy="side-column-nav-bar-annotated-toggle-button"]').click();
     cy.get('[data-cy="side-column-nav-bar-diagnosis"]').should('not.be.visible');
     cy.get('[data-cy="side-column-nav-bar-assessment tool"]').should('not.be.visible');
+    cy.get('[data-cy="side-column-nav-bar-categorical"]').should('not.be.visible');
+    cy.get('[data-cy="side-column-nav-bar-continuous"]').should('not.be.visible');
+    cy.get('[data-cy="side-column-nav-bar-unannotated"]').click();
     cy.get('[data-cy="side-column-nav-bar-categorical"]')
       .should('be.visible')
       .and('contain', 'sex');
@@ -66,6 +69,7 @@ describe('SideColumnNavBar', () => {
         selectedColumnId={props.selectedColumnId}
       />
     );
+    cy.get('[data-cy="side-column-nav-bar-unannotated"]').click();
     cy.get('[data-cy="side-column-nav-bar-categorical-select-button"]').click();
     cy.get('@spy').should('have.been.calledWith', { columnIDs: ['3'], dataType: 'Categorical' });
   });
