@@ -20,7 +20,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@fontsource/roboto": "^5.2.7",
+    "@fontsource/roboto": "^5.2.8",
     "@microlink/react-json-view": "^1.27.0",
     "@mui/icons-material": "^6.5.0",
     "@mui/material": "^6.4.8",
