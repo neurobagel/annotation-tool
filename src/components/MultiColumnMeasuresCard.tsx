@@ -81,6 +81,7 @@ function MultiColumnMeasuresCard({
           <CardContent>
             <div className="mt-4">
               <Autocomplete
+                disableCloseOnSelect
                 data-cy={`multi-column-measures-card-${cardIndex}-columns-dropdown`}
                 options={columnOptions}
                 getOptionLabel={(option) => option.label}
