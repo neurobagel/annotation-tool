@@ -14,7 +14,7 @@ import { useSortedFilteredValues } from '~/hooks';
 import useDataStore from '~/stores/data';
 import { StandardizedVariable } from '~/utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
-import MissingValueCheckbox from './MissingValueCheckbox';
+import MissingValueGroupButton from './MissingValueGroupButton';
 import StatusSortCell from './StatusSortCell';
 import ValueSortCell from './ValueSortCell';
 
@@ -133,7 +133,7 @@ function Categorical({
               )}
               {standardizedVariable && (
                 <TableCell align="center">
-                  <MissingValueCheckbox
+                  <MissingValueGroupButton
                     value={value}
                     columnId={columnID}
                     missingValues={missingValues}

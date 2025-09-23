@@ -14,7 +14,7 @@ import { useSortedFilteredValues } from '~/hooks';
 import useDataStore from '~/stores/data';
 import { StandardizedVariable, TermFormat } from '~/utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
-import MissingValueCheckbox from './MissingValueCheckbox';
+import MissingValueGroupButton from './MissingValueGroupButton';
 import StatusSortCell from './StatusSortCell';
 import ValueSortCell from './ValueSortCell';
 
@@ -105,7 +105,7 @@ function Continuous({
                     </TableCell>
                     {standardizedVariable && (
                       <TableCell align="center">
-                        <MissingValueCheckbox
+                        <MissingValueGroupButton
                           // eslint-disable-next-line react/no-array-index-key
                           key={`${columnID}-${value}-${index}-missingbutton`}
                           value={value}

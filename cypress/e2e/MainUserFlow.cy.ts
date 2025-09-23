@@ -260,7 +260,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="3-F-description"]').should('be.visible');
     cy.get('[data-cy="3-F-description"]').type('Female');
     cy.get('[data-cy="3-F-term-dropdown"]').type('Female{downArrow}{enter}');
-    cy.get('[data-cy="3-N/A-missing-value-checkbox"]').click();
+    cy.get('[data-cy="3-N/A-missing-value-yes"]').click();
 
     cy.get('[data-cy="side-column-nav-bar-diagnosis-group_dx"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-diagnosis-select-button"]').click();
@@ -283,14 +283,14 @@ describe('Main user flow', () => {
     cy.get('[data-cy="5-HC-description"]').type('Healthy Control');
     cy.get('[data-cy="5-HC-description"]').should('contain', 'Healthy Control');
     cy.get('[data-cy="5-HC-term-dropdown"]').type('Healthy{downArrow}{enter}');
-    cy.get('[data-cy="5-N/A-missing-value-checkbox"]').click();
+    cy.get('[data-cy="5-N/A-missing-value-yes"]').click();
     cy.get('[data-cy="5-Patient-description"]').type('Patient');
     cy.get('[data-cy="5-Patient-description"]').should('contain', 'Patient');
     // TODO: We have to put this wait here because the description debounce save will break if we click the
     // missing value button before the description is finished saving. This is a bug!
     // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(1000);
-    cy.get('[data-cy="5-Patient-missing-value-checkbox"]').click();
+    cy.get('[data-cy="5-Patient-missing-value-yes"]').click();
 
     cy.get('[data-cy="side-column-nav-bar-assessment tool-select-button"]').click();
     cy.get('[data-cy="6-continuous"]').should('be.visible');
@@ -449,7 +449,7 @@ describe('Main user flow', () => {
       );
     });
   });
-  it.only('loads in a data dictionary from the legacy annotation tool', () => {
+  it('loads in a data dictionary from the legacy annotation tool', () => {
     cy.visit('http://localhost:5173');
     cy.get('[data-cy="next-button"]').click();
 
@@ -549,7 +549,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="3-format-dropdown"] input').should('have.value', 'euro');
     cy.get('[data-cy="3-continuous-table"]').should('be.visible').and('contain.text', 'NA');
     cy.get('[data-cy="3-sort-status-button"]').click();
-    cy.get('[data-cy="3-NA-missing-value-checkbox"] input').should('be.checked');
+    cy.get('[data-cy="3-NA-missing-value-yes"]').should('have.class', 'Mui-selected');
 
     cy.get('[data-cy="side-column-nav-bar-sex-pheno_sex"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-sex-select-button"]').click();
@@ -557,7 +557,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="4-categorical-table"]').should('be.visible').and('contain.text', 'missing');
     cy.get('[data-cy="4-M-term-dropdown"] input').should('have.value', 'Male');
     cy.get('[data-cy="4-F-term-dropdown"] input').should('have.value', 'Female');
-    cy.get('[data-cy="4-missing-missing-value-checkbox"] input').should('be.checked');
+    cy.get('[data-cy="4-missing-missing-value-yes"]').should('have.class', 'Mui-selected');
 
     cy.get('[data-cy="side-column-nav-bar-diagnosis-pheno_group"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-diagnosis-select-button"]').click();
@@ -567,7 +567,7 @@ describe('Main user flow', () => {
       'have.value',
       'Attention deficit hyperactivity disorder'
     );
-    cy.get('[data-cy="5-NA-missing-value-checkbox"] input').should('be.checked');
+    cy.get('[data-cy="5-NA-missing-value-yes"]').should('have.class', 'Mui-selected');
 
     cy.get('[data-cy="side-column-nav-bar-assessment tool-select-button"]').click();
     cy.get(
@@ -584,12 +584,12 @@ describe('Main user flow', () => {
     cy.get('[data-cy="6-tab"]').should('be.visible').and('contain.text', 'tool1_item1');
     cy.get('[data-cy="6-continuous"]').should('be.visible');
     cy.get('[data-cy="6-continuous-table"]').should('be.visible').and('contain.text', 'good');
-    cy.get('[data-cy="6-missing-missing-value-checkbox"] input').should('be.checked');
+    cy.get('[data-cy="6-missing-missing-value-yes"]').should('have.class', 'Mui-selected');
 
     cy.get('[data-cy="7-tab"]').should('be.visible').and('contain.text', 'tool1_item2').click();
     cy.get('[data-cy="7-continuous"]').should('be.visible');
     cy.get('[data-cy="7-continuous-table"]').should('be.visible').and('contain.text', 'far');
-    cy.get('[data-cy="7-missing-missing-value-checkbox"] input').should('be.checked');
+    cy.get('[data-cy="7-missing-missing-value-yes"]').should('have.class', 'Mui-selected');
 
     cy.get(
       '[data-cy="side-column-nav-bar-assessment tool-Unified Parkinsons disease rating scale score"]'
@@ -607,7 +607,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="8-tab"]').should('be.visible').and('contain.text', 'tool2_item1');
     cy.get('[data-cy="8-continuous"]').should('be.visible');
     cy.get('[data-cy="8-continuous-table"]').should('be.visible').and('contain.text', 'hello');
-    cy.get('[data-cy="8-not completed-missing-value-checkbox"] input').should('be.checked');
+    cy.get('[data-cy="8-not completed-missing-value-yes"]').should('have.class', 'Mui-selected');
 
     cy.get('[data-cy="side-column-nav-bar-unannotated"]').click();
     cy.get('[data-cy="side-column-nav-bar-other-session_id"]').should('exist');

@@ -70,7 +70,7 @@ describe('Continuous', () => {
     );
     cy.get('[data-cy="1-description"]').should('be.visible').and('contain', 'some units');
     cy.get('[data-cy="1-1-0-value"]').should('be.visible').and('contain', '1');
-    cy.get('[data-cy="1-3-missing-value-checkbox"]').should('be.visible');
+    cy.get('[data-cy="1-3-missing-value-button-group"]').should('be.visible');
     cy.get('[data-cy="1-format-dropdown"]').should('be.visible');
   });
   it('renders the component correctly for a unannotated column', () => {
@@ -88,7 +88,7 @@ describe('Continuous', () => {
       />
     );
     cy.get('[data-cy="1-description"]').should('be.visible').and('contain', 'some units');
-    cy.get('[data-cy="1-3-missing-value-checkbox"]').should('not.exist');
+    cy.get('[data-cy="1-3-missing-value-button-group"]').should('not.exist');
     cy.get('[data-cy="1-format-dropdown"]').should('not.exist');
     cy.get('[data-cy="1-continuous-table"]').should('be.visible');
   });
@@ -126,7 +126,7 @@ describe('Continuous', () => {
         onUpdateFormat={props.onUpdateFormat}
       />
     );
-    cy.get('[data-cy="1-3-missing-value-checkbox"]').click();
+    cy.get('[data-cy="1-3-missing-value-yes"]').click();
     cy.get('@spy').should('have.been.calledWith', '1', '3', true);
   });
   it('fires the onUpdateFormat event handler with the appropriate payload when the format is changed', () => {
