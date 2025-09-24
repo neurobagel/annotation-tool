@@ -10,13 +10,12 @@ import {
   TextField,
 } from '@mui/material';
 import { useState } from 'react';
-import { useSortedFilteredValues } from '~/hooks';
+import { useSortedValues } from '~/hooks';
 import useDataStore from '~/stores/data';
 import { StandardizedVariable } from '~/utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueGroupButton from './MissingValueGroupButton';
-import StatusSortCell from './StatusSortCell';
-import ValueSortCell from './ValueSortCell';
+import SortCell from './SortCell';
 
 interface CategoricalProps {
   columnID: string;
@@ -55,14 +54,14 @@ function Categorical({
   const termOptions = useDataStore((state) => state.termOptions);
   const options = standardizedVariable ? termOptions[standardizedVariable.identifier] || [] : [];
 
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
-  const [filterMissing, setFilterMissing] = useState(false);
+  const [sortValueDir, setSortValueDir] = useState<'asc' | 'desc'>('asc');
+  const [sortMissingDir, setSortMissingDir] = useState<'asc' | 'desc'>('asc');
 
-  const { visibleValues } = useSortedFilteredValues(
+  const { visibleValues } = useSortedValues(
     uniqueValues,
     missingValues,
-    sortDir,
-    filterMissing
+    sortValueDir,
+    sortMissingDir
   );
 
   return (
@@ -77,9 +76,10 @@ function Categorical({
       <Table stickyHeader className="min-w-[768px]" data-cy={`${columnID}-categorical-table`}>
         <TableHead data-cy={`${columnID}-categorical-table-head`}>
           <TableRow className="bg-blue-50">
-            <ValueSortCell
-              sortDir={sortDir}
-              onToggle={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
+            <SortCell
+              label="Value"
+              sortDir={sortValueDir}
+              onToggle={() => setSortValueDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
               dataCy={`${columnID}-sort-values-button`}
             />
             <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
@@ -91,10 +91,10 @@ function Categorical({
               </TableCell>
             )}
             {standardizedVariable && (
-              <StatusSortCell
-                filterMissing={filterMissing}
-                onToggle={() => setFilterMissing((f) => !f)}
-                width="25%"
+              <SortCell
+                label="Status"
+                sortDir={sortMissingDir}
+                onToggle={() => setSortMissingDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
                 dataCy={`${columnID}-sort-status-button`}
               />
             )}

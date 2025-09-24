@@ -21,6 +21,10 @@ const props = {
 };
 
 describe('Continuous', () => {
+  // Helper function to get the value of a specific row
+  const rowValue = (rowIdx: number) =>
+    cy.get(`[data-cy="${props.columnID}-continuous-table"] tbody tr:eq(${rowIdx}) td:eq(0)`);
+
   beforeEach(() => {
     useDataStore.setState({
       formatOptions: {
@@ -148,7 +152,49 @@ describe('Continuous', () => {
     cy.get('[data-cy="1-format-dropdown"]').type('float{downarrow}{enter}');
     cy.get('@spy').should('have.been.calledWith', '1', { termURL: 'nb:FromFloat', label: 'float' });
   });
-  it('sorts and filters the values', () => {
+  it('sorts values in order', () => {
+    cy.mount(
+      <Continuous
+        columnID={props.columnID}
+        units={props.units}
+        uniqueValues={['1', '9', '22', '19', '99', '2']}
+        missingValues={[]}
+        format={props.format}
+        standardizedVariable={props.standardizedVariable}
+        onUpdateUnits={props.onUpdateUnits}
+        onToggleMissingValue={props.onToggleMissingValue}
+        onUpdateFormat={props.onUpdateFormat}
+      />
+    );
+
+    // Initial state: values asc (1, 2, 19, 99, 9, 22)
+    rowValue(0).should('contain', '1');
+    rowValue(1).should('contain', '2');
+    rowValue(2).should('contain', '9');
+    rowValue(3).should('contain', '19');
+    rowValue(4).should('contain', '22');
+    rowValue(5).should('contain', '99');
+
+    // Click value sort to desc (99, 19, 2, 1, 22, 9)
+    cy.get('[data-cy="1-sort-values-button"]').click();
+    rowValue(0).should('contain', '99');
+    rowValue(1).should('contain', '22');
+    rowValue(2).should('contain', '19');
+    rowValue(3).should('contain', '9');
+    rowValue(4).should('contain', '2');
+    rowValue(5).should('contain', '1');
+
+    // Click value sort back to asc
+    cy.get('[data-cy="1-sort-values-button"]').click();
+    rowValue(0).should('contain', '1');
+    rowValue(1).should('contain', '2');
+    rowValue(2).should('contain', '9');
+    rowValue(3).should('contain', '19');
+    rowValue(4).should('contain', '22');
+    rowValue(5).should('contain', '99');
+  });
+
+  it('sorts values by missing status', () => {
     cy.mount(
       <Continuous
         columnID={props.columnID}
@@ -162,29 +208,86 @@ describe('Continuous', () => {
         onUpdateFormat={props.onUpdateFormat}
       />
     );
-    // Helper function to get the value of a specific row
-    const rowValue = (rowIdx: number) =>
-      cy.get(`[data-cy="${props.columnID}-continuous-table"] tbody tr:eq(${rowIdx}) td:eq(0)`);
 
-    // initial ascending order
+    // Initial state: missing status asc (non-missing first: 1, 2, 19, 99, then missing: 9, 22)
     rowValue(0).should('contain', '1');
+    rowValue(1).should('contain', '2');
+    rowValue(2).should('contain', '19');
+    rowValue(3).should('contain', '99');
+    rowValue(4).should('contain', '9');
+    rowValue(5).should('contain', '22');
+
+    // Click missing status sort to desc (missing first: 9, 22, then non-missing: 1, 2, 19, 99)
+    cy.get('[data-cy="1-sort-status-button"]').click();
+    rowValue(0).should('contain', '9');
+    rowValue(1).should('contain', '22');
+    rowValue(2).should('contain', '1');
+    rowValue(3).should('contain', '2');
+    rowValue(4).should('contain', '19');
     rowValue(5).should('contain', '99');
 
-    // switch to descending
-    cy.get('[data-cy="1-sort-values-button"]').click();
-    rowValue(0).should('contain', '99');
-    rowValue(5).should('contain', '1');
-
-    // show missing at the top
+    // Click missing status sort back to asc
     cy.get('[data-cy="1-sort-status-button"]').click();
+    rowValue(0).should('contain', '1');
+    rowValue(1).should('contain', '2');
+    rowValue(2).should('contain', '19');
+    rowValue(3).should('contain', '99');
+    rowValue(4).should('contain', '9');
+    rowValue(5).should('contain', '22');
+
+    cy.get('tbody tr').should('have.length', 6);
+  });
+
+  it('sorts values by missing status and alphabetical order combined', () => {
+    cy.mount(
+      <Continuous
+        columnID={props.columnID}
+        units={props.units}
+        uniqueValues={['22', '1', '19', '9', '99', '2']}
+        missingValues={['9', '22']}
+        format={props.format}
+        standardizedVariable={props.standardizedVariable}
+        onUpdateUnits={props.onUpdateUnits}
+        onToggleMissingValue={props.onToggleMissingValue}
+        onUpdateFormat={props.onUpdateFormat}
+      />
+    );
+
+    // Initial state: missing asc, values asc (1, 2, 19, 99, 9, 22)
+    rowValue(0).should('contain', '1');
+    rowValue(1).should('contain', '2');
+    rowValue(2).should('contain', '19');
+    rowValue(3).should('contain', '99');
+    rowValue(4).should('contain', '9');
+    rowValue(5).should('contain', '22');
+
+    // Change to missing desc, values asc (9, 22, 1, 2, 19, 99)
+    cy.get('[data-cy="1-sort-status-button"]').click();
+    rowValue(0).should('contain', '9');
+    rowValue(1).should('contain', '22');
+    rowValue(2).should('contain', '1');
+    rowValue(3).should('contain', '2');
+    rowValue(4).should('contain', '19');
+    rowValue(5).should('contain', '99');
+
+    // Change to missing desc, values desc (22, 9, 99, 19, 2, 1)
+    cy.get('[data-cy="1-sort-values-button"]').click();
     rowValue(0).should('contain', '22');
     rowValue(1).should('contain', '9');
-    cy.get('tbody tr').should('have.length', 6);
+    rowValue(2).should('contain', '99');
+    rowValue(3).should('contain', '19');
+    rowValue(4).should('contain', '2');
+    rowValue(5).should('contain', '1');
 
-    // back to ascending and missing where they belong
-    cy.get('[data-cy="1-sort-values-button"]').click();
+    // Change to missing asc, values desc (99, 19, 2, 1, 22, 9)
     cy.get('[data-cy="1-sort-status-button"]').click();
-    rowValue(0).should('contain', '1');
-    rowValue(5).should('contain', '99');
+    rowValue(0).should('contain', '99');
+    rowValue(1).should('contain', '19');
+    rowValue(2).should('contain', '2');
+    rowValue(3).should('contain', '1');
+    rowValue(4).should('contain', '22');
+    rowValue(5).should('contain', '9');
+
+    cy.get('tbody tr').should('have.length', 6);
   });
 });

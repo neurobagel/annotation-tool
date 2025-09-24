@@ -10,13 +10,12 @@ import {
   TextField,
 } from '@mui/material';
 import { useState } from 'react';
-import { useSortedFilteredValues } from '~/hooks';
+import { useSortedValues } from '~/hooks';
 import useDataStore from '~/stores/data';
 import { StandardizedVariable, TermFormat } from '~/utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueGroupButton from './MissingValueGroupButton';
-import StatusSortCell from './StatusSortCell';
-import ValueSortCell from './ValueSortCell';
+import SortCell from './SortCell';
 
 interface ContinuousProps {
   columnID: string;
@@ -58,14 +57,9 @@ function Continuous({
   const showUnits = !(columnIsMultiColumnMeasure && columns[columnID].variableType === null);
 
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
-  const [filterMissing, setFilterMissing] = useState(false);
+  const [sortMissingDir, setSortMissingDir] = useState<'asc' | 'desc'>('asc');
 
-  const { visibleValues } = useSortedFilteredValues(
-    uniqueValues,
-    missingValues,
-    sortDir,
-    filterMissing
-  );
+  const { visibleValues } = useSortedValues(uniqueValues, missingValues, sortDir, sortMissingDir);
 
   return (
     <Paper elevation={3} className="h-full shadow-lg" data-cy={`${columnID}-continuous`}>
@@ -80,17 +74,19 @@ function Continuous({
             <Table stickyHeader>
               <TableHead>
                 <TableRow className="bg-blue-50">
-                  <ValueSortCell
+                  <SortCell
+                    label="Value"
                     sortDir={sortDir}
                     onToggle={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
                     width={standardizedVariable ? '60%' : undefined}
                     dataCy={`${columnID}-sort-values-button`}
                   />
                   {standardizedVariable && (
-                    <StatusSortCell
-                      filterMissing={filterMissing}
-                      onToggle={() => setFilterMissing((f) => !f)}
-                      width="40%"
+                    <SortCell
+                      label="Status"
+                      sortDir={sortMissingDir}
+                      onToggle={() => setSortMissingDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
+                      width="30%"
                       dataCy={`${columnID}-sort-status-button`}
                     />
                   )}

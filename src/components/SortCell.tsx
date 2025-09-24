@@ -6,19 +6,15 @@ const defaultProps = {
   dataCy: '',
 };
 
-interface ValueSortCellProps {
+interface SortCellProps {
+  label: string;
   sortDir: 'asc' | 'desc';
   onToggle: () => void;
   width?: string | number;
   dataCy?: string;
 }
 
-function ValueSortCell({
-  sortDir,
-  onToggle,
-  width,
-  dataCy = 'sort-values-button',
-}: ValueSortCellProps) {
+function SortCell({ label, sortDir, onToggle, width, dataCy }: SortCellProps) {
   return (
     <TableCell
       data-cy={dataCy}
@@ -31,15 +27,15 @@ function ValueSortCell({
       }}
       onClick={onToggle}
     >
-      Value
       {sortDir === 'asc' ? (
         <ArrowUpward fontSize="inherit" sx={{ ml: 0.5, verticalAlign: 'middle' }} />
       ) : (
         <ArrowDownward fontSize="inherit" sx={{ ml: 0.5, verticalAlign: 'middle' }} />
       )}
+      {label}
     </TableCell>
   );
 }
 
-ValueSortCell.defaultProps = defaultProps;
-export default ValueSortCell;
+SortCell.defaultProps = defaultProps;
+export default SortCell;

@@ -19,6 +19,10 @@ const props = {
 };
 
 describe('Categorical', () => {
+  // Helper function to get the value of a specific row
+  const rowValue = (rowIdx: number) =>
+    cy.get(`[data-cy="${props.columnID}-categorical-table"] tbody tr:eq(${rowIdx}) td:eq(0)`);
+
   beforeEach(() => {
     useDataStore.setState({
       termOptions: {
@@ -86,7 +90,7 @@ describe('Categorical', () => {
       label: 'test',
     });
   });
-  it('alphabetically sorts and filters the values', () => {
+  it('sorts values alphabetically', () => {
     cy.mount(
       <Categorical
         columnID={props.columnID}
@@ -99,29 +103,102 @@ describe('Categorical', () => {
         onUpdateLevelTerm={props.onUpdateLevelTerm}
       />
     );
-    // Helper function to get the value of a specific row
-    const rowValue = (rowIdx: number) =>
-      cy.get(`[data-cy="${props.columnID}-categorical-table"] tbody tr:eq(${rowIdx}) td:eq(0)`);
 
-    // initial ascending order
+    // Initial state: values asc (F, M, Missing, N/A)
     rowValue(0).should('contain', 'F');
+    rowValue(1).should('contain', 'M');
+    rowValue(2).should('contain', 'Missing');
     rowValue(3).should('contain', 'N/A');
 
-    // switch to descending
+    // Click value sort to desc (N/A, Missing, M, F)
     cy.get('[data-cy="3-sort-values-button"]').click();
-    rowValue(0).should('contain', 'N/A');
-    rowValue(3).should('contain', 'F');
-
-    // show missing at the top
-    cy.get('[data-cy="3-sort-status-button"]').click();
     rowValue(0).should('contain', 'N/A');
     rowValue(1).should('contain', 'Missing');
-    cy.get('tbody tr').should('have.length', 4);
+    rowValue(2).should('contain', 'M');
+    rowValue(3).should('contain', 'F');
 
-    // back to ascending and missing where they belong
+    // Click value sort back to asc
     cy.get('[data-cy="3-sort-values-button"]').click();
+    rowValue(0).should('contain', 'F');
+    rowValue(1).should('contain', 'M');
+    rowValue(2).should('contain', 'Missing');
+    rowValue(3).should('contain', 'N/A');
+  });
+
+  it('sorts values by missing status', () => {
+    cy.mount(
+      <Categorical
+        columnID={props.columnID}
+        uniqueValues={props.uniqueValues}
+        missingValues={props.missingValues}
+        standardizedVariable={props.standardizedVariable}
+        levels={props.levels}
+        onUpdateDescription={props.onUpdateDescription}
+        onToggleMissingValue={props.onToggleMissingValue}
+        onUpdateLevelTerm={props.onUpdateLevelTerm}
+      />
+    );
+
+    // Initial state: missing status asc (non-missing first: F, M, then missing: Missing, N/A)
+    rowValue(0).should('contain', 'F');
+    rowValue(1).should('contain', 'M');
+    rowValue(2).should('contain', 'Missing');
+    rowValue(3).should('contain', 'N/A');
+
+    // Click missing status sort to desc (missing first: Missing, N/A, then non-missing: F, M)
+    cy.get('[data-cy="3-sort-status-button"]').click();
+    rowValue(0).should('contain', 'Missing');
+    rowValue(1).should('contain', 'N/A');
+    rowValue(2).should('contain', 'F');
+    rowValue(3).should('contain', 'M');
+
+    // Click missing status sort back to asc
     cy.get('[data-cy="3-sort-status-button"]').click();
     rowValue(0).should('contain', 'F');
+    rowValue(1).should('contain', 'M');
+    rowValue(2).should('contain', 'Missing');
     rowValue(3).should('contain', 'N/A');
+  });
+
+  it('sorts values by missing status and alphabetical order combined', () => {
+    cy.mount(
+      <Categorical
+        columnID={props.columnID}
+        uniqueValues={props.uniqueValues}
+        missingValues={props.missingValues}
+        standardizedVariable={props.standardizedVariable}
+        levels={props.levels}
+        onUpdateDescription={props.onUpdateDescription}
+        onToggleMissingValue={props.onToggleMissingValue}
+        onUpdateLevelTerm={props.onUpdateLevelTerm}
+      />
+    );
+
+    // Initial state: missing asc, values asc (F, M, Missing, N/A)
+    rowValue(0).should('contain', 'F');
+    rowValue(1).should('contain', 'M');
+    rowValue(2).should('contain', 'Missing');
+    rowValue(3).should('contain', 'N/A');
+
+    // Change to missing desc, values asc (Missing, N/A, F, M)
+    cy.get('[data-cy="3-sort-status-button"]').click();
+    rowValue(0).should('contain', 'Missing');
+    rowValue(1).should('contain', 'N/A');
+    rowValue(2).should('contain', 'F');
+    rowValue(3).should('contain', 'M');
+
+    // Change to missing desc, values desc (N/A, Missing, M, F)
+    cy.get('[data-cy="3-sort-values-button"]').click();
+    rowValue(0).should('contain', 'N/A');
+    rowValue(1).should('contain', 'Missing');
+    rowValue(2).should('contain', 'M');
+    rowValue(3).should('contain', 'F');
+
+    // Change to missing asc, values desc (M, F, N/A, Missing)
+    cy.get('[data-cy="3-sort-status-button"]').click();
+    rowValue(0).should('contain', 'M');
+    rowValue(1).should('contain', 'F');
+    rowValue(2).should('contain', 'N/A');
+    rowValue(3).should('contain', 'Missing');
   });
 });
