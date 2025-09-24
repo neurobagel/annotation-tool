@@ -6,6 +6,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
   Autocomplete,
   TextField,
 } from '@mui/material';
@@ -17,6 +18,7 @@ import DescriptionEditor from './DescriptionEditor';
 import MissingValueButton from './MissingValueButton';
 import StatusFilterCell from './StatusFilterCell';
 import ValueSortCell from './ValueSortCell';
+import VirtualListbox from './VirtualListBox';
 
 interface CategoricalProps {
   columnID: string;
@@ -127,6 +129,29 @@ function Categorical({
                       // eslint-disable-next-line react/jsx-props-no-spreading
                       <TextField {...params} variant="standard" size="small" fullWidth />
                     )}
+                    renderOption={(props, option) => (
+                      // eslint-disable-next-line react/jsx-props-no-spreading
+                      <li {...props}>
+                        <Tooltip
+                          title={option.label}
+                          arrow
+                          componentsProps={{
+                            tooltip: {
+                              sx: {
+                                fontSize: '16px',
+                              },
+                            },
+                          }}
+                        >
+                          <div className="w-full truncate">{option.label}</div>
+                        </Tooltip>
+                      </li>
+                    )}
+                    slotProps={{
+                      listbox: {
+                        component: VirtualListbox,
+                      },
+                    }}
                   />
                 </TableCell>
               )}
