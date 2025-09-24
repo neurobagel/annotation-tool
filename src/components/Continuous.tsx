@@ -83,7 +83,7 @@ function Continuous({
                   />
                   {standardizedVariable && (
                     <SortCell
-                      label="Status"
+                      label="Treat as missing value"
                       sortDir={sortMissingDir}
                       onToggle={() => setSortMissingDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
                       width="30%"

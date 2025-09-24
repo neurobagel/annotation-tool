@@ -92,7 +92,7 @@ function Categorical({
             )}
             {standardizedVariable && (
               <SortCell
-                label="Status"
+                label="Treat as missing value"
                 sortDir={sortMissingDir}
                 onToggle={() => setSortMissingDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
                 dataCy={`${columnID}-sort-status-button`}
