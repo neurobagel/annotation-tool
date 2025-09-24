@@ -116,7 +116,7 @@ const initialState = {
   dataTable: {},
   columns: {},
   uploadedDataTableFileName: null,
-  isConfigLoading: false,
+  isConfigLoading: true,
   uploadedDataDictionary: {},
   uploadedDataDictionaryFileName: null,
   configOptions: [],
@@ -151,8 +151,6 @@ const useDataStore = create<DataStore>()(
 
         reader.onload = (e) => {
           const content = e.target?.result as string;
-
-          get().reset();
 
           const { headers, data } = parseTsvContent(content);
 
