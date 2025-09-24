@@ -95,7 +95,7 @@ describe('Categorical', () => {
       <Categorical
         columnID={props.columnID}
         uniqueValues={props.uniqueValues}
-        missingValues={props.missingValues}
+        missingValues={[]}
         standardizedVariable={props.standardizedVariable}
         levels={props.levels}
         onUpdateDescription={props.onUpdateDescription}
