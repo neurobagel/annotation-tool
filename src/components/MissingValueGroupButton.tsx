@@ -29,19 +29,7 @@ function MissingValueGroupButton({
       size="small"
       data-cy={`${columnId}-${value}-missing-value-button-group`}
     >
-      <ToggleButton
-        value={false}
-        data-cy={`${columnId}-${value}-missing-value-no`}
-        sx={{
-          '&.Mui-selected': {
-            backgroundColor: 'success.main',
-            color: 'success.contrastText',
-            '&:hover': {
-              backgroundColor: 'success.dark',
-            },
-          },
-        }}
-      >
+      <ToggleButton value={false} data-cy={`${columnId}-${value}-missing-value-no`}>
         No
       </ToggleButton>
       <ToggleButton
