@@ -131,11 +131,14 @@ function Categorical({
                     )}
                     renderOption={(props, option) => (
                       // eslint-disable-next-line react/jsx-props-no-spreading
-                      <li {...props}>
+                      <li {...props} data-cy={`${columnID}-${value}-term-dropdown-option`}>
                         <Tooltip
+                          data-cy={`${columnID}-${value}-term-tooltip`}
                           title={option.label}
+                          placement="right"
+                          enterDelay={400}
                           arrow
-                          componentsProps={{
+                          slotProps={{
                             tooltip: {
                               sx: {
                                 fontSize: '16px',
