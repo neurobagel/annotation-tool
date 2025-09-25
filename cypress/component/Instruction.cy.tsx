@@ -1,12 +1,14 @@
 import Instruction from '../../src/components/Instruction';
 
 describe('Instruction', () => {
-  it('renders the component correctly', () => {
+  beforeEach(() => {
     cy.mount(
       <Instruction title="Test Instruction">
         <p>This is a test instruction content.</p>
       </Instruction>
     );
+  });
+  it('renders the component correctly', () => {
     cy.get('[data-cy="instruction-button"]')
       .should('be.visible')
       .and('contain', 'How to use this page');
