@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import useDataStore from '../stores/data';
+import { UploadInstructions } from '../utils/instructions';
 import ConfigCard from './ConfigCard';
 import DataDictionaryPreview from './DataDictionaryPreview';
 import DataTablePreview from './DataTablePreview';
+import Instruction from './Instruction';
 import UploadCard from './UploadCard';
 
 interface UploadProps {
@@ -53,6 +55,11 @@ function Upload({ disableConfig }: UploadProps) {
 
   return (
     <div className="flex flex-col items-center gap-8" data-config-loading={isConfigLoading}>
+      <div className="w-full max-w-[1024px]">
+        <Instruction title="Upload" className="mb-2">
+          <UploadInstructions />
+        </Instruction>
+      </div>
       {disableConfig ? null : (
         <ConfigCard
           title="Configuration"

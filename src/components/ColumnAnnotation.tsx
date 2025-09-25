@@ -1,6 +1,8 @@
 import { useColumnUpdates } from '../hooks';
 import useDataStore from '../stores/data';
+import { ColumnAnnotationInstructions } from '../utils/instructions';
 import ColumnAnnotationCard from './ColumnAnnotationCard';
+import Instruction from './Instruction';
 
 function ColumnAnnotation() {
   const { columns, standardizedVariables } = useDataStore();
@@ -15,6 +17,11 @@ function ColumnAnnotation() {
       className="flex flex-col items-center gap-6 h-[70vh] overflow-auto"
       data-cy="column-annotation-container"
     >
+      <div className="w-full max-w-5xl">
+        <Instruction title="Column Annotation" className="mb-2">
+          <ColumnAnnotationInstructions />
+        </Instruction>
+      </div>
       {columnsArray.map(([columnId, column]) => (
         <div key={columnId} className="w-full">
           <ColumnAnnotationCard
