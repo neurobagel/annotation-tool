@@ -1,17 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
 import CancelIcon from '@mui/icons-material/Cancel';
-import {
-  Fab,
-  Card,
-  CardContent,
-  CardHeader,
-  Typography,
-  Tabs,
-  Tab,
-  List,
-  ListItem,
-  ListItemText,
-} from '@mui/material';
+import { Fab, Card, CardContent, CardHeader, Typography, Tabs, Tab } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useState } from 'react';
 import {
@@ -20,6 +9,7 @@ import {
   useActiveVariableData,
 } from '../hooks';
 import useDataStore from '../stores/data';
+import { MultiColumnMeasuresInstructions } from '../utils/instructions';
 import { MultiColumnMeasuresTerm } from '../utils/internal_types';
 import { getColumnsAssignedText, createMappedColumnHeaders } from '../utils/util';
 import Instruction from './Instruction';
@@ -72,7 +62,9 @@ function MultiColumnMeasures() {
   };
 
   const handleUnassignColumn = (columnId: string) => {
-    if (!activeVariableTab) return;
+    if (!activeVariableTab) {
+      return;
+    }
 
     const cardWithColumn = currentTermCards.find((card) => card.mappedColumns.includes(columnId));
 
@@ -92,33 +84,7 @@ function MultiColumnMeasures() {
       <div className="flex flex-row gap-6 max-w-[1200px] w-full">
         <div className="flex-1 min-w-0">
           <Instruction title="Multi-Column Measures" className="mb-2">
-            <List dense sx={{ listStyleType: 'disc', pl: 4 }}>
-              <ListItem sx={{ display: 'list-item' }}>
-                <ListItemText primary="On the right side you see all the columns you have previously mapped to the special “Multi-column measure” standardized variable." />
-              </ListItem>
-              <ListItem sx={{ display: 'list-item' }}>
-                <ListItemText primary="Your task is now to create “Collections” for each of the measures these columns belong to, and to then map the columns to their correct “Collection”." />
-              </ListItem>
-              <ListItem sx={{ display: 'list-item' }}>
-                <ListItemText
-                  primary={
-                    <>
-                      Click the big (<strong>+</strong>) plus icon to start a new “Collection” card
-                      and choose the name of the measure you want to create.
-                    </>
-                  }
-                />
-              </ListItem>
-              <ListItem sx={{ display: 'list-item' }}>
-                <ListItemText primary="On each card, select the columns that belong to this measure from the dropdown." />
-              </ListItem>
-              <ListItem sx={{ display: 'list-item' }}>
-                <ListItemText primary="As you map columns to measure “Collections”, they will turn grey in the list overview on the right. It is likely that you will not be able to find the right measure for every column." />
-              </ListItem>
-              <ListItem sx={{ display: 'list-item' }}>
-                <ListItemText primary="Before you proceed to the next step, make sure to remove any columns you were not able to map to a measure by clicking the (×) symbol next to the column name." />
-              </ListItem>
-            </List>
+            <MultiColumnMeasuresInstructions />
           </Instruction>
           <Tabs
             value={activeTab}

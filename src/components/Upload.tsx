@@ -1,6 +1,6 @@
-import { List, ListItem, ListItemText } from '@mui/material';
 import { useEffect } from 'react';
 import useDataStore from '../stores/data';
+import { UploadInstructions } from '../utils/instructions';
 import ConfigCard from './ConfigCard';
 import DataDictionaryPreview from './DataDictionaryPreview';
 import DataTablePreview from './DataTablePreview';
@@ -55,46 +55,7 @@ function Upload({ disableConfig }: UploadProps) {
     <div className="flex flex-col items-center gap-8" data-config-loading={isConfigLoading}>
       <div className="w-full max-w-[1024px]">
         <Instruction title="Upload" className="mb-2">
-          <List dense sx={{ listStyleType: 'disc', pl: 4 }}>
-            <ListItem sx={{ display: 'list-item' }}>
-              <ListItemText
-                primary={
-                  <>Here you load the tabular data, that you want to annotate, into the app.</>
-                }
-              />
-            </ListItem>
-            <ListItem sx={{ display: 'list-item' }}>
-              <ListItemText
-                primary={
-                  <>
-                    <strong>[required]</strong> Upload a tabular phenotypic <code>.tsv</code> file.
-                  </>
-                }
-              />
-            </ListItem>
-            <ListItem sx={{ display: 'list-item' }}>
-              <ListItemText
-                primary={
-                  <>
-                    <strong>[optional]</strong> Upload a data dictionary for your tabular file to
-                    give you more context during the annotation. This could be a BIDS data
-                    dictionary or a data dictionary you have generated in a previous session with
-                    the Neurobagel annotator.
-                  </>
-                }
-              />
-            </ListItem>
-            <ListItem sx={{ display: 'list-item' }}>
-              <ListItemText
-                primary={
-                  <>
-                    When you have uploaded your files, you can look at a preview to check that all
-                    looks good. And then you can navigate to the next step.
-                  </>
-                }
-              />
-            </ListItem>
-          </List>
+          <UploadInstructions />
         </Instruction>
       </div>
       {disableConfig ? null : (
