@@ -56,10 +56,10 @@ function Continuous({
   // Don't show units when the variable is a multi column measure and its data type is null
   const showUnits = !(columnIsMultiColumnMeasure && columns[columnID].variableType === null);
 
+  const [sortBy, setSortBy] = useState<'value' | 'missing'>('value');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
-  const [sortMissingDir, setSortMissingDir] = useState<'asc' | 'desc'>('asc');
 
-  const { visibleValues } = useSortedValues(uniqueValues, missingValues, sortDir, sortMissingDir);
+  const { visibleValues } = useSortedValues(uniqueValues, missingValues, sortBy, sortDir);
 
   return (
     <Paper elevation={3} className="h-full shadow-lg" data-cy={`${columnID}-continuous`}>
@@ -77,16 +77,32 @@ function Continuous({
                   <SortCell
                     label="Value"
                     sortDir={sortDir}
-                    onToggle={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
+                    onToggle={() => {
+                      if (sortBy === 'value') {
+                        setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+                      } else {
+                        setSortBy('value');
+                        setSortDir('asc');
+                      }
+                    }}
                     width={standardizedVariable ? '60%' : undefined}
+                    isActive={sortBy === 'value'}
                     dataCy={`${columnID}-sort-values-button`}
                   />
                   {standardizedVariable && (
                     <SortCell
                       label="Treat as missing value"
-                      sortDir={sortMissingDir}
-                      onToggle={() => setSortMissingDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
-                      width="30%"
+                      sortDir={sortDir}
+                      onToggle={() => {
+                        if (sortBy === 'missing') {
+                          setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+                        } else {
+                          setSortBy('missing');
+                          setSortDir('asc');
+                        }
+                      }}
+                      width="40%"
+                      isActive={sortBy === 'missing'}
                       dataCy={`${columnID}-sort-status-button`}
                     />
                   )}

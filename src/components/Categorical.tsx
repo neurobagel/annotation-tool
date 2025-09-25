@@ -54,15 +54,10 @@ function Categorical({
   const termOptions = useDataStore((state) => state.termOptions);
   const options = standardizedVariable ? termOptions[standardizedVariable.identifier] || [] : [];
 
-  const [sortValueDir, setSortValueDir] = useState<'asc' | 'desc'>('asc');
-  const [sortMissingDir, setSortMissingDir] = useState<'asc' | 'desc'>('asc');
+  const [sortBy, setSortBy] = useState<'value' | 'missing'>('value');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
-  const { visibleValues } = useSortedValues(
-    uniqueValues,
-    missingValues,
-    sortValueDir,
-    sortMissingDir
-  );
+  const { visibleValues } = useSortedValues(uniqueValues, missingValues, sortBy, sortDir);
 
   return (
     <TableContainer
@@ -78,8 +73,16 @@ function Categorical({
           <TableRow className="bg-blue-50">
             <SortCell
               label="Value"
-              sortDir={sortValueDir}
-              onToggle={() => setSortValueDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
+              sortDir={sortDir}
+              onToggle={() => {
+                if (sortBy === 'value') {
+                  setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+                } else {
+                  setSortBy('value');
+                  setSortDir('asc');
+                }
+              }}
+              isActive={sortBy === 'value'}
               dataCy={`${columnID}-sort-values-button`}
             />
             <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
@@ -93,8 +96,16 @@ function Categorical({
             {standardizedVariable && (
               <SortCell
                 label="Treat as missing value"
-                sortDir={sortMissingDir}
-                onToggle={() => setSortMissingDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
+                sortDir={sortDir}
+                onToggle={() => {
+                  if (sortBy === 'missing') {
+                    setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+                  } else {
+                    setSortBy('missing');
+                    setSortDir('asc');
+                  }
+                }}
+                isActive={sortBy === 'missing'}
                 dataCy={`${columnID}-sort-status-button`}
               />
             )}

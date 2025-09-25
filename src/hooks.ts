@@ -201,28 +201,28 @@ export function useSchemaValidation(dataDictionary: DataDictionary) {
 export function useSortedValues(
   uniqueValues: string[],
   missingValues: string[],
-  sortDir: 'asc' | 'desc',
-  missingSortDir: 'asc' | 'desc'
+  sortBy: 'value' | 'missing',
+  sortDir: 'asc' | 'desc'
 ) {
-  const sortedValues = useMemo(
-    () =>
-      [...uniqueValues].sort((a, b) => {
-        const aIsMissing = missingValues.includes(a);
-        const bIsMissing = missingValues.includes(b);
+  const sortedValues = useMemo(() => {
+    const missingSet = new Set(missingValues);
 
-        // First sort by missing status
+    return [...uniqueValues].sort((a, b) => {
+      if (sortBy === 'missing') {
+        const aIsMissing = missingSet.has(a);
+        const bIsMissing = missingSet.has(b);
+
         if (aIsMissing !== bIsMissing) {
-          if (missingSortDir === 'asc') {
-            return aIsMissing ? 1 : -1; // Non-missing first, then missing
+          if (sortDir === 'asc') {
+            return aIsMissing ? -1 : 1; // Missing first, then non-missing
           }
-          return aIsMissing ? -1 : 1; // Missing first, then non-missing
+          return aIsMissing ? 1 : -1; // Non-missing first, then missing
         }
-
-        // Then sort by value within the same missing status group
-        return sortDir === 'asc' ? naturalCompare(a, b) : naturalCompare(b, a);
-      }),
-    [uniqueValues, missingValues, sortDir, missingSortDir]
-  );
+        return naturalCompare(a, b);
+      }
+      return sortDir === 'asc' ? naturalCompare(a, b) : naturalCompare(b, a);
+    });
+  }, [uniqueValues, missingValues, sortBy, sortDir]);
 
   return { sortedValues, visibleValues: sortedValues };
 }
