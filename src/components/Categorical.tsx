@@ -154,6 +154,12 @@ function Categorical({
                       listbox: {
                         component: VirtualListbox,
                       },
+                      paper: {
+                        sx: {
+                          width: 'max-content',
+                          minWidth: '500px',
+                        },
+                      },
                     }}
                   />
                 </TableCell>
