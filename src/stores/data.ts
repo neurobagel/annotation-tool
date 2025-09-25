@@ -121,6 +121,7 @@ const initialState = {
   uploadedDataDictionaryFileName: null,
   configOptions: [],
   config: {},
+  selectedConfig: null,
   standardizedVariables: {},
   mappedStandardizedVariables: [],
   mappedMultiColumnMeasureStandardizedVariables: [],
@@ -150,6 +151,7 @@ const useDataStore = create<DataStore>()(
 
         reader.onload = (e) => {
           const content = e.target?.result as string;
+
           const { headers, data } = parseTsvContent(content);
 
           // Transform data into column-based structure
@@ -986,7 +988,21 @@ const useDataStore = create<DataStore>()(
       }));
     },
 
-    reset: () => set(initialState),
+    reset: () =>
+      set((state) => ({
+        // Reset everything to initial state
+        ...initialState,
+        // But preserve config-related state
+        configOptions: state.configOptions,
+        config: state.config,
+        selectedConfig: state.selectedConfig,
+        isConfigLoading: state.isConfigLoading,
+        standardizedVariables: state.standardizedVariables,
+        multiColumnMeasureVariableIdentifiers: state.multiColumnMeasureVariableIdentifiers,
+        singleColumnVariableIdentifiers: state.singleColumnVariableIdentifiers,
+        termOptions: state.termOptions,
+        formatOptions: state.formatOptions,
+      })),
   }))
 );
 
