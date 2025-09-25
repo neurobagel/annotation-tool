@@ -121,6 +121,7 @@ const initialState = {
   uploadedDataDictionaryFileName: null,
   configOptions: [],
   config: {},
+  selectedConfig: null,
   standardizedVariables: {},
   mappedStandardizedVariables: [],
   mappedMultiColumnMeasureStandardizedVariables: [],
@@ -139,7 +140,6 @@ const useDataStore = create<DataStore>()(
   devtools((set, get) => ({
     // Data table
     ...initialState,
-    reset: () => set(initialState),
     // TODO: remove - this seems unused
     setDataTable: (data: DataTable) => set({ dataTable: data }),
     setUploadedDataTableFileName: (fileName: string | null) =>
@@ -987,6 +987,22 @@ const useDataStore = create<DataStore>()(
         },
       }));
     },
+
+    reset: () =>
+      set((state) => ({
+        // Reset everything to initial state
+        ...initialState,
+        // But preserve config-related state
+        configOptions: state.configOptions,
+        config: state.config,
+        selectedConfig: state.selectedConfig,
+        isConfigLoading: state.isConfigLoading,
+        standardizedVariables: state.standardizedVariables,
+        multiColumnMeasureVariableIdentifiers: state.multiColumnMeasureVariableIdentifiers,
+        singleColumnVariableIdentifiers: state.singleColumnVariableIdentifiers,
+        termOptions: state.termOptions,
+        formatOptions: state.formatOptions,
+      })),
   }))
 );
 

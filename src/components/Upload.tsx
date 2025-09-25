@@ -49,7 +49,7 @@ function Upload({ disableConfig }: UploadProps) {
     };
     loadConfigs();
     setSelectedConfig('Neurobagel');
-  }, [loadConfigOptions, setSelectedConfig, configOptions]);
+  }, [loadConfigOptions, setSelectedConfig]);
 
   return (
     <div className="flex flex-col items-center gap-8" data-config-loading={isConfigLoading}>
