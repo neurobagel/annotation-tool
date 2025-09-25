@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import useDataStore from '../stores/data';
+import { UploadInstructions } from '../utils/instructions';
 import ConfigCard from './ConfigCard';
 import DataDictionaryPreview from './DataDictionaryPreview';
 import DataTablePreview from './DataTablePreview';
+import Instruction from './Instruction';
 import UploadCard from './UploadCard';
 
 interface UploadProps {
@@ -10,6 +12,7 @@ interface UploadProps {
 }
 
 function Upload({ disableConfig }: UploadProps) {
+  const reset = useDataStore((state) => state.reset);
   const processDataTableFile = useDataStore((state) => state.processDataTableFile);
   const processDataDictionaryFile = useDataStore((state) => state.processDataDictionaryFile);
   const dataTable = useDataStore((state) => state.dataTable);
@@ -31,7 +34,8 @@ function Upload({ disableConfig }: UploadProps) {
 
   const isDataTableEmpty = Object.keys(dataTable).length === 0;
 
-  const handleFileUpload = (file: File) => {
+  const handleDataTableFileUpload = (file: File) => {
+    reset();
     setUploadedDataTableFileName(file.name);
     processDataTableFile(file);
   };
@@ -51,6 +55,11 @@ function Upload({ disableConfig }: UploadProps) {
 
   return (
     <div className="flex flex-col items-center gap-8" data-config-loading={isConfigLoading}>
+      <div className="w-full max-w-[1024px]">
+        <Instruction title="Upload" className="mb-2">
+          <UploadInstructions />
+        </Instruction>
+      </div>
       {disableConfig ? null : (
         <ConfigCard
           title="Configuration"
@@ -66,7 +75,7 @@ function Upload({ disableConfig }: UploadProps) {
         FileUploaderDisplayText="Upload your tabular phenotypic .tsv file (required)"
         allowedFileType=".tsv"
         uploadedFileName={uploadedDataTableFileName}
-        onFileUpload={handleFileUpload}
+        onFileUpload={handleDataTableFileUpload}
         previewComponent={<DataTablePreview dataTable={dataTable} columns={columns} />}
         diableFileUploader={isConfigLoading}
       />

@@ -6,6 +6,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
   Autocomplete,
   TextField,
 } from '@mui/material';
@@ -16,6 +17,7 @@ import { StandardizedVariable } from '~/utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueGroupButton from './MissingValueGroupButton';
 import SortCell from './SortCell';
+import VirtualListbox from './VirtualListBox';
 
 interface CategoricalProps {
   columnID: string;
@@ -139,6 +141,38 @@ function Categorical({
                       // eslint-disable-next-line react/jsx-props-no-spreading
                       <TextField {...params} variant="standard" size="small" fullWidth />
                     )}
+                    renderOption={(props, option) => (
+                      // eslint-disable-next-line react/jsx-props-no-spreading
+                      <li {...props} data-cy={`${columnID}-${value}-term-dropdown-option`}>
+                        <Tooltip
+                          data-cy={`${columnID}-${value}-term-tooltip`}
+                          title={option.label}
+                          placement="right"
+                          enterDelay={400}
+                          arrow
+                          slotProps={{
+                            tooltip: {
+                              sx: {
+                                fontSize: '16px',
+                              },
+                            },
+                          }}
+                        >
+                          <div className="w-full truncate">{option.label}</div>
+                        </Tooltip>
+                      </li>
+                    )}
+                    slotProps={{
+                      listbox: {
+                        component: VirtualListbox,
+                      },
+                      paper: {
+                        sx: {
+                          width: 'max-content',
+                          minWidth: '500px',
+                        },
+                      },
+                    }}
                   />
                 </TableCell>
               )}

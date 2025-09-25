@@ -166,4 +166,21 @@ describe('Categorical', () => {
     rowValue(2).should('contain', 'Missing');
     rowValue(3).should('contain', 'N/A');
   });
+  it('Displays the tooltip when hovering over an option', () => {
+    cy.mount(
+      <Categorical
+        columnID={props.columnID}
+        uniqueValues={props.uniqueValues}
+        missingValues={props.missingValues}
+        standardizedVariable={props.standardizedVariable}
+        levels={props.levels}
+        onUpdateDescription={props.onUpdateDescription}
+        onToggleMissingValue={props.onToggleMissingValue}
+        onUpdateLevelTerm={props.onUpdateLevelTerm}
+      />
+    );
+    cy.get('[data-cy="3-F-term-dropdown"]').click();
+    cy.get('[data-cy="3-F-term-dropdown-option"]').trigger('mouseover');
+    cy.get('[data-cy="3-F-term-tooltip"]').should('be.visible').and('contain.text', 'test');
+  });
 });
