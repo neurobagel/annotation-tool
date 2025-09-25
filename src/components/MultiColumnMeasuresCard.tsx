@@ -46,13 +46,17 @@ function MultiColumnMeasuresCard({
         title={
           card.term ? (
             <Typography variant="h6" className="font-bold">
-              {card.term.label}
+              {card.term.abbreviation
+                ? `${card.term.abbreviation} - ${card.term.label}`
+                : card.term.label}
             </Typography>
           ) : (
             <Autocomplete
               data-cy={`multi-column-measures-card-${cardIndex}-title-dropdown`}
               options={availableTerms}
-              getOptionLabel={(option: MultiColumnMeasuresTerm) => option.label}
+              getOptionLabel={(option: MultiColumnMeasuresTerm) =>
+                option.abbreviation ? `${option.abbreviation} - ${option.label}` : option.label
+              }
               getOptionDisabled={(option) => option.disabled || false}
               onChange={(_, newValue) => onTermSelect(newValue)}
               renderInput={(params) => (
