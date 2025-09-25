@@ -96,22 +96,19 @@ function ValueAnnotation() {
   };
 
   return (
-    <div
-      className="mx-auto flex w-full  max-h-[calc(100vh-250px)]
-  max-w-7xl space-x-4 p-4"
-    >
-      <SideColumnNavBar
-        columns={columns}
-        onSelect={handleSelect}
-        selectedColumnId={selectedColumnIds[0] || null}
-      />
-      <div className="flex-1">
-        <div className="mb-2">
-          <Instruction title="Value Annotation">
-            <ValueAnnotationInstructions />
-          </Instruction>
-        </div>
-        {renderContent()}
+    <div className="mx-auto flex flex-col w-full max-w-7xl p-4">
+      <div className="mb-4">
+        <Instruction title="Value Annotation">
+          <ValueAnnotationInstructions />
+        </Instruction>
+      </div>
+      <div className="flex w-full max-h-[calc(100vh-320px)] space-x-4">
+        <SideColumnNavBar
+          columns={columns}
+          onSelect={handleSelect}
+          selectedColumnId={selectedColumnIds[0] || null}
+        />
+        <div className="flex-1">{renderContent()}</div>
       </div>
     </div>
   );
