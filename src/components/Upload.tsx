@@ -12,6 +12,7 @@ interface UploadProps {
 }
 
 function Upload({ disableConfig }: UploadProps) {
+  const reset = useDataStore((state) => state.reset);
   const processDataTableFile = useDataStore((state) => state.processDataTableFile);
   const processDataDictionaryFile = useDataStore((state) => state.processDataDictionaryFile);
   const dataTable = useDataStore((state) => state.dataTable);
@@ -33,7 +34,8 @@ function Upload({ disableConfig }: UploadProps) {
 
   const isDataTableEmpty = Object.keys(dataTable).length === 0;
 
-  const handleFileUpload = (file: File) => {
+  const handleDataTableFileUpload = (file: File) => {
+    reset();
     setUploadedDataTableFileName(file.name);
     processDataTableFile(file);
   };
@@ -73,7 +75,7 @@ function Upload({ disableConfig }: UploadProps) {
         FileUploaderDisplayText="Upload your tabular phenotypic .tsv file (required)"
         allowedFileType=".tsv"
         uploadedFileName={uploadedDataTableFileName}
-        onFileUpload={handleFileUpload}
+        onFileUpload={handleDataTableFileUpload}
         previewComponent={<DataTablePreview dataTable={dataTable} columns={columns} />}
         diableFileUploader={isConfigLoading}
       />
