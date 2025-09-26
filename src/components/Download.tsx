@@ -77,7 +77,7 @@ function Download() {
         </Alert>
       ) : (
         <Alert
-          severity="error"
+          severity="warning"
           data-cy="incomplete-annotations-alert"
           className="mb-6 w-full max-w-2xl"
         >
@@ -187,7 +187,7 @@ function Download() {
         <Button
           data-cy="download-datadictionary-button"
           variant="contained"
-          color={schemaValid ? 'success' : 'error'}
+          color={schemaValid ? 'success' : 'warning'}
           disabled={!schemaValid && !forceAllowDownload}
           onClick={handleDownload}
         >
