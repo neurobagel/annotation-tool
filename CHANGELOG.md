@@ -1,3 +1,27 @@
+# v0.4.0 (Fri Sep 26 2025)
+
+#### 🚀 Enhancements
+
+- [ENH] Changed `missing value` button to a checkbox [#277](https://github.com/neurobagel/annotation-tool/pull/277) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Prefixed assessment terms with abbreviations [#292](https://github.com/neurobagel/annotation-tool/pull/292) ([@rmanaem](https://github.com/rmanaem))
+- Added instructions for different steps [#275](https://github.com/neurobagel/annotation-tool/pull/275) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Show full text of options on hover [#290](https://github.com/neurobagel/annotation-tool/pull/290) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Changed unannotated section to be collapsed by default [#279](https://github.com/neurobagel/annotation-tool/pull/279) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Disabled column selection dropdown from closing after selection in multi-column measures [#278](https://github.com/neurobagel/annotation-tool/pull/278) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] sort and filter values in value annotation step [#262](https://github.com/neurobagel/annotation-tool/pull/262) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Disabled `next` button on `Upload` step when no data table is uploaded [#272](https://github.com/neurobagel/annotation-tool/pull/272) ([@rmanaem](https://github.com/rmanaem))
+
+#### 🐛 Bug Fixes
+
+- [FIX] Catch and display warnings for missing levels annotation [#293](https://github.com/neurobagel/annotation-tool/pull/293) ([@rmanaem](https://github.com/rmanaem))
+- [FIX] Reset the state when a data table file is uploaded [#285](https://github.com/neurobagel/annotation-tool/pull/285) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.3.4 (Fri Sep 05 2025)
 
 #### 🐛 Bug Fixes
