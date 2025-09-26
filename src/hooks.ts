@@ -198,24 +198,31 @@ export function useSchemaValidation(dataDictionary: DataDictionary) {
   }, [dataDictionary]);
 }
 
-export function useSortedFilteredValues(
+export function useSortedValues(
   uniqueValues: string[],
   missingValues: string[],
-  sortDir: 'asc' | 'desc',
-  filterMissing: boolean
+  sortBy: 'value' | 'missing',
+  sortDir: 'asc' | 'desc'
 ) {
-  const sortedValues = useMemo(
-    () =>
-      [...uniqueValues].sort((a, b) =>
-        sortDir === 'asc' ? naturalCompare(a, b) : naturalCompare(b, a)
-      ),
-    [uniqueValues, sortDir]
-  );
+  const sortedValues = useMemo(() => {
+    const missingSet = new Set(missingValues);
 
-  const visibleValues = useMemo(
-    () => (filterMissing ? sortedValues.filter((v) => missingValues.includes(v)) : sortedValues),
-    [sortedValues, filterMissing, missingValues]
-  );
+    return [...uniqueValues].sort((a, b) => {
+      if (sortBy === 'missing') {
+        const aIsMissing = missingSet.has(a);
+        const bIsMissing = missingSet.has(b);
 
-  return { sortedValues, visibleValues };
+        if (aIsMissing !== bIsMissing) {
+          if (sortDir === 'asc') {
+            return aIsMissing ? -1 : 1; // Missing first, then non-missing
+          }
+          return aIsMissing ? 1 : -1; // Non-missing first, then missing
+        }
+        return naturalCompare(a, b);
+      }
+      return sortDir === 'asc' ? naturalCompare(a, b) : naturalCompare(b, a);
+    });
+  }, [uniqueValues, missingValues, sortBy, sortDir]);
+
+  return { sortedValues, visibleValues: sortedValues };
 }

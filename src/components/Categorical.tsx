@@ -11,13 +11,12 @@ import {
   TextField,
 } from '@mui/material';
 import { useState } from 'react';
-import { useSortedFilteredValues } from '~/hooks';
+import { useSortedValues } from '~/hooks';
 import useDataStore from '~/stores/data';
 import { StandardizedVariable } from '~/utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
-import MissingValueButton from './MissingValueButton';
-import StatusFilterCell from './StatusFilterCell';
-import ValueSortCell from './ValueSortCell';
+import MissingValueGroupButton from './MissingValueGroupButton';
+import SortCell from './SortCell';
 import VirtualListbox from './VirtualListBox';
 
 interface CategoricalProps {
@@ -57,15 +56,10 @@ function Categorical({
   const termOptions = useDataStore((state) => state.termOptions);
   const options = standardizedVariable ? termOptions[standardizedVariable.identifier] || [] : [];
 
+  const [sortBy, setSortBy] = useState<'value' | 'missing'>('value');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
-  const [filterMissing, setFilterMissing] = useState(false);
 
-  const { visibleValues } = useSortedFilteredValues(
-    uniqueValues,
-    missingValues,
-    sortDir,
-    filterMissing
-  );
+  const { visibleValues } = useSortedValues(uniqueValues, missingValues, sortBy, sortDir);
 
   return (
     <TableContainer
@@ -79,9 +73,18 @@ function Categorical({
       <Table stickyHeader className="min-w-[768px]" data-cy={`${columnID}-categorical-table`}>
         <TableHead data-cy={`${columnID}-categorical-table-head`}>
           <TableRow className="bg-blue-50">
-            <ValueSortCell
+            <SortCell
+              label="Value"
               sortDir={sortDir}
-              onToggle={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
+              onToggle={() => {
+                if (sortBy === 'value') {
+                  setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+                } else {
+                  setSortBy('value');
+                  setSortDir('asc');
+                }
+              }}
+              isActive={sortBy === 'value'}
               dataCy={`${columnID}-sort-values-button`}
             />
             <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
@@ -93,10 +96,19 @@ function Categorical({
               </TableCell>
             )}
             {standardizedVariable && (
-              <StatusFilterCell
-                filterMissing={filterMissing}
-                onToggle={() => setFilterMissing((f) => !f)}
-                dataCy={`${columnID}-filter-status-button`}
+              <SortCell
+                label="Treat as missing value"
+                sortDir={sortDir}
+                onToggle={() => {
+                  if (sortBy === 'missing') {
+                    setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+                  } else {
+                    setSortBy('missing');
+                    setSortDir('asc');
+                  }
+                }}
+                isActive={sortBy === 'missing'}
+                dataCy={`${columnID}-sort-status-button`}
               />
             )}
           </TableRow>
@@ -165,8 +177,8 @@ function Categorical({
                 </TableCell>
               )}
               {standardizedVariable && (
-                <TableCell align="left">
-                  <MissingValueButton
+                <TableCell align="center">
+                  <MissingValueGroupButton
                     value={value}
                     columnId={columnID}
                     missingValues={missingValues}

@@ -4,21 +4,19 @@ import { TableCell } from '@mui/material';
 const defaultProps = {
   width: '',
   dataCy: '',
+  isActive: false,
 };
 
-interface ValueSortCellProps {
+interface SortCellProps {
+  label: string;
   sortDir: 'asc' | 'desc';
   onToggle: () => void;
   width?: string | number;
   dataCy?: string;
+  isActive?: boolean;
 }
 
-function ValueSortCell({
-  sortDir,
-  onToggle,
-  width,
-  dataCy = 'sort-values-button',
-}: ValueSortCellProps) {
+function SortCell({ label, sortDir, onToggle, width, dataCy, isActive }: SortCellProps) {
   return (
     <TableCell
       data-cy={dataCy}
@@ -31,15 +29,16 @@ function ValueSortCell({
       }}
       onClick={onToggle}
     >
-      Value
-      {sortDir === 'asc' ? (
-        <ArrowUpward fontSize="inherit" sx={{ ml: 0.5, verticalAlign: 'middle' }} />
-      ) : (
-        <ArrowDownward fontSize="inherit" sx={{ ml: 0.5, verticalAlign: 'middle' }} />
-      )}
+      {isActive &&
+        (sortDir === 'asc' ? (
+          <ArrowUpward sx={{ mr: 0.2, verticalAlign: 'middle', fontSize: '1.2em' }} />
+        ) : (
+          <ArrowDownward sx={{ mr: 0.22, verticalAlign: 'middle', fontSize: '1.2em' }} />
+        ))}
+      {label}
     </TableCell>
   );
 }
 
-ValueSortCell.defaultProps = defaultProps;
-export default ValueSortCell;
+SortCell.defaultProps = defaultProps;
+export default SortCell;

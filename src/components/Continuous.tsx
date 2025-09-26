@@ -10,13 +10,12 @@ import {
   TextField,
 } from '@mui/material';
 import { useState } from 'react';
-import { useSortedFilteredValues } from '~/hooks';
+import { useSortedValues } from '~/hooks';
 import useDataStore from '~/stores/data';
 import { StandardizedVariable, TermFormat } from '~/utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
-import MissingValueButton from './MissingValueButton';
-import StatusFilterCell from './StatusFilterCell';
-import ValueSortCell from './ValueSortCell';
+import MissingValueGroupButton from './MissingValueGroupButton';
+import SortCell from './SortCell';
 
 interface ContinuousProps {
   columnID: string;
@@ -57,15 +56,10 @@ function Continuous({
   // Don't show units when the variable is a multi column measure and its data type is null
   const showUnits = !(columnIsMultiColumnMeasure && columns[columnID].variableType === null);
 
+  const [sortBy, setSortBy] = useState<'value' | 'missing'>('value');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
-  const [filterMissing, setFilterMissing] = useState(false);
 
-  const { visibleValues } = useSortedFilteredValues(
-    uniqueValues,
-    missingValues,
-    sortDir,
-    filterMissing
-  );
+  const { visibleValues } = useSortedValues(uniqueValues, missingValues, sortBy, sortDir);
 
   return (
     <Paper elevation={3} className="h-full shadow-lg" data-cy={`${columnID}-continuous`}>
@@ -80,18 +74,36 @@ function Continuous({
             <Table stickyHeader>
               <TableHead>
                 <TableRow className="bg-blue-50">
-                  <ValueSortCell
+                  <SortCell
+                    label="Value"
                     sortDir={sortDir}
-                    onToggle={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
-                    width={standardizedVariable ? '70%' : undefined}
+                    onToggle={() => {
+                      if (sortBy === 'value') {
+                        setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+                      } else {
+                        setSortBy('value');
+                        setSortDir('asc');
+                      }
+                    }}
+                    width={standardizedVariable ? '60%' : undefined}
+                    isActive={sortBy === 'value'}
                     dataCy={`${columnID}-sort-values-button`}
                   />
                   {standardizedVariable && (
-                    <StatusFilterCell
-                      filterMissing={filterMissing}
-                      onToggle={() => setFilterMissing((f) => !f)}
-                      width="30%"
-                      dataCy={`${columnID}-filter-status-button`}
+                    <SortCell
+                      label="Treat as missing value"
+                      sortDir={sortDir}
+                      onToggle={() => {
+                        if (sortBy === 'missing') {
+                          setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+                        } else {
+                          setSortBy('missing');
+                          setSortDir('asc');
+                        }
+                      }}
+                      width="40%"
+                      isActive={sortBy === 'missing'}
+                      dataCy={`${columnID}-sort-status-button`}
                     />
                   )}
                 </TableRow>
@@ -104,8 +116,8 @@ function Continuous({
                       {value}
                     </TableCell>
                     {standardizedVariable && (
-                      <TableCell align="left">
-                        <MissingValueButton
+                      <TableCell align="center">
+                        <MissingValueGroupButton
                           // eslint-disable-next-line react/no-array-index-key
                           key={`${columnID}-${value}-${index}-missingbutton`}
                           value={value}

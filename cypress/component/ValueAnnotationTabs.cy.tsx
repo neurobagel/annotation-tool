@@ -106,7 +106,7 @@ describe('ValueAnnotationTabs', () => {
       />
     );
     cy.get('[data-cy="2-tab"]').click();
-    cy.get('[data-cy="2-23-missing-value-button"]').click();
+    cy.get('[data-cy="2-23-missing-value-yes"]').click();
     cy.get('@spy').should('have.been.calledWith', '2', '23', true);
   });
   it('fires onUpdateFormat with the appropriate payload when the format field is updated', () => {
