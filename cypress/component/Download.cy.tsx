@@ -60,7 +60,9 @@ describe('Download', () => {
   });
 
   it('generates valid data dictionary with descriptions provided by user', () => {
-    useDataStore.setState({ columns: mockColumns });
+    useDataStore.setState({
+      columns: mockColumns,
+    });
     useDataStore.setState({ config: mockConfig });
     useDataStore.setState({ uploadedDataTableFileName: 'someFileName.tsv' });
 

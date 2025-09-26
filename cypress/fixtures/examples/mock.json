@@ -25,11 +25,32 @@
   },
   "sex": {
     "Description": "Sex of the participant",
+    "Levels": {
+      "F": {
+        "Description": "Female",
+        "TermURL": "snomed:248152002"
+      },
+      "M": {
+        "Description": "Male",
+        "TermURL": "snomed:248153007"
+      }
+    },
     "Annotations": {
       "IsAbout": {
         "TermURL": "nb:Sex",
         "Label": "Sex"
       },
+      "Levels": {
+        "F": {
+          "TermURL": "snomed:248152002",
+          "Label": "Female"
+        },
+        "M": {
+          "TermURL": "snomed:248153007",
+          "Label": "Male"
+        }
+      },
+      "MissingValues": ["N/A"],
       "VariableType": "Categorical"
     }
   },

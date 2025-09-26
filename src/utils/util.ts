@@ -231,13 +231,25 @@ export function getDataDictionary(columns: Columns): DataDictionary {
           );
 
           dictionaryEntry.Annotations.Levels = Object.entries(column.levels).reduce(
-            (termsObj, [levelKey, levelValue]) => ({
-              ...termsObj,
-              [levelKey]: {
-                TermURL: levelValue.termURL || '',
-                Label: levelValue.label || '',
-              },
-            }),
+            (termsObj, [levelKey, levelValue]) => {
+              if (levelValue.termURL && levelValue.label) {
+                // Include properly mapped levels
+                return {
+                  ...termsObj,
+                  [levelKey]: {
+                    TermURL: levelValue.termURL,
+                    Label: levelValue.label,
+                  },
+                };
+              }
+              // Replace the incomplete levels annotation with an empty object
+              // to avoid a data dictionary with undefined values and to raise a
+              // warning to the user based on the schema validation
+              return {
+                ...termsObj,
+                [levelKey]: {} as { TermURL: string; Label: string },
+              };
+            },
             {} as { [key: string]: { TermURL: string; Label: string } }
           );
         }
