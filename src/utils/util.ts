@@ -242,7 +242,9 @@ export function getDataDictionary(columns: Columns): DataDictionary {
                   },
                 };
               }
-              // Include unmapped levels as empty objects to trigger AJV validation errors
+              // Replace the incomplete levels annotation with an empty object
+              // to avoid a data dictionary with undefined values and to raise a
+              // warning to the user based on the schema validation
               return {
                 ...termsObj,
                 [levelKey]: {} as { TermURL: string; Label: string },

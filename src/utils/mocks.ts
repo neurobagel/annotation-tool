@@ -116,10 +116,10 @@ export const mockColumns: Columns = {
     },
     variableType: 'Categorical' as VariableType,
     levels: {
-      F: { description: '' },
-      M: { description: '' },
-      'N/A': { description: '' },
+      F: { description: 'Female', label: 'Female', termURL: 'snomed:248152002' },
+      M: { description: 'Male', label: 'Male', termURL: 'snomed:248153007' },
     },
+    missingValues: ['N/A'],
   },
   4: {
     header: 'group_dx',
@@ -247,13 +247,12 @@ export const mockDataDictionaryWithAnnotations = {
     Description: 'Sex of the participant',
     Levels: {
       F: {
-        Description: '',
+        Description: 'Female',
+        TermURL: 'snomed:248152002',
       },
       M: {
-        Description: '',
-      },
-      'N/A': {
-        Description: '',
+        Description: 'Male',
+        TermURL: 'snomed:248153007',
       },
     },
     Annotations: {
@@ -263,18 +262,15 @@ export const mockDataDictionaryWithAnnotations = {
       },
       Levels: {
         F: {
-          TermURL: '',
-          Label: '',
+          TermURL: 'snomed:248152002',
+          Label: 'Female',
         },
         M: {
-          TermURL: '',
-          Label: '',
-        },
-        'N/A': {
-          TermURL: '',
-          Label: '',
+          TermURL: 'snomed:248153007',
+          Label: 'Male',
         },
       },
+      MissingValues: ['N/A'],
       VariableType: 'Categorical' as VariableType,
     },
   },
