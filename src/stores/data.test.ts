@@ -302,4 +302,15 @@ describe('data store actions', () => {
     expect(result.current.columns['1'].standardizedVariable).toBeUndefined();
     expect(result.current.columns['1'].variableType).toBeUndefined();
   });
+
+  it('filters special line endings from an uploaded .tsv table', async () => {
+    const { result } = renderHook(() => useDataStore());
+    const carriageReturnTablePath = 'table_with_carriage_returns.tsv';
+
+    await act(async () => {
+      await result.current.processDataTableFile(mockDataTableFile(carriageReturnTablePath));
+    });
+
+    expect(result.current.dataTable['3']).toContain('\\r');
+  });
 });

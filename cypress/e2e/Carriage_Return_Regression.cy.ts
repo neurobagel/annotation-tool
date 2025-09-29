@@ -25,7 +25,7 @@ describe('Regression tests', () => {
     // Download view
     cy.get('[data-cy="download-datadictionary-button"]').click();
 
-    cy.readFile(`${outputFileName}`).then((fileContent) => {
+    cy.readFile(outputFileName).then((fileContent) => {
       const fileContentString = JSON.stringify(fileContent);
       // Check that the output string no longer contains a carriage return
       expect(fileContentString).to.not.contain('\\r');
