@@ -303,7 +303,7 @@ describe('data store actions', () => {
     expect(result.current.columns['1'].variableType).toBeUndefined();
   });
 
-  it('filters special line endings from an uploaded .tsv table', async () => {
+  it('filters CR(LF) line endings from an uploaded .tsv table', async () => {
     const { result } = renderHook(() => useDataStore());
     const carriageReturnTablePath = 'table_with_carriage_returns.tsv';
 
@@ -311,6 +311,9 @@ describe('data store actions', () => {
       await result.current.processDataTableFile(mockDataTableFile(carriageReturnTablePath));
     });
 
-    expect(result.current.dataTable['3']).toContain('\\r');
+    // This assertion is only matching an exact carriage return r\,
+    // so this test only fails if the test value looks like this: [ 'male\r', 'female\r', '\r' ],
+    // i.e. if there is an empty value in the table AND the table uses CR(LF) line endings
+    expect(result.current.dataTable['3']).to.not.contain('\r');
   });
 });
