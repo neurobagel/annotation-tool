@@ -1,3 +1,15 @@
+# v0.4.1 (Tue Sep 30 2025)
+
+#### 🐛 Bug Fixes
+
+- [FIX] Replace custom .tsv parsing with papaparse library [#295](https://github.com/neurobagel/annotation-tool/pull/295) ([@surchs](https://github.com/surchs))
+
+#### Authors: 1
+
+- Sebastian Urchs ([@surchs](https://github.com/surchs))
+
+---
+
 # v0.4.0 (Fri Sep 26 2025)
 
 #### 🚀 Enhancements
