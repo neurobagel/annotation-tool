@@ -26,6 +26,8 @@ import {
 export function parseTsvContent(content: string): { headers: string[]; data: string[][] } {
   if (!content) return { headers: [], data: [] };
 
+  // TODO: simply skipping empty rows here may cause downstream problems,
+  // see: https://github.com/neurobagel/annotation-tool/issues/142
   const result = Papa.parse<string[]>(content, {
     delimiter: '\t',
     skipEmptyLines: true,
