@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Papa from 'papaparse';
 import assessmentTerms from '../assets/default_config/assessment.json';
 import defaultConfigData from '../assets/default_config/config.json';
 import diagnosisTerms from '../assets/default_config/diagnosis.json';
@@ -23,12 +24,17 @@ import {
 // Utility functions for store
 
 export function parseTsvContent(content: string): { headers: string[]; data: string[][] } {
-  const rows = content
-    .split('\n')
-    .filter((row) => row !== '')
-    .map((row) => row.split('\t'));
+  if (!content) return { headers: [], data: [] };
+
+  const result = Papa.parse<string[]>(content, {
+    delimiter: '\t',
+    skipEmptyLines: true,
+  });
+
+  const rows = (result.data || []) as string[][];
   const headers = rows[0];
   const data = rows.slice(1);
+
   return { headers, data };
 }
 
