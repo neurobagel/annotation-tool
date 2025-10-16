@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { matchSorter } from 'match-sorter';
 import Papa from 'papaparse';
 import assessmentTerms from '../assets/default_config/assessment.json';
 import defaultConfigData from '../assets/default_config/config.json';
@@ -192,13 +191,6 @@ export function createMappedColumnHeaders(
 ): Record<string, string> {
   return Object.fromEntries(mappedColumns.map((id) => [id, columns[id]?.header || `Column ${id}`]));
 }
-
-export const createAutocompleteSorter =
-  <T>(getSearchableText: (item: T) => string) =>
-  (options: T[], { inputValue }: { inputValue: string }) =>
-    matchSorter(options, inputValue, {
-      keys: [getSearchableText],
-    });
 
 export function getDataDictionary(columns: Columns): DataDictionary {
   return Object.entries(columns).reduce<DataDictionary>((dictAcc, [_columnKey, column]) => {

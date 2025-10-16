@@ -10,11 +10,11 @@ import {
   Autocomplete,
   TextField,
 } from '@mui/material';
+import { matchSorter } from 'match-sorter';
 import { useState } from 'react';
 import { useSortedValues } from '~/hooks';
 import useDataStore from '~/stores/data';
 import { StandardizedVariable, StandardizedTerm } from '~/utils/internal_types';
-import { createAutocompleteSorter } from '~/utils/util';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueGroupButton from './MissingValueGroupButton';
 import SortCell from './SortCell';
@@ -62,10 +62,13 @@ function Categorical({
 
   const { visibleValues } = useSortedValues(uniqueValues, missingValues, sortBy, sortDir);
 
-  // Create a filter that sorts term options by relevance
-  const termFilter = createAutocompleteSorter<StandardizedTerm>((option) =>
-    option.abbreviation ? `${option.abbreviation} - ${option.label}` : option.label
-  );
+  const filterOptions = (items: StandardizedTerm[], { inputValue }: { inputValue: string }) =>
+    matchSorter(items, inputValue, {
+      keys: [
+        (option) =>
+          option.abbreviation ? `${option.abbreviation} - ${option.label}` : option.label,
+      ],
+    });
 
   return (
     <TableContainer
@@ -147,7 +150,7 @@ function Categorical({
                     onChange={(_, newValue) => {
                       onUpdateLevelTerm(columnID, value, newValue);
                     }}
-                    filterOptions={termFilter}
+                    filterOptions={filterOptions}
                     renderInput={(params) => (
                       // eslint-disable-next-line react/jsx-props-no-spreading
                       <TextField {...params} variant="standard" size="small" fullWidth />
