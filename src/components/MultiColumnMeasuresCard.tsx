@@ -11,6 +11,7 @@ import {
   TextField,
 } from '@mui/material';
 import { MultiColumnMeasuresTerm, MultiColumnMeasuresTermCard } from '../utils/internal_types';
+import { createAutocompleteSorter } from '../utils/util';
 
 interface TermCardProps {
   card: MultiColumnMeasuresTermCard;
@@ -35,6 +36,10 @@ function MultiColumnMeasuresCard({
   onRemoveColumn,
   onRemoveCard,
 }: TermCardProps) {
+  const termFilter = createAutocompleteSorter<MultiColumnMeasuresTerm>((option) =>
+    option.abbreviation ? `${option.abbreviation} - ${option.label}` : option.label
+  );
+
   return (
     <Card
       elevation={3}
@@ -59,6 +64,7 @@ function MultiColumnMeasuresCard({
               }
               getOptionDisabled={(option) => option.disabled || false}
               onChange={(_, newValue) => onTermSelect(newValue)}
+              filterOptions={termFilter}
               renderInput={(params) => (
                 <TextField
                   // eslint-disable-next-line react/jsx-props-no-spreading

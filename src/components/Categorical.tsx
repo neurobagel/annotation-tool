@@ -13,7 +13,8 @@ import {
 import { useState } from 'react';
 import { useSortedValues } from '~/hooks';
 import useDataStore from '~/stores/data';
-import { StandardizedVariable } from '~/utils/internal_types';
+import { StandardizedVariable, StandardizedTerm } from '~/utils/internal_types';
+import { createAutocompleteSorter } from '~/utils/util';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueGroupButton from './MissingValueGroupButton';
 import SortCell from './SortCell';
@@ -60,6 +61,11 @@ function Categorical({
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   const { visibleValues } = useSortedValues(uniqueValues, missingValues, sortBy, sortDir);
+
+  // Create a filter that sorts term options by relevance
+  const termFilter = createAutocompleteSorter<StandardizedTerm>((option) =>
+    option.abbreviation ? `${option.abbreviation} - ${option.label}` : option.label
+  );
 
   return (
     <TableContainer
@@ -132,11 +138,16 @@ function Categorical({
                   <Autocomplete
                     data-cy={`${columnID}-${value}-term-dropdown`}
                     options={options}
-                    getOptionLabel={(option) => option.label}
+                    getOptionLabel={(option: StandardizedTerm) =>
+                      option.abbreviation
+                        ? `${option.abbreviation} - ${option.label}`
+                        : option.label
+                    }
                     value={options.find((opt) => opt.identifier === levels[value]?.termURL) || null}
                     onChange={(_, newValue) => {
                       onUpdateLevelTerm(columnID, value, newValue);
                     }}
+                    filterOptions={termFilter}
                     renderInput={(params) => (
                       // eslint-disable-next-line react/jsx-props-no-spreading
                       <TextField {...params} variant="standard" size="small" fullWidth />
