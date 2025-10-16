@@ -271,7 +271,7 @@ describe('Main user flow', () => {
       'Attention deficit hyperactivity disorder'
     );
     cy.get('[data-cy="4-ADHD-term-dropdown"]').type(
-      'Attention deficit hyperactivity disorder{downArrow}{downArrow}{downArrow}{enter}'
+      'Attention deficit hyperactivity disorder{downArrow}{enter}'
     );
     cy.get('[data-cy="4-PD-description"]').type('Parkinsons');
     cy.get('[data-cy="4-PD-description"]').should('contain', 'Parkinsons');

@@ -10,10 +10,11 @@ import {
   Autocomplete,
   TextField,
 } from '@mui/material';
+import { matchSorter } from 'match-sorter';
 import { useState } from 'react';
 import { useSortedValues } from '~/hooks';
 import useDataStore from '~/stores/data';
-import { StandardizedVariable } from '~/utils/internal_types';
+import { StandardizedVariable, StandardizedTerm } from '~/utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueGroupButton from './MissingValueGroupButton';
 import SortCell from './SortCell';
@@ -60,6 +61,14 @@ function Categorical({
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   const { visibleValues } = useSortedValues(uniqueValues, missingValues, sortBy, sortDir);
+
+  const filterOptions = (items: StandardizedTerm[], { inputValue }: { inputValue: string }) =>
+    matchSorter(items, inputValue, {
+      keys: [
+        (option) =>
+          option.abbreviation ? `${option.abbreviation} - ${option.label}` : option.label,
+      ],
+    });
 
   return (
     <TableContainer
@@ -132,11 +141,16 @@ function Categorical({
                   <Autocomplete
                     data-cy={`${columnID}-${value}-term-dropdown`}
                     options={options}
-                    getOptionLabel={(option) => option.label}
+                    getOptionLabel={(option: StandardizedTerm) =>
+                      option.abbreviation
+                        ? `${option.abbreviation} - ${option.label}`
+                        : option.label
+                    }
                     value={options.find((opt) => opt.identifier === levels[value]?.termURL) || null}
                     onChange={(_, newValue) => {
                       onUpdateLevelTerm(columnID, value, newValue);
                     }}
+                    filterOptions={filterOptions}
                     renderInput={(params) => (
                       // eslint-disable-next-line react/jsx-props-no-spreading
                       <TextField {...params} variant="standard" size="small" fullWidth />
