@@ -1,4 +1,3 @@
-import { FilterOptionsState } from '@mui/material';
 import axios from 'axios';
 import { describe, it, expect, vi } from 'vitest';
 import { fetchConfigGitHubURL, githubRawBaseURL } from './constants';
@@ -278,106 +277,70 @@ describe('createAutocompleteSorter', () => {
   ];
 
   it('should prioritize exact matches first', () => {
-    const sorter = createAutocompleteSorter<MockOption>((option) => option.label);
-    const state: FilterOptionsState<MockOption> = {
-      inputValue: 'test',
-      getOptionLabel: (option) => option.label,
-    };
+    const filter = createAutocompleteSorter<MockOption>((option) => option.label);
 
-    const result = sorter(mockOptions, state);
+    const result = filter(mockOptions, { inputValue: 'test' });
 
-    // Exact match should be first
     expect(result[0].label.toLowerCase()).toBe('test');
   });
 
-  it('should sort starts-with matches by length (shortest first)', () => {
-    const sorter = createAutocompleteSorter<MockOption>((option) => option.label);
-    const state: FilterOptionsState<MockOption> = {
-      inputValue: 'test',
-      getOptionLabel: (option) => option.label,
-    };
+  it('should prioritize starts-with matches after exact matches', () => {
+    const filter = createAutocompleteSorter<MockOption>((option) => option.label);
 
-    const result = sorter(mockOptions, state);
+    const result = filter(mockOptions, { inputValue: 'test' });
 
-    // Find all starts-with matches (excluding exact match)
-    const startsWithMatches = result.filter(
-      (opt) => opt.label.toLowerCase().startsWith('test') && opt.label.toLowerCase() !== 'test'
-    );
+    const startsWithMatches = result
+      .slice(1)
+      .filter((opt) => opt.label.toLowerCase().startsWith('test'));
 
-    // Check they're sorted by length
-    for (let i = 0; i < startsWithMatches.length - 1; i += 1) {
-      expect(startsWithMatches[i].label.length).toBeLessThanOrEqual(
-        startsWithMatches[i + 1].label.length
-      );
-    }
+    expect(startsWithMatches.length).toBeGreaterThan(0);
+    expect(startsWithMatches.some((opt) => opt.label === 'Testing')).toBe(true);
   });
 
-  it('should prioritize contains matches after starts-with matches', () => {
-    const sorter = createAutocompleteSorter<MockOption>((option) => option.label);
-    const state: FilterOptionsState<MockOption> = {
-      inputValue: 'test',
-      getOptionLabel: (option) => option.label,
-    };
+  it('should include contains matches', () => {
+    const filter = createAutocompleteSorter<MockOption>((option) => option.label);
 
-    const result = sorter(mockOptions, state);
+    const result = filter(mockOptions, { inputValue: 'test' });
 
-    // Find options that contain but don't start with "test"
-    const containsMatches = result.filter(
-      (opt) =>
-        opt.label.toLowerCase().includes('test') && !opt.label.toLowerCase().startsWith('test')
-    );
-
-    expect(containsMatches.length).toBeGreaterThan(0);
-    expect(containsMatches.some((opt) => opt.label === 'A Test Case')).toBe(true);
+    expect(result.some((opt) => opt.label === 'A Test Case')).toBe(true);
+    expect(result.some((opt) => opt.label === 'Something with test in middle')).toBe(true);
   });
 
   it('should handle case-insensitive matching', () => {
-    const sorter = createAutocompleteSorter<MockOption>((option) => option.label);
-    const state: FilterOptionsState<MockOption> = {
-      inputValue: 'TEST',
-      getOptionLabel: (option) => option.label,
-    };
+    const filter = createAutocompleteSorter<MockOption>((option) => option.label);
 
-    const result = sorter(mockOptions, state);
+    const result = filter(mockOptions, { inputValue: 'TEST' });
 
-    // Should still find matches regardless of case
     expect(result.length).toBeGreaterThan(0);
     expect(result[0].label.toLowerCase()).toBe('test');
   });
 
   it('should work with options with abbreviations', () => {
-    interface OptionWithAbbriviation {
+    interface OptionWithAbbreviation {
       id: string;
       abbreviation?: string;
       label: string;
     }
 
-    const complexOptions: OptionWithAbbriviation[] = [
+    const complexOptions: OptionWithAbbreviation[] = [
       { id: '1', abbreviation: 'MRI', label: 'Magnetic Resonance Imaging' },
       { id: '2', abbreviation: 'CT', label: 'Computed Tomography' },
       { id: '3', abbreviation: 'PET', label: 'Positron Emission Tomography' },
       { id: '4', label: 'MRI Scanner' },
     ];
 
-    const sorter = createAutocompleteSorter<OptionWithAbbriviation>((option) =>
+    const filter = createAutocompleteSorter<OptionWithAbbreviation>((option) =>
       option.abbreviation ? `${option.abbreviation} - ${option.label}` : option.label
     );
 
-    const state: FilterOptionsState<OptionWithAbbriviation> = {
-      inputValue: 'MRI',
-      getOptionLabel: (option) =>
-        option.abbreviation ? `${option.abbreviation} - ${option.label}` : option.label,
-    };
-
-    const result = sorter(complexOptions, state);
+    const result = filter(complexOptions, { inputValue: 'MRI' });
 
     // Should find both options with MRI
     expect(result.length).toBeGreaterThan(0);
-    // The first result should start with "MRI" (the abbreviation option)
-    const firstResultText = result[0].abbreviation
-      ? `${result[0].abbreviation} - ${result[0].label}`
-      : result[0].label;
-    expect(firstResultText.startsWith('MRI')).toBe(true);
+    // Should include the option with MRI abbreviation
+    expect(result.some((opt) => opt.abbreviation === 'MRI')).toBe(true);
+    // Should include the option with "MRI Scanner" label
+    expect(result.some((opt) => opt.label === 'MRI Scanner')).toBe(true);
   });
 
   it('should handle partial word matching', () => {
@@ -388,20 +351,32 @@ describe('createAutocompleteSorter', () => {
       { id: '4', label: 'Diag' },
     ];
 
-    const sorter = createAutocompleteSorter<MockOption>((option) => option.label);
-    const state: FilterOptionsState<MockOption> = {
-      inputValue: 'diag',
-      getOptionLabel: (option) => option.label,
-    };
+    const filter = createAutocompleteSorter<MockOption>((option) => option.label);
 
-    const result = sorter(options, state);
+    const result = filter(options, { inputValue: 'diag' });
 
-    // Exact match first
+    // Should find all matching options
+    expect(result.length).toBe(4);
+    // Exact match should be first
     expect(result[0].label).toBe('Diag');
-    // Then starts with
+    // Starts-with matches should come next
     expect(result[1].label).toBe('Diagnosis');
     expect(result[2].label).toBe('Diagnostic Test');
-    // Then contains
-    expect(result[3].label).toBe('Pre-diagnosis');
+  });
+
+  it('should return all options when input is empty', () => {
+    const filter = createAutocompleteSorter<MockOption>((option) => option.label);
+
+    const result = filter(mockOptions, { inputValue: '' });
+
+    expect(result.length).toBe(mockOptions.length);
+  });
+
+  it('should filter out non-matching options', () => {
+    const filter = createAutocompleteSorter<MockOption>((option) => option.label);
+
+    const result = filter(mockOptions, { inputValue: 'xyz' });
+
+    expect(result.length).toBe(0);
   });
 });

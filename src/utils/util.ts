@@ -1,5 +1,5 @@
-import { createFilterOptions, FilterOptionsState } from '@mui/material';
 import axios from 'axios';
+import { matchSorter } from 'match-sorter';
 import Papa from 'papaparse';
 import assessmentTerms from '../assets/default_config/assessment.json';
 import defaultConfigData from '../assets/default_config/config.json';
@@ -193,63 +193,12 @@ export function createMappedColumnHeaders(
   return Object.fromEntries(mappedColumns.map((id) => [id, columns[id]?.header || `Column ${id}`]));
 }
 
-/**
- * Creates a custom autocomplete sorter function for MUI Autocomplete components.
- *
- * This function wraps MUI's default filtering and adds custom sorting to prioritize
- * results by relevance:
- * 1. Exact matches first
- * 2. Starts with input (shortest to longest)
- * 3. Contains input (shortest to longest)
- * 4. Other matches (shortest to longest)
- *
- * Note: The actual filtering (which options match) is handled by MUI's createFilterOptions.
- * This function only sorts the already-filtered results for better UX.
- */
-export function createAutocompleteSorter<T>(
-  stringify: (option: T) => string
-): (options: T[], state: FilterOptionsState<T>) => T[] {
-  const baseFilter = createFilterOptions({ stringify });
-
-  return (options: T[], state: FilterOptionsState<T>) => {
-    // First, let MUI's default filter handle the actual filtering
-    const filtered = baseFilter(options, state);
-    const inputValue = state.inputValue.toLowerCase().trim();
-
-    // If no input, return filtered results in original order
-    if (!inputValue) return filtered;
-
-    // Sort the filtered results by relevance
-    return filtered.sort((a, b) => {
-      const aText = stringify(a).toLowerCase();
-      const bText = stringify(b).toLowerCase();
-
-      // Priority 1: Exact matches
-      const aExact = aText === inputValue;
-      const bExact = bText === inputValue;
-      if (aExact && !bExact) return -1;
-      if (!aExact && bExact) return 1;
-      if (aExact && bExact) return aText.length - bText.length;
-
-      // Priority 2: Starts with input (shorter options first)
-      const aStarts = aText.startsWith(inputValue);
-      const bStarts = bText.startsWith(inputValue);
-      if (aStarts && !bStarts) return -1;
-      if (!aStarts && bStarts) return 1;
-      if (aStarts && bStarts) return aText.length - bText.length;
-
-      // Priority 3: Contains input (shorter options first)
-      const aContains = aText.includes(inputValue);
-      const bContains = bText.includes(inputValue);
-      if (aContains && !bContains) return -1;
-      if (!aContains && bContains) return 1;
-      if (aContains && bContains) return aText.length - bText.length;
-
-      // Priority 4: Other matches (shorter options first)
-      return aText.length - bText.length;
+export const createAutocompleteSorter =
+  <T>(getSearchableText: (item: T) => string) =>
+  (options: T[], { inputValue }: { inputValue: string }) =>
+    matchSorter(options, inputValue, {
+      keys: [getSearchableText],
     });
-  };
-}
 
 export function getDataDictionary(columns: Columns): DataDictionary {
   return Object.entries(columns).reduce<DataDictionary>((dictAcc, [_columnKey, column]) => {
