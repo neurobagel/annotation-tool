@@ -1,3 +1,15 @@
+# v0.4.2 (Thu Oct 16 2025)
+
+#### 🚀 Enhancements
+
+- [ENH] Implemented and integrated sorter for terms' autocomplete [#304](https://github.com/neurobagel/annotation-tool/pull/304) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.4.1 (Tue Sep 30 2025)
 
 #### 🐛 Bug Fixes
