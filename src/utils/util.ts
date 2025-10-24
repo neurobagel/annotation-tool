@@ -192,15 +192,24 @@ export function createMappedColumnHeaders(
   return Object.fromEntries(mappedColumns.map((id) => [id, columns[id]?.header || `Column ${id}`]));
 }
 
-export function getDataDictionary(columns: Columns): DataDictionary {
+export function getDataDictionary(columns: Columns, config: Config): DataDictionary {
   return Object.entries(columns).reduce<DataDictionary>((dictAcc, [_columnKey, column]) => {
     if (column.header) {
       const dictionaryEntry: DataDictionary[string] = {
         Description: column.description || '',
       };
 
-      // Description of levels always included for the BIDS section
-      if (column.variableType === 'Categorical' && column.levels) {
+      // Get the config entry for this column's assigned standardized variable to use for
+      // output if no mapped standardized variable was mapped column variableType as fallback
+      const configEntry =
+        config && column.standardizedVariable
+          ? Object.values(config).find(
+              (configItem) => configItem.identifier === column.standardizedVariable?.identifier
+            )
+          : undefined;
+      const outputVariableType = configEntry?.variable_type || column.variableType;
+
+      if (outputVariableType === 'Categorical' && column.levels) {
         dictionaryEntry.Levels = Object.entries(column.levels).reduce(
           (levelsObj, [levelKey, levelValue]) => ({
             ...levelsObj,
@@ -212,7 +221,7 @@ export function getDataDictionary(columns: Columns): DataDictionary {
         );
       }
 
-      if (column.variableType === 'Continuous' && column.units !== undefined) {
+      if (outputVariableType === 'Continuous' && column.units !== undefined) {
         dictionaryEntry.Units = column.units;
       }
 
@@ -222,11 +231,11 @@ export function getDataDictionary(columns: Columns): DataDictionary {
             TermURL: column.standardizedVariable.identifier,
             Label: column.standardizedVariable.label,
           },
-          VariableType: column.variableType,
+          VariableType: outputVariableType,
         };
 
         // Add term url to Levels under BIDS section only for a categorical column with a standardized variable
-        if (column.variableType === 'Categorical' && column.levels) {
+        if (outputVariableType === 'Categorical' && column.levels) {
           dictionaryEntry.Levels = Object.entries(column.levels).reduce(
             (updatedLevels, [levelKey, levelValue]) => ({
               ...updatedLevels,
@@ -269,11 +278,11 @@ export function getDataDictionary(columns: Columns): DataDictionary {
           };
         }
 
-        if (column.missingValues && column.variableType !== null) {
+        if (column.missingValues && outputVariableType !== null) {
           dictionaryEntry.Annotations.MissingValues = column.missingValues;
         }
 
-        if (column.variableType === 'Continuous' && column.format) {
+        if (outputVariableType === 'Continuous' && column.format) {
           dictionaryEntry.Annotations.Format = {
             TermURL: column.format?.termURL || '',
             Label: column.format?.label || '',

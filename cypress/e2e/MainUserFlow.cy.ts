@@ -343,6 +343,8 @@ describe('Main user flow', () => {
     // Scroll to access the 4th column annotation card
     cy.get('[data-cy="4-column-annotation-card"]').scrollIntoView();
     cy.get('[data-cy="4-column-annotation-card-data-type"]').should('contain', 'Categorical');
+
+    cy.get('[data-cy="6-column-annotation-card-data-type-categorical-button"]').click();
     cy.get('[data-cy="next-button"]').click();
 
     // Multi-Column Measures view
@@ -448,6 +450,7 @@ describe('Main user flow', () => {
       expect(fileContent.iq.Annotations.IsPartOf.Label).to.equal(
         'Previous IQ assessment by pronunciation'
       );
+      expect(fileContent.iq.Annotations.VariableType).to.equal('Collection');
     });
   });
   it('loads in a data dictionary from the legacy annotation tool', () => {
