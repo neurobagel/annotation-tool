@@ -264,7 +264,7 @@ describe('mapConfigFileToStoreConfig', () => {
   });
 });
 
-describe('mapConfigFileToStoreConfig', () => {
+describe('getDataDictionary', () => {
   it('should generate the desired output data dictionary', () => {
     const result = getDataDictionary(mockColumns, mockConfig);
 

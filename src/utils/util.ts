@@ -199,8 +199,8 @@ export function getDataDictionary(columns: Columns, config: Config): DataDiction
         Description: column.description || '',
       };
 
-      // Get the config entry for this column's assigned standardized variable to use for
-      // output if no mapped standardized variable was mapped column variableType as fallback
+      // Get the config entry for this column's assigned standardized variable to use for output
+      // if no standardized variable was mapped then use column variableType as fallback
       const configEntry =
         config && column.standardizedVariable
           ? Object.values(config).find(
