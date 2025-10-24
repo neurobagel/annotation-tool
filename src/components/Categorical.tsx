@@ -68,6 +68,7 @@ function Categorical({
         (option) =>
           option.abbreviation ? `${option.abbreviation} - ${option.label}` : option.label,
       ],
+      baseSort: (a, b) => a.index - b.index,
     });
 
   return (
