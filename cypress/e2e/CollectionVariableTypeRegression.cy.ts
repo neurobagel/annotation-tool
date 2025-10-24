@@ -76,6 +76,9 @@ describe('Regression tests for collection variable type', () => {
     cy.get('[data-cy="3-tab"]').click();
     cy.get('[data-cy="3-M-description"]').type('Male');
     cy.get('[data-cy="3-F-description"]').type('Female');
+    // Remove once we've addressed the problem with description not being
+    // saved on after setting a value as missing
+    cy.wait('5000');
     cy.get('[data-cy="3-N/A-missing-value-yes"]').click();
     cy.get('[data-cy="next-button"]').click();
 
