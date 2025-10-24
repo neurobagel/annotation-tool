@@ -209,7 +209,7 @@ export function getDataDictionary(columns: Columns, config: Config): DataDiction
           : undefined;
       const outputVariableType = configEntry?.variable_type || column.variableType;
 
-      if (outputVariableType === 'Categorical' && column.levels) {
+      if (column.variableType === 'Categorical' && column.levels) {
         dictionaryEntry.Levels = Object.entries(column.levels).reduce(
           (levelsObj, [levelKey, levelValue]) => ({
             ...levelsObj,
@@ -221,7 +221,7 @@ export function getDataDictionary(columns: Columns, config: Config): DataDiction
         );
       }
 
-      if (outputVariableType === 'Continuous' && column.units !== undefined) {
+      if (column.variableType === 'Continuous' && column.units !== undefined) {
         dictionaryEntry.Units = column.units;
       }
 
@@ -235,7 +235,11 @@ export function getDataDictionary(columns: Columns, config: Config): DataDiction
         };
 
         // Add term url to Levels under BIDS section only for a categorical column with a standardized variable
-        if (outputVariableType === 'Categorical' && column.levels) {
+        if (
+          outputVariableType !== 'Collection' &&
+          column.variableType === 'Categorical' &&
+          column.levels
+        ) {
           dictionaryEntry.Levels = Object.entries(column.levels).reduce(
             (updatedLevels, [levelKey, levelValue]) => ({
               ...updatedLevels,
@@ -278,11 +282,11 @@ export function getDataDictionary(columns: Columns, config: Config): DataDiction
           };
         }
 
-        if (column.missingValues && outputVariableType !== null) {
+        if (column.missingValues && column.variableType !== null) {
           dictionaryEntry.Annotations.MissingValues = column.missingValues;
         }
 
-        if (outputVariableType === 'Continuous' && column.format) {
+        if (column.variableType === 'Continuous' && column.format) {
           dictionaryEntry.Annotations.Format = {
             TermURL: column.format?.termURL || '',
             Label: column.format?.label || '',

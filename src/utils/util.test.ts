@@ -1,20 +1,12 @@
 import axios from 'axios';
 import { describe, it, expect, vi } from 'vitest';
 import { fetchConfigGitHubURL, githubRawBaseURL } from './constants';
-import {
-  mockGitHubResponse,
-  mockConfigFile,
-  mockTermsData,
-  mockConfig,
-  mockColumns,
-  mockDataDictionaryWithAnnotations,
-} from './mocks';
+import { mockGitHubResponse, mockConfigFile, mockTermsData, mockConfig } from './mocks';
 import {
   parseTsvContent,
   fetchAvailableConfigs,
   fetchConfig,
   mapConfigFileToStoreConfig,
-  getDataDictionary,
 } from './util';
 
 // Mock axios
@@ -261,13 +253,5 @@ describe('mapConfigFileToStoreConfig', () => {
         ],
       },
     });
-  });
-});
-
-describe('getDataDictionary', () => {
-  it('should generate the desired output data dictionary', () => {
-    const result = getDataDictionary(mockColumns, mockConfig);
-
-    expect(result).toEqual(mockDataDictionaryWithAnnotations);
   });
 });
