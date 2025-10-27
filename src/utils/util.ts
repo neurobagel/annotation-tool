@@ -201,7 +201,7 @@ export function getDataDictionary(columns: Columns, config: Config): DataDiction
 
       // Make a temporary copy of the variableType of the column to be used in the data dictionary output.
       // If column is mapped to a standardized variable, use the variableType of the standardized variable.
-      // Otherwise use the variableType currently assgined to the column.
+      // Otherwise use the variableType currently assigned to the column.
       // The only time we expect a difference between column.variableType and variableType of the mapped
       // standardized variable is for "Assessment tool" columns (SV.variableType='Collection') that had a
       // manually defined column.variableType (e.g. categorical or continuous)
