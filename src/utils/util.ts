@@ -199,8 +199,12 @@ export function getDataDictionary(columns: Columns, config: Config): DataDiction
         Description: column.description || '',
       };
 
-      // Get the config entry for this column's assigned standardized variable to use for output
-      // if no standardized variable was mapped then use column variableType as fallback
+      // Make a temporary copy of the variableType of the column to be used in the data dictionary output.
+      // If column is mapped to a standardized variable, use the variableType of the standardized variable.
+      // Otherwise use the variableType currently assgined to the column.
+      // The only time we expect a difference between column.variableType and variableType of the mapped
+      // standardized variable is for "Assessment tool" columns (SV.variableType='Collection') that had a
+      // manually defined column.variableType (e.g. categorical or continuous)
       const configEntry =
         config && column.standardizedVariable
           ? Object.values(config).find(
@@ -209,6 +213,7 @@ export function getDataDictionary(columns: Columns, config: Config): DataDiction
           : undefined;
       const outputVariableType = configEntry?.variable_type || column.variableType;
 
+      // Handle the BIDS annotation for all columns first
       if (column.variableType === 'Categorical' && column.levels) {
         dictionaryEntry.Levels = Object.entries(column.levels).reduce(
           (levelsObj, [levelKey, levelValue]) => ({
