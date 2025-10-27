@@ -192,14 +192,28 @@ export function createMappedColumnHeaders(
   return Object.fromEntries(mappedColumns.map((id) => [id, columns[id]?.header || `Column ${id}`]));
 }
 
-export function getDataDictionary(columns: Columns): DataDictionary {
+export function getDataDictionary(columns: Columns, config: Config): DataDictionary {
   return Object.entries(columns).reduce<DataDictionary>((dictAcc, [_columnKey, column]) => {
     if (column.header) {
       const dictionaryEntry: DataDictionary[string] = {
         Description: column.description || '',
       };
 
-      // Description of levels always included for the BIDS section
+      // Make a temporary copy of the variableType of the column to be used in the data dictionary output.
+      // If column is mapped to a standardized variable, use the variableType of the standardized variable.
+      // Otherwise use the variableType currently assigned to the column.
+      // The only time we expect a difference between column.variableType and variableType of the mapped
+      // standardized variable is for "Assessment tool" columns (SV.variableType='Collection') that had a
+      // manually defined column.variableType (e.g. categorical or continuous)
+      const configEntry =
+        config && column.standardizedVariable
+          ? Object.values(config).find(
+              (configItem) => configItem.identifier === column.standardizedVariable?.identifier
+            )
+          : undefined;
+      const outputVariableType = configEntry?.variable_type || column.variableType;
+
+      // Handle the BIDS annotation for all columns first
       if (column.variableType === 'Categorical' && column.levels) {
         dictionaryEntry.Levels = Object.entries(column.levels).reduce(
           (levelsObj, [levelKey, levelValue]) => ({
@@ -222,11 +236,15 @@ export function getDataDictionary(columns: Columns): DataDictionary {
             TermURL: column.standardizedVariable.identifier,
             Label: column.standardizedVariable.label,
           },
-          VariableType: column.variableType,
+          VariableType: outputVariableType,
         };
 
         // Add term url to Levels under BIDS section only for a categorical column with a standardized variable
-        if (column.variableType === 'Categorical' && column.levels) {
+        if (
+          outputVariableType !== 'Collection' &&
+          column.variableType === 'Categorical' &&
+          column.levels
+        ) {
           dictionaryEntry.Levels = Object.entries(column.levels).reduce(
             (updatedLevels, [levelKey, levelValue]) => ({
               ...updatedLevels,
