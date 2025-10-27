@@ -4,7 +4,7 @@ describe('Regression tests', () => {
     cy.intercept('GET', '**/api.github.com/repos/**', { forceNetworkError: true });
     cy.intercept('GET', '**/raw.githubusercontent.com/**', { forceNetworkError: true });
   });
-  it('Preserves Healthy Control as first diagnosis term when filtering', () => {
+  it('"Healthy Control" is the first diagnosis term when filtering', () => {
     const mockTablePath = 'cypress/fixtures/examples/mock.tsv';
 
     cy.visit('http://localhost:5173');
