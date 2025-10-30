@@ -6,7 +6,7 @@ type FreshDataStore = FreshDataStoreState & {
   actions: FreshDataStoreActions;
 };
 
-const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
+const useFreshDataStore = create<FreshDataStore>()((set) => ({
   columns: {},
   standardizedVariables: {},
   standardizedTerms: {},
@@ -20,7 +20,9 @@ const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
     dataDictionary: {},
   },
   actions: {
-    loadConfig: async (configName: string) => {},
+    loadConfig: async (configName: string) => {
+      set({ config: configName });
+    },
   },
 }));
 
