@@ -706,3 +706,5 @@ export const mockDiagnosisTerms = [
     ],
   },
 ];
+
+export const mockAvailableConfigOptions = ['Neurobagel', 'OtherConfig', 'TestConfig'];

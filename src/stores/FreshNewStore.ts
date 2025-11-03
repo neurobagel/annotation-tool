@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { FreshDataStoreState, FreshDataStoreActions } from '../../datamodel';
+import { fetchAvailableConfigs, fetchConfig } from '../utils/store-utils';
 
 type FreshDataStore = FreshDataStoreState & {
   actions: FreshDataStoreActions;
@@ -22,6 +23,30 @@ const useFreshDataStore = create<FreshDataStore>()((set) => ({
   actions: {
     loadConfig: async (configName: string) => {
       set({ config: configName });
+    },
+    appFetchesConfigOptions: async () => {
+      try {
+        const availableConfigs = await fetchAvailableConfigs();
+        set({ configOptions: availableConfigs });
+      } catch (error) {
+        // TODO: show a notif error
+        set({ configOptions: [] });
+      }
+    },
+    userSelectsConfig: async (userSelectedConfig: string) => {
+      set({ isConfigLoading: true });
+
+      try {
+        const { config, termsData } = await fetchConfig(userSelectedConfig);
+        set({ config: userSelectedConfig });
+        //
+      } catch (error) {
+        // TODO: show a notif error
+        // The fallback is already handled in fetchConfig, so if we get here,
+        // both remote and default config failed
+      }
+
+      set({ isConfigLoading: false });
     },
   },
 }));
