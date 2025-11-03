@@ -1,4 +1,5 @@
 // --- Raw config file types (used for parsing config files from disk/network) ---
+import { VariableType as FreshVariableType } from 'datamodel';
 import { VariableType } from './internal_types';
 
 // A term as it appears in a terms file (raw config)
@@ -28,6 +29,7 @@ export interface VocabConfig {
 }
 
 // A standardized variable as it appears in a config file (raw config)
+// TODO: remove one of the duplicates once the store refactoring is done
 export type ConfigFileStandardizedVariable = {
   id: string;
   name: string;
@@ -41,11 +43,33 @@ export type ConfigFileStandardizedVariable = {
   same_as?: string | null;
 };
 
+export type FreshConfigFileStandardizedVariable = {
+  id: string;
+  name: string;
+  variable_type?: FreshVariableType;
+  terms_file?: string | null;
+  formats?: ConfigFileTermFormat[] | null;
+  required?: boolean;
+  description?: string;
+  is_multi_column_measure?: boolean;
+  can_have_multiple_columns?: boolean;
+  same_as?: string | null;
+};
+
 // The config file as it appears on disk/network (raw config)
+// TODO: remove one of the duplicates once the store refactoring is done
 export interface ConfigFile {
   vocabulary_name: string;
   namespace_prefix: string;
   namespace_url: string;
   version: string;
   standardized_variables: ConfigFileStandardizedVariable[];
+}
+
+export interface FreshConfigFile {
+  vocabulary_name: string;
+  namespace_prefix: string;
+  namespace_url: string;
+  version: string;
+  standardized_variables: FreshConfigFileStandardizedVariable[];
 }

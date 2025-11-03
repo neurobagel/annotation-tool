@@ -5,9 +5,9 @@ import diagnosisTerms from '../assets/default_config/diagnosis.json';
 import sexTerms from '../assets/default_config/sex.json';
 import { fetchConfigGitHubURL, githubRawBaseURL } from './constants';
 import {
-  ConfigFile,
+  FreshConfigFile,
   VocabConfig,
-  ConfigFileStandardizedVariable,
+  FreshConfigFileStandardizedVariable,
 } from './external_types';
 
 export async function fetchAvailableConfigs(): Promise<string[]> {
@@ -26,7 +26,7 @@ export async function fetchAvailableConfigs(): Promise<string[]> {
 // Helper function to load config from a given path
 async function loadConfigFromPath(
   configPath: string
-): Promise<{ config: ConfigFile; termsData: Record<string, VocabConfig[]> }> {
+): Promise<{ config: FreshConfigFile; termsData: Record<string, VocabConfig[]> }> {
   const configResponse = await axios.get(configPath);
   const configArray = configResponse.data;
   const config = configArray[0];
@@ -35,7 +35,7 @@ async function loadConfigFromPath(
   const termFiles = new Set<string>();
   const variables = config.standardized_variables;
 
-  variables.forEach((variable: ConfigFileStandardizedVariable) => {
+  variables.forEach((variable: FreshConfigFileStandardizedVariable) => {
     if (variable.terms_file) {
       termFiles.add(variable.terms_file);
     }
@@ -62,14 +62,14 @@ async function loadConfigFromPath(
 
 export async function fetchConfig(
   selectedConfig: string
-): Promise<{ config: ConfigFile; termsData: Record<string, VocabConfig[]> }> {
+): Promise<{ config: FreshConfigFile; termsData: Record<string, VocabConfig[]> }> {
   try {
     return await loadConfigFromPath(`${githubRawBaseURL}${selectedConfig}/config.json`);
   } catch (error) {
     // TODO: show a notif error
     // Fallback to default config when remote fetching fails
     try {
-      const config = (defaultConfigData as ConfigFile[])[0];
+      const config = (defaultConfigData as FreshConfigFile[])[0];
       const termsData: Record<string, VocabConfig[]> = {
         'assessment.json': assessmentTerms as VocabConfig[],
         'diagnosis.json': diagnosisTerms as VocabConfig[],
@@ -77,7 +77,7 @@ export async function fetchConfig(
       };
       return { config, termsData };
     } catch (fallbackError) {
-      return { config: {} as ConfigFile, termsData: {} };
+      return { config: {} as FreshConfigFile, termsData: {} };
     }
   }
 }
