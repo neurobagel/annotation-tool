@@ -102,7 +102,7 @@ type DataStore = {
   // convert to string, points to the name of the selected config
   config: Config;
   configOptions: string[];
-  // refactor to be just a setter called inside hte component
+  // refactor to be just a setter called inside the component
   loadConfigOptions: () => Promise<void>;
   // remove and use config instead
   selectedConfig: string | null;
