@@ -169,7 +169,8 @@ export function useActiveVariableData(
 
 export function useDataDictionary(): DataDictionary {
   const columns = useDataStore((state) => state.columns);
-  return useMemo(() => getDataDictionary(columns), [columns]);
+  const config = useDataStore((state) => state.config);
+  return useMemo(() => getDataDictionary(columns, config), [columns, config]);
 }
 
 export function useSchemaValidation(dataDictionary: DataDictionary) {

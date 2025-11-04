@@ -343,6 +343,7 @@ describe('Main user flow', () => {
     // Scroll to access the 4th column annotation card
     cy.get('[data-cy="4-column-annotation-card"]').scrollIntoView();
     cy.get('[data-cy="4-column-annotation-card-data-type"]').should('contain', 'Categorical');
+
     cy.get('[data-cy="next-button"]').click();
 
     // Multi-Column Measures view
