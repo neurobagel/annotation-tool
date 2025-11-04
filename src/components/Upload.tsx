@@ -25,7 +25,7 @@ function Upload({ disableConfig }: UploadProps) {
   const dataTable = useDataTable();
   const dataDictionary = useDataStore((state) => state.uploadedDataDictionary);
   const uploadedDataTableFileName = useUploadedDataTableFileName();
-  const { appFetchesConfigOptions, userUploadedDataTableFile, userSelectsConfig } =
+  const { appFetchesConfigOptions, userUploadsDataTableFile, userSelectsConfig } =
     useFreshDataActions();
   const configOptions = useConfigOptions();
   const selectedConfig = useConfig();
@@ -41,7 +41,7 @@ function Upload({ disableConfig }: UploadProps) {
 
   const handleDataTableFileUpload = (file: File) => {
     reset();
-    userUploadedDataTableFile(file);
+    userUploadsDataTableFile(file);
   };
 
   const handleDataDictionaryFileUpload = (file: File) => {

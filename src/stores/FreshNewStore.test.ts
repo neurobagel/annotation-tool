@@ -223,7 +223,7 @@ describe('userUploadedDataTableFile', () => {
     }));
 
     await act(async () => {
-      await result.current.actions.userUploadedDataTableFile(mockFile);
+      await result.current.actions.userUploadsDataTableFile(mockFile);
     });
 
     expect(mockedReadFile).toHaveBeenCalledWith(mockFile);
@@ -258,7 +258,7 @@ value4\tvalue5\t
     }));
 
     await act(async () => {
-      await result.current.actions.userUploadedDataTableFile(mockFile);
+      await result.current.actions.userUploadsDataTableFile(mockFile);
     });
 
     expect(result.current.columns['0'].allValues).toEqual(['value1', 'value4', '']);
@@ -281,7 +281,7 @@ value4\tvalue5\t
     }));
 
     await act(async () => {
-      await result.current.actions.userUploadedDataTableFile(mockFile);
+      await result.current.actions.userUploadsDataTableFile(mockFile);
     });
 
     expect(result.current.columns['0'].id).toBe('0');
@@ -310,7 +310,7 @@ value4\tvalue5\t
     }));
 
     await act(async () => {
-      await result.current.actions.userUploadedDataTableFile(mockFile);
+      await result.current.actions.userUploadsDataTableFile(mockFile);
     });
 
     expect(mockedReadFile).toHaveBeenCalledWith(mockFile);
@@ -334,7 +334,7 @@ value4\tvalue5\t
     }));
 
     await act(async () => {
-      await result.current.actions.userUploadedDataTableFile(mockFile);
+      await result.current.actions.userUploadsDataTableFile(mockFile);
     });
 
     expect(result.current.columns).toEqual({});

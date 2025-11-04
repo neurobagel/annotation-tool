@@ -126,7 +126,7 @@ const useFreshDataStore = create<FreshDataStore>()((set) => ({
       }
     },
 
-    userUploadedDataTableFile: async (dataTableFile: File) => {
+    userUploadsDataTableFile: async (dataTableFile: File) => {
       try {
         const content = await readFile(dataTableFile);
         const { headers, data } = parseTsvContent(content);

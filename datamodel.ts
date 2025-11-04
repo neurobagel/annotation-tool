@@ -124,7 +124,7 @@ export type FreshDataStoreActions = {
   loadConfig: (configName: string) => Promise<void>;
   appFetchesConfigOptions: () => Promise<void>;
   userSelectsConfig: (userSelectedConfig: string | null) => Promise<void>;
-  userUploadedDataTableFile: (dataTableFile: File) => Promise<void>;
+  userUploadsDataTableFile: (dataTableFile: File) => Promise<void>;
 };
 
 export type FreshDataStore = FreshDataStoreState & {
