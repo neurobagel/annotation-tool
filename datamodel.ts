@@ -13,7 +13,7 @@ export enum DataType {
 interface Column {
   id: string;
   name: string;
-  allValues: [string]; // because we want to show the datable preview
+  allValues: string[]; // because we want to show the datable preview
   description?: string;
   dataType?: DataType;
   isPartOf?: string; // foreign key (primary key in terms table) to standardized term in the terms for the corresponding standardized variable
@@ -120,6 +120,7 @@ export type FreshDataStoreActions = {
   loadConfig: (configName: string) => Promise<void>;
   appFetchesConfigOptions: () => Promise<void>;
   userSelectsConfig: (userSelectedConfig: string | null) => Promise<void>;
+  userUploadedDataTableFile: (dataTableFile: File) => Promise<void>;
 };
 
 export type FreshDataStore = FreshDataStoreState & {

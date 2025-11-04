@@ -6,8 +6,14 @@ import {
   StandardizedVariables,
   StandardizedTerms,
   StandardizedFormats,
+  Columns,
 } from '../../datamodel';
-import { fetchAvailableConfigs, fetchConfig } from '../utils/store-utils';
+import {
+  fetchAvailableConfigs,
+  fetchConfig,
+  readFile,
+  parseTsvContent,
+} from '../utils/store-utils';
 
 type FreshDataStore = FreshDataStoreState & {
   actions: FreshDataStoreActions;
@@ -117,6 +123,37 @@ const useFreshDataStore = create<FreshDataStore>()((set) => ({
         }
 
         set({ isConfigLoading: false });
+      }
+    },
+
+    userUploadedDataTableFile: async (dataTableFile: File) => {
+      try {
+        const content = await readFile(dataTableFile);
+        const { headers, data } = parseTsvContent(content);
+
+        const columns: Columns = {};
+
+        headers.forEach((header, index) => {
+          const columnId = index.toString();
+          const allValues = data.map((row) => row[index] || '');
+
+          columns[columnId] = {
+            id: columnId,
+            name: header,
+            allValues,
+          };
+        });
+
+        set({
+          columns,
+          uploadedDataTableFileName: dataTableFile.name,
+        });
+      } catch (error) {
+        // TODO: show a notif error
+        set({
+          columns: {},
+          uploadedDataTableFileName: null,
+        });
       }
     },
   },

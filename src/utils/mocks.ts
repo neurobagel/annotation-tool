@@ -967,3 +967,50 @@ export const mockFreshStandardizedFormats = {
     examples: ['31Y6M'],
   },
 };
+
+// Mocked based on mock.tsv
+export const mockFreshColumnsAfterDataTableUpload = {
+  '0': {
+    id: '0',
+    name: 'participant_id',
+    allValues: [
+      'sub-718211',
+      'sub-718213',
+      'sub-718216',
+      'sub-718217',
+      'sub-718218',
+      'sub-718219',
+      'sub-718220',
+      'sub-718221',
+      'sub-718222',
+      'sub-718223',
+      'sub-718224',
+      'sub-718225',
+    ],
+  },
+  '1': {
+    id: '1',
+    name: 'age',
+    allValues: ['28.4', '24.6', '43.6', '28.4', '72.1', '56.2', '23', '22', '21', '45', '34', '65'],
+  },
+  '2': {
+    id: '2',
+    name: 'sex',
+    allValues: ['M', 'F', 'M', 'F', 'M', 'M', 'M', 'F', 'M', 'F', 'M', 'N/A'],
+  },
+  '3': {
+    id: '3',
+    name: 'group_dx',
+    allValues: ['ADHD', 'ADHD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'ADHD', 'PD'],
+  },
+  '4': {
+    id: '4',
+    name: 'group',
+    allValues: ['HC', 'HC', 'HC', 'HC', 'HC', 'N/A', 'HC', 'HC', 'Patient', 'HC', 'HC', 'HC'],
+  },
+  '5': {
+    id: '5',
+    name: 'iq',
+    allValues: ['80', '90', '100', '110', '65', '87', '94', '90', '81', '66', '67', '83'],
+  },
+};
