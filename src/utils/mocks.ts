@@ -1014,3 +1014,26 @@ export const mockFreshColumnsAfterDataTableUpload = {
     allValues: ['80', '90', '100', '110', '65', '87', '94', '90', '81', '66', '67', '83'],
   },
 };
+
+// Expected DataTable output from mockFreshColumnsAfterDataTableUpload
+export const mockFreshDataTableFromColumns = {
+  participant_id: [
+    'sub-718211',
+    'sub-718213',
+    'sub-718216',
+    'sub-718217',
+    'sub-718218',
+    'sub-718219',
+    'sub-718220',
+    'sub-718221',
+    'sub-718222',
+    'sub-718223',
+    'sub-718224',
+    'sub-718225',
+  ],
+  age: ['28.4', '24.6', '43.6', '28.4', '72.1', '56.2', '23', '22', '21', '45', '34', '65'],
+  sex: ['M', 'F', 'M', 'F', 'M', 'M', 'M', 'F', 'M', 'F', 'M', 'N/A'],
+  group_dx: ['ADHD', 'ADHD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'PD', 'ADHD', 'PD'],
+  group: ['HC', 'HC', 'HC', 'HC', 'HC', 'N/A', 'HC', 'HC', 'Patient', 'HC', 'HC', 'HC'],
+  iq: ['80', '90', '100', '110', '65', '87', '94', '90', '81', '66', '67', '83'],
+};

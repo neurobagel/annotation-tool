@@ -10,6 +10,10 @@ export enum DataType {
   continuous = 'Continuous',
 }
 
+export interface DataTable {
+  [key: string]: string[];
+}
+
 interface Column {
   id: string;
   name: string;
