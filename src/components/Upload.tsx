@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
+import { useDataTable } from '~/hooks/useDataTable';
 import {
   useConfig,
   useFreshDataActions,
   useIsConfigLoading,
+  useUploadedDataTableFileName,
   useConfigOptions,
 } from '../stores/FreshNewStore';
 import useDataStore from '../stores/data';
@@ -19,17 +21,14 @@ interface UploadProps {
 
 function Upload({ disableConfig }: UploadProps) {
   const reset = useDataStore((state) => state.reset);
-  const processDataTableFile = useDataStore((state) => state.processDataTableFile);
   const processDataDictionaryFile = useDataStore((state) => state.processDataDictionaryFile);
-  const dataTable = useDataStore((state) => state.dataTable);
-  const columns = useDataStore((state) => state.columns);
+  const dataTable = useDataTable();
   const dataDictionary = useDataStore((state) => state.uploadedDataDictionary);
-  const uploadedDataTableFileName = useDataStore((state) => state.uploadedDataTableFileName);
-  const { appFetchesConfigOptions } = useFreshDataActions();
+  const uploadedDataTableFileName = useUploadedDataTableFileName();
+  const { appFetchesConfigOptions, userUploadedDataTableFile, userSelectsConfig } =
+    useFreshDataActions();
   const configOptions = useConfigOptions();
   const selectedConfig = useConfig();
-  const { userSelectsConfig } = useFreshDataActions();
-  const setUploadedDataTableFileName = useDataStore((state) => state.setUploadedDataTableFileName);
   const setUploadedDataDictionaryFileName = useDataStore(
     (state) => state.setUploadedDataDictionaryFileName
   );
@@ -42,8 +41,7 @@ function Upload({ disableConfig }: UploadProps) {
 
   const handleDataTableFileUpload = (file: File) => {
     reset();
-    setUploadedDataTableFileName(file.name);
-    processDataTableFile(file);
+    userUploadedDataTableFile(file);
   };
 
   const handleDataDictionaryFileUpload = (file: File) => {
@@ -82,7 +80,7 @@ function Upload({ disableConfig }: UploadProps) {
         allowedFileType=".tsv"
         uploadedFileName={uploadedDataTableFileName}
         onFileUpload={handleDataTableFileUpload}
-        previewComponent={<DataTablePreview dataTable={dataTable} columns={columns} />}
+        previewComponent={<DataTablePreview dataTable={dataTable} />}
         diableFileUploader={isConfigLoading}
       />
       <UploadCard
