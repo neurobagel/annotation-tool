@@ -1,5 +1,10 @@
 import { useEffect } from 'react';
-import { useConfig, useFreshDataActions, useIsConfigLoading } from '../stores/FreshNewStore';
+import {
+  useConfig,
+  useFreshDataActions,
+  useIsConfigLoading,
+  useConfigOptions,
+} from '../stores/FreshNewStore';
 import useDataStore from '../stores/data';
 import { UploadInstructions } from '../utils/instructions';
 import ConfigCard from './ConfigCard';
@@ -21,7 +26,7 @@ function Upload({ disableConfig }: UploadProps) {
   const dataDictionary = useDataStore((state) => state.uploadedDataDictionary);
   const uploadedDataTableFileName = useDataStore((state) => state.uploadedDataTableFileName);
   const { appFetchesConfigOptions } = useFreshDataActions();
-  const configOptions = useDataStore((state) => state.configOptions);
+  const configOptions = useConfigOptions();
   const selectedConfig = useConfig();
   const { userSelectsConfig } = useFreshDataActions();
   const setUploadedDataTableFileName = useDataStore((state) => state.setUploadedDataTableFileName);
