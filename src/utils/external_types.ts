@@ -1,3 +1,4 @@
+// TODO: Remove duplicate types once store refactoring is done
 // --- Raw config file types (used for parsing config files from disk/network) ---
 import { VariableType as FreshVariableType } from 'datamodel';
 import { VariableType } from './internal_types';
@@ -29,7 +30,6 @@ export interface VocabConfig {
 }
 
 // A standardized variable as it appears in a config file (raw config)
-// TODO: remove one of the duplicates once the store refactoring is done
 export type ConfigFileStandardizedVariable = {
   id: string;
   name: string;
@@ -57,7 +57,6 @@ export type FreshConfigFileStandardizedVariable = {
 };
 
 // The config file as it appears on disk/network (raw config)
-// TODO: remove one of the duplicates once the store refactoring is done
 export interface ConfigFile {
   vocabulary_name: string;
   namespace_prefix: string;

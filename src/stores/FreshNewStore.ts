@@ -1,6 +1,12 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { FreshDataStoreState, FreshDataStoreActions } from '../../datamodel';
+import {
+  FreshDataStoreState,
+  FreshDataStoreActions,
+  StandardizedVariables,
+  StandardizedTerms,
+  StandardizedFormats,
+} from '../../datamodel';
 import { fetchAvailableConfigs, fetchConfig } from '../utils/store-utils';
 
 type FreshDataStore = FreshDataStoreState & {
@@ -33,20 +39,85 @@ const useFreshDataStore = create<FreshDataStore>()((set) => ({
         set({ configOptions: [] });
       }
     },
-    userSelectsConfig: async (userSelectedConfig: string) => {
-      set({ isConfigLoading: true });
+    userSelectsConfig: async (userSelectedConfig: string | null) => {
+      if (userSelectedConfig) {
+        set({ isConfigLoading: true });
 
-      try {
-        const { config, termsData } = await fetchConfig(userSelectedConfig);
-        set({ config: userSelectedConfig });
-        //
-      } catch (error) {
-        // TODO: show a notif error
-        // The fallback is already handled in fetchConfig, so if we get here,
-        // both remote and default config failed
+        try {
+          const { config, termsData } = await fetchConfig(userSelectedConfig);
+          const namespacePrefix = config.namespace_prefix;
+
+          // Convert standardized variables
+          const standardizedVariables: StandardizedVariables = {};
+          config.standardized_variables.forEach((variable) => {
+            const identifier = `${namespacePrefix}:${variable.id}`;
+            const { id, name, terms_file: termsFile, formats: rawFormats, ...rest } = variable;
+            standardizedVariables[identifier] = {
+              id: identifier,
+              name,
+              ...rest,
+            };
+          });
+
+          // Convert standardized terms from all terms files
+          const standardizedTerms: StandardizedTerms = {};
+          Object.entries(termsData).forEach(([fileName, vocabsArray]) => {
+            vocabsArray.forEach((vocab) => {
+              const termsNamespace = vocab.namespace_prefix;
+              vocab.terms.forEach((term) => {
+                const termIdentifier = `${termsNamespace}:${term.id}`;
+                const { id, name, ...restTermFields } = term;
+
+                // Find which standardized variable this term belongs to
+                const parentVariable = config.standardized_variables.find(
+                  (v) => v.terms_file === fileName
+                );
+                const standardizedVariableId = parentVariable
+                  ? `${namespacePrefix}:${parentVariable.id}`
+                  : '';
+
+                standardizedTerms[termIdentifier] = {
+                  standardizedVariableId,
+                  id: termIdentifier,
+                  label: name,
+                  ...restTermFields,
+                };
+              });
+            });
+          });
+
+          // Convert standardized formats from all standardized variables
+          const standardizedFormats: StandardizedFormats = {};
+          config.standardized_variables.forEach((variable) => {
+            if (variable.formats) {
+              const standardizedVariableId = `${namespacePrefix}:${variable.id}`;
+              variable.formats.forEach((format) => {
+                const formatIdentifier = `${namespacePrefix}:${format.id}`;
+                const { id, name, ...restFormatFields } = format;
+                standardizedFormats[formatIdentifier] = {
+                  standardizedVariableId,
+                  identifier: formatIdentifier,
+                  label: name,
+                  ...restFormatFields,
+                };
+              });
+            }
+          });
+
+          set({
+            config: userSelectedConfig,
+            standardizedVariables,
+            standardizedTerms,
+            standardizedFormats,
+          });
+        } catch (error) {
+          // TODO: show a notif error
+          // The fallback is already handled in fetchConfig, so if we get here,
+          // both remote and default config failed
+        }
+
+        set({ isConfigLoading: false });
       }
-
-      set({ isConfigLoading: false });
     },
   },
 }));
