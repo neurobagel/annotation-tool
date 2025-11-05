@@ -1,10 +1,11 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import mockDataDictionaryRaw from '../../cypress/fixtures/examples/mock.json?raw';
 import mockTsvRaw from '../../cypress/fixtures/examples/mock.tsv?raw';
 import {
   mockAvailableConfigOptions,
   mockFreshConfigFile,
-  mockTermsData,
+  mockFreshTermsData,
   mockFreshStandardizedVariables,
   mockFreshStandardizedTerms,
   mockFreshStandardizedFormats,
@@ -20,6 +21,7 @@ import {
   useConfig,
   useColumns,
   useUploadedDataTableFileName,
+  useUploadedDataDictionary,
 } from './FreshNewStore';
 
 const mockedFetchAvailableConfigs = vi.spyOn(storeUtils, 'fetchAvailableConfigs');
@@ -71,7 +73,7 @@ describe('userSelectsConfig', () => {
   it('should update all store states on success', async () => {
     mockedFetchConfig.mockResolvedValueOnce({
       config: mockFreshConfigFile,
-      termsData: mockTermsData,
+      termsData: mockFreshTermsData,
     });
 
     const { result } = renderHook(() => ({
@@ -96,7 +98,7 @@ describe('userSelectsConfig', () => {
   it('should correctly map standardized variables with all properties', async () => {
     mockedFetchConfig.mockResolvedValueOnce({
       config: mockFreshConfigFile,
-      termsData: mockTermsData,
+      termsData: mockFreshTermsData,
     });
 
     const { result } = renderHook(() => ({
@@ -120,7 +122,7 @@ describe('userSelectsConfig', () => {
   it('should correctly map terms from multiple vocabularies', async () => {
     mockedFetchConfig.mockResolvedValueOnce({
       config: mockFreshConfigFile,
-      termsData: mockTermsData,
+      termsData: mockFreshTermsData,
     });
 
     const { result } = renderHook(() => ({
@@ -155,7 +157,7 @@ describe('userSelectsConfig', () => {
   it('should correctly map formats with proper identifiers', async () => {
     mockedFetchConfig.mockResolvedValueOnce({
       config: mockFreshConfigFile,
-      termsData: mockTermsData,
+      termsData: mockFreshTermsData,
     });
 
     const { result } = renderHook(() => ({
@@ -182,7 +184,7 @@ describe('userSelectsConfig', () => {
   });
 });
 
-describe('userUploadedDataTableFile', () => {
+describe('userUploadsDataTableFile', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -332,5 +334,285 @@ value4\tvalue5\t
 
     expect(result.current.columns).toEqual({});
     expect(result.current.fileName).toBeNull();
+  });
+});
+
+describe('userUploadsDataDictionaryFile', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should process data dictionary file and update columns with annotations', async () => {
+    // Upload data table to have columns
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['participant_id', 'age', 'sex', 'group_dx', 'group', 'iq'],
+      data: [
+        ['sub-718211', '28.4', 'M', 'ADHD', 'HC', '80'],
+        ['sub-718213', '24.6', 'F', 'ADHD', 'HC', '90'],
+      ],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+      standardizedVariables: useStandardizedVariables(),
+      standardizedTerms: useStandardizedTerms(),
+      standardizedFormats: useStandardizedFormats(),
+      uploadedDataDictionary: useUploadedDataDictionary(),
+    }));
+
+    // Upload data table first
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    // Load config to have standardized variables, terms, and formats
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockFreshConfigFile,
+      termsData: mockFreshTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    // Upload data dictionary
+    const mockDictFile = new File([mockDataDictionaryRaw], 'mock.json', {
+      type: 'application/json',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockDataDictionaryRaw);
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataDictionaryFile(mockDictFile);
+    });
+
+    expect(mockedReadFile).toHaveBeenCalledWith(mockDictFile);
+
+    // Check columns were updated with data dictionary information
+    const { columns } = result.current;
+
+    expect(columns['0'].description).toBe('A participant ID');
+    expect(columns['0'].standardizedVariable).toBe('nb:ParticipantID');
+    expect(columns['0'].dataType).toBeUndefined(); // Identifier type doesn't map to DataType
+
+    expect(columns['1'].description).toBe('Age of the participant');
+    expect(columns['1'].standardizedVariable).toBe('nb:Age');
+    expect(columns['1'].dataType).toBe('Continuous');
+    expect(columns['1'].format).toBe('nb:FromFloat');
+
+    expect(columns['2'].description).toBe('Sex of the participant');
+    expect(columns['2'].standardizedVariable).toBe('nb:Sex');
+    expect(columns['2'].dataType).toBe('Categorical');
+    expect(columns['2'].levels).toBeDefined();
+    expect(columns['2'].levels?.M.description).toBe('Male');
+    expect(columns['2'].levels?.M.standardizedTerm).toBe('snomed:248153007');
+    expect(columns['2'].levels?.F.description).toBe('Female');
+    expect(columns['2'].levels?.F.standardizedTerm).toBe('snomed:248152002');
+    expect(columns['2'].missingValues).toEqual(['N/A']);
+
+    expect(columns['3'].description).toBe('Diagnosis of the participant');
+    expect(columns['3'].standardizedVariable).toBe('nb:Diagnosis');
+    expect(columns['3'].dataType).toBe('Categorical');
+    expect(columns['3'].levels).toBeDefined();
+    expect(columns['3'].levels?.ADHD.description).toBe('Attention deficit hyperactivity disorder');
+    expect(columns['3'].levels?.ADHD.standardizedTerm).toBe('snomed:406506008');
+
+    expect(columns['5'].description).toBe('iq test score of the participant');
+    expect(columns['5'].standardizedVariable).toBe('nb:Assessment');
+    expect(columns['5'].isPartOf).toBe('snomed:273712001');
+
+    expect(result.current.uploadedDataDictionary.fileName).toBe('mock.json');
+    expect(result.current.uploadedDataDictionary.dataDictionary).toBeDefined();
+  });
+
+  it('should handle data dictionary upload when columns do not match', async () => {
+    // Upload data table with different columns
+    const tsvContent = 'col1\tcol2\tcol3\nval1\tval2\tval3';
+    const mockTsvFile = new File([tsvContent], 'test.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(tsvContent);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['col1', 'col2', 'col3'],
+      data: [['val1', 'val2', 'val3']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    // Load config
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockFreshConfigFile,
+      termsData: mockFreshTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    // Upload data dictionary with non-matching columns
+    const mockDictFile = new File([mockDataDictionaryRaw], 'mock.json', {
+      type: 'application/json',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockDataDictionaryRaw);
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataDictionaryFile(mockDictFile);
+    });
+
+    // Columns should remain unchanged since names don't match
+    expect(result.current.columns['0'].description).toBeUndefined();
+    expect(result.current.columns['0'].standardizedVariable).toBeUndefined();
+  });
+
+  it('should reset uploadedDataDictionary when file reading fails', async () => {
+    const mockDictFile = new File(['invalid'], 'invalid.json', {
+      type: 'application/json',
+    });
+
+    mockedReadFile.mockRejectedValueOnce(new Error('File read error'));
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      uploadedDataDictionary: useUploadedDataDictionary(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataDictionaryFile(mockDictFile);
+    });
+
+    expect(result.current.uploadedDataDictionary.fileName).toBe('');
+    expect(result.current.uploadedDataDictionary.dataDictionary).toEqual({});
+  });
+
+  it('should reset uploadedDataDictionary when JSON parsing fails', async () => {
+    const invalidJson = '{ invalid json }';
+    const mockDictFile = new File([invalidJson], 'invalid.json', {
+      type: 'application/json',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(invalidJson);
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      uploadedDataDictionary: useUploadedDataDictionary(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataDictionaryFile(mockDictFile);
+    });
+
+    expect(result.current.uploadedDataDictionary.fileName).toBe('');
+    expect(result.current.uploadedDataDictionary.dataDictionary).toEqual({});
+  });
+});
+
+describe('reset', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should reset columns and uploaded files while preserving config state', async () => {
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockFreshConfigFile,
+      termsData: mockFreshTermsData,
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+      uploadedDataTableFileName: useUploadedDataTableFileName(),
+      uploadedDataDictionary: useUploadedDataDictionary(),
+      config: useConfig(),
+      standardizedVariables: useStandardizedVariables(),
+      standardizedTerms: useStandardizedTerms(),
+      standardizedFormats: useStandardizedFormats(),
+    }));
+
+    // Load config
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    // Upload data table
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['participant_id', 'age'],
+      data: [['sub-001', '25']],
+    });
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    // Upload data dictionary
+    const mockDictFile = new File([mockDataDictionaryRaw], 'mock.json', {
+      type: 'application/json',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockDataDictionaryRaw);
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataDictionaryFile(mockDictFile);
+    });
+
+    // Verify columns has data
+    expect(result.current.columns).not.toEqual({});
+    expect(result.current.uploadedDataTableFileName).toBe('mock.tsv');
+    expect(result.current.uploadedDataDictionary.fileName).toBe('mock.json');
+    expect(result.current.uploadedDataDictionary.dataDictionary).toBeDefined();
+    expect(result.current.config).toBe('Neurobagel');
+
+    expect(result.current.columns['0'].id).toBe('0');
+    expect(result.current.columns['0'].name).toBe('participant_id');
+    expect(result.current.columns['0'].allValues).toEqual(['sub-001']);
+    expect(result.current.columns['0'].description).toBe('A participant ID');
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:ParticipantID');
+    expect(result.current.columns['1'].id).toBe('1');
+    expect(result.current.columns['1'].name).toBe('age');
+    expect(result.current.columns['1'].allValues).toEqual(['25']);
+    expect(result.current.columns['1'].description).toBe('Age of the participant');
+    expect(result.current.columns['1'].standardizedVariable).toBe('nb:Age');
+    expect(result.current.columns['1'].dataType).toBe('Continuous');
+    expect(result.current.columns['1'].format).toBe('nb:FromFloat');
+
+    // Reset
+    act(() => {
+      result.current.actions.reset();
+    });
+
+    // Verify column data is cleared
+    expect(result.current.columns).toEqual({});
+    expect(result.current.uploadedDataTableFileName).toBeNull();
+    expect(result.current.uploadedDataDictionary.fileName).toBe('');
+    expect(result.current.uploadedDataDictionary.dataDictionary).toEqual({});
+
+    // Verify specific column values are cleared
+    expect(result.current.columns['0']).toBeUndefined();
+    expect(result.current.columns['1']).toBeUndefined();
+
+    // Verify config state is preserved
+    expect(result.current.config).toBe('Neurobagel');
+    expect(result.current.standardizedVariables).toEqual(mockFreshStandardizedVariables);
+    expect(result.current.standardizedTerms).toEqual(mockFreshStandardizedTerms);
+    expect(result.current.standardizedFormats).toEqual(mockFreshStandardizedFormats);
   });
 });
