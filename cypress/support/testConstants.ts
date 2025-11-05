@@ -1,0 +1,10 @@
+export const mockDataTableFileName = 'mock.tsv';
+export const mockDataTableFilePath = `cypress/fixtures/examples/${mockDataTableFileName}`;
+export const mockDataDictionaryFileName = 'mock.json';
+export const mockDataDictionaryFilePath = `cypress/fixtures/examples/${mockDataDictionaryFileName}`;
+export const mockPartiallyAnnotatedDataDictionaryFileName = 'mock_annotated.json';
+export const mockPartiallyAnnotatedDataDictionaryFilePath = `cypress/downloads/${mockPartiallyAnnotatedDataDictionaryFileName}`;
+export const legacyDataTableFileName = 'example_synthetic.tsv';
+export const legacyDataTableFilePath = `cypress/fixtures/examples/${legacyDataTableFileName}`;
+export const legacyDataDictionaryFileName = 'example_synthetic.json';
+export const legacyDataDictionaryFilePath = `cypress/fixtures/examples/${legacyDataDictionaryFileName}`;

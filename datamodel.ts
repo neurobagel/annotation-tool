@@ -10,10 +10,14 @@ export enum DataType {
   continuous = 'Continuous',
 }
 
+export interface DataTable {
+  [key: string]: string[];
+}
+
 interface Column {
   id: string;
   name: string;
-  allValues: [string]; // because we want to show the datable preview
+  allValues: string[]; // because we want to show the datable preview
   description?: string;
   dataType?: DataType;
   isPartOf?: string; // foreign key (primary key in terms table) to standardized term in the terms for the corresponding standardized variable
@@ -120,6 +124,7 @@ export type FreshDataStoreActions = {
   loadConfig: (configName: string) => Promise<void>;
   appFetchesConfigOptions: () => Promise<void>;
   userSelectsConfig: (userSelectedConfig: string | null) => Promise<void>;
+  userUploadsDataTableFile: (dataTableFile: File) => Promise<void>;
 };
 
 export type FreshDataStore = FreshDataStoreState & {

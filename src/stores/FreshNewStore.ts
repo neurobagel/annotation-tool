@@ -1,12 +1,14 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { FreshDataStoreState, FreshDataStoreActions } from '../../datamodel';
+import { FreshDataStoreState, FreshDataStoreActions, Columns } from '../../datamodel';
 import {
   fetchAvailableConfigs,
   fetchConfig,
   convertStandardizedVariables,
   convertStandardizedTerms,
   convertStandardizedFormats,
+  readFile,
+  parseTsvContent,
 } from '../utils/store-utils';
 
 type FreshDataStore = FreshDataStoreState & {
@@ -76,6 +78,37 @@ const useFreshDataStore = create<FreshDataStore>()((set) => ({
         }
 
         set({ isConfigLoading: false });
+      }
+    },
+
+    userUploadsDataTableFile: async (dataTableFile: File) => {
+      try {
+        const content = await readFile(dataTableFile);
+        const { headers, data } = parseTsvContent(content);
+
+        const columns: Columns = {};
+
+        headers.forEach((header, index) => {
+          const columnId = index.toString();
+          const allValues = data.map((row) => row[index] || '');
+
+          columns[columnId] = {
+            id: columnId,
+            name: header,
+            allValues,
+          };
+        });
+
+        set({
+          columns,
+          uploadedDataTableFileName: dataTableFile.name,
+        });
+      } catch (error) {
+        // TODO: show a notif error
+        set({
+          columns: {},
+          uploadedDataTableFileName: null,
+        });
       }
     },
   },

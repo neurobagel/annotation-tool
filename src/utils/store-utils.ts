@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Papa from 'papaparse';
 import { StandardizedVariables, StandardizedTerms, StandardizedFormats } from '../../datamodel';
 import assessmentTerms from '../assets/default_config/assessment.json';
 import defaultConfigData from '../assets/default_config/config.json';
@@ -164,4 +165,39 @@ export function convertStandardizedFormats(
       ...Object.assign({}, ...newFormats),
     };
   }, {} as StandardizedFormats);
+}
+
+export async function readFile(file: File): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      resolve(content);
+    };
+
+    reader.onerror = (error) => {
+      reject(error);
+    };
+
+    reader.readAsText(file);
+  });
+}
+
+export function parseTsvContent(content: string): { headers: string[]; data: string[][] } {
+  if (!content) return { headers: [], data: [] };
+
+  // TODO: consider validating the table against our schema first,
+  // simply skipping empty rows here may cause downstream problems,
+  // see: https://github.com/neurobagel/annotation-tool/issues/142
+  const result = Papa.parse<string[]>(content, {
+    delimiter: '\t',
+    skipEmptyLines: true,
+  });
+
+  const rows = (result.data || []) as string[][];
+  const headers = rows[0];
+  const data = rows.slice(1);
+
+  return { headers, data };
 }

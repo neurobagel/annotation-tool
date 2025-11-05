@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { describe, it, expect, vi } from 'vitest';
+import mockTsvRaw from '../../cypress/fixtures/examples/mock.tsv?raw';
+import mockTsvWithEmptyLineRaw from '../../cypress/fixtures/examples/mock_with_empty_line.tsv?raw';
 import { fetchConfigGitHubURL, githubRawBaseURL } from './constants';
 import { mockGitHubResponse, mockConfigFile, mockTermsData, mockFreshConfigFile } from './mocks';
 import {
@@ -8,6 +10,8 @@ import {
   convertStandardizedVariables,
   convertStandardizedTerms,
   convertStandardizedFormats,
+  readFile,
+  parseTsvContent,
 } from './store-utils';
 
 // Mock axios
@@ -241,5 +245,67 @@ describe('convertStandardizedFormats', () => {
     expect(result['nb:FromBounded']).toBeDefined();
     expect(result['nb:FromRange']).toBeDefined();
     expect(result['nb:FromISO8601']).toBeDefined();
+  });
+});
+
+describe('readFile + parseTsvContent integration', () => {
+  it('should read and parse a valid TSV file correctly', async () => {
+    const file = new File([mockTsvRaw], 'mock.tsv', { type: 'text/tab-separated-values' });
+
+    const content = await readFile(file);
+    const { headers, data } = parseTsvContent(content);
+
+    expect(headers).toEqual(['participant_id', 'age', 'sex', 'group_dx', 'group', 'iq']);
+    expect(data).toHaveLength(12);
+    expect(data[0]).toEqual(['sub-718211', '28.4', 'M', 'ADHD', 'HC', '80']);
+    expect(data[11]).toEqual(['sub-718225', '65', 'N/A', 'PD', 'HC', '83']);
+  });
+
+  it('should handle an empty TSV file', async () => {
+    const file = new File([''], 'empty.tsv', { type: 'text/tab-separated-values' });
+
+    const content = await readFile(file);
+    const { headers, data } = parseTsvContent(content);
+
+    expect(headers).toEqual([]);
+    expect(data).toEqual([]);
+  });
+
+  it('should handle a TSV file with only headers', async () => {
+    const tsvContent = 'col1\tcol2\tcol3';
+    const file = new File([tsvContent], 'headers-only.tsv', { type: 'text/tab-separated-values' });
+
+    const content = await readFile(file);
+    const { headers, data } = parseTsvContent(content);
+
+    expect(headers).toEqual(['col1', 'col2', 'col3']);
+    expect(data).toEqual([]);
+  });
+
+  it('should handle a TSV file with empty values', async () => {
+    const tsvContent = 'col1\tcol2\tcol3\nval1\t\tval3\n\tval2\t';
+    const file = new File([tsvContent], 'empty-values.tsv', { type: 'text/tab-separated-values' });
+
+    const content = await readFile(file);
+    const { headers, data } = parseTsvContent(content);
+
+    expect(headers).toEqual(['col1', 'col2', 'col3']);
+    expect(data).toHaveLength(2);
+    expect(data[0]).toEqual(['val1', '', 'val3']);
+    expect(data[1]).toEqual(['', 'val2', '']);
+  });
+
+  it('should skip empty lines in a TSV file', async () => {
+    const file = new File([mockTsvWithEmptyLineRaw], 'mock_with_empty_line.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    const content = await readFile(file);
+    const { headers, data } = parseTsvContent(content);
+
+    expect(headers).toEqual(['participant_id', 'age', 'sex', 'group_dx', 'iq']);
+    expect(data).toHaveLength(12);
+    expect(data[0]).toEqual(['sub-718211', '28.4', 'M', 'ADHD', '80']);
+    expect(data[11]).toEqual(['sub-718225', '65', 'N/A', 'PD', '83']);
   });
 });

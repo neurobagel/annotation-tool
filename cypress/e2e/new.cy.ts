@@ -1,3 +1,5 @@
+import { mockDataTableFileName, mockDataTableFilePath } from '../support/testConstants';
+
 describe('Main user flow', () => {
   beforeEach(() => {
     // Mock failed GitHub API requests to force fallback to local configs
@@ -9,5 +11,21 @@ describe('Main user flow', () => {
     cy.get('[data-cy="next-button"]').click();
 
     // Upload View
+    cy.get('[data-cy="back-button"]').should('contain', 'Landing');
+    cy.get('[data-cy="next-button"]').should('contain', 'Column Annotation').and('be.disabled');
+    cy.get('[data-cy="nav-stepper"]').should('be.visible');
+    cy.get('[data-cy="Upload-step"]').within(() => {
+      cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
+    });
+
+    cy.get('[data-cy="datadictionary-upload-input"]').should('be.disabled');
+    cy.get('[data-cy="datatable-upload-input"]').selectFile(mockDataTableFilePath, {
+      force: true,
+    });
+    cy.get('[data-cy="datatable-uploaded-file-name"]').should('contain', mockDataTableFileName);
+    cy.get('[data-cy="datatable-toggle-preview-button"]').click();
+    cy.get('[data-cy="datatable-preview"]').should('be.visible').and('contain', 'participant_id');
+    cy.get('[data-cy="datatable-preview-pagination"]').should('be.visible');
+    cy.get('[data-cy="datatable-toggle-preview-button"]').click();
   });
 });

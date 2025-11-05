@@ -1,13 +1,12 @@
-const mockDataTableFileName = 'mock.tsv';
-const mockDataTableFilePath = `cypress/fixtures/examples/${mockDataTableFileName}`;
-const mockDataDictionaryFileName = 'mock.json';
-const mockDataDictionaryFilePath = `cypress/fixtures/examples/${mockDataDictionaryFileName}`;
-const mockPartiallyAnnotatedDataDictionaryFileName = 'mock_annotated.json';
-const mockPartiallyAnnotatedDataDictionaryFilePath = `cypress/downloads/${mockPartiallyAnnotatedDataDictionaryFileName}`;
-const legacyDataTableFileName = 'example_synthetic.tsv';
-const legacyDataTableFilePath = `cypress/fixtures/examples/${legacyDataTableFileName}`;
-const legacyDataDictionaryFileName = 'example_synthetic.json';
-const legacyDataDictionaryFilePath = `cypress/fixtures/examples/${legacyDataDictionaryFileName}`;
+import {
+  mockDataTableFileName,
+  mockDataTableFilePath,
+  mockDataDictionaryFileName,
+  mockPartiallyAnnotatedDataDictionaryFileName,
+  mockPartiallyAnnotatedDataDictionaryFilePath,
+  legacyDataTableFilePath,
+  legacyDataDictionaryFilePath,
+} from '../support/testConstants';
 
 describe('Main user flow', () => {
   beforeEach(() => {
