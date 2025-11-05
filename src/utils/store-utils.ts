@@ -1,6 +1,14 @@
 import axios from 'axios';
 import Papa from 'papaparse';
-import { StandardizedVariables, StandardizedTerms, StandardizedFormats } from '../../datamodel';
+import {
+  StandardizedVariables,
+  StandardizedTerms,
+  StandardizedFormats,
+  DataDictionary,
+  Columns,
+  VariableType,
+  DataType,
+} from '../../datamodel';
 import assessmentTerms from '../assets/default_config/assessment.json';
 import defaultConfigData from '../assets/default_config/config.json';
 import diagnosisTerms from '../assets/default_config/diagnosis.json';
@@ -200,4 +208,95 @@ export function parseTsvContent(content: string): { headers: string[]; data: str
   const data = rows.slice(1);
 
   return { headers, data };
+}
+
+export function applyDataDictionaryToColumns(
+  columns: Columns,
+  dataDictionary: DataDictionary,
+  standardizedVariables: StandardizedVariables,
+  standardizedTerms: StandardizedTerms,
+  standardizedFormats: StandardizedFormats
+): Columns {
+  return Object.entries(dataDictionary).reduce((updatedColumns, [columnName, columnData]) => {
+    const matchingColumnEntry = Object.entries(updatedColumns).find(
+      ([_, column]) => column.name === columnName
+    );
+
+    if (!matchingColumnEntry) return updatedColumns;
+
+    const [columnId] = matchingColumnEntry;
+    const column = { ...updatedColumns[columnId] };
+
+    if (columnData.Description) {
+      column.description = columnData.Description;
+    }
+
+    if (columnData.Annotations?.IsAbout?.TermURL) {
+      const standardizedVariableId = columnData.Annotations.IsAbout.TermURL;
+      if (standardizedVariables[standardizedVariableId]) {
+        column.standardizedVariable = standardizedVariableId;
+      }
+    }
+
+    if (columnData.Annotations?.VariableType) {
+      const varType = columnData.Annotations.VariableType;
+      if (varType === VariableType.categorical) {
+        column.dataType = DataType.categorical;
+      } else if (varType === VariableType.continuous) {
+        column.dataType = DataType.continuous;
+      } else {
+        column.dataType = undefined;
+      }
+    }
+
+    if (columnData.Annotations?.IsPartOf?.TermURL) {
+      const termId = columnData.Annotations.IsPartOf.TermURL;
+      if (standardizedTerms[termId]) {
+        column.isPartOf = termId;
+      }
+    }
+
+    if (columnData.Levels) {
+      column.levels = Object.entries(columnData.Levels).reduce(
+        (acc, [levelKey, levelValue]) => {
+          const annotationLevel = columnData.Annotations?.Levels?.[levelKey];
+          const standardizedTerm =
+            annotationLevel?.TermURL && standardizedTerms[annotationLevel.TermURL]
+              ? annotationLevel.TermURL
+              : '';
+
+          return {
+            ...acc,
+            [levelKey]: {
+              description: levelValue.Description || '',
+              standardizedTerm,
+            },
+          };
+        },
+        {} as { [key: string]: { description: string; standardizedTerm: string } }
+      );
+      column.dataType = DataType.categorical;
+    }
+
+    if (columnData.Units !== undefined) {
+      column.units = columnData.Units;
+      column.dataType = DataType.continuous;
+    }
+
+    if (columnData.Annotations?.MissingValues) {
+      column.missingValues = columnData.Annotations.MissingValues;
+    }
+
+    if (columnData.Annotations?.Format?.TermURL) {
+      const formatId = columnData.Annotations.Format.TermURL;
+      if (standardizedFormats[formatId]) {
+        column.format = formatId;
+      }
+    }
+
+    return {
+      ...updatedColumns,
+      [columnId]: column,
+    };
+  }, columns);
 }

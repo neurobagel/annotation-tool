@@ -816,14 +816,91 @@ export const mockFreshConfigFile: FreshConfigFile = {
   ],
 };
 
+export const mockFreshTermsData = {
+  'sex.json': [
+    {
+      namespace_prefix: 'snomed',
+      namespace_url: 'http://snomed.info/sct/',
+      vocabulary_name: 'SNOMED CT',
+      version: '1.0.0',
+      terms: [
+        {
+          id: '248153007',
+          name: 'Male',
+        },
+        {
+          id: '248152002',
+          name: 'Female',
+        },
+        {
+          id: '32570681000036106',
+          name: 'Other',
+        },
+      ],
+    },
+  ],
+  'diagnosis.json': [
+    {
+      namespace_prefix: 'snomed',
+      namespace_url: 'http://snomed.info/sct/',
+      vocabulary_name: 'SNOMED CT',
+      version: '1.0.0',
+      terms: [
+        {
+          id: '1231282002',
+          name: 'Self-limited familial neonatal-infantile epilepsy',
+        },
+        {
+          id: '1237571004',
+          name: 'Self-limited familial infantile epilepsy',
+        },
+        {
+          id: '1259106002',
+          name: 'Alexander disease type I',
+        },
+        {
+          id: '406506008',
+          name: 'Attention deficit hyperactivity disorder',
+        },
+      ],
+    },
+  ],
+  'assessment.json': [
+    {
+      namespace_prefix: 'snomed',
+      namespace_url: 'http://snomed.info/sct/',
+      vocabulary_name: 'SNOMED CT',
+      version: '1.0.0',
+      terms: [
+        {
+          id: '1303696008',
+          name: 'Robson Ten Group Classification System',
+        },
+        {
+          id: '1304062007',
+          name: 'Malnutrition Screening Tool',
+        },
+        {
+          id: '1332329009',
+          name: 'Interviewer led Chronic Respiratory Questionnaire',
+        },
+        {
+          id: '273712001',
+          name: 'Previous IQ assessment by pronunciation',
+        },
+      ],
+    },
+  ],
+};
+
 export const mockAvailableConfigOptions = ['Neurobagel', 'OtherConfig', 'TestConfig'];
 
-// Mock data for FreshDataStore based on mockConfigFile and mockTermsData
+// Mock data for FreshDataStore based on mockFreshConfigFile and mockFreshTermsData
 export const mockFreshStandardizedVariables = {
   'nb:ParticipantID': {
     id: 'nb:ParticipantID',
     name: 'Participant ID',
-    variable_type: 'Identifier' as VariableType,
+    variable_type: 'Identifier' as FreshVariableType,
     required: true,
     description: 'Unique participant identifier.',
     is_multi_column_measure: false,
@@ -833,7 +910,7 @@ export const mockFreshStandardizedVariables = {
   'nb:SessionID': {
     id: 'nb:SessionID',
     name: 'Session ID',
-    variable_type: 'Identifier' as VariableType,
+    variable_type: 'Identifier' as FreshVariableType,
     required: false,
     description: 'Unique session identifier.',
     is_multi_column_measure: false,
@@ -843,7 +920,7 @@ export const mockFreshStandardizedVariables = {
   'nb:Age': {
     id: 'nb:Age',
     name: 'Age',
-    variable_type: 'Continuous' as VariableType,
+    variable_type: 'Continuous' as FreshVariableType,
     required: false,
     description: 'The age of the participant.',
     is_multi_column_measure: false,
@@ -853,7 +930,7 @@ export const mockFreshStandardizedVariables = {
   'nb:Sex': {
     id: 'nb:Sex',
     name: 'Sex',
-    variable_type: 'Categorical' as VariableType,
+    variable_type: 'Categorical' as FreshVariableType,
     required: false,
     description: 'The sex of the participant.',
     is_multi_column_measure: false,
@@ -863,7 +940,7 @@ export const mockFreshStandardizedVariables = {
   'nb:Diagnosis': {
     id: 'nb:Diagnosis',
     name: 'Diagnosis',
-    variable_type: 'Categorical' as VariableType,
+    variable_type: 'Categorical' as FreshVariableType,
     required: false,
     description: 'Participant diagnosis information',
     is_multi_column_measure: false,
@@ -873,7 +950,7 @@ export const mockFreshStandardizedVariables = {
   'nb:Assessment': {
     id: 'nb:Assessment',
     name: 'Assessment Tool',
-    variable_type: 'Collection' as VariableType,
+    variable_type: 'Collection' as FreshVariableType,
     required: false,
     description: 'A cognitive or clinical rating scale, instrument, or assessment tool.',
     is_multi_column_measure: true,
@@ -932,6 +1009,11 @@ export const mockFreshStandardizedTerms = {
     standardizedVariableId: 'nb:Assessment',
     id: 'snomed:1332329009',
     label: 'Interviewer led Chronic Respiratory Questionnaire',
+  },
+  'snomed:273712001': {
+    standardizedVariableId: 'nb:Assessment',
+    id: 'snomed:273712001',
+    label: 'Previous IQ assessment by pronunciation',
   },
 };
 
