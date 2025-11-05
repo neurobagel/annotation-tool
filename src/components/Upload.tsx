@@ -1,4 +1,10 @@
 import { useEffect } from 'react';
+import {
+  useConfig,
+  useFreshDataActions,
+  useIsConfigLoading,
+  useConfigOptions,
+} from '../stores/FreshNewStore';
 import useDataStore from '../stores/data';
 import { UploadInstructions } from '../utils/instructions';
 import ConfigCard from './ConfigCard';
@@ -19,10 +25,10 @@ function Upload({ disableConfig }: UploadProps) {
   const columns = useDataStore((state) => state.columns);
   const dataDictionary = useDataStore((state) => state.uploadedDataDictionary);
   const uploadedDataTableFileName = useDataStore((state) => state.uploadedDataTableFileName);
-  const loadConfigOptions = useDataStore((state) => state.loadConfigOptions);
-  const configOptions = useDataStore((state) => state.configOptions);
-  const selectedConfig = useDataStore((state) => state.selectedConfig);
-  const setSelectedConfig = useDataStore((state) => state.setSelectedConfig);
+  const { appFetchesConfigOptions } = useFreshDataActions();
+  const configOptions = useConfigOptions();
+  const selectedConfig = useConfig();
+  const { userSelectsConfig } = useFreshDataActions();
   const setUploadedDataTableFileName = useDataStore((state) => state.setUploadedDataTableFileName);
   const setUploadedDataDictionaryFileName = useDataStore(
     (state) => state.setUploadedDataDictionaryFileName
@@ -30,7 +36,7 @@ function Upload({ disableConfig }: UploadProps) {
   const uploadedDataDictionaryFileName = useDataStore(
     (state) => state.uploadedDataDictionaryFileName
   );
-  const isConfigLoading = useDataStore((state) => state.isConfigLoading);
+  const isConfigLoading = useIsConfigLoading();
 
   const isDataTableEmpty = Object.keys(dataTable).length === 0;
 
@@ -47,11 +53,11 @@ function Upload({ disableConfig }: UploadProps) {
 
   useEffect(() => {
     const loadConfigs = async () => {
-      await loadConfigOptions();
+      await appFetchesConfigOptions();
     };
     loadConfigs();
-    setSelectedConfig('Neurobagel');
-  }, [loadConfigOptions, setSelectedConfig]);
+    userSelectsConfig('Neurobagel');
+  }, [appFetchesConfigOptions, userSelectsConfig]);
 
   return (
     <div className="flex flex-col items-center gap-8" data-config-loading={isConfigLoading}>
@@ -66,7 +72,7 @@ function Upload({ disableConfig }: UploadProps) {
           options={configOptions}
           value={selectedConfig}
           isLoading={isConfigLoading}
-          onChange={(value) => setSelectedConfig(value)}
+          onChange={(value) => userSelectsConfig(value)}
         />
       )}
       <UploadCard
