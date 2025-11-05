@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
-import { useDataTable } from '~/hooks/useDataTable';
+import { useDataTable } from '../hooks/useDataTable';
 import {
   useConfig,
   useFreshDataActions,
   useIsConfigLoading,
   useUploadedDataTableFileName,
   useConfigOptions,
+  useUploadedDataDictionary,
 } from '../stores/FreshNewStore';
-import useDataStore from '../stores/data';
 import { UploadInstructions } from '../utils/instructions';
 import ConfigCard from './ConfigCard';
 import DataDictionaryPreview from './DataDictionaryPreview';
@@ -20,21 +20,18 @@ interface UploadProps {
 }
 
 function Upload({ disableConfig }: UploadProps) {
-  const reset = useDataStore((state) => state.reset);
-  const processDataDictionaryFile = useDataStore((state) => state.processDataDictionaryFile);
   const dataTable = useDataTable();
-  const dataDictionary = useDataStore((state) => state.uploadedDataDictionary);
+  const { fileName, dataDictionary } = useUploadedDataDictionary();
   const uploadedDataTableFileName = useUploadedDataTableFileName();
-  const { appFetchesConfigOptions, userUploadsDataTableFile, userSelectsConfig } =
-    useFreshDataActions();
+  const {
+    appFetchesConfigOptions,
+    userSelectsConfig,
+    userUploadsDataTableFile,
+    reset,
+    userUploadsDataDictionaryFile,
+  } = useFreshDataActions();
   const configOptions = useConfigOptions();
   const selectedConfig = useConfig();
-  const setUploadedDataDictionaryFileName = useDataStore(
-    (state) => state.setUploadedDataDictionaryFileName
-  );
-  const uploadedDataDictionaryFileName = useDataStore(
-    (state) => state.uploadedDataDictionaryFileName
-  );
   const isConfigLoading = useIsConfigLoading();
 
   const isDataTableEmpty = Object.keys(dataTable).length === 0;
@@ -45,8 +42,7 @@ function Upload({ disableConfig }: UploadProps) {
   };
 
   const handleDataDictionaryFileUpload = (file: File) => {
-    processDataDictionaryFile(file);
-    setUploadedDataDictionaryFileName(file.name);
+    userUploadsDataDictionaryFile(file);
   };
 
   useEffect(() => {
@@ -88,7 +84,7 @@ function Upload({ disableConfig }: UploadProps) {
         title="Data Dictionary"
         FileUploaderDisplayText="Upload your data dictionary .json file (optional)"
         allowedFileType=".json"
-        uploadedFileName={uploadedDataDictionaryFileName}
+        uploadedFileName={fileName}
         onFileUpload={handleDataDictionaryFileUpload}
         previewComponent={<DataDictionaryPreview dataDictionary={dataDictionary} />}
         diableFileUploader={isDataTableEmpty || isConfigLoading}
