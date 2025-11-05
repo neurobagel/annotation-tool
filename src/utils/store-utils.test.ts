@@ -1,34 +1,18 @@
-// TODO: Remove duplicate tests once store refactoring is done
 import axios from 'axios';
 import { describe, it, expect, vi } from 'vitest';
 import { fetchConfigGitHubURL, githubRawBaseURL } from './constants';
-import { mockGitHubResponse, mockConfigFile, mockTermsData, mockConfig } from './mocks';
+import { mockGitHubResponse, mockConfigFile, mockTermsData, mockFreshConfigFile } from './mocks';
 import {
-  parseTsvContent,
   fetchAvailableConfigs,
   fetchConfig,
-  mapConfigFileToStoreConfig,
-} from './util';
+  convertStandardizedVariables,
+  convertStandardizedTerms,
+  convertStandardizedFormats,
+} from './store-utils';
 
 // Mock axios
 vi.mock('axios');
 const mockedAxios = vi.mocked(axios, true);
-
-describe('parseTsvContent', () => {
-  it('parses rows of empty values correctly as string', () => {
-    const tsvContent = `Column1\tColumn2\tColumn3
-Value1\t\t
-Value2\t\tValue3`;
-    const result = parseTsvContent(tsvContent);
-    expect(result).toEqual({
-      headers: ['Column1', 'Column2', 'Column3'],
-      data: [
-        ['Value1', '', ''],
-        ['Value2', '', 'Value3'],
-      ],
-    });
-  });
-});
 
 describe('fetchAvailableConfigs', () => {
   it('should fetch available configs from the right GitHub location and handles the (mock) response', async () => {
@@ -166,93 +150,96 @@ describe('fetchConfig', () => {
   });
 });
 
-describe('mapConfigFileToStoreConfig', () => {
-  it('should map config file to store config correctly', () => {
-    const result = mapConfigFileToStoreConfig(mockConfigFile, mockTermsData);
+describe('convertStandardizedVariables', () => {
+  it('should convert standardized variables config array to StandardizedVariables object', () => {
+    const result = convertStandardizedVariables(
+      mockFreshConfigFile.standardized_variables,
+      mockFreshConfigFile.namespace_prefix
+    );
 
-    expect(result).toEqual(mockConfig);
+    expect(result).toBeDefined();
+    expect(Object.keys(result)).toHaveLength(6);
+    expect(result['nb:ParticipantID']).toBeDefined();
+    expect(result['nb:Age']).toBeDefined();
   });
 
-  it('should handle config without terms files', () => {
-    const configWithoutTerms = {
-      ...mockConfigFile,
-      standardized_variables: [
-        {
-          name: 'Participant ID',
-          id: 'ParticipantID',
-          data_type: null as 'Categorical' | 'Continuous' | null,
-          terms_file: undefined,
-          formats: undefined,
-          required: true,
-          description: 'Unique participant identifier.',
-          is_multi_column_measure: false,
-          can_have_multiple_columns: false,
-          same_as: undefined,
-        },
-      ],
-    };
+  it("should correctly map a standardized variable's properties", () => {
+    const result = convertStandardizedVariables(
+      mockFreshConfigFile.standardized_variables,
+      mockFreshConfigFile.namespace_prefix
+    );
 
-    const result = mapConfigFileToStoreConfig(configWithoutTerms, {});
+    const ageVariable = result['nb:Age'];
+    expect(ageVariable.id).toBe('nb:Age');
+    expect(ageVariable.name).toBe('Age');
+    expect(ageVariable.variable_type).toBe('Continuous');
+    expect(ageVariable.description).toBe('The age of the participant.');
+    expect(ageVariable.required).toBe(false);
+  });
+});
 
-    expect(result).toEqual({
-      'nb:ParticipantID': {
-        identifier: 'nb:ParticipantID',
-        label: 'Participant ID',
-        data_type: null,
-        required: true,
-        description: 'Unique participant identifier.',
-        is_multi_column_measure: false,
-        can_have_multiple_columns: false,
-        same_as: undefined,
-      },
-    });
+describe('convertStandardizedTerms', () => {
+  it('should correctly convert termsData to StandardizedTerms object', () => {
+    const result = convertStandardizedTerms(
+      mockTermsData,
+      mockFreshConfigFile.standardized_variables,
+      mockFreshConfigFile.namespace_prefix
+    );
+
+    expect(result).toBeDefined();
+    expect(Object.keys(result).length).toBeGreaterThan(0);
   });
 
-  it('should handle config with formats but no terms', () => {
-    const configWithFormats = {
-      ...mockConfigFile,
-      standardized_variables: [
-        {
-          name: 'Age',
-          id: 'Age',
-          data_type: 'Continuous' as 'Categorical' | 'Continuous' | null,
-          terms_file: undefined,
-          formats: [
-            {
-              id: 'FromFloat',
-              name: 'float',
-              examples: ['31.5'],
-            },
-          ],
-          required: false,
-          description: 'The age of the participant.',
-          is_multi_column_measure: false,
-          can_have_multiple_columns: false,
-          same_as: undefined,
-        },
-      ],
-    };
+  it("should correctly map a standardized variable's terms", () => {
+    const result = convertStandardizedTerms(
+      mockTermsData,
+      mockFreshConfigFile.standardized_variables,
+      mockFreshConfigFile.namespace_prefix
+    );
 
-    const result = mapConfigFileToStoreConfig(configWithFormats, {});
+    const adhdTerm = result['snomed:406506008'];
+    expect(adhdTerm).toBeDefined();
+    expect(adhdTerm.id).toBe('snomed:406506008');
+    expect(adhdTerm.label).toBe('Attention deficit hyperactivity disorder');
+    expect(adhdTerm.standardizedVariableId).toBe('nb:Diagnosis');
+  });
+});
 
-    expect(result).toEqual({
-      'nb:Age': {
-        identifier: 'nb:Age',
-        label: 'Age',
-        data_type: 'Continuous',
-        required: false,
-        description: 'The age of the participant.',
-        is_multi_column_measure: false,
-        can_have_multiple_columns: false,
-        same_as: undefined,
-        formats: [
-          {
-            termURL: 'nb:FromFloat',
-            label: 'float',
-            examples: ['31.5'],
-          },
-        ],
-      },
-    });
+describe('convertStandardizedFormats', () => {
+  it('should convert formats to StandardizedFormats object', () => {
+    const result = convertStandardizedFormats(
+      mockFreshConfigFile.standardized_variables,
+      mockFreshConfigFile.namespace_prefix
+    );
+
+    expect(result).toBeDefined();
+    expect(Object.keys(result)).toHaveLength(5);
+  });
+
+  it('should correctly map a format', () => {
+    const result = convertStandardizedFormats(
+      mockFreshConfigFile.standardized_variables,
+      mockFreshConfigFile.namespace_prefix
+    );
+
+    const floatFormat = result['nb:FromFloat'];
+    expect(floatFormat).toBeDefined();
+    expect(floatFormat.identifier).toBe('nb:FromFloat');
+    expect(floatFormat.label).toBe('float');
+    expect(floatFormat.standardizedVariableId).toBe('nb:Age');
+    expect(floatFormat.examples).toEqual(['31.5']);
+  });
+
+  it('should map all age formats', () => {
+    const result = convertStandardizedFormats(
+      mockFreshConfigFile.standardized_variables,
+      mockFreshConfigFile.namespace_prefix
+    );
+
+    expect(result['nb:FromFloat']).toBeDefined();
+    expect(result['nb:FromEuro']).toBeDefined();
+    expect(result['nb:FromBounded']).toBeDefined();
+    expect(result['nb:FromRange']).toBeDefined();
+    expect(result['nb:FromISO8601']).toBeDefined();
   });
 });
