@@ -3,9 +3,16 @@ import { describe, it, expect, vi } from 'vitest';
 import mockTsvRaw from '../../cypress/fixtures/examples/mock.tsv?raw';
 import mockTsvWithEmptyLineRaw from '../../cypress/fixtures/examples/mock_with_empty_line.tsv?raw';
 import { fetchConfigGitHubURL, githubRawBaseURL } from './constants';
-import { mockGitHubResponse, mockConfigFile, mockTermsData } from './mocks';
-import { fetchAvailableConfigs, fetchConfig, readFile } from './store-utils';
-import { parseTsvContent } from './util';
+import { mockGitHubResponse, mockConfigFile, mockTermsData, mockFreshConfigFile } from './mocks';
+import {
+  fetchAvailableConfigs,
+  fetchConfig,
+  convertStandardizedVariables,
+  convertStandardizedTerms,
+  convertStandardizedFormats,
+  readFile,
+  parseTsvContent,
+} from './store-utils';
 
 // Mock axios
 vi.mock('axios');
@@ -144,6 +151,100 @@ describe('fetchConfig', () => {
       'diagnosis.json': mockTermsData['diagnosis.json'],
       'assessment.json': mockTermsData['assessment.json'],
     });
+  });
+});
+
+describe('convertStandardizedVariables', () => {
+  it('should convert standardized variables config array to StandardizedVariables object', () => {
+    const result = convertStandardizedVariables(
+      mockFreshConfigFile.standardized_variables,
+      mockFreshConfigFile.namespace_prefix
+    );
+
+    expect(result).toBeDefined();
+    expect(Object.keys(result)).toHaveLength(6);
+    expect(result['nb:ParticipantID']).toBeDefined();
+    expect(result['nb:Age']).toBeDefined();
+  });
+
+  it("should correctly map a standardized variable's properties", () => {
+    const result = convertStandardizedVariables(
+      mockFreshConfigFile.standardized_variables,
+      mockFreshConfigFile.namespace_prefix
+    );
+
+    const ageVariable = result['nb:Age'];
+    expect(ageVariable.id).toBe('nb:Age');
+    expect(ageVariable.name).toBe('Age');
+    expect(ageVariable.variable_type).toBe('Continuous');
+    expect(ageVariable.description).toBe('The age of the participant.');
+    expect(ageVariable.required).toBe(false);
+  });
+});
+
+describe('convertStandardizedTerms', () => {
+  it('should correctly convert termsData to StandardizedTerms object', () => {
+    const result = convertStandardizedTerms(
+      mockTermsData,
+      mockFreshConfigFile.standardized_variables,
+      mockFreshConfigFile.namespace_prefix
+    );
+
+    expect(result).toBeDefined();
+    expect(Object.keys(result).length).toBeGreaterThan(0);
+  });
+
+  it("should correctly map a standardized variable's terms", () => {
+    const result = convertStandardizedTerms(
+      mockTermsData,
+      mockFreshConfigFile.standardized_variables,
+      mockFreshConfigFile.namespace_prefix
+    );
+
+    const adhdTerm = result['snomed:406506008'];
+    expect(adhdTerm).toBeDefined();
+    expect(adhdTerm.id).toBe('snomed:406506008');
+    expect(adhdTerm.label).toBe('Attention deficit hyperactivity disorder');
+    expect(adhdTerm.standardizedVariableId).toBe('nb:Diagnosis');
+  });
+});
+
+describe('convertStandardizedFormats', () => {
+  it('should convert formats to StandardizedFormats object', () => {
+    const result = convertStandardizedFormats(
+      mockFreshConfigFile.standardized_variables,
+      mockFreshConfigFile.namespace_prefix
+    );
+
+    expect(result).toBeDefined();
+    expect(Object.keys(result)).toHaveLength(5);
+  });
+
+  it('should correctly map a format', () => {
+    const result = convertStandardizedFormats(
+      mockFreshConfigFile.standardized_variables,
+      mockFreshConfigFile.namespace_prefix
+    );
+
+    const floatFormat = result['nb:FromFloat'];
+    expect(floatFormat).toBeDefined();
+    expect(floatFormat.identifier).toBe('nb:FromFloat');
+    expect(floatFormat.label).toBe('float');
+    expect(floatFormat.standardizedVariableId).toBe('nb:Age');
+    expect(floatFormat.examples).toEqual(['31.5']);
+  });
+
+  it('should map all age formats', () => {
+    const result = convertStandardizedFormats(
+      mockFreshConfigFile.standardized_variables,
+      mockFreshConfigFile.namespace_prefix
+    );
+
+    expect(result['nb:FromFloat']).toBeDefined();
+    expect(result['nb:FromEuro']).toBeDefined();
+    expect(result['nb:FromBounded']).toBeDefined();
+    expect(result['nb:FromRange']).toBeDefined();
+    expect(result['nb:FromISO8601']).toBeDefined();
   });
 });
 

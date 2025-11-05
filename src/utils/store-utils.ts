@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Papa from 'papaparse';
+import { StandardizedVariables, StandardizedTerms, StandardizedFormats } from '../../datamodel';
 import assessmentTerms from '../assets/default_config/assessment.json';
 import defaultConfigData from '../assets/default_config/config.json';
 import diagnosisTerms from '../assets/default_config/diagnosis.json';
@@ -81,6 +82,89 @@ export async function fetchConfig(
       return { config: {} as FreshConfigFile, termsData: {} };
     }
   }
+}
+
+export function convertStandardizedVariables(
+  variables: FreshConfigFileStandardizedVariable[],
+  namespacePrefix: string
+): StandardizedVariables {
+  return variables.reduce((acc, variable) => {
+    const identifier = `${namespacePrefix}:${variable.id}`;
+    const { id, name, terms_file: termsFile, formats: rawFormats, ...rest } = variable;
+    return {
+      ...acc,
+      [identifier]: {
+        id: identifier,
+        name,
+        ...rest,
+      },
+    };
+  }, {} as StandardizedVariables);
+}
+
+export function convertStandardizedTerms(
+  termsData: Record<string, VocabConfig[]>,
+  variables: FreshConfigFileStandardizedVariable[],
+  variableNamespacePrefix: string
+): StandardizedTerms {
+  return Object.entries(termsData).reduce((acc, [fileName, vocabsArray]) => {
+    const newTerms = vocabsArray.flatMap((vocab) => {
+      const termsNamespace = vocab.namespace_prefix;
+      return vocab.terms.map((term) => {
+        const termIdentifier = `${termsNamespace}:${term.id}`;
+        const { id, name, ...restTermFields } = term;
+
+        const parentVariable = variables.find((v) => v.terms_file === fileName);
+        const standardizedVariableId = parentVariable
+          ? `${variableNamespacePrefix}:${parentVariable.id}`
+          : '';
+
+        return {
+          [termIdentifier]: {
+            standardizedVariableId,
+            id: termIdentifier,
+            label: name,
+            ...restTermFields,
+          },
+        };
+      });
+    });
+
+    return {
+      ...acc,
+      ...Object.assign({}, ...newTerms),
+    };
+  }, {} as StandardizedTerms);
+}
+
+export function convertStandardizedFormats(
+  variables: FreshConfigFileStandardizedVariable[],
+  namespacePrefix: string
+): StandardizedFormats {
+  return variables.reduce((acc, variable) => {
+    if (!variable.formats) {
+      return acc;
+    }
+
+    const standardizedVariableId = `${namespacePrefix}:${variable.id}`;
+    const newFormats = variable.formats.map((format) => {
+      const formatIdentifier = `${namespacePrefix}:${format.id}`;
+      const { id, name, ...restFormatFields } = format;
+      return {
+        [formatIdentifier]: {
+          standardizedVariableId,
+          identifier: formatIdentifier,
+          label: name,
+          ...restFormatFields,
+        },
+      };
+    });
+
+    return {
+      ...acc,
+      ...Object.assign({}, ...newFormats),
+    };
+  }, {} as StandardizedFormats);
 }
 
 export async function readFile(file: File): Promise<string> {

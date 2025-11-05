@@ -10,12 +10,7 @@ import {
   mockFreshStandardizedFormats,
   mockFreshColumnsAfterDataTableUpload,
 } from '../utils/mocks';
-import {
-  fetchAvailableConfigs,
-  fetchConfig,
-  readFile,
-  parseTsvContent,
-} from '../utils/store-utils';
+import * as storeUtils from '../utils/store-utils';
 import {
   useFreshDataActions,
   useConfigOptions,
@@ -27,12 +22,10 @@ import {
   useUploadedDataTableFileName,
 } from './FreshNewStore';
 
-// Mock the store-utils module
-vi.mock('../utils/store-utils');
-const mockedFetchAvailableConfigs = vi.mocked(fetchAvailableConfigs);
-const mockedFetchConfig = vi.mocked(fetchConfig);
-const mockedReadFile = vi.mocked(readFile);
-const mockedParseTsvContent = vi.mocked(parseTsvContent);
+const mockedFetchAvailableConfigs = vi.spyOn(storeUtils, 'fetchAvailableConfigs');
+const mockedFetchConfig = vi.spyOn(storeUtils, 'fetchConfig');
+const mockedReadFile = vi.spyOn(storeUtils, 'readFile');
+const mockedParseTsvContent = vi.spyOn(storeUtils, 'parseTsvContent');
 
 describe('appFetchesConfigOptions', () => {
   beforeEach(() => {
