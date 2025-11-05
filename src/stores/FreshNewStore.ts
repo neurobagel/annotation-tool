@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { FreshDataStoreState, FreshDataStoreActions } from '../../datamodel';
 import {
-  FreshDataStoreState,
-  FreshDataStoreActions,
-  StandardizedVariables,
-  StandardizedTerms,
-  StandardizedFormats,
-} from '../../datamodel';
-import { fetchAvailableConfigs, fetchConfig } from '../utils/store-utils';
+  fetchAvailableConfigs,
+  fetchConfig,
+  convertStandardizedVariables,
+  convertStandardizedTerms,
+  convertStandardizedFormats,
+} from '../utils/store-utils';
 
 type FreshDataStore = FreshDataStoreState & {
   actions: FreshDataStoreActions;
@@ -45,64 +45,23 @@ const useFreshDataStore = create<FreshDataStore>()((set) => ({
 
         try {
           const { config, termsData } = await fetchConfig(userSelectedConfig);
-          const namespacePrefix = config.namespace_prefix;
+          const variableNameSpacePrefix = config.namespace_prefix;
 
-          // Convert standardized variables
-          const standardizedVariables: StandardizedVariables = {};
-          config.standardized_variables.forEach((variable) => {
-            const identifier = `${namespacePrefix}:${variable.id}`;
-            const { id, name, terms_file: termsFile, formats: rawFormats, ...rest } = variable;
-            standardizedVariables[identifier] = {
-              id: identifier,
-              name,
-              ...rest,
-            };
-          });
+          const standardizedVariables = convertStandardizedVariables(
+            config.standardized_variables,
+            variableNameSpacePrefix
+          );
 
-          // Convert standardized terms from all terms files
-          const standardizedTerms: StandardizedTerms = {};
-          Object.entries(termsData).forEach(([fileName, vocabsArray]) => {
-            vocabsArray.forEach((vocab) => {
-              const termsNamespace = vocab.namespace_prefix;
-              vocab.terms.forEach((term) => {
-                const termIdentifier = `${termsNamespace}:${term.id}`;
-                const { id, name, ...restTermFields } = term;
+          const standardizedTerms = convertStandardizedTerms(
+            termsData,
+            config.standardized_variables,
+            variableNameSpacePrefix
+          );
 
-                // Find which standardized variable this term belongs to
-                const parentVariable = config.standardized_variables.find(
-                  (v) => v.terms_file === fileName
-                );
-                const standardizedVariableId = parentVariable
-                  ? `${namespacePrefix}:${parentVariable.id}`
-                  : '';
-
-                standardizedTerms[termIdentifier] = {
-                  standardizedVariableId,
-                  id: termIdentifier,
-                  label: name,
-                  ...restTermFields,
-                };
-              });
-            });
-          });
-
-          // Convert standardized formats from all standardized variables
-          const standardizedFormats: StandardizedFormats = {};
-          config.standardized_variables.forEach((variable) => {
-            if (variable.formats) {
-              const standardizedVariableId = `${namespacePrefix}:${variable.id}`;
-              variable.formats.forEach((format) => {
-                const formatIdentifier = `${namespacePrefix}:${format.id}`;
-                const { id, name, ...restFormatFields } = format;
-                standardizedFormats[formatIdentifier] = {
-                  standardizedVariableId,
-                  identifier: formatIdentifier,
-                  label: name,
-                  ...restFormatFields,
-                };
-              });
-            }
-          });
+          const standardizedFormats = convertStandardizedFormats(
+            config.standardized_variables,
+            variableNameSpacePrefix
+          );
 
           set({
             config: userSelectedConfig,

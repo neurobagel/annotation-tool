@@ -8,7 +8,7 @@ import {
   mockFreshStandardizedTerms,
   mockFreshStandardizedFormats,
 } from '../utils/mocks';
-import { fetchAvailableConfigs, fetchConfig } from '../utils/store-utils';
+import * as storeUtils from '../utils/store-utils';
 import {
   useFreshDataActions,
   useConfigOptions,
@@ -18,10 +18,8 @@ import {
   useConfig,
 } from './FreshNewStore';
 
-// Mock the store-utils module
-vi.mock('../utils/store-utils');
-const mockedFetchAvailableConfigs = vi.mocked(fetchAvailableConfigs);
-const mockedFetchConfig = vi.mocked(fetchConfig);
+const mockedFetchAvailableConfigs = vi.spyOn(storeUtils, 'fetchAvailableConfigs');
+const mockedFetchConfig = vi.spyOn(storeUtils, 'fetchConfig');
 
 describe('appFetchesConfigOptions', () => {
   beforeEach(() => {
