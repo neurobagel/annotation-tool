@@ -116,7 +116,7 @@ describe('MultiColumnMeasuresCard', () => {
 });
 
 describe('Card mapping dropdown', () => {
-  it('opens if card is not assigned to a standardized variable yet', () => {
+  it('should open dropdown if card has not been assigned a standardized term yet', () => {
     cy.mount(
       <MultiColumnMeasuresCard
         card={{ ...props.card, term: null }}
