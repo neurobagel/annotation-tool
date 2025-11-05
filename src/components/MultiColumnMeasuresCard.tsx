@@ -10,7 +10,7 @@ import {
   Autocomplete,
   TextField,
 } from '@mui/material';
-import { matchSorter } from 'match-sorter';
+import { matchSorter, rankings } from 'match-sorter';
 import { MultiColumnMeasuresTerm, MultiColumnMeasuresTermCard } from '../utils/internal_types';
 
 interface TermCardProps {
@@ -45,6 +45,7 @@ function MultiColumnMeasuresCard({
         (option) =>
           option.abbreviation ? `${option.abbreviation} - ${option.label}` : option.label,
       ],
+      threshold: rankings.CONTAINS,
     });
 
   return (

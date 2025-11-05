@@ -132,4 +132,39 @@ describe('Card mapping dropdown', () => {
     );
     cy.get('[data-cy="multi-column-measures-card-1-title-dropdown"]').should('be.visible');
   });
+
+  // NOTE: this is a regression test for #327
+  it.only('filters options in the correct order', () => {
+    cy.mount(
+      <MultiColumnMeasuresCard
+        card={{ ...props.card, term: null }}
+        cardIndex={1}
+        mappedColumnHeaders={props.mappedColumnHeaders}
+        availableTerms={[
+          {
+            identifier: 'nb:one',
+            label: 'Stroop Color-Word Test',
+          },
+          {
+            identifier: 'nb:two',
+            label: 'Questionnaire for Psychotic Experiences; hallucinations_psychosis',
+          },
+          {
+            identifier: 'nb:three',
+            label:
+              'Non-Motor Symptoms Scale for Parkinson\u2019s Disease; non-motor symptoms general',
+          },
+        ]}
+        columnOptions={props.columnOptions}
+        onTermSelect={props.onTermSelect}
+        onColumnSelect={props.onColumnSelect}
+        onRemoveColumn={props.onRemoveColumn}
+        onRemoveCard={props.onRemoveCard}
+      />
+    );
+    cy.get('[data-cy="multi-column-measures-card-1-title-dropdown"]').should('be.visible');
+    cy.get('[data-cy="multi-column-measures-card-1-title-dropdown"]').type('Stroop');
+    cy.get('[role="option"]').should('have.length', 1);
+    cy.get('[role="option"]').first().should('contain', 'Stroop Color-Word Test');
+  });
 });
