@@ -7,7 +7,7 @@ import {
 } from '../utils/mocks';
 import { useDataTable } from './useDataTable';
 
-// Mock the store
+// Mock the store hook that the useDataTable hook depends on
 vi.mock('../stores/FreshNewStore', () => ({
   useColumns: vi.fn(),
 }));
@@ -45,7 +45,7 @@ describe('useDataTable', () => {
   });
 
   it('should handle columns with non-sequential IDs correctly', () => {
-    const columnsWithGaps = {
+    const unorderedColumns = {
       '0': {
         id: '0',
         name: 'col1',
@@ -63,7 +63,7 @@ describe('useDataTable', () => {
       },
     };
 
-    mockedUseColumns.mockReturnValue(columnsWithGaps);
+    mockedUseColumns.mockReturnValue(unorderedColumns);
 
     const { result } = renderHook(() => useDataTable());
 
