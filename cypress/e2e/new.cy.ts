@@ -1,4 +1,8 @@
-import { mockDataTableFileName, mockDataTableFilePath } from '../support/testConstants';
+import {
+  mockDataTableFileName,
+  mockDataTableFilePath,
+  mockDataDictionaryFilePath,
+} from '../support/testConstants';
 
 describe('Main user flow', () => {
   beforeEach(() => {
@@ -27,5 +31,17 @@ describe('Main user flow', () => {
     cy.get('[data-cy="datatable-preview"]').should('be.visible').and('contain', 'participant_id');
     cy.get('[data-cy="datatable-preview-pagination"]').should('be.visible');
     cy.get('[data-cy="datatable-toggle-preview-button"]').click();
+
+    cy.get('[data-cy="datadictionary-upload-input"]').selectFile(mockDataDictionaryFilePath, {
+      force: true,
+    });
+    cy.get('[data-cy="datadictionary-uploaded-file-name"]').should('contain', 'mock.json');
+    cy.get('[data-cy="datadictionary-toggle-preview-button"]').click();
+    cy.get('[data-cy="datadictionary-preview"]')
+      .should('be.visible')
+      .and('contain', 'Description:"A participant ID"')
+      .and('contain', 'Description:"Age of the participant"');
+    cy.get('[data-cy="datadictionary-toggle-preview-button"]').click();
+    cy.get('[data-cy="next-button"]').click();
   });
 });
