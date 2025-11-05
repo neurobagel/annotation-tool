@@ -134,7 +134,7 @@ describe('Card mapping dropdown', () => {
   });
 
   // NOTE: this is a regression test for #327
-  it.only('filters options in the correct order', () => {
+  it('filters options in the correct order', () => {
     cy.mount(
       <MultiColumnMeasuresCard
         card={{ ...props.card, term: null }}
