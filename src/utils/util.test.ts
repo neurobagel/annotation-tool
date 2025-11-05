@@ -1,4 +1,3 @@
-// TODO: Remove duplicate tests once store refactoring is done
 import axios from 'axios';
 import { describe, it, expect, vi } from 'vitest';
 import { fetchConfigGitHubURL, githubRawBaseURL } from './constants';

@@ -54,7 +54,7 @@ interface StandardizedTerm {
   status?: string;
 }
 
-export interface StandardizedTerms {
+interface StandardizedTerms {
   [key: string]: StandardizedTerm;
 }
 
@@ -65,7 +65,7 @@ interface StandardizedFormat {
   examples?: string[];
 }
 
-export interface StandardizedFormats {
+interface StandardizedFormats {
   [key: string]: StandardizedFormat;
 }
 
@@ -118,8 +118,6 @@ export type FreshDataStoreState = {
 
 export type FreshDataStoreActions = {
   loadConfig: (configName: string) => Promise<void>;
-  appFetchesConfigOptions: () => Promise<void>;
-  userSelectsConfig: (userSelectedConfig: string | null) => Promise<void>;
 };
 
 export type FreshDataStore = FreshDataStoreState & {
