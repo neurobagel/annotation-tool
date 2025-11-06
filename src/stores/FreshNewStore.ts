@@ -1,6 +1,11 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { FreshDataStoreState, FreshDataStoreActions, Columns } from '../../datamodel';
+import {
+  FreshDataStoreState,
+  FreshDataStoreActions,
+  Columns,
+  DataDictionary,
+} from '../../datamodel';
 import {
   fetchAvailableConfigs,
   fetchConfig,
@@ -9,13 +14,14 @@ import {
   convertStandardizedFormats,
   readFile,
   parseTsvContent,
+  applyDataDictionaryToColumns,
 } from '../utils/store-utils';
 
 type FreshDataStore = FreshDataStoreState & {
   actions: FreshDataStoreActions;
 };
 
-const useFreshDataStore = create<FreshDataStore>()((set) => ({
+const initialState = {
   columns: {},
   standardizedVariables: {},
   standardizedTerms: {},
@@ -28,6 +34,10 @@ const useFreshDataStore = create<FreshDataStore>()((set) => ({
     fileName: '',
     dataDictionary: {},
   },
+};
+
+const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
+  ...initialState,
   actions: {
     loadConfig: async (configName: string) => {
       set({ config: configName });
@@ -111,6 +121,50 @@ const useFreshDataStore = create<FreshDataStore>()((set) => ({
         });
       }
     },
+    userUploadsDataDictionaryFile: async (dataDictionaryFile: File) => {
+      try {
+        const content = await readFile(dataDictionaryFile);
+        const dataDictionary: DataDictionary = JSON.parse(content);
+
+        const { columns, standardizedVariables, standardizedTerms, standardizedFormats } = get();
+
+        const updatedColumns = applyDataDictionaryToColumns(
+          columns,
+          dataDictionary,
+          standardizedVariables,
+          standardizedTerms,
+          standardizedFormats
+        );
+
+        set({
+          columns: updatedColumns,
+          uploadedDataDictionary: {
+            fileName: dataDictionaryFile.name,
+            dataDictionary,
+          },
+        });
+      } catch (error) {
+        // TODO: show a notif error
+        set({
+          uploadedDataDictionary: {
+            fileName: '',
+            dataDictionary: {},
+          },
+        });
+      }
+    },
+    reset: () => {
+      set((state) => ({
+        ...initialState,
+        // Preserve config-related state
+        config: state.config,
+        configOptions: state.configOptions,
+        isConfigLoading: state.isConfigLoading,
+        standardizedVariables: state.standardizedVariables,
+        standardizedTerms: state.standardizedTerms,
+        standardizedFormats: state.standardizedFormats,
+      }));
+    },
   },
 }));
 
@@ -121,6 +175,8 @@ export const useStandardizedTerms = () => useFreshDataStore((state) => state.sta
 export const useStandardizedFormats = () => useFreshDataStore((state) => state.standardizedFormats);
 export const useUploadedDataTableFileName = () =>
   useFreshDataStore((state) => state.uploadedDataTableFileName);
+export const useUploadedDataDictionary = () =>
+  useFreshDataStore((state) => state.uploadedDataDictionary);
 export const useIsConfigLoading = () => useFreshDataStore((state) => state.isConfigLoading);
 export const useConfig = () => useFreshDataStore((state) => state.config);
 export const useConfigOptions = () => useFreshDataStore((state) => state.configOptions);

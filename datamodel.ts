@@ -73,7 +73,7 @@ export interface StandardizedFormats {
   [key: string]: StandardizedFormat;
 }
 
-interface DataDictionary {
+export interface DataDictionary {
   [key: string]: {
     Description: string;
     Levels?: { [key: string]: { Description: string; TermURL?: string } };
@@ -103,7 +103,7 @@ interface DataDictionary {
   };
 }
 
-export interface InputDataDictionaryFile {
+export interface UploadedDataDictionaryFile {
   fileName: string;
   dataDictionary: DataDictionary;
 }
@@ -117,7 +117,7 @@ export type FreshDataStoreState = {
   isConfigLoading: boolean;
   config: string;
   configOptions: string[];
-  uploadedDataDictionary: InputDataDictionaryFile;
+  uploadedDataDictionary: UploadedDataDictionaryFile;
 };
 
 export type FreshDataStoreActions = {
@@ -125,6 +125,8 @@ export type FreshDataStoreActions = {
   appFetchesConfigOptions: () => Promise<void>;
   userSelectsConfig: (userSelectedConfig: string | null) => Promise<void>;
   userUploadsDataTableFile: (dataTableFile: File) => Promise<void>;
+  userUploadsDataDictionaryFile: (dataDictionaryFile: File) => Promise<void>;
+  reset: () => void;
 };
 
 export type FreshDataStore = FreshDataStoreState & {

@@ -1,9 +1,20 @@
 import axios from 'axios';
 import { describe, it, expect, vi } from 'vitest';
+import mockDataDictionaryRaw from '../../cypress/fixtures/examples/mock.json?raw';
 import mockTsvRaw from '../../cypress/fixtures/examples/mock.tsv?raw';
 import mockTsvWithEmptyLineRaw from '../../cypress/fixtures/examples/mock_with_empty_line.tsv?raw';
+import { Columns, DataDictionary, StandardizedVariables } from '../../datamodel';
 import { fetchConfigGitHubURL, githubRawBaseURL } from './constants';
-import { mockGitHubResponse, mockConfigFile, mockTermsData, mockFreshConfigFile } from './mocks';
+import {
+  mockGitHubResponse,
+  mockConfigFile,
+  mockTermsData,
+  mockFreshConfigFile,
+  mockFreshStandardizedVariables,
+  mockFreshStandardizedTerms,
+  mockFreshStandardizedFormats,
+  mockFreshColumnsAfterDataTableUpload,
+} from './mocks';
 import {
   fetchAvailableConfigs,
   fetchConfig,
@@ -12,6 +23,7 @@ import {
   convertStandardizedFormats,
   readFile,
   parseTsvContent,
+  applyDataDictionaryToColumns,
 } from './store-utils';
 
 // Mock axios
@@ -307,5 +319,401 @@ describe('readFile + parseTsvContent integration', () => {
     expect(data).toHaveLength(12);
     expect(data[0]).toEqual(['sub-718211', '28.4', 'M', 'ADHD', '80']);
     expect(data[11]).toEqual(['sub-718225', '65', 'N/A', 'PD', '83']);
+  });
+});
+
+describe('applyDataDictionaryToColumns', () => {
+  it('should apply data dictionary from mock.json to columns and return updated columns', () => {
+    const mockDataDict = JSON.parse(mockDataDictionaryRaw);
+
+    const result = applyDataDictionaryToColumns(
+      mockFreshColumnsAfterDataTableUpload,
+      mockDataDict,
+      mockFreshStandardizedVariables,
+      mockFreshStandardizedTerms,
+      mockFreshStandardizedFormats
+    );
+
+    expect(result['0'].description).toBe('A participant ID');
+    expect(result['0'].standardizedVariable).toBe('nb:ParticipantID');
+    // Identifier VariableType doesn't map to DataType
+    expect(result['0'].dataType).toBeUndefined();
+
+    expect(result['1'].description).toBe('Age of the participant');
+    expect(result['1'].standardizedVariable).toBe('nb:Age');
+    expect(result['1'].dataType).toBe('Continuous');
+    expect(result['1'].format).toBe('nb:FromFloat');
+
+    expect(result['2'].description).toBe('Sex of the participant');
+    expect(result['2'].standardizedVariable).toBe('nb:Sex');
+    expect(result['2'].dataType).toBe('Categorical');
+    expect(result['2'].levels).toBeDefined();
+    expect(result['2'].levels?.M.description).toBe('Male');
+    expect(result['2'].levels?.M.standardizedTerm).toBe('snomed:248153007');
+    expect(result['2'].levels?.F.description).toBe('Female');
+    expect(result['2'].levels?.F.standardizedTerm).toBe('snomed:248152002');
+    expect(result['2'].missingValues).toEqual(['N/A']);
+
+    expect(result['3'].description).toBe('Diagnosis of the participant');
+    expect(result['3'].standardizedVariable).toBe('nb:Diagnosis');
+    expect(result['3'].dataType).toBe('Categorical');
+
+    expect(result['5'].description).toBe('iq test score of the participant');
+    expect(result['5'].standardizedVariable).toBe('nb:Assessment');
+    // Collection VariableType doesn't map to DataType
+    expect(result['5'].dataType).toBeUndefined();
+    expect(result['5'].isPartOf).toBe('snomed:273712001');
+  });
+
+  it('should handle categorical variables with levels', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'sex',
+        allValues: ['M', 'F'],
+      },
+    };
+
+    const mockDataDict = {
+      sex: {
+        Description: 'Sex of the participant',
+        Levels: {
+          M: {
+            Description: 'Male',
+          },
+          F: {
+            Description: 'Female',
+          },
+        },
+        Annotations: {
+          IsAbout: {
+            TermURL: 'nb:Sex',
+            Label: 'Sex',
+          },
+          VariableType: 'Categorical' as const,
+          Levels: {
+            M: {
+              TermURL: 'snomed:248153007',
+              Label: 'Male',
+            },
+            F: {
+              TermURL: 'snomed:248152002',
+              Label: 'Female',
+            },
+          },
+          MissingValues: ['N/A'],
+        },
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      mockFreshStandardizedVariables as unknown as StandardizedVariables,
+      mockFreshStandardizedTerms,
+      mockFreshStandardizedFormats
+    );
+
+    expect(result['0'].description).toBe('Sex of the participant');
+    expect(result['0'].standardizedVariable).toBe('nb:Sex');
+    expect(result['0'].dataType).toBe('Categorical');
+    expect(result['0'].levels).toBeDefined();
+    expect(result['0'].levels?.M.description).toBe('Male');
+    expect(result['0'].levels?.M.standardizedTerm).toBe('snomed:248153007');
+    expect(result['0'].levels?.F.description).toBe('Female');
+    expect(result['0'].levels?.F.standardizedTerm).toBe('snomed:248152002');
+    expect(result['0'].missingValues).toEqual(['N/A']);
+  });
+
+  it('should handle multi-column measures with IsPartOf', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'iq',
+        allValues: ['100', '110'],
+      },
+    };
+
+    const mockDataDict = {
+      iq: {
+        Description: 'IQ test score',
+        Annotations: {
+          IsAbout: {
+            TermURL: 'nb:Assessment',
+            Label: 'Assessment Tool',
+          },
+          VariableType: 'Collection' as const,
+          IsPartOf: {
+            TermURL: 'snomed:273712001',
+            Label: 'Previous IQ assessment by pronunciation',
+          },
+        },
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      mockFreshStandardizedVariables as unknown as StandardizedVariables,
+      mockFreshStandardizedTerms,
+      mockFreshStandardizedFormats
+    );
+
+    expect(result['0'].description).toBe('IQ test score');
+    expect(result['0'].standardizedVariable).toBe('nb:Assessment');
+    expect(result['0'].isPartOf).toBe('snomed:273712001');
+  });
+
+  it('should handle formats for continuous variables', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'age',
+        allValues: ['25.5', '30.2'],
+      },
+    };
+
+    const mockDataDict = {
+      age: {
+        Description: 'Age of the participant',
+        Annotations: {
+          IsAbout: {
+            TermURL: 'nb:Age',
+            Label: 'Age',
+          },
+          VariableType: 'Continuous' as const,
+          Format: {
+            TermURL: 'nb:FromFloat',
+            Label: 'float',
+          },
+        },
+        Units: 'years',
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      mockFreshStandardizedVariables as unknown as StandardizedVariables,
+      mockFreshStandardizedTerms,
+      mockFreshStandardizedFormats
+    );
+
+    expect(result['0'].format).toBe('nb:FromFloat');
+    expect(result['0'].dataType).toBe('Continuous');
+    expect(result['0'].units).toBe('years');
+  });
+
+  it('should not modify columns when column names do not match', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'column1',
+        allValues: ['val1', 'val2'],
+      },
+    };
+
+    const mockDataDict = {
+      different_column: {
+        Description: 'Some description',
+        Annotations: {
+          IsAbout: {
+            TermURL: 'nb:Age',
+            Label: 'Age',
+          },
+        },
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns,
+      mockDataDict,
+      mockFreshStandardizedVariables,
+      mockFreshStandardizedTerms,
+      mockFreshStandardizedFormats
+    );
+
+    expect(result['0'].description).toBeUndefined();
+    expect(result['0'].standardizedVariable).toBeUndefined();
+  });
+
+  it('should skip invalid standardized variable references', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'test_column',
+        allValues: ['val1', 'val2'],
+      },
+    };
+
+    const mockDataDict = {
+      test_column: {
+        Description: 'Test column',
+        Annotations: {
+          IsAbout: {
+            TermURL: 'nb:NonExistentVariable',
+            Label: 'Non Existent',
+          },
+        },
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns,
+      mockDataDict,
+      mockFreshStandardizedVariables,
+      mockFreshStandardizedTerms,
+      mockFreshStandardizedFormats
+    );
+
+    expect(result['0'].description).toBe('Test column');
+    expect(result['0'].standardizedVariable).toBeUndefined();
+  });
+
+  it('should skip invalid term references in IsPartOf', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'test_column',
+        allValues: ['val1', 'val2'],
+      },
+    };
+
+    const mockDataDict = {
+      test_column: {
+        Description: 'Test column',
+        Annotations: {
+          IsAbout: {
+            TermURL: 'nb:Assessment',
+            Label: 'Assessment Tool',
+          },
+          IsPartOf: {
+            TermURL: 'snomed:NonExistentTerm',
+            Label: 'Non Existent Term',
+          },
+        },
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns,
+      mockDataDict,
+      mockFreshStandardizedVariables,
+      mockFreshStandardizedTerms,
+      mockFreshStandardizedFormats
+    );
+
+    expect(result['0'].standardizedVariable).toBe('nb:Assessment');
+    expect(result['0'].isPartOf).toBeUndefined();
+  });
+
+  it('should skip invalid format references', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'age',
+        allValues: ['25', '30'],
+      },
+    };
+
+    const mockDataDict = {
+      age: {
+        Description: 'Age',
+        Annotations: {
+          IsAbout: {
+            TermURL: 'nb:Age',
+            Label: 'Age',
+          },
+          Format: {
+            TermURL: 'nb:NonExistentFormat',
+            Label: 'Non Existent',
+          },
+        },
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns,
+      mockDataDict,
+      mockFreshStandardizedVariables,
+      mockFreshStandardizedTerms,
+      mockFreshStandardizedFormats
+    );
+
+    expect(result['0'].standardizedVariable).toBe('nb:Age');
+    expect(result['0'].format).toBeUndefined();
+  });
+
+  it('should handle levels without term annotations', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'category',
+        allValues: ['A', 'B'],
+      },
+    };
+
+    const mockDataDict = {
+      category: {
+        Description: 'Category column',
+        Levels: {
+          A: {
+            Description: 'Category A',
+          },
+          B: {
+            Description: 'Category B',
+          },
+        },
+        Annotations: {
+          IsAbout: {
+            TermURL: 'nb:Diagnosis',
+            Label: 'Diagnosis',
+          },
+          VariableType: 'Categorical' as const,
+        },
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      mockFreshStandardizedVariables as unknown as StandardizedVariables,
+      mockFreshStandardizedTerms,
+      mockFreshStandardizedFormats
+    );
+
+    expect(result['0'].levels).toBeDefined();
+    expect(result['0'].levels?.A.description).toBe('Category A');
+    expect(result['0'].levels?.A.standardizedTerm).toBe('');
+    expect(result['0'].levels?.B.description).toBe('Category B');
+    expect(result['0'].levels?.B.standardizedTerm).toBe('');
+  });
+
+  it('should return a new columns object without mutating the original', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'test',
+        allValues: ['val1'],
+      },
+    };
+
+    const mockDataDict = {
+      test: {
+        Description: 'Test description',
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      mockFreshStandardizedVariables as unknown as StandardizedVariables,
+      mockFreshStandardizedTerms,
+      mockFreshStandardizedFormats
+    );
+
+    expect(result).not.toBe(mockColumns);
+    expect((mockColumns as Columns)['0'].description).toBeUndefined();
+    expect(result['0'].description).toBe('Test description');
   });
 });
