@@ -115,7 +115,7 @@ describe('MultiColumnMeasuresCard', () => {
   });
 
   // NOTE: this is a regression test for #342
-  it.only('keeps the same query string after an option is selected', () => {
+  it('should keep the same query string after an option is selected', () => {
     cy.mount(
       <MultiColumnMeasuresCard
         card={props.card}
