@@ -55,6 +55,7 @@ describe('MultiColumnMeasuresCard', () => {
     cy.get('[data-cy=multi-column-measures-card-1-columns-dropdown]').should('be.visible');
     cy.get('[data-cy=mapped-column-1]').should('be.visible').and('contain', 'participant_id');
   });
+
   it('fires onColumnSelect with the appropriate payload when a column is selected', () => {
     const spy = cy.spy().as('onColumnSelect');
     cy.mount(
@@ -73,6 +74,7 @@ describe('MultiColumnMeasuresCard', () => {
     cy.get('[data-cy=multi-column-measures-card-1-columns-dropdown]').type('age{downArrow}{enter}');
     cy.get('@onColumnSelect').should('have.been.calledWith', '2');
   });
+
   it('fires onRemoveColumn with the appropriate payload when a chip is deleted', () => {
     const spy = cy.spy().as('onRemoveColumn');
     cy.mount(
@@ -110,5 +112,86 @@ describe('MultiColumnMeasuresCard', () => {
     );
     cy.get('[data-cy=remove-card-1-button]').click();
     cy.get('@onRemoveCard').should('have.been.calledOnce');
+  });
+
+  // NOTE: this is a regression test for #342
+  it('should keep the same query string after an option is selected', () => {
+    cy.mount(
+      <MultiColumnMeasuresCard
+        card={props.card}
+        cardIndex={1}
+        mappedColumnHeaders={props.mappedColumnHeaders}
+        availableTerms={props.availableTerms}
+        columnOptions={[
+          { id: '1', label: 'my happy column', disabled: false },
+          { id: '2', label: 'my happy other column', disabled: false },
+          { id: '3', label: 'my happyness column', disabled: false },
+        ]}
+        onTermSelect={props.onTermSelect}
+        onColumnSelect={props.onColumnSelect}
+        onRemoveColumn={props.onRemoveColumn}
+        onRemoveCard={props.onRemoveCard}
+      />
+    );
+    cy.get('[data-cy=multi-column-measures-card-1-columns-dropdown]').type(
+      'my happy{downArrow}{enter}'
+    );
+    cy.get('[data-cy=multi-column-measures-card-1-columns-dropdown]')
+      .find('input')
+      .should('have.value', 'my happy');
+  });
+});
+
+describe('Card mapping dropdown', () => {
+  it('should open dropdown if card has not been assigned a standardized term yet', () => {
+    cy.mount(
+      <MultiColumnMeasuresCard
+        card={{ ...props.card, term: null }}
+        cardIndex={1}
+        mappedColumnHeaders={props.mappedColumnHeaders}
+        availableTerms={props.availableTerms}
+        columnOptions={props.columnOptions}
+        onTermSelect={props.onTermSelect}
+        onColumnSelect={props.onColumnSelect}
+        onRemoveColumn={props.onRemoveColumn}
+        onRemoveCard={props.onRemoveCard}
+      />
+    );
+    cy.get('[data-cy="multi-column-measures-card-1-title-dropdown"]').should('be.visible');
+  });
+
+  // NOTE: this is a regression test for #327
+  it('should filter options in the correct order', () => {
+    cy.mount(
+      <MultiColumnMeasuresCard
+        card={{ ...props.card, term: null }}
+        cardIndex={1}
+        mappedColumnHeaders={props.mappedColumnHeaders}
+        availableTerms={[
+          {
+            identifier: 'nb:one',
+            label: 'Stroop Color-Word Test',
+          },
+          {
+            identifier: 'nb:two',
+            label: 'Questionnaire for Psychotic Experiences; hallucinations_psychosis',
+          },
+          {
+            identifier: 'nb:three',
+            label:
+              'Non-Motor Symptoms Scale for Parkinson\u2019s Disease; non-motor symptoms general',
+          },
+        ]}
+        columnOptions={props.columnOptions}
+        onTermSelect={props.onTermSelect}
+        onColumnSelect={props.onColumnSelect}
+        onRemoveColumn={props.onRemoveColumn}
+        onRemoveCard={props.onRemoveCard}
+      />
+    );
+    cy.get('[data-cy="multi-column-measures-card-1-title-dropdown"]').should('be.visible');
+    cy.get('[data-cy="multi-column-measures-card-1-title-dropdown"]').type('Stroop');
+    cy.get('[role="option"]').should('have.length', 1);
+    cy.get('[role="option"]').first().should('contain', 'Stroop Color-Word Test');
   });
 });
