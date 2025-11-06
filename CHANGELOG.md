@@ -1,3 +1,16 @@
+# v0.4.4 (Thu Nov 06 2025)
+
+#### 🐛 Bug Fixes
+
+- [FIX] Keep query string after user selects dropdown option [#344](https://github.com/neurobagel/annotation-tool/pull/344) ([@surchs](https://github.com/surchs))
+- [FIX] Ensure dropdown options match complete substring [#341](https://github.com/neurobagel/annotation-tool/pull/341) ([@surchs](https://github.com/surchs))
+
+#### Authors: 1
+
+- Sebastian Urchs ([@surchs](https://github.com/surchs))
+
+---
+
 # v0.4.3 (Mon Oct 27 2025)
 
 #### 🐛 Bug Fixes
