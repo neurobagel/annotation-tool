@@ -41,10 +41,6 @@ function Upload({ disableConfig }: UploadProps) {
     userUploadsDataTableFile(file);
   };
 
-  const handleDataDictionaryFileUpload = (file: File) => {
-    userUploadsDataDictionaryFile(file);
-  };
-
   useEffect(() => {
     const loadConfigs = async () => {
       await appFetchesConfigOptions();
@@ -85,7 +81,7 @@ function Upload({ disableConfig }: UploadProps) {
         FileUploaderDisplayText="Upload your data dictionary .json file (optional)"
         allowedFileType=".json"
         uploadedFileName={fileName}
-        onFileUpload={handleDataDictionaryFileUpload}
+        onFileUpload={userUploadsDataDictionaryFile}
         previewComponent={<DataDictionaryPreview dataDictionary={dataDictionary} />}
         diableFileUploader={isDataTableEmpty || isConfigLoading}
         FileUploaderToolTipContent={isDataTableEmpty ? 'Please upload a data table first' : ''}

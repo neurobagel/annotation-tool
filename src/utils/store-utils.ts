@@ -231,67 +231,81 @@ export function applyDataDictionaryToColumns(
       column.description = columnData.Description;
     }
 
-    if (columnData.Annotations?.IsAbout?.TermURL) {
-      const standardizedVariableId = columnData.Annotations.IsAbout.TermURL;
-      if (standardizedVariables[standardizedVariableId]) {
-        column.standardizedVariable = standardizedVariableId;
-      }
-    }
-
-    if (columnData.Annotations?.VariableType) {
-      const varType = columnData.Annotations.VariableType;
-      if (varType === VariableType.categorical) {
-        column.dataType = DataType.categorical;
-      } else if (varType === VariableType.continuous) {
-        column.dataType = DataType.continuous;
-      } else {
-        column.dataType = undefined;
-      }
-    }
-
-    if (columnData.Annotations?.IsPartOf?.TermURL) {
-      const termId = columnData.Annotations.IsPartOf.TermURL;
-      if (standardizedTerms[termId]) {
-        column.isPartOf = termId;
-      }
-    }
-
-    if (columnData.Levels) {
-      column.levels = Object.entries(columnData.Levels).reduce(
-        (acc, [levelKey, levelValue]) => {
-          const annotationLevel = columnData.Annotations?.Levels?.[levelKey];
-          const standardizedTerm =
-            annotationLevel?.TermURL && standardizedTerms[annotationLevel.TermURL]
-              ? annotationLevel.TermURL
-              : '';
-
-          return {
-            ...acc,
-            [levelKey]: {
-              description: levelValue.Description || '',
-              standardizedTerm,
-            },
-          };
-        },
-        {} as { [key: string]: { description: string; standardizedTerm: string } }
-      );
-      column.dataType = DataType.categorical;
-    }
-
-    if (columnData.Units !== undefined) {
-      column.units = columnData.Units;
-      column.dataType = DataType.continuous;
-    }
-
     if (columnData.Annotations?.MissingValues) {
       column.missingValues = columnData.Annotations.MissingValues;
     }
 
-    if (columnData.Annotations?.Format?.TermURL) {
-      const formatId = columnData.Annotations.Format.TermURL;
-      if (standardizedFormats[formatId]) {
-        column.format = formatId;
+    let variableType: VariableType | undefined;
+    if (columnData.Annotations?.IsAbout?.TermURL) {
+      const standardizedVariableId = columnData.Annotations.IsAbout.TermURL;
+      if (standardizedVariables[standardizedVariableId]) {
+        column.standardizedVariable = standardizedVariableId;
+        variableType = standardizedVariables[standardizedVariableId].variable_type;
       }
+    }
+
+    if (!variableType && columnData.Annotations?.VariableType) {
+      variableType = columnData.Annotations.VariableType;
+    }
+
+    switch (variableType) {
+      case VariableType.categorical:
+        column.dataType = DataType.categorical;
+
+        if (columnData.Levels) {
+          column.levels = Object.entries(columnData.Levels).reduce(
+            (acc, [levelKey, levelValue]) => {
+              const annotationLevel = columnData.Annotations?.Levels?.[levelKey];
+              const standardizedTerm =
+                annotationLevel?.TermURL && standardizedTerms[annotationLevel.TermURL]
+                  ? annotationLevel.TermURL
+                  : '';
+
+              return {
+                ...acc,
+                [levelKey]: {
+                  description: levelValue.Description || '',
+                  standardizedTerm,
+                },
+              };
+            },
+            {} as { [key: string]: { description: string; standardizedTerm: string } }
+          );
+        }
+        break;
+
+      case VariableType.continuous:
+        column.dataType = DataType.continuous;
+
+        if (columnData.Units !== undefined) {
+          column.units = columnData.Units;
+        }
+
+        if (columnData.Annotations?.Format?.TermURL) {
+          const formatId = columnData.Annotations.Format.TermURL;
+          if (standardizedFormats[formatId]) {
+            column.format = formatId;
+          }
+        }
+        break;
+
+      case VariableType.identifier:
+        column.dataType = undefined;
+        break;
+
+      case VariableType.collection:
+        column.dataType = undefined;
+
+        if (columnData.Annotations?.IsPartOf?.TermURL) {
+          const termId = columnData.Annotations.IsPartOf.TermURL;
+          if (standardizedTerms[termId]) {
+            column.isPartOf = termId;
+          }
+        }
+        break;
+
+      default:
+        break;
     }
 
     return {

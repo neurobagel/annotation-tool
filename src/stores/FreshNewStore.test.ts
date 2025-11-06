@@ -343,7 +343,7 @@ describe('userUploadsDataDictionaryFile', () => {
   });
 
   it('should process data dictionary file and update columns with annotations', async () => {
-    // Upload data table to have columns
+    // Upload data table to populate columns object in store
     const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
       type: 'text/tab-separated-values',
     });
