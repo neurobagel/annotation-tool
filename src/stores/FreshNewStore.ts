@@ -6,6 +6,8 @@ import {
   FreshDataStoreActions,
   Columns,
   DataDictionary,
+  DataType,
+  VariableType,
 } from '../../datamodel';
 import {
   fetchAvailableConfigs,
@@ -16,6 +18,7 @@ import {
   readFile,
   parseTsvContent,
   applyDataDictionaryToColumns,
+  applyDataTypeToColumn,
 } from '../utils/store-utils';
 
 type FreshDataStore = FreshDataStoreState & {
@@ -158,6 +161,14 @@ const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
       set((state) => ({
         columns: produce(state.columns, (draft) => {
           draft[columnID].description = description;
+        }),
+      }));
+    },
+
+    userUpdatesColumnDataType(columnID, dataType) {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          applyDataTypeToColumn(draft[columnID], dataType, state.columns[columnID].allValues);
         }),
       }));
     },
