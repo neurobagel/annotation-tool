@@ -173,6 +173,45 @@ const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
       }));
     },
 
+    userUpdatesColumnStandardizedVariable(columnID, standardizedVariableId) {
+      const { standardizedVariables } = get();
+
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          draft[columnID].standardizedVariable = standardizedVariableId;
+
+          // Handle isPartOf for multi-column measures
+          const standardizedVariable = standardizedVariableId
+            ? standardizedVariables[standardizedVariableId]
+            : null;
+
+          if (standardizedVariable?.is_multi_column_measure) {
+            // When setting to a multi-column measure, initialize isPartOf if it doesn't exist
+            if (!draft[columnID].isPartOf) {
+              draft[columnID].isPartOf = '';
+            }
+          } else if (draft[columnID].isPartOf) {
+            // Remove isPartOf when changing from multi-column measure to something else
+            delete draft[columnID].isPartOf;
+          }
+
+          // Apply data type from standardized variable if available
+          if (standardizedVariable) {
+            const variableType = standardizedVariable.variable_type;
+            let dataType: DataType | null = null;
+
+            if (variableType === VariableType.categorical) {
+              dataType = DataType.categorical;
+            } else if (variableType === VariableType.continuous) {
+              dataType = DataType.continuous;
+            }
+
+            applyDataTypeToColumn(draft[columnID], dataType, state.columns[columnID].allValues);
+          }
+        }),
+      }));
+    },
+
     reset: () => {
       set((state) => ({
         ...initialState,
