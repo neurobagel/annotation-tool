@@ -1,3 +1,4 @@
+import { produce } from 'immer';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import {
@@ -153,6 +154,14 @@ const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
         });
       }
     },
+    userUpdatesColumnDescription: (columnID: string, description: string | null) => {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          draft[columnID].description = description;
+        }),
+      }));
+    },
+
     reset: () => {
       set((state) => ({
         ...initialState,
@@ -181,5 +190,8 @@ export const useIsConfigLoading = () => useFreshDataStore((state) => state.isCon
 export const useConfig = () => useFreshDataStore((state) => state.config);
 export const useConfigOptions = () => useFreshDataStore((state) => state.configOptions);
 export const useFreshDataActions = () => useFreshDataStore((state) => state.actions);
+
+// Export the raw store for testing purposes
+export { useFreshDataStore };
 
 export default devtools(useFreshDataStore);

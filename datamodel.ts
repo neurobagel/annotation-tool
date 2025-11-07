@@ -18,12 +18,12 @@ interface Column {
   id: string;
   name: string;
   allValues: string[]; // because we want to show the datable preview
-  description?: string;
-  dataType?: DataType;
+  description?: string | null;
+  dataType?: DataType | null;
   isPartOf?: string; // foreign key (primary key in terms table) to standardized term in the terms for the corresponding standardized variable
   levels?: { [key: string]: { description: string; standardizedTerm: string } } | null; // foreign key to standardized term
   units?: string;
-  standardizedVariable?: string; // foreign key to standardized variable
+  standardizedVariable?: string | null; // foreign key to standardized variable
   missingValues?: string[];
   format?: string; // foreign key to term format
 }
@@ -126,6 +126,7 @@ export type FreshDataStoreActions = {
   userSelectsConfig: (userSelectedConfig: string | null) => Promise<void>;
   userUploadsDataTableFile: (dataTableFile: File) => Promise<void>;
   userUploadsDataDictionaryFile: (dataDictionaryFile: File) => Promise<void>;
+  userUpdatesColumnDescription: (columnID: string, description: string | null) => void;
   reset: () => void;
 };
 
