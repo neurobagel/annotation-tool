@@ -190,7 +190,7 @@ const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
             if (!draft[columnID].isPartOf) {
               draft[columnID].isPartOf = '';
             }
-          } else if (draft[columnID].isPartOf) {
+          } else if (draft[columnID].isPartOf !== undefined) {
             // Remove isPartOf when changing from multi-column measure to something else
             delete draft[columnID].isPartOf;
           }

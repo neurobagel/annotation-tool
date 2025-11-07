@@ -846,6 +846,252 @@ B`;
   });
 });
 
+describe('userUpdatesColumnStandardizedVariable', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should set standardized variable and apply categorical data type', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['sex'],
+      data: [['M'], ['F'], ['M']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+      standardizedVariables: useStandardizedVariables(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockFreshConfigFile,
+      termsData: mockFreshTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnStandardizedVariable('0', 'nb:Sex');
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Sex');
+    expect(result.current.columns['0'].dataType).toBe(DataType.categorical);
+    expect(result.current.columns['0'].levels).toBeDefined();
+    expect(Object.keys(result.current.columns['0'].levels!)).toEqual(['M', 'F']);
+  });
+
+  it('should set standardized variable and apply continuous data type', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['age'],
+      data: [['25'], ['30'], ['35']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockFreshConfigFile,
+      termsData: mockFreshTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnStandardizedVariable('0', 'nb:Age');
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Age');
+    expect(result.current.columns['0'].dataType).toBe(DataType.continuous);
+    expect(result.current.columns['0'].units).toBe('');
+    expect(result.current.columns['0'].levels).toBeUndefined();
+  });
+
+  it('should initialize isPartOf for multi-column measure variables', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['assessment'],
+      data: [['100'], ['110'], ['120']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockFreshConfigFile,
+      termsData: mockFreshTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnStandardizedVariable('0', 'nb:Assessment');
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Assessment');
+    expect(result.current.columns['0'].isPartOf).toBe('');
+  });
+
+  it('should remove isPartOf when changing from multi-column measure to a non-multi-column measure variable', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['column'],
+      data: [['100'], ['110'], ['120']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockFreshConfigFile,
+      termsData: mockFreshTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnStandardizedVariable('0', 'nb:Assessment');
+    });
+
+    expect(result.current.columns['0'].isPartOf).toBe('');
+
+    act(() => {
+      result.current.actions.userUpdatesColumnStandardizedVariable('0', 'nb:Age');
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Age');
+    expect(result.current.columns['0'].isPartOf).toBeUndefined();
+  });
+
+  it('should clear standardized variable when null is provided', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['column'],
+      data: [['M'], ['F']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockFreshConfigFile,
+      termsData: mockFreshTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnStandardizedVariable('0', 'nb:Sex');
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Sex');
+
+    act(() => {
+      result.current.actions.userUpdatesColumnStandardizedVariable('0', null);
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBeNull();
+  });
+
+  it('should handle identifier variable type without setting dataType', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['participant_id'],
+      data: [['sub-001'], ['sub-002'], ['sub-003']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockFreshConfigFile,
+      termsData: mockFreshTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnStandardizedVariable('0', 'nb:ParticipantID');
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:ParticipantID');
+    expect(result.current.columns['0'].dataType).toBeNull();
+    expect(result.current.columns['0'].levels).toBeUndefined();
+    expect(result.current.columns['0'].units).toBeUndefined();
+  });
+});
+
 describe('reset', () => {
   beforeEach(() => {
     vi.clearAllMocks();
