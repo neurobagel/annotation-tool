@@ -1,15 +1,16 @@
-import { VariableType } from '~/utils/internal_types';
+import { DataType } from '../../datamodel';
 import ColumnAnnotationCard from '../../src/components/ColumnAnnotationCard';
-import useDataStore from '../../src/stores/data';
 import { mockStandardizedVariables } from '../../src/utils/mocks';
 
 const props = {
   id: '1',
-  header: 'some header',
+  name: 'some header',
   description: 'some description',
-  variableType: 'Categorical' as VariableType,
-  standardizedVariable: { identifier: 'participant_id', label: 'Participant ID' },
-  standardizedVariableOptions: mockStandardizedVariables,
+  dataType: 'Categorical' as DataType,
+  standardizedVariableLabel: 'Participant ID',
+  standardizedVariableOptions: Object.values(mockStandardizedVariables).map((sv) => sv.label),
+  isDataTypeEditable: true,
+  disabledStandardizedVariableLabels: new Set(['Participant ID', 'Sex']),
   onDescriptionChange: () => {},
   onDataTypeChange: () => {},
   onStandardizedVariableChange: () => {},
@@ -17,20 +18,16 @@ const props = {
 
 describe('ColumnAnnotationCard', () => {
   beforeEach(() => {
-    useDataStore.setState({
-      mappedSingleColumnStandardizedVariables: [
-        mockStandardizedVariables['Participant ID'],
-        mockStandardizedVariables.Sex,
-      ],
-    });
     cy.mount(
       <ColumnAnnotationCard
         id={props.id}
-        header={props.header}
+        name={props.name}
         description={props.description}
-        variableType={props.variableType}
-        standardizedVariable={props.standardizedVariable}
+        dataType={props.dataType}
+        standardizedVariableLabel={props.standardizedVariableLabel}
         standardizedVariableOptions={props.standardizedVariableOptions}
+        isDataTypeEditable={props.isDataTypeEditable}
+        disabledStandardizedVariableLabels={props.disabledStandardizedVariableLabels}
         onDescriptionChange={props.onDescriptionChange}
         onDataTypeChange={props.onDataTypeChange}
         onStandardizedVariableChange={props.onStandardizedVariableChange}
@@ -58,11 +55,13 @@ describe('ColumnAnnotationCard', () => {
     cy.mount(
       <ColumnAnnotationCard
         id={props.id}
-        header={props.header}
+        name={props.name}
         description={props.description}
-        variableType={props.variableType}
-        standardizedVariable={props.standardizedVariable}
+        dataType={props.dataType}
+        standardizedVariableLabel={props.standardizedVariableLabel}
         standardizedVariableOptions={props.standardizedVariableOptions}
+        isDataTypeEditable={props.isDataTypeEditable}
+        disabledStandardizedVariableLabels={props.disabledStandardizedVariableLabels}
         onDescriptionChange={spy}
         onDataTypeChange={props.onDataTypeChange}
         onStandardizedVariableChange={props.onStandardizedVariableChange}
@@ -78,11 +77,13 @@ describe('ColumnAnnotationCard', () => {
     cy.mount(
       <ColumnAnnotationCard
         id={props.id}
-        header={props.header}
+        name={props.name}
         description={props.description}
-        variableType={props.variableType}
-        standardizedVariable={props.standardizedVariable}
+        dataType={props.dataType}
+        standardizedVariableLabel={props.standardizedVariableLabel}
         standardizedVariableOptions={props.standardizedVariableOptions}
+        isDataTypeEditable={props.isDataTypeEditable}
+        disabledStandardizedVariableLabels={props.disabledStandardizedVariableLabels}
         onDescriptionChange={props.onDescriptionChange}
         onDataTypeChange={spy}
         onStandardizedVariableChange={props.onStandardizedVariableChange}
@@ -96,11 +97,13 @@ describe('ColumnAnnotationCard', () => {
     cy.mount(
       <ColumnAnnotationCard
         id={props.id}
-        header={props.header}
+        name={props.name}
         description={props.description}
-        variableType={props.variableType}
-        standardizedVariable={props.standardizedVariable}
+        dataType={props.dataType}
+        standardizedVariableLabel={props.standardizedVariableLabel}
         standardizedVariableOptions={props.standardizedVariableOptions}
+        isDataTypeEditable={props.isDataTypeEditable}
+        disabledStandardizedVariableLabels={props.disabledStandardizedVariableLabels}
         onDescriptionChange={props.onDescriptionChange}
         onDataTypeChange={props.onDataTypeChange}
         onStandardizedVariableChange={spy}
@@ -109,7 +112,7 @@ describe('ColumnAnnotationCard', () => {
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
       'age{downarrow}{enter}'
     );
-    cy.get('@spy').should('have.been.calledWith', '1', { identifier: 'nb:Age', label: 'Age' });
+    cy.get('@spy').should('have.been.calledWith', '1', 'Age');
   });
 
   it('Cannot assign single-column standardized variables twice', () => {
