@@ -521,6 +521,76 @@ describe('userUploadsDataDictionaryFile', () => {
   });
 });
 
+describe('userUpdatesColumnDescription', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should update the description of a specific column', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['participant_id', 'age', 'sex'],
+      data: [['sub-001', '25', 'M']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDescription('0', 'Updated participant identifier');
+    });
+
+    expect(result.current.columns['0'].description).toBe('Updated participant identifier');
+    expect(result.current.columns['1'].description).toBeUndefined();
+    expect(result.current.columns['2'].description).toBeUndefined();
+  });
+
+  it('should set description to null when null is provided', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['participant_id', 'age'],
+      data: [['sub-001', '25']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    // Set initial description
+    act(() => {
+      result.current.actions.userUpdatesColumnDescription('0', 'Initial description');
+    });
+
+    expect(result.current.columns['0'].description).toBe('Initial description');
+
+    // Clear the description by setting it to null
+    act(() => {
+      result.current.actions.userUpdatesColumnDescription('0', null);
+    });
+
+    expect(result.current.columns['0'].description).toBeNull();
+  });
+});
+
 describe('reset', () => {
   beforeEach(() => {
     vi.clearAllMocks();
