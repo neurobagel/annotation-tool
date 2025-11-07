@@ -40,20 +40,6 @@ function ColumnAnnotationCard({
   onDataTypeChange,
   onStandardizedVariableChange,
 }: ColumnAnnotationCardProps) {
-  // No hooks! Pure controlled component
-  // TODO: think of what to call this, since it doesn't receive
-  // VariableType in the strict sense - it's more like a BIDSType
-  const handleDataTypeChange = (_: React.MouseEvent<HTMLElement>, newDataType: DataType | null) => {
-    onDataTypeChange(id, newDataType);
-  };
-
-  const handleStandardizedVariableChange = (
-    _: React.ChangeEvent<unknown>,
-    newValue: string | null
-  ) => {
-    onStandardizedVariableChange(id, newValue);
-  };
-
   return (
     <Card data-cy={`${id}-column-annotation-card`} className="mx-auto w-full max-w-5xl shadow-lg">
       <CardHeader title={name} className="bg-gray-50" />
@@ -75,7 +61,7 @@ function ColumnAnnotationCard({
                 <ToggleButtonGroup
                   data-cy={`${id}-column-annotation-card-data-type`}
                   value={dataType}
-                  onChange={handleDataTypeChange}
+                  onChange={(_, newDataType) => onDataTypeChange(id, newDataType)}
                   exclusive
                   color="primary"
                 >
@@ -117,7 +103,7 @@ function ColumnAnnotationCard({
             <Autocomplete
               data-cy={`${id}-column-annotation-card-standardized-variable-dropdown`}
               value={standardizedVariableLabel || ''}
-              onChange={handleStandardizedVariableChange}
+              onChange={(_, newValue) => onStandardizedVariableChange(id, newValue)}
               options={standardizedVariableOptions}
               getOptionDisabled={(option) => disabledStandardizedVariableLabels.has(option)}
               renderInput={(params) => (
