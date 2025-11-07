@@ -210,6 +210,46 @@ export function parseTsvContent(content: string): { headers: string[]; data: str
   return { headers, data };
 }
 
+/**
+ * Applies data type changes to a column draft (for use with Immer produce).
+ * It mutates the draft directly.
+ */
+export function applyDataTypeToColumn(
+  draft: {
+    dataType?: DataType | null;
+    levels?: { [key: string]: { description: string; standardizedTerm: string } } | null;
+    units?: string;
+  },
+  dataType: DataType | null,
+  allValues: string[]
+): void {
+  draft.dataType = dataType;
+
+  if (dataType === DataType.categorical) {
+    const uniqueValues = Array.from(new Set(allValues));
+
+    if (!draft.levels) {
+      draft.levels = uniqueValues.reduce(
+        (acc, value) => ({
+          ...acc,
+          [value]: { description: '', standardizedTerm: '' },
+        }),
+        {} as { [key: string]: { description: string; standardizedTerm: string } }
+      );
+    }
+
+    delete draft.units;
+  } else if (dataType === DataType.continuous) {
+    if (draft.units === undefined) {
+      draft.units = '';
+    }
+    delete draft.levels;
+  } else {
+    delete draft.levels;
+    delete draft.units;
+  }
+}
+
 export function applyDataDictionaryToColumns(
   columns: Columns,
   dataDictionary: DataDictionary,
