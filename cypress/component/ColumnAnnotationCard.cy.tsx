@@ -1,6 +1,6 @@
 import { DataType } from '../../datamodel';
 import ColumnAnnotationCard from '../../src/components/ColumnAnnotationCard';
-import { mockStandardizedVariables } from '../../src/utils/mocks';
+import { mockFreshStandardizedVariables } from '../../src/utils/mocks';
 
 const props = {
   id: '1',
@@ -8,7 +8,7 @@ const props = {
   description: 'some description',
   dataType: 'Categorical' as DataType,
   standardizedVariableLabel: 'Participant ID',
-  standardizedVariableOptions: Object.values(mockStandardizedVariables).map((sv) => sv.label),
+  standardizedVariableOptions: Object.values(mockFreshStandardizedVariables).map((sv) => sv.name),
   isDataTypeEditable: true,
   disabledStandardizedVariableLabels: new Set(['Participant ID', 'Sex']),
   onDescriptionChange: () => {},
