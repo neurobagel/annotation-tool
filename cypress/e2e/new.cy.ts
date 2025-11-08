@@ -43,7 +43,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="datadictionary-toggle-preview-button"]').click();
     cy.get('[data-cy="next-button"]').click();
   });
-  it('should step through the upload and column annotation views and goes through the basic user flow', () => {
+  it('should step through the upload and column annotation views and go through the basic user flow', () => {
     cy.visit('http://localhost:5173');
     cy.get('[data-cy="next-button"]').click();
 
