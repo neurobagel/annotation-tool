@@ -1,16 +1,19 @@
 import { DataType } from '../../datamodel';
 import ColumnAnnotationCard from '../../src/components/ColumnAnnotationCard';
-import { mockFreshStandardizedVariables } from '../../src/utils/mocks';
 
 const props = {
   id: '1',
   name: 'some header',
   description: 'some description',
   dataType: 'Categorical' as DataType,
-  standardizedVariableLabel: 'Participant ID',
-  standardizedVariableOptions: Object.values(mockFreshStandardizedVariables).map((sv) => sv.name),
+  standardizedVariableId: 'nb:ParticipantID',
+  standardizedVariableOptions: [
+    { id: 'nb:ParticipantID', label: 'Participant ID', disabled: true },
+    { id: 'nb:Sex', label: 'Sex', disabled: true },
+    { id: 'nb:Age', label: 'Age', disabled: false },
+    { id: 'nb:Assessment', label: 'Assessment Tool', disabled: false },
+  ],
   isDataTypeEditable: true,
-  disabledStandardizedVariableLabels: new Set(['Participant ID', 'Sex']),
   onDescriptionChange: () => {},
   onDataTypeChange: () => {},
   onStandardizedVariableChange: () => {},
@@ -24,10 +27,9 @@ describe('ColumnAnnotationCard', () => {
         name={props.name}
         description={props.description}
         dataType={props.dataType}
-        standardizedVariableLabel={props.standardizedVariableLabel}
+        standardizedVariableId={props.standardizedVariableId}
         standardizedVariableOptions={props.standardizedVariableOptions}
         isDataTypeEditable={props.isDataTypeEditable}
-        disabledStandardizedVariableLabels={props.disabledStandardizedVariableLabels}
         onDescriptionChange={props.onDescriptionChange}
         onDataTypeChange={props.onDataTypeChange}
         onStandardizedVariableChange={props.onStandardizedVariableChange}
@@ -58,10 +60,9 @@ describe('ColumnAnnotationCard', () => {
         name={props.name}
         description={props.description}
         dataType={props.dataType}
-        standardizedVariableLabel={props.standardizedVariableLabel}
+        standardizedVariableId={props.standardizedVariableId}
         standardizedVariableOptions={props.standardizedVariableOptions}
         isDataTypeEditable={props.isDataTypeEditable}
-        disabledStandardizedVariableLabels={props.disabledStandardizedVariableLabels}
         onDescriptionChange={spy}
         onDataTypeChange={props.onDataTypeChange}
         onStandardizedVariableChange={props.onStandardizedVariableChange}
@@ -80,10 +81,9 @@ describe('ColumnAnnotationCard', () => {
         name={props.name}
         description={props.description}
         dataType={props.dataType}
-        standardizedVariableLabel={props.standardizedVariableLabel}
+        standardizedVariableId={props.standardizedVariableId}
         standardizedVariableOptions={props.standardizedVariableOptions}
         isDataTypeEditable={props.isDataTypeEditable}
-        disabledStandardizedVariableLabels={props.disabledStandardizedVariableLabels}
         onDescriptionChange={props.onDescriptionChange}
         onDataTypeChange={spy}
         onStandardizedVariableChange={props.onStandardizedVariableChange}
@@ -100,10 +100,9 @@ describe('ColumnAnnotationCard', () => {
         name={props.name}
         description={props.description}
         dataType={props.dataType}
-        standardizedVariableLabel={props.standardizedVariableLabel}
+        standardizedVariableId={props.standardizedVariableId}
         standardizedVariableOptions={props.standardizedVariableOptions}
         isDataTypeEditable={props.isDataTypeEditable}
-        disabledStandardizedVariableLabels={props.disabledStandardizedVariableLabels}
         onDescriptionChange={props.onDescriptionChange}
         onDataTypeChange={props.onDataTypeChange}
         onStandardizedVariableChange={spy}
@@ -112,7 +111,7 @@ describe('ColumnAnnotationCard', () => {
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
       'age{downarrow}{enter}'
     );
-    cy.get('@spy').should('have.been.calledWith', '1', 'Age');
+    cy.get('@spy').should('have.been.calledWith', '1', 'nb:Age');
   });
 
   it('Cannot assign single-column standardized variables twice', () => {

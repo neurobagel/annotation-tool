@@ -11,6 +11,7 @@ import {
   Tooltip,
 } from '@mui/material';
 import { DataType } from 'datamodel';
+import { StandardizedVariableOption } from '../hooks/useStandardizedVariableOptions';
 import DescriptionEditor from './DescriptionEditor';
 
 interface ColumnAnnotationCardProps {
@@ -18,13 +19,12 @@ interface ColumnAnnotationCardProps {
   name: string;
   description: string | null;
   dataType: DataType | null;
-  standardizedVariableLabel: string | null;
-  standardizedVariableOptions: string[];
+  standardizedVariableId: string | null;
+  standardizedVariableOptions: StandardizedVariableOption[];
   isDataTypeEditable: boolean;
-  disabledStandardizedVariableLabels: Set<string>;
   onDescriptionChange: (columnId: string, newDescription: string | null) => void;
   onDataTypeChange: (columnId: string, newDataType: 'Categorical' | 'Continuous' | null) => void;
-  onStandardizedVariableChange: (columnId: string, newLabel: string | null) => void;
+  onStandardizedVariableChange: (columnId: string, newId: string | null) => void;
 }
 
 function ColumnAnnotationCard({
@@ -32,14 +32,18 @@ function ColumnAnnotationCard({
   name,
   description,
   dataType,
-  standardizedVariableLabel,
+  standardizedVariableId,
   standardizedVariableOptions,
   isDataTypeEditable,
-  disabledStandardizedVariableLabels,
   onDescriptionChange,
   onDataTypeChange,
   onStandardizedVariableChange,
 }: ColumnAnnotationCardProps) {
+  const selectedOption =
+    standardizedVariableId !== null
+      ? standardizedVariableOptions.find((option) => option.id === standardizedVariableId) || null
+      : null;
+
   return (
     <Card data-cy={`${id}-column-annotation-card`} className="mx-auto w-full max-w-5xl shadow-lg">
       <CardHeader title={name} className="bg-gray-50" />
@@ -102,10 +106,12 @@ function ColumnAnnotationCard({
             </Typography>
             <Autocomplete
               data-cy={`${id}-column-annotation-card-standardized-variable-dropdown`}
-              value={standardizedVariableLabel || ''}
-              onChange={(_, newValue) => onStandardizedVariableChange(id, newValue)}
+              value={selectedOption}
+              onChange={(_, newValue) => onStandardizedVariableChange(id, newValue?.id ?? null)}
               options={standardizedVariableOptions}
-              getOptionDisabled={(option) => disabledStandardizedVariableLabels.has(option)}
+              getOptionDisabled={(option) => option.disabled}
+              getOptionLabel={(option) => option.label}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
               renderInput={(params) => (
                 <TextField
                   // eslint-disable-next-line react/jsx-props-no-spreading

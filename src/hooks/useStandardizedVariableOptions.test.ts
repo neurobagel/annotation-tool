@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useColumns, useStandardizedVariables } from '~/stores/FreshNewStore';
 import { mockFreshStandardizedVariables } from '~/utils/mocks';
-import { useDisabledStandardizedVariables } from './useDisabledStandardizedVariables';
+import { useStandardizedVariableOptions } from './useStandardizedVariableOptions';
 
 vi.mock('~/stores/FreshNewStore', () => ({
   useColumns: vi.fn(),
@@ -12,12 +12,12 @@ vi.mock('~/stores/FreshNewStore', () => ({
 const mockedUseColumns = vi.mocked(useColumns);
 const mockedUseStandardizedVariables = vi.mocked(useStandardizedVariables);
 
-describe('useDisabledStandardizedVariables', () => {
+describe('useStandardizedVariableOptions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should return an empty set when no columns are mapped', () => {
+  it('should return options enabled when no columns are mapped', () => {
     mockedUseColumns.mockReturnValue({
       '1': {
         id: '1',
@@ -32,13 +32,13 @@ describe('useDisabledStandardizedVariables', () => {
     });
     mockedUseStandardizedVariables.mockReturnValue(mockFreshStandardizedVariables);
 
-    const { result } = renderHook(() => useDisabledStandardizedVariables());
+    const { result } = renderHook(() => useStandardizedVariableOptions());
 
-    expect(result.current).toBeInstanceOf(Set);
-    expect(result.current.size).toBe(0);
+    expect(result.current).toHaveLength(Object.keys(mockFreshStandardizedVariables).length);
+    expect(result.current.every((option) => option.disabled === false)).toBe(true);
   });
 
-  it('should return an empty set when columns are mapped to multi-column variables', () => {
+  it('should return options enabled when columns are mapped to multi-column variables', () => {
     mockedUseColumns.mockReturnValue({
       '1': {
         id: '1',
@@ -55,12 +55,12 @@ describe('useDisabledStandardizedVariables', () => {
     });
     mockedUseStandardizedVariables.mockReturnValue(mockFreshStandardizedVariables);
 
-    const { result } = renderHook(() => useDisabledStandardizedVariables());
+    const { result } = renderHook(() => useStandardizedVariableOptions());
 
-    expect(result.current.size).toBe(0);
+    expect(result.current.find((option) => option.id === 'nb:Assessment')?.disabled).toBe(false);
   });
 
-  it('should return an empty set when columns are mapped to variables that can have multiple columns', () => {
+  it('should return options enabled when columns are mapped to variables that can have multiple columns', () => {
     mockedUseColumns.mockReturnValue({
       '1': {
         id: '1',
@@ -77,12 +77,12 @@ describe('useDisabledStandardizedVariables', () => {
     });
     mockedUseStandardizedVariables.mockReturnValue(mockFreshStandardizedVariables);
 
-    const { result } = renderHook(() => useDisabledStandardizedVariables());
+    const { result } = renderHook(() => useStandardizedVariableOptions());
 
-    expect(result.current.size).toBe(0);
+    expect(result.current.find((option) => option.id === 'nb:Diagnosis')?.disabled).toBe(false);
   });
 
-  it('should return disabled labels only for single-column variables', () => {
+  it('should return disabled options only for single-column variables', () => {
     mockedUseColumns.mockReturnValue({
       '1': {
         id: '1',
@@ -111,13 +111,13 @@ describe('useDisabledStandardizedVariables', () => {
     });
     mockedUseStandardizedVariables.mockReturnValue(mockFreshStandardizedVariables);
 
-    const { result } = renderHook(() => useDisabledStandardizedVariables());
+    const { result } = renderHook(() => useStandardizedVariableOptions());
 
-    expect(result.current.size).toBe(2);
-    expect(result.current.has('Participant ID')).toBe(true);
-    expect(result.current.has('Age')).toBe(true);
-    expect(result.current.has('Diagnosis')).toBe(false);
-    expect(result.current.has('Assessment Tool')).toBe(false);
+    expect(result.current.filter((option) => option.disabled).length).toBe(2);
+    expect(result.current.find((option) => option.id === 'nb:ParticipantID')?.disabled).toBe(true);
+    expect(result.current.find((option) => option.id === 'nb:Age')?.disabled).toBe(true);
+    expect(result.current.find((option) => option.id === 'nb:Diagnosis')?.disabled).toBe(false);
+    expect(result.current.find((option) => option.id === 'nb:Assessment')?.disabled).toBe(false);
   });
 
   it('should handle columns with invalid standardizedVariable IDs gracefully', () => {
@@ -137,10 +137,10 @@ describe('useDisabledStandardizedVariables', () => {
     });
     mockedUseStandardizedVariables.mockReturnValue(mockFreshStandardizedVariables);
 
-    const { result } = renderHook(() => useDisabledStandardizedVariables());
+    const { result } = renderHook(() => useStandardizedVariableOptions());
 
-    expect(result.current.size).toBe(1);
-    expect(result.current.has('Participant ID')).toBe(true);
+    expect(result.current.filter((option) => option.disabled).length).toBe(1);
+    expect(result.current.find((option) => option.id === 'nb:ParticipantID')?.disabled).toBe(true);
   });
 
   it('should handle columns with null standardizedVariable', () => {
@@ -160,13 +160,13 @@ describe('useDisabledStandardizedVariables', () => {
     });
     mockedUseStandardizedVariables.mockReturnValue(mockFreshStandardizedVariables);
 
-    const { result } = renderHook(() => useDisabledStandardizedVariables());
+    const { result } = renderHook(() => useStandardizedVariableOptions());
 
-    expect(result.current.size).toBe(1);
-    expect(result.current.has('Participant ID')).toBe(true);
+    expect(result.current.filter((option) => option.disabled).length).toBe(1);
+    expect(result.current.find((option) => option.id === 'nb:ParticipantID')?.disabled).toBe(true);
   });
 
-  it('should return empty set when standardizedVariables is empty', () => {
+  it('should return empty array when standardizedVariables is empty', () => {
     mockedUseColumns.mockReturnValue({
       '1': {
         id: '1',
@@ -177,8 +177,8 @@ describe('useDisabledStandardizedVariables', () => {
     });
     mockedUseStandardizedVariables.mockReturnValue({});
 
-    const { result } = renderHook(() => useDisabledStandardizedVariables());
+    const { result } = renderHook(() => useStandardizedVariableOptions());
 
-    expect(result.current.size).toBe(0);
+    expect(result.current).toEqual([]);
   });
 });

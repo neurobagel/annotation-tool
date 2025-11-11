@@ -1,6 +1,6 @@
 import { useColumns, useStandardizedVariables, useFreshDataActions } from '~/stores/FreshNewStore';
 import { DataType } from '../../datamodel';
-import { useDisabledStandardizedVariables } from '../hooks/useDisabledStandardizedVariables';
+import { useStandardizedVariableOptions } from '../hooks/useStandardizedVariableOptions';
 import { ColumnAnnotationInstructions } from '../utils/instructions';
 import ColumnAnnotationCard from './ColumnAnnotationCard';
 import Instruction from './Instruction';
@@ -13,18 +13,12 @@ function ColumnAnnotation() {
     userUpdatesColumnStandardizedVariable,
     userUpdatesColumnDataType,
   } = useFreshDataActions();
-  const disabledStandardizedVariableLabels = useDisabledStandardizedVariables();
+  const standardizedVariableOptions = useStandardizedVariableOptions();
 
   const columnsArray = Object.entries(columns);
 
-  const standardizedVariableLabels = Object.values(standardizedVariables).map((sv) => sv.name);
-
-  const handleStandardizedVariableChange = (columnId: string, newLabel: string | null) => {
-    const variableId = newLabel
-      ? (Object.entries(standardizedVariables).find(([_, sv]) => sv.name === newLabel)?.[0] ?? null)
-      : null;
-
-    userUpdatesColumnStandardizedVariable(columnId, variableId);
+  const handleStandardizedVariableChange = (columnId: string, newId: string | null) => {
+    userUpdatesColumnStandardizedVariable(columnId, newId);
   };
 
   const handleDataTypeChange = (
@@ -43,11 +37,6 @@ function ColumnAnnotation() {
   };
 
   const columnCardData = columnsArray.map(([columnId, column]) => {
-    // Look up standardized variable label for auto complete
-    const standardizedVariableLabel = column.standardizedVariable
-      ? standardizedVariables[column.standardizedVariable]?.name || null
-      : null;
-
     // Data type is editable when:
     // 1. No standardized variable is selected, OR
     // 2. The selected standardized variable is a multi-column measure
@@ -60,7 +49,7 @@ function ColumnAnnotation() {
       name: column.name,
       description: column.description || null,
       dataType: column.dataType || null,
-      standardizedVariableLabel,
+      standardizedVariableId: column.standardizedVariable || null,
       isDataTypeEditable,
     };
   });
@@ -82,10 +71,9 @@ function ColumnAnnotation() {
             name={columnData.name}
             description={columnData.description}
             dataType={columnData.dataType}
-            standardizedVariableLabel={columnData.standardizedVariableLabel}
-            standardizedVariableOptions={standardizedVariableLabels}
+            standardizedVariableId={columnData.standardizedVariableId}
+            standardizedVariableOptions={standardizedVariableOptions}
             isDataTypeEditable={columnData.isDataTypeEditable}
-            disabledStandardizedVariableLabels={disabledStandardizedVariableLabels}
             onDescriptionChange={userUpdatesColumnDescription}
             onDataTypeChange={handleDataTypeChange}
             onStandardizedVariableChange={handleStandardizedVariableChange}
