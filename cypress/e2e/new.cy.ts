@@ -87,14 +87,22 @@ describe('Main user flow', () => {
       'age{downArrow}{enter}'
     );
     cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').click();
-    cy.get('[role="option"]').contains('Age').should('have.attr', 'aria-disabled', 'true');
+    cy.get('ul[role="listbox"]')
+      .last()
+      .within(() => {
+        cy.get('[role="option"]').contains('Age').should('have.attr', 'aria-disabled', 'true');
+      });
 
     // Switch the column assignment to another variable and assert that age is now enabled again
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
       'participant{downArrow}{enter}'
     );
     cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').click();
-    cy.get('[role="option"]').contains('Age').should('not.have.attr', 'aria-disabled', 'true');
+    cy.get('ul[role="listbox"]')
+      .last()
+      .within(() => {
+        cy.get('[role="option"]').contains('Age').should('not.have.attr', 'aria-disabled', 'true');
+      });
     cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').type(
       'age{downArrow}{enter}'
     );
