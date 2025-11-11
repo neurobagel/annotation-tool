@@ -14,7 +14,7 @@ const props = {
     { id: 'nb:Assessment', label: 'Assessment Tool', disabled: false },
   ],
   isDataTypeEditable: true,
-  lockedDataTypeLabel: null,
+  inferredDataTypeLabel: null,
   onDescriptionChange: () => {},
   onDataTypeChange: () => {},
   onStandardizedVariableChange: () => {},
@@ -31,7 +31,7 @@ describe('ColumnAnnotationCard', () => {
         standardizedVariableId={props.standardizedVariableId}
         standardizedVariableOptions={props.standardizedVariableOptions}
         isDataTypeEditable={props.isDataTypeEditable}
-        inferredDataTypeLabel={props.lockedDataTypeLabel}
+        inferredDataTypeLabel={props.inferredDataTypeLabel}
         onDescriptionChange={props.onDescriptionChange}
         onDataTypeChange={props.onDataTypeChange}
         onStandardizedVariableChange={props.onStandardizedVariableChange}
@@ -65,7 +65,7 @@ describe('ColumnAnnotationCard', () => {
         standardizedVariableId={props.standardizedVariableId}
         standardizedVariableOptions={props.standardizedVariableOptions}
         isDataTypeEditable={props.isDataTypeEditable}
-        inferredDataTypeLabel={props.lockedDataTypeLabel}
+        inferredDataTypeLabel={props.inferredDataTypeLabel}
         onDescriptionChange={spy}
         onDataTypeChange={props.onDataTypeChange}
         onStandardizedVariableChange={props.onStandardizedVariableChange}
@@ -90,7 +90,7 @@ describe('ColumnAnnotationCard', () => {
         onDescriptionChange={props.onDescriptionChange}
         onDataTypeChange={spy}
         onStandardizedVariableChange={props.onStandardizedVariableChange}
-        inferredDataTypeLabel={props.lockedDataTypeLabel}
+        inferredDataTypeLabel={props.inferredDataTypeLabel}
       />
     );
     cy.get('[data-cy="1-column-annotation-card-data-type-continuous-button"]').click();
@@ -110,7 +110,7 @@ describe('ColumnAnnotationCard', () => {
         onDescriptionChange={props.onDescriptionChange}
         onDataTypeChange={props.onDataTypeChange}
         onStandardizedVariableChange={spy}
-        inferredDataTypeLabel={props.lockedDataTypeLabel}
+        inferredDataTypeLabel={props.inferredDataTypeLabel}
       />
     );
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
