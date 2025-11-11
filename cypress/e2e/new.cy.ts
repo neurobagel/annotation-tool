@@ -97,6 +97,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
       'participant{downArrow}{enter}'
     );
+    cy.get('[data-cy="1-column-annotation-card-data-type"]').should('contain', 'Identifier');
     cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').click();
     cy.get('ul[role="listbox"]')
       .last()

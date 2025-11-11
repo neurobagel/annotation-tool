@@ -14,6 +14,7 @@ const props = {
     { id: 'nb:Assessment', label: 'Assessment Tool', disabled: false },
   ],
   isDataTypeEditable: true,
+  lockedDataTypeLabel: null,
   onDescriptionChange: () => {},
   onDataTypeChange: () => {},
   onStandardizedVariableChange: () => {},
@@ -30,6 +31,7 @@ describe('ColumnAnnotationCard', () => {
         standardizedVariableId={props.standardizedVariableId}
         standardizedVariableOptions={props.standardizedVariableOptions}
         isDataTypeEditable={props.isDataTypeEditable}
+        inferredDataTypeLabel={props.lockedDataTypeLabel}
         onDescriptionChange={props.onDescriptionChange}
         onDataTypeChange={props.onDataTypeChange}
         onStandardizedVariableChange={props.onStandardizedVariableChange}
@@ -63,6 +65,7 @@ describe('ColumnAnnotationCard', () => {
         standardizedVariableId={props.standardizedVariableId}
         standardizedVariableOptions={props.standardizedVariableOptions}
         isDataTypeEditable={props.isDataTypeEditable}
+        inferredDataTypeLabel={props.lockedDataTypeLabel}
         onDescriptionChange={spy}
         onDataTypeChange={props.onDataTypeChange}
         onStandardizedVariableChange={props.onStandardizedVariableChange}
@@ -87,6 +90,7 @@ describe('ColumnAnnotationCard', () => {
         onDescriptionChange={props.onDescriptionChange}
         onDataTypeChange={spy}
         onStandardizedVariableChange={props.onStandardizedVariableChange}
+        inferredDataTypeLabel={props.lockedDataTypeLabel}
       />
     );
     cy.get('[data-cy="1-column-annotation-card-data-type-continuous-button"]').click();
@@ -106,6 +110,7 @@ describe('ColumnAnnotationCard', () => {
         onDescriptionChange={props.onDescriptionChange}
         onDataTypeChange={props.onDataTypeChange}
         onStandardizedVariableChange={spy}
+        inferredDataTypeLabel={props.lockedDataTypeLabel}
       />
     );
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
@@ -126,5 +131,25 @@ describe('ColumnAnnotationCard', () => {
 
     // Verify that other options like "Age" are still enabled
     cy.get('[role="option"]').contains('Age').should('not.have.attr', 'aria-disabled', 'true');
+  });
+
+  it('shows identifier label when data type is locked by standardized variable', () => {
+    cy.mount(
+      <ColumnAnnotationCard
+        id="2"
+        name="Identifier Column"
+        description={null}
+        dataType={null}
+        standardizedVariableId="nb:ParticipantID"
+        standardizedVariableOptions={props.standardizedVariableOptions}
+        isDataTypeEditable={false}
+        inferredDataTypeLabel="Identifier"
+        onDescriptionChange={props.onDescriptionChange}
+        onDataTypeChange={props.onDataTypeChange}
+        onStandardizedVariableChange={props.onStandardizedVariableChange}
+      />
+    );
+
+    cy.get('[data-cy="2-column-annotation-card-data-type"]').should('contain', 'Identifier');
   });
 });
