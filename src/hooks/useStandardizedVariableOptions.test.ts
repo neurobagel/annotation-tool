@@ -38,7 +38,7 @@ describe('useStandardizedVariableOptions', () => {
     expect(result.current.every((option) => option.disabled === false)).toBe(true);
   });
 
-  it('should return options enabled when columns are mapped to multi-column variables', () => {
+  it('should return options enabled when columns are mapped to Collections variables', () => {
     mockedUseColumns.mockReturnValue({
       '1': {
         id: '1',
