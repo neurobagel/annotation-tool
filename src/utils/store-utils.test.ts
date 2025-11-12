@@ -720,188 +720,145 @@ describe('applyDataDictionaryToColumns', () => {
 });
 
 describe('applyDataTypeToColumn', () => {
-  it('should set dataType to categorical and initialize levels from allValues', () => {
-    const draft: {
+  const createColumn = (
+    overrides: {
       dataType?: DataType | null;
       levels?: { [key: string]: { description: string; standardizedTerm: string } } | null;
       units?: string;
-    } = {
-      dataType: undefined,
-      levels: undefined,
-      units: undefined,
-    };
+    } = {}
+  ) => ({
+    dataType: undefined,
+    levels: undefined,
+    units: undefined,
+    ...overrides,
+  });
+
+  it('should set dataType to categorical and initialize levels from allValues', () => {
+    const column = createColumn();
     const allValues = ['A', 'B', 'A', 'C', 'B'];
 
-    applyDataTypeToColumn(draft, DataType.categorical, allValues);
+    const result = applyDataTypeToColumn(column, DataType.categorical, allValues);
 
-    expect(draft.dataType).toBe(DataType.categorical);
-    expect(draft.levels).toBeDefined();
-    expect(Object.keys(draft.levels!)).toEqual(['A', 'B', 'C']);
-    expect(draft.levels!.A).toEqual({ description: '', standardizedTerm: '' });
-    expect(draft.levels!.B).toEqual({ description: '', standardizedTerm: '' });
-    expect(draft.levels!.C).toEqual({ description: '', standardizedTerm: '' });
-    expect(draft.units).toBeUndefined();
+    expect(result).not.toBe(column);
+    expect(result.dataType).toBe(DataType.categorical);
+    expect(result.levels).toBeDefined();
+    expect(Object.keys(result.levels!)).toEqual(['A', 'B', 'C']);
+    expect(result.levels!.A).toEqual({ description: '', standardizedTerm: '' });
+    expect(result.levels!.B).toEqual({ description: '', standardizedTerm: '' });
+    expect(result.levels!.C).toEqual({ description: '', standardizedTerm: '' });
+    expect(result.units).toBeUndefined();
+    expect(column.levels).toBeUndefined(); // original column unchanged
   });
 
   it('should preserve existing levels when switching to categorical', () => {
-    const draft: {
-      dataType?: DataType | null;
-      levels?: { [key: string]: { description: string; standardizedTerm: string } } | null;
-      units?: string;
-    } = {
-      dataType: undefined,
+    const column = createColumn({
       levels: {
         A: { description: 'Existing A', standardizedTerm: 'term:A' },
         B: { description: 'Existing B', standardizedTerm: 'term:B' },
       },
-      units: undefined,
-    };
+    });
     const allValues = ['A', 'B', 'C'];
 
-    applyDataTypeToColumn(draft, DataType.categorical, allValues);
+    const result = applyDataTypeToColumn(column, DataType.categorical, allValues);
 
-    expect(draft.dataType).toBe(DataType.categorical);
-    expect(draft.levels).toBeDefined();
-    expect(draft.levels!.A).toEqual({ description: 'Existing A', standardizedTerm: 'term:A' });
-    expect(draft.levels!.B).toEqual({ description: 'Existing B', standardizedTerm: 'term:B' });
-    expect(draft.units).toBeUndefined();
+    expect(result.dataType).toBe(DataType.categorical);
+    expect(result.levels).toBeDefined();
+    expect(result.levels!.A).toEqual({ description: 'Existing A', standardizedTerm: 'term:A' });
+    expect(result.levels!.B).toEqual({ description: 'Existing B', standardizedTerm: 'term:B' });
+    expect(result.units).toBeUndefined();
   });
 
   it('should remove units when switching to categorical', () => {
-    const draft: {
-      dataType?: DataType | null;
-      levels?: { [key: string]: { description: string; standardizedTerm: string } } | null;
-      units?: string;
-    } = {
+    const column = createColumn({
       dataType: DataType.continuous,
-      levels: undefined,
       units: 'years',
-    };
+    });
     const allValues = ['A', 'B', 'C'];
 
-    applyDataTypeToColumn(draft, DataType.categorical, allValues);
+    const result = applyDataTypeToColumn(column, DataType.categorical, allValues);
 
-    expect(draft.dataType).toBe(DataType.categorical);
-    expect(draft.levels).toBeDefined();
-    expect(draft.units).toBeUndefined();
+    expect(result.dataType).toBe(DataType.categorical);
+    expect(result.levels).toBeDefined();
+    expect(result.units).toBeUndefined();
   });
 
-  it('should set dataType to continuous and initialize units', () => {
-    const draft: {
-      dataType?: DataType | null;
-      levels?: { [key: string]: { description: string; standardizedTerm: string } } | null;
-      units?: string;
-    } = {
-      dataType: undefined,
-      levels: undefined,
-      units: undefined,
-    };
+  it('should initialize column units attribute when dataType is set to continuous', () => {
+    const column = createColumn();
     const allValues = ['25', '30', '35'];
 
-    applyDataTypeToColumn(draft, DataType.continuous, allValues);
+    const result = applyDataTypeToColumn(column, DataType.continuous, allValues);
 
-    expect(draft.dataType).toBe(DataType.continuous);
-    expect(draft.units).toBe('');
-    expect(draft.levels).toBeUndefined();
+    expect(result.dataType).toBe(DataType.continuous);
+    expect(result.units).toBe('');
+    expect(result.levels).toBeUndefined();
   });
 
   it('should preserve existing units when switching to continuous', () => {
-    const draft: {
-      dataType?: DataType | null;
-      levels?: { [key: string]: { description: string; standardizedTerm: string } } | null;
-      units?: string;
-    } = {
-      dataType: undefined,
-      levels: undefined,
+    const column = createColumn({
       units: 'kg',
-    };
+    });
     const allValues = ['25', '30', '35'];
 
-    applyDataTypeToColumn(draft, DataType.continuous, allValues);
+    const result = applyDataTypeToColumn(column, DataType.continuous, allValues);
 
-    expect(draft.dataType).toBe(DataType.continuous);
-    expect(draft.units).toBe('kg');
-    expect(draft.levels).toBeUndefined();
+    expect(result.dataType).toBe(DataType.continuous);
+    expect(result.units).toBe('kg');
+    expect(result.levels).toBeUndefined();
   });
 
   it('should remove levels when switching to continuous', () => {
-    const draft: {
-      dataType?: DataType | null;
-      levels?: { [key: string]: { description: string; standardizedTerm: string } } | null;
-      units?: string;
-    } = {
+    const column = createColumn({
       dataType: DataType.categorical,
       levels: {
         A: { description: 'Level A', standardizedTerm: 'term:A' },
       },
-      units: undefined,
-    };
+    });
     const allValues = ['25', '30', '35'];
 
-    applyDataTypeToColumn(draft, DataType.continuous, allValues);
+    const result = applyDataTypeToColumn(column, DataType.continuous, allValues);
 
-    expect(draft.dataType).toBe(DataType.continuous);
-    expect(draft.units).toBe('');
-    expect(draft.levels).toBeUndefined();
+    expect(result.dataType).toBe(DataType.continuous);
+    expect(result.units).toBe('');
+    expect(result.levels).toBeUndefined();
   });
 
   it('should clear dataType, levels, and units when dataType is null', () => {
-    const draft: {
-      dataType?: DataType | null;
-      levels?: { [key: string]: { description: string; standardizedTerm: string } } | null;
-      units?: string;
-    } = {
+    const column = createColumn({
       dataType: DataType.categorical,
       levels: {
         A: { description: 'Level A', standardizedTerm: 'term:A' },
       },
       units: 'years',
-    };
+    });
     const allValues = ['A', 'B'];
 
-    applyDataTypeToColumn(draft, null, allValues);
+    const result = applyDataTypeToColumn(column, null, allValues);
 
-    expect(draft.dataType).toBeNull();
-    expect(draft.levels).toBeUndefined();
-    expect(draft.units).toBeUndefined();
+    expect(result.dataType).toBeNull();
+    expect(result.levels).toBeUndefined();
+    expect(result.units).toBeUndefined();
   });
 
   it('should handle empty allValues array for categorical', () => {
-    const draft: {
-      dataType?: DataType | null;
-      levels?: { [key: string]: { description: string; standardizedTerm: string } } | null;
-      units?: string;
-    } = {
-      dataType: undefined,
-      levels: undefined,
-      units: undefined,
-    };
+    const column = createColumn();
     const allValues: string[] = [];
 
-    applyDataTypeToColumn(draft, DataType.categorical, allValues);
+    const result = applyDataTypeToColumn(column, DataType.categorical, allValues);
 
-    expect(draft.dataType).toBe(DataType.categorical);
-    expect(draft.levels).toBeDefined();
-    expect(Object.keys(draft.levels!)).toEqual([]);
+    expect(result.dataType).toBe(DataType.categorical);
+    expect(result.levels).toBeDefined();
+    expect(Object.keys(result.levels!)).toEqual([]);
   });
 
   it('should handle empty strings in allValues for categorical', () => {
-    const draft: {
-      dataType?: DataType | null;
-      levels?: { [key: string]: { description: string; standardizedTerm: string } } | null;
-      units?: string;
-    } = {
-      dataType: undefined,
-      levels: undefined,
-      units: undefined,
-    };
+    const column = createColumn();
     const allValues = ['A', '', 'B', ''];
 
-    applyDataTypeToColumn(draft, DataType.categorical, allValues);
+    const result = applyDataTypeToColumn(column, DataType.categorical, allValues);
 
-    expect(draft.dataType).toBe(DataType.categorical);
-    expect(draft.levels).toBeDefined();
-    expect(Object.keys(draft.levels!)).toEqual(['A', '', 'B']);
-    expect(draft.levels!['']).toEqual({ description: '', standardizedTerm: '' });
+    expect(result.dataType).toBe(DataType.categorical);
+    expect(result.levels).toBeDefined();
+    expect(Object.keys(result.levels!)).toEqual(['A', '', 'B']);
+    expect(result.levels!['']).toEqual({ description: '', standardizedTerm: '' });
   });
 });

@@ -1,4 +1,4 @@
-import { produce } from 'immer';
+import { produce, current } from 'immer';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import {
@@ -166,11 +166,16 @@ const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
     },
 
     userUpdatesColumnDataType(columnID, dataType) {
-      set((state) => ({
-        columns: produce(state.columns, (draft) => {
-          applyDataTypeToColumn(draft[columnID], dataType, state.columns[columnID].allValues);
-        }),
-      }));
+      set((state) => {
+        const column = state.columns[columnID];
+        const updatedColumn = applyDataTypeToColumn(column, dataType, column.allValues);
+
+        return {
+          columns: produce(state.columns, (draft) => {
+            draft[columnID] = updatedColumn;
+          }),
+        };
+      });
     },
 
     userUpdatesColumnStandardizedVariable(columnID, standardizedVariableId) {
@@ -206,7 +211,12 @@ const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
               dataType = DataType.continuous;
             }
 
-            applyDataTypeToColumn(draft[columnID], dataType, state.columns[columnID].allValues);
+            const columnWithDataType = applyDataTypeToColumn(
+              current(draft[columnID]),
+              dataType,
+              state.columns[columnID].allValues
+            );
+            draft[columnID] = columnWithDataType;
           }
         }),
       }));
