@@ -26,7 +26,7 @@
     "@mui/material": "^6.4.8",
     "@mui/system": "^6.4.3",
     "ajv": "^8.17.1",
-    "axios": "^1.13.0",
+    "axios": "^1.13.2",
     "immer": "^10.2.0",
     "lodash": "^4.17.21",
     "match-sorter": "^8.1.0",
@@ -34,7 +34,7 @@
     "papaparse": "^5.5.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-window": "^2.2.2",
+    "react-window": "^2.2.3",
     "seedrandom": "^3.0.5",
     "uuid": "^11.1.0",
     "zustand": "^5.0.8"
