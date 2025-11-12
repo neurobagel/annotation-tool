@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import mockDataDictionaryRaw from '../../cypress/fixtures/examples/mock.json?raw';
 import mockTsvRaw from '../../cypress/fixtures/examples/mock.tsv?raw';
 import mockTsvWithEmptyLineRaw from '../../cypress/fixtures/examples/mock_with_empty_line.tsv?raw';
-import { Columns, DataDictionary, StandardizedVariables } from '../../datamodel';
+import { Columns, DataDictionary, StandardizedVariables, DataType } from '../../datamodel';
 import { fetchConfigGitHubURL, githubRawBaseURL } from './constants';
 import {
   mockGitHubResponse,
@@ -24,6 +24,7 @@ import {
   readFile,
   parseTsvContent,
   applyDataDictionaryToColumns,
+  applyDataTypeToColumn,
 } from './store-utils';
 
 // Mock axios
@@ -715,5 +716,149 @@ describe('applyDataDictionaryToColumns', () => {
     expect(result).not.toBe(mockColumns);
     expect((mockColumns as Columns)['0'].description).toBeUndefined();
     expect(result['0'].description).toBe('Test description');
+  });
+});
+
+describe('applyDataTypeToColumn', () => {
+  const createColumn = (
+    overrides: {
+      dataType?: DataType | null;
+      levels?: { [key: string]: { description: string; standardizedTerm: string } } | null;
+      units?: string;
+    } = {}
+  ) => ({
+    dataType: undefined,
+    levels: undefined,
+    units: undefined,
+    ...overrides,
+  });
+
+  it('should set dataType to categorical and initialize levels from allValues', () => {
+    const column = createColumn();
+    const allValues = ['A', 'B', 'A', 'C', 'B'];
+
+    const result = applyDataTypeToColumn(column, DataType.categorical, allValues);
+
+    expect(result).not.toBe(column);
+    expect(result.dataType).toBe(DataType.categorical);
+    expect(result.levels).toBeDefined();
+    expect(Object.keys(result.levels!)).toEqual(['A', 'B', 'C']);
+    expect(result.levels!.A).toEqual({ description: '', standardizedTerm: '' });
+    expect(result.levels!.B).toEqual({ description: '', standardizedTerm: '' });
+    expect(result.levels!.C).toEqual({ description: '', standardizedTerm: '' });
+    expect(result.units).toBeUndefined();
+    expect(column.levels).toBeUndefined(); // original column unchanged
+  });
+
+  it('should preserve existing levels when switching to categorical', () => {
+    const column = createColumn({
+      levels: {
+        A: { description: 'Existing A', standardizedTerm: 'term:A' },
+        B: { description: 'Existing B', standardizedTerm: 'term:B' },
+      },
+    });
+    const allValues = ['A', 'B', 'C'];
+
+    const result = applyDataTypeToColumn(column, DataType.categorical, allValues);
+
+    expect(result.dataType).toBe(DataType.categorical);
+    expect(result.levels).toBeDefined();
+    expect(result.levels!.A).toEqual({ description: 'Existing A', standardizedTerm: 'term:A' });
+    expect(result.levels!.B).toEqual({ description: 'Existing B', standardizedTerm: 'term:B' });
+    expect(result.units).toBeUndefined();
+  });
+
+  it('should remove units when switching to categorical', () => {
+    const column = createColumn({
+      dataType: DataType.continuous,
+      units: 'years',
+    });
+    const allValues = ['A', 'B', 'C'];
+
+    const result = applyDataTypeToColumn(column, DataType.categorical, allValues);
+
+    expect(result.dataType).toBe(DataType.categorical);
+    expect(result.levels).toBeDefined();
+    expect(result.units).toBeUndefined();
+  });
+
+  it('should initialize column units attribute when dataType is set to continuous', () => {
+    const column = createColumn();
+    const allValues = ['25', '30', '35'];
+
+    const result = applyDataTypeToColumn(column, DataType.continuous, allValues);
+
+    expect(result.dataType).toBe(DataType.continuous);
+    expect(result.units).toBe('');
+    expect(result.levels).toBeUndefined();
+  });
+
+  it('should preserve existing units when switching to continuous', () => {
+    const column = createColumn({
+      units: 'kg',
+    });
+    const allValues = ['25', '30', '35'];
+
+    const result = applyDataTypeToColumn(column, DataType.continuous, allValues);
+
+    expect(result.dataType).toBe(DataType.continuous);
+    expect(result.units).toBe('kg');
+    expect(result.levels).toBeUndefined();
+  });
+
+  it('should remove levels when switching to continuous', () => {
+    const column = createColumn({
+      dataType: DataType.categorical,
+      levels: {
+        A: { description: 'Level A', standardizedTerm: 'term:A' },
+      },
+    });
+    const allValues = ['25', '30', '35'];
+
+    const result = applyDataTypeToColumn(column, DataType.continuous, allValues);
+
+    expect(result.dataType).toBe(DataType.continuous);
+    expect(result.units).toBe('');
+    expect(result.levels).toBeUndefined();
+  });
+
+  it('should clear dataType, levels, and units when dataType is null', () => {
+    const column = createColumn({
+      dataType: DataType.categorical,
+      levels: {
+        A: { description: 'Level A', standardizedTerm: 'term:A' },
+      },
+      units: 'years',
+    });
+    const allValues = ['A', 'B'];
+
+    const result = applyDataTypeToColumn(column, null, allValues);
+
+    expect(result.dataType).toBeNull();
+    expect(result.levels).toBeUndefined();
+    expect(result.units).toBeUndefined();
+  });
+
+  it('should handle empty allValues array for categorical', () => {
+    const column = createColumn();
+    const allValues: string[] = [];
+
+    const result = applyDataTypeToColumn(column, DataType.categorical, allValues);
+
+    expect(result.dataType).toBe(DataType.categorical);
+    expect(result.levels).toBeDefined();
+    expect(Object.keys(result.levels!)).toEqual([]);
+  });
+
+  it('should handle empty strings in allValues for categorical', () => {
+    const column = createColumn();
+    const allValues = ['A', '', 'B', ''];
+
+    const result = applyDataTypeToColumn(column, DataType.categorical, allValues);
+
+    expect(result.dataType).toBe(DataType.categorical);
+    expect(result.levels).toBeDefined();
+    expect(Object.keys(result.levels!)).toEqual(['A', '', 'B']);
+    expect(result.levels!['']).toEqual({ description: '', standardizedTerm: '' });
   });
 });

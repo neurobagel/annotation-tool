@@ -210,6 +210,53 @@ export function parseTsvContent(content: string): { headers: string[]; data: str
   return { headers, data };
 }
 
+/**
+ * Returns a copy of the column with data type dependent fields updated.
+ * Safe to use with Immer since the original object remains untouched.
+ */
+interface ColumnDataShape {
+  dataType?: DataType | null;
+  levels?: { [key: string]: { description: string; standardizedTerm: string } } | null;
+  units?: string;
+}
+
+export function applyDataTypeToColumn<T extends ColumnDataShape>(
+  column: T,
+  dataType: DataType | null,
+  allValues: string[]
+): T {
+  const updatedColumn: T = {
+    ...column,
+    dataType,
+  };
+
+  if (dataType === DataType.categorical) {
+    const uniqueValues = Array.from(new Set(allValues));
+
+    if (!column.levels) {
+      updatedColumn.levels = uniqueValues.reduce(
+        (acc, value) => ({
+          ...acc,
+          [value]: { description: '', standardizedTerm: '' },
+        }),
+        {} as { [key: string]: { description: string; standardizedTerm: string } }
+      );
+    }
+
+    delete updatedColumn.units;
+  } else if (dataType === DataType.continuous) {
+    if (updatedColumn.units === undefined) {
+      updatedColumn.units = '';
+    }
+    delete updatedColumn.levels;
+  } else {
+    delete updatedColumn.levels;
+    delete updatedColumn.units;
+  }
+
+  return updatedColumn;
+}
+
 export function applyDataDictionaryToColumns(
   columns: Columns,
   dataDictionary: DataDictionary,

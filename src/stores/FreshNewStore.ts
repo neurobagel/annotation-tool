@@ -1,3 +1,4 @@
+import { produce, current } from 'immer';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import {
@@ -5,6 +6,8 @@ import {
   FreshDataStoreActions,
   Columns,
   DataDictionary,
+  DataType,
+  VariableType,
 } from '../../datamodel';
 import {
   fetchAvailableConfigs,
@@ -15,6 +18,7 @@ import {
   readFile,
   parseTsvContent,
   applyDataDictionaryToColumns,
+  applyDataTypeToColumn,
 } from '../utils/store-utils';
 
 type FreshDataStore = FreshDataStoreState & {
@@ -153,6 +157,71 @@ const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
         });
       }
     },
+    userUpdatesColumnDescription: (columnID: string, description: string | null) => {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          draft[columnID].description = description;
+        }),
+      }));
+    },
+
+    userUpdatesColumnDataType(columnID, dataType) {
+      set((state) => {
+        const column = state.columns[columnID];
+        const updatedColumn = applyDataTypeToColumn(column, dataType, column.allValues);
+
+        return {
+          columns: produce(state.columns, (draft) => {
+            draft[columnID] = updatedColumn;
+          }),
+        };
+      });
+    },
+
+    userUpdatesColumnStandardizedVariable(columnID, standardizedVariableId) {
+      const { standardizedVariables } = get();
+
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          draft[columnID].standardizedVariable = standardizedVariableId;
+
+          // Handle isPartOf for multi-column measures
+          const standardizedVariable = standardizedVariableId
+            ? standardizedVariables[standardizedVariableId]
+            : null;
+
+          if (standardizedVariable?.is_multi_column_measure) {
+            // When setting to a multi-column measure, initialize isPartOf if it doesn't exist
+            if (!draft[columnID].isPartOf) {
+              draft[columnID].isPartOf = '';
+            }
+          } else if (draft[columnID].isPartOf !== undefined) {
+            // Remove isPartOf when changing from multi-column measure to something else
+            delete draft[columnID].isPartOf;
+          }
+
+          // Apply data type from standardized variable if available
+          if (standardizedVariable) {
+            const variableType = standardizedVariable.variable_type;
+            let dataType: DataType | null = null;
+
+            if (variableType === VariableType.categorical) {
+              dataType = DataType.categorical;
+            } else if (variableType === VariableType.continuous) {
+              dataType = DataType.continuous;
+            }
+
+            const columnWithDataType = applyDataTypeToColumn(
+              current(draft[columnID]),
+              dataType,
+              state.columns[columnID].allValues
+            );
+            draft[columnID] = columnWithDataType;
+          }
+        }),
+      }));
+    },
+
     reset: () => {
       set((state) => ({
         ...initialState,
@@ -181,5 +250,8 @@ export const useIsConfigLoading = () => useFreshDataStore((state) => state.isCon
 export const useConfig = () => useFreshDataStore((state) => state.config);
 export const useConfigOptions = () => useFreshDataStore((state) => state.configOptions);
 export const useFreshDataActions = () => useFreshDataStore((state) => state.actions);
+
+// Export the raw store for testing purposes
+export { useFreshDataStore };
 
 export default devtools(useFreshDataStore);

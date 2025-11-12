@@ -2,6 +2,7 @@ import { act, renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import mockDataDictionaryRaw from '../../cypress/fixtures/examples/mock.json?raw';
 import mockTsvRaw from '../../cypress/fixtures/examples/mock.tsv?raw';
+import { DataType } from '../../datamodel';
 import {
   mockAvailableConfigOptions,
   mockFreshConfigFile,
@@ -518,6 +519,576 @@ describe('userUploadsDataDictionaryFile', () => {
 
     expect(result.current.uploadedDataDictionary.fileName).toBe('');
     expect(result.current.uploadedDataDictionary.dataDictionary).toEqual({});
+  });
+});
+
+describe('userUpdatesColumnDescription', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should update the description of a specific column', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['participant_id', 'age', 'sex'],
+      data: [['sub-001', '25', 'M']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDescription('0', 'Updated participant identifier');
+    });
+
+    expect(result.current.columns['0'].description).toBe('Updated participant identifier');
+    expect(result.current.columns['1'].description).toBeUndefined();
+    expect(result.current.columns['2'].description).toBeUndefined();
+  });
+
+  it('should set description to null when description is cleared', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['participant_id', 'age'],
+      data: [['sub-001', '25']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    // Set initial description
+    act(() => {
+      result.current.actions.userUpdatesColumnDescription('0', 'Initial description');
+    });
+
+    expect(result.current.columns['0'].description).toBe('Initial description');
+
+    // Clear the description by setting it to null
+    act(() => {
+      result.current.actions.userUpdatesColumnDescription('0', null);
+    });
+
+    expect(result.current.columns['0'].description).toBeNull();
+  });
+});
+
+describe('userUpdatesColumnDataType', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should set dataType to categorical and initialize levels from column values', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['category'],
+      data: [['A'], ['B'], ['A'], ['C'], ['B']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('0', DataType.categorical);
+    });
+
+    expect(result.current.columns['0'].dataType).toBe('Categorical');
+    expect(result.current.columns['0'].levels).toBeDefined();
+    expect(Object.keys(result.current.columns['0'].levels!)).toEqual(['A', 'B', 'C']);
+    expect(result.current.columns['0'].levels!.A).toEqual({
+      description: '',
+      standardizedTerm: '',
+    });
+    expect(result.current.columns['0'].units).toBeUndefined();
+  });
+
+  it('should preserve existing levels when switching to categorical', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['category'],
+      data: [['A'], ['B'], ['C']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('0', DataType.categorical);
+    });
+
+    expect(result.current.columns['0'].levels).toBeDefined();
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('0', DataType.continuous);
+    });
+
+    expect(result.current.columns['0'].levels).toBeUndefined();
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('0', DataType.categorical);
+    });
+
+    expect(result.current.columns['0'].levels).toBeDefined();
+    expect(result.current.columns['0'].levels!.A.description).toBe('');
+  });
+
+  it('should set dataType to continuous and initialize units', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['age'],
+      data: [['25'], ['30'], ['35']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('0', DataType.continuous);
+    });
+
+    expect(result.current.columns['0'].dataType).toBe(DataType.continuous);
+    expect(result.current.columns['0'].units).toBe('');
+    expect(result.current.columns['0'].levels).toBeUndefined();
+  });
+
+  it('should remove levels when switching from categorical to continuous', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['column'],
+      data: [['A'], ['B'], ['C']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('0', DataType.categorical);
+    });
+
+    expect(result.current.columns['0'].levels).toBeDefined();
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('0', DataType.continuous);
+    });
+
+    expect(result.current.columns['0'].dataType).toBe(DataType.continuous);
+    expect(result.current.columns['0'].levels).toBeUndefined();
+    expect(result.current.columns['0'].units).toBe('');
+  });
+
+  it('should remove units when switching from continuous to categorical', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['column'],
+      data: [['25'], ['30'], ['35']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('0', DataType.continuous);
+    });
+
+    expect(result.current.columns['0'].units).toBe('');
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('0', DataType.categorical);
+    });
+
+    expect(result.current.columns['0'].dataType).toBe(DataType.categorical);
+    expect(result.current.columns['0'].units).toBeUndefined();
+    expect(result.current.columns['0'].levels).toBeDefined();
+  });
+
+  it('should clear dataType, levels, and units when dataType is set to null', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['column'],
+      data: [['A'], ['B']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    // Set to categorical first
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('0', DataType.categorical);
+    });
+
+    expect(result.current.columns['0'].dataType).toBe(DataType.categorical);
+    expect(result.current.columns['0'].levels).toBeDefined();
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('0', null);
+    });
+
+    expect(result.current.columns['0'].dataType).toBeNull();
+    expect(result.current.columns['0'].levels).toBeUndefined();
+    expect(result.current.columns['0'].units).toBeUndefined();
+  });
+
+  it('should handle empty values in categorical levels', async () => {
+    const tsvWithEmptyValues = `col1
+A
+
+B`;
+
+    const mockTsvFile = new File([tsvWithEmptyValues], 'data-with-empty.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(tsvWithEmptyValues);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['col1'],
+      data: [['A'], [''], ['B']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('0', DataType.categorical);
+    });
+
+    expect(result.current.columns['0'].dataType).toBe(DataType.categorical);
+    expect(result.current.columns['0'].levels).toBeDefined();
+    expect(Object.keys(result.current.columns['0'].levels!)).toContain('');
+    expect(result.current.columns['0'].levels!['']).toEqual({
+      description: '',
+      standardizedTerm: '',
+    });
+  });
+});
+
+describe('userUpdatesColumnStandardizedVariable', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should set standardized variable and apply categorical data type', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['sex'],
+      data: [['M'], ['F'], ['M']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+      standardizedVariables: useStandardizedVariables(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockFreshConfigFile,
+      termsData: mockFreshTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnStandardizedVariable('0', 'nb:Sex');
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Sex');
+    expect(result.current.columns['0'].dataType).toBe(DataType.categorical);
+    expect(result.current.columns['0'].levels).toBeDefined();
+    expect(Object.keys(result.current.columns['0'].levels!)).toEqual(['M', 'F']);
+  });
+
+  it('should set standardized variable and apply continuous data type', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['age'],
+      data: [['25'], ['30'], ['35']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockFreshConfigFile,
+      termsData: mockFreshTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnStandardizedVariable('0', 'nb:Age');
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Age');
+    expect(result.current.columns['0'].dataType).toBe(DataType.continuous);
+    expect(result.current.columns['0'].units).toBe('');
+    expect(result.current.columns['0'].levels).toBeUndefined();
+  });
+
+  it('should initialize isPartOf when column is mapped to Collection type variables', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['assessment'],
+      data: [['100'], ['110'], ['120']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockFreshConfigFile,
+      termsData: mockFreshTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnStandardizedVariable('0', 'nb:Assessment');
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Assessment');
+    expect(result.current.columns['0'].isPartOf).toBe('');
+  });
+
+  it('should remove isPartOf when changing from multi-column measure to a non-multi-column measure variable', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['column'],
+      data: [['100'], ['110'], ['120']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockFreshConfigFile,
+      termsData: mockFreshTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnStandardizedVariable('0', 'nb:Assessment');
+    });
+
+    expect(result.current.columns['0'].isPartOf).toBe('');
+
+    act(() => {
+      result.current.actions.userUpdatesColumnStandardizedVariable('0', 'nb:Age');
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Age');
+    expect(result.current.columns['0'].isPartOf).toBeUndefined();
+  });
+
+  it('should set standardized variable foreign key to null when column is unmapped from all standardized variables', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['column'],
+      data: [['M'], ['F']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockFreshConfigFile,
+      termsData: mockFreshTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnStandardizedVariable('0', 'nb:Sex');
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Sex');
+
+    act(() => {
+      result.current.actions.userUpdatesColumnStandardizedVariable('0', null);
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBeNull();
+  });
+
+  it('should handle identifier variable type without setting dataType', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['participant_id'],
+      data: [['sub-001'], ['sub-002'], ['sub-003']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockFreshConfigFile,
+      termsData: mockFreshTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnStandardizedVariable('0', 'nb:ParticipantID');
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:ParticipantID');
+    expect(result.current.columns['0'].dataType).toBeNull();
+    expect(result.current.columns['0'].levels).toBeUndefined();
+    expect(result.current.columns['0'].units).toBeUndefined();
   });
 });
 
