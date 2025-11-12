@@ -83,9 +83,13 @@ describe('Main user flow', () => {
     cy.get('[data-cy="2-description"]').should('be.visible');
     cy.get('[data-cy="2-description"]').type('some cool new description');
     // Test that a single column standardized variable like "age" will be disabled once mapped to a column
-    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
-      'age{downArrow}{enter}'
-    );
+    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').click();
+    cy.focused().type('age');
+    cy.get('ul[role="listbox"]')
+      .last()
+      .within(() => {
+        cy.get('[role="option"]').contains('Age').click();
+      });
     cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').click();
     cy.get('ul[role="listbox"]')
       .last()
@@ -94,9 +98,13 @@ describe('Main user flow', () => {
       });
 
     // Switch the column assignment to another variable and assert that age is now enabled again
-    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
-      'participant{downArrow}{enter}'
-    );
+    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').click();
+    cy.focused().type('{selectAll}{backspace}participant');
+    cy.get('ul[role="listbox"]')
+      .last()
+      .within(() => {
+        cy.get('[role="option"]').contains('Participant ID').click();
+      });
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"] input').should(
       'have.value',
       'Participant ID'
