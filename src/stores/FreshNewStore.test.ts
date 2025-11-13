@@ -1092,6 +1092,74 @@ describe('userUpdatesColumnStandardizedVariable', () => {
   });
 });
 
+describe('userUpdatesColumnIsPartOf', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const prepareMultiColumnAssessment = async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['assessment'],
+      data: [['100'], ['110'], ['120']],
+    });
+
+    const result = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockFreshConfigFile,
+      termsData: mockFreshTermsData,
+    });
+
+    await act(async () => {
+      await result.result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    act(() => {
+      result.result.current.actions.userUpdatesColumnStandardizedVariable('0', 'nb:Assessment');
+    });
+
+    return result;
+  };
+
+  it('should set isPartOf when provided a term identifier', async () => {
+    const result = await prepareMultiColumnAssessment();
+
+    act(() => {
+      result.result.current.actions.userUpdatesColumnIsPartOf('0', 'snomed:1303696008');
+    });
+
+    expect(result.result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
+  });
+
+  it('should delete isPartOf when null is provided', async () => {
+    const result = await prepareMultiColumnAssessment();
+
+    act(() => {
+      result.result.current.actions.userUpdatesColumnIsPartOf('0', 'snomed:1303696008');
+    });
+
+    expect(result.result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
+
+    act(() => {
+      result.result.current.actions.userUpdatesColumnIsPartOf('0', null);
+    });
+
+    expect(result.result.current.columns['0'].isPartOf).toBeUndefined();
+  });
+});
+
 describe('reset', () => {
   beforeEach(() => {
     vi.clearAllMocks();
