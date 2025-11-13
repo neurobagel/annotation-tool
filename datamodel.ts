@@ -48,7 +48,7 @@ export interface StandardizedVariables {
 }
 
 // Includes all terms in one place
-interface StandardizedTerm {
+export interface StandardizedTerm {
   standardizedVariableId: string; // foreign key (primary key in the standardized variable table) to standardized variable
   id: string;
   label: string;
@@ -132,6 +132,7 @@ export type FreshDataStoreActions = {
     columnID: string,
     standardizedVariableId: string | null
   ) => void;
+  userUpdatesColumnIsPartOf: (columnID: string, termId: string | null) => void;
   reset: () => void;
 };
 
