@@ -1108,13 +1108,13 @@ describe('userUpdatesColumnIsPartOf', () => {
       data: [['100'], ['110'], ['120']],
     });
 
-    const result = renderHook(() => ({
+    const { result } = renderHook(() => ({
       actions: useFreshDataActions(),
       columns: useColumns(),
     }));
 
     await act(async () => {
-      await result.result.current.actions.userUploadsDataTableFile(mockTsvFile);
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
     });
 
     mockedFetchConfig.mockResolvedValueOnce({
@@ -1123,11 +1123,11 @@ describe('userUpdatesColumnIsPartOf', () => {
     });
 
     await act(async () => {
-      await result.result.current.actions.userSelectsConfig('Neurobagel');
+      await result.current.actions.userSelectsConfig('Neurobagel');
     });
 
     act(() => {
-      result.result.current.actions.userUpdatesColumnStandardizedVariable('0', 'nb:Assessment');
+      result.current.actions.userUpdatesColumnStandardizedVariable('0', 'nb:Assessment');
     });
 
     return result;
@@ -1137,26 +1137,78 @@ describe('userUpdatesColumnIsPartOf', () => {
     const result = await prepareMultiColumnAssessment();
 
     act(() => {
-      result.result.current.actions.userUpdatesColumnIsPartOf('0', 'snomed:1303696008');
+      result.current.actions.userUpdatesColumnIsPartOf('0', 'snomed:1303696008');
     });
 
-    expect(result.result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
+    expect(result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
   });
 
   it('should delete isPartOf when null is provided', async () => {
     const result = await prepareMultiColumnAssessment();
 
     act(() => {
-      result.result.current.actions.userUpdatesColumnIsPartOf('0', 'snomed:1303696008');
+      result.current.actions.userUpdatesColumnIsPartOf('0', 'snomed:1303696008');
     });
 
-    expect(result.result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
+    expect(result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
 
     act(() => {
-      result.result.current.actions.userUpdatesColumnIsPartOf('0', null);
+      result.current.actions.userUpdatesColumnIsPartOf('0', null);
     });
 
-    expect(result.result.current.columns['0'].isPartOf).toBeUndefined();
+    expect(result.current.columns['0'].isPartOf).toBeUndefined();
+  });
+});
+
+describe('userUpdatesMultiColumnMeasureCards', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const initializeTerms = async () => {
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockFreshConfigFile,
+      termsData: mockFreshTermsData,
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      standardizedTerms: useStandardizedTerms(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    return result;
+  };
+
+  it('should set isCollection to true for the provided term', async () => {
+    const result = await initializeTerms();
+
+    expect(result.current.standardizedTerms['snomed:1303696008'].isCollection).toBe(false);
+
+    act(() => {
+      result.current.actions.userUpdatesMultiColumnMeasureCards('snomed:1303696008', true);
+    });
+
+    expect(result.current.standardizedTerms['snomed:1303696008'].isCollection).toBe(true);
+  });
+
+  it('should set isCollection to false when toggled off', async () => {
+    const result = await initializeTerms();
+
+    act(() => {
+      result.current.actions.userUpdatesMultiColumnMeasureCards('snomed:1303696008', true);
+    });
+
+    expect(result.current.standardizedTerms['snomed:1303696008'].isCollection).toBe(true);
+
+    act(() => {
+      result.current.actions.userUpdatesMultiColumnMeasureCards('snomed:1303696008', false);
+    });
+
+    expect(result.current.standardizedTerms['snomed:1303696008'].isCollection).toBe(false);
   });
 });
 
