@@ -134,6 +134,7 @@ export type FreshDataStoreActions = {
     standardizedVariableId: string | null
   ) => void;
   userUpdatesColumnIsPartOf: (columnID: string, termId: string | null) => void;
+  userUpdatesMultiColumnMeasureCards: (termId: string, isCollection: boolean) => void;
   reset: () => void;
 };
 

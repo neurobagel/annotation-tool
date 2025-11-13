@@ -224,6 +224,16 @@ const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
       }));
     },
 
+    userUpdatesMultiColumnMeasureCards(termId, isCollection) {
+      set((state) => ({
+        standardizedTerms: produce(state.standardizedTerms, (draft) => {
+          if (draft[termId]) {
+            draft[termId].isCollection = isCollection;
+          }
+        }),
+      }));
+    },
+
     reset: () => {
       set((state) => ({
         ...initialState,
