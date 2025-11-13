@@ -56,6 +56,7 @@ export interface StandardizedTerm {
   description?: string;
   same_as?: string;
   status?: string;
+  isCollection?: boolean;
 }
 
 export interface StandardizedTerms {
