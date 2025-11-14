@@ -1,81 +1,85 @@
 import AddIcon from '@mui/icons-material/Add';
-import CancelIcon from '@mui/icons-material/Cancel';
-import { Fab, Card, CardContent, CardHeader, Typography, Tabs, Tab } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import { useState } from 'react';
-import {
-  useMultiColumnMeasuresState,
-  useMultiColumnMeasuresData,
-  useActiveVariableData,
-} from '../hooks';
-import useDataStore from '../stores/data';
+import { Fab } from '@mui/material';
+import { SyntheticEvent } from 'react';
+import { useMultiColumnMeasureCardData } from '../hooks/useMultiColumnMeasureCardData';
+import { useMultiColumnMeasureDraftCard } from '../hooks/useMultiColumnMeasureDraftCard';
+import { useMultiColumnMeasureTabs } from '../hooks/useMultiColumnMeasureTabs';
+import { usePersistedMultiColumnCards } from '../hooks/usePersistedMultiColumnCards';
+import { useColumns, useFreshDataActions } from '../stores/FreshNewStore';
 import { MultiColumnMeasuresInstructions } from '../utils/instructions';
-import { MultiColumnMeasuresTerm } from '../utils/internal_types';
-import { getColumnsAssignedText, createMappedColumnHeaders } from '../utils/util';
 import Instruction from './Instruction';
+import MultiColumnMeasureTabs from './MultiColumnMeasureTabs';
 import MultiColumnMeasuresCard from './MultiColumnMeasuresCard';
+import MultiColumnMeasuresColumnsSidebar from './MultiColumnMeasuresColumnsSidebar';
 
 function MultiColumnMeasures() {
-  const theme = useTheme();
-  const [activeTab, setActiveTab] = useState(0);
-  const updateColumnStandardizedVariable = useDataStore(
-    (state) => state.updateColumnStandardizedVariable
+  const {
+    variables: multiColumnVariables,
+    activeTab,
+    activeVariable,
+    setActiveTab,
+  } = useMultiColumnMeasureTabs();
+  const activeVariableId = activeVariable?.id || '';
+  const persistedCards = usePersistedMultiColumnCards(activeVariableId);
+  const { draftMeasureCards, createDraft, updateDraftTerm, removeDraft, hasDraft } =
+    useMultiColumnMeasureDraftCard(activeVariableId);
+  const combinedCards = [...persistedCards, ...draftMeasureCards];
+  const { cardData, variableAllMappedColumns } = useMultiColumnMeasureCardData(
+    activeVariableId,
+    combinedCards,
+    persistedCards
   );
+  const columns = useColumns();
+  const actions = useFreshDataActions();
+  const currentVariableColumns = activeVariable
+    ? Object.entries(columns)
+        .filter(([_, column]) => column.standardizedVariable === activeVariable.id)
+        .map(([id, column]) => ({ id, header: column.name }))
+    : [];
+  const canAddDraft = !hasDraft;
 
-  const stateManager = useMultiColumnMeasuresState();
-  const { multiColumnVariables, columns } = useMultiColumnMeasuresData();
-  const { activeVariableTab, currentVariableColumns, currentTermCards, variableAllMappedColumns } =
-    useActiveVariableData(multiColumnVariables, activeTab);
-
-  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_: SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
 
   const handleAddNewCard = () => {
-    if (activeVariableTab) {
-      stateManager.addTermCard(activeVariableTab.identifier);
-    }
+    createDraft();
   };
 
-  const handleTermSelect = (cardId: string, term: MultiColumnMeasuresTerm | null) => {
-    if (activeVariableTab) {
-      stateManager.updateTermInCard(activeVariableTab.identifier, cardId, term);
-    }
+  const handleTermSelect = (cardId: string, termId: string | null) => {
+    if (!termId) return;
+    updateDraftTerm(cardId, termId);
   };
 
-  const handleColumnSelect = (cardId: string, columnId: string | null) => {
-    if (columnId && activeVariableTab) {
-      stateManager.addColumnToCard(activeVariableTab.identifier, cardId, columnId);
-    }
+  const handleColumnSelect = (cardId: string, termId: string, columnId: string | null) => {
+    if (!columnId) return;
+    actions.userUpdatesColumnIsPartOf(columnId, termId);
+    actions.userUpdatesMultiColumnMeasureCards(termId, true);
+    removeDraft(cardId);
   };
 
-  const handleRemoveColumn = (cardId: string, columnId: string) => {
-    if (activeVariableTab) {
-      stateManager.removeColumnFromCard(activeVariableTab.identifier, cardId, columnId);
-    }
+  const handleRemoveColumn = (columnId: string) => {
+    actions.userUpdatesColumnIsPartOf(columnId, null);
   };
 
   const handleRemoveCard = (cardId: string) => {
-    if (activeVariableTab) {
-      stateManager.removeTermCard(activeVariableTab.identifier, cardId);
+    const card = combinedCards.find((c) => c.id === cardId);
+    if (card?.term) {
+      card.mappedColumns.forEach((colId) => {
+        actions.userUpdatesColumnIsPartOf(colId, null);
+      });
+      actions.userUpdatesMultiColumnMeasureCards(card.term.id, false);
+    } else {
+      removeDraft(cardId);
     }
   };
 
   const handleUnassignColumn = (columnId: string) => {
-    if (!activeVariableTab) {
-      return;
-    }
-
-    const cardWithColumn = currentTermCards.find((card) => card.mappedColumns.includes(columnId));
-
-    if (cardWithColumn) {
-      stateManager.removeColumnFromCard(activeVariableTab.identifier, cardWithColumn.id, columnId);
-    }
-
-    updateColumnStandardizedVariable(columnId, null);
+    actions.userUpdatesColumnIsPartOf(columnId, null);
+    actions.userUpdatesColumnStandardizedVariable(columnId, null);
   };
 
-  if (!activeVariableTab) {
+  if (!activeVariable) {
     return null;
   }
 
@@ -89,44 +93,28 @@ function MultiColumnMeasures() {
         </div>
         <div className="flex flex-row gap-6 w-full">
           <div className="flex-1 min-w-0">
-            <Tabs
+            <MultiColumnMeasureTabs
+              variables={multiColumnVariables}
               value={activeTab}
               onChange={handleTabChange}
-              aria-label="Multi-column measures tabs"
-            >
-              {multiColumnVariables.map((variable, index) => (
-                <Tab
-                  data-cy={`multi-column-measures-tab-${variable.label}`}
-                  key={variable.identifier}
-                  label={variable.label}
-                  id={`tab-${index}`}
-                />
-              ))}
-            </Tabs>
+            />
 
             <div className="flex flex-col">
               <div className="w-full h-[65vh] overflow-y-auto">
                 <div className="space-y-4">
-                  {currentTermCards.map((card, index) => (
+                  {cardData.map((card, index) => (
                     <div key={card.id} className="w-full">
                       <MultiColumnMeasuresCard
-                        card={card}
+                        card={card.cardDisplay}
                         cardIndex={index}
-                        mappedColumnHeaders={createMappedColumnHeaders(card.mappedColumns, columns)}
-                        availableTerms={
-                          stateManager.availableTermsForVariables[activeVariableTab.identifier]?.[
-                            card.id
-                          ] ||
-                          stateManager.availableTermsForVariables[activeVariableTab.identifier]
-                            ?.null ||
-                          []
+                        availableTerms={card.availableTerms}
+                        columnOptions={card.columnOptions}
+                        mappedColumnHeaders={card.mappedColumnHeaders}
+                        onTermSelect={(termId) => handleTermSelect(card.id, termId)}
+                        onColumnSelect={(termId, columnId) =>
+                          handleColumnSelect(card.id, termId, columnId)
                         }
-                        columnOptions={
-                          stateManager.columnOptionsForVariables[activeVariableTab.identifier] || []
-                        }
-                        onTermSelect={(term) => handleTermSelect(card.id, term)}
-                        onColumnSelect={(columnId) => handleColumnSelect(card.id, columnId)}
-                        onRemoveColumn={(columnId) => handleRemoveColumn(card.id, columnId)}
+                        onRemoveColumn={handleRemoveColumn}
                         onRemoveCard={() => handleRemoveCard(card.id)}
                       />
                     </div>
@@ -135,7 +123,12 @@ function MultiColumnMeasures() {
               </div>
 
               <div className="flex justify-center mt-4">
-                <Fab color="primary" onClick={handleAddNewCard} data-cy="add-term-card-button">
+                <Fab
+                  color="primary"
+                  onClick={handleAddNewCard}
+                  disabled={!canAddDraft}
+                  data-cy="add-term-card-button"
+                >
                   <AddIcon />
                 </Fab>
               </div>
@@ -143,48 +136,12 @@ function MultiColumnMeasures() {
           </div>
 
           <div className="flex-shrink-0">
-            <Card
-              className="w-full shadow-lg"
-              elevation={3}
-              data-cy="multi-column-measures-columns-card"
-            >
-              <CardHeader
-                className="bg-gray-50"
-                title={`${activeVariableTab.label}: all columns`}
-              />
-              <CardContent className="text-center">
-                <div className="max-h-[500px] overflow-auto">
-                  {currentVariableColumns.map(({ id, header }) => (
-                    <div key={id} className="p-2 border-b flex items-center justify-between">
-                      <Typography
-                        sx={{
-                          color: variableAllMappedColumns.includes(id)
-                            ? theme.palette.primary.main
-                            : 'inherit',
-                        }}
-                      >
-                        {header}
-                      </Typography>
-                      <CancelIcon
-                        sx={{
-                          fontSize: 16,
-                          color: theme.palette.grey[500],
-                          cursor: 'pointer',
-                          '&:hover': {
-                            color: theme.palette.error.main,
-                          },
-                        }}
-                        onClick={() => handleUnassignColumn(id)}
-                        data-cy={`unassign-column-${id}`}
-                      />
-                    </div>
-                  ))}
-                </div>
-                <Typography variant="body2" className="mt-8">
-                  {getColumnsAssignedText(variableAllMappedColumns.length)}
-                </Typography>
-              </CardContent>
-            </Card>
+            <MultiColumnMeasuresColumnsSidebar
+              variableName={activeVariable.name}
+              columns={currentVariableColumns}
+              mappedColumnIds={variableAllMappedColumns}
+              onUnassignColumn={handleUnassignColumn}
+            />
           </div>
         </div>
       </div>
