@@ -1,5 +1,5 @@
 import { useColumns } from '../stores/FreshNewStore';
-import { MultiColumnCardData } from '../types/multiColumnMeasures';
+import { MultiColumnCardData } from '../types/multiColumnMeasureTypes';
 import { useColumnOptionsForMultiColumnMeasureVariable } from './useColumnOptionsForMultiColumnMeasureVariable';
 import { UsePersistedMultiColumnCardsOutput } from './usePersistedMultiColumnCards';
 import { useTermsForMultiColumnMeasureVariable } from './useTermsForMultiColumnMeasureVariable';

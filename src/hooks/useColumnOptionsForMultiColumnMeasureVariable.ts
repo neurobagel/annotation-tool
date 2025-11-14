@@ -1,5 +1,5 @@
 import { useColumns } from '~/stores/FreshNewStore';
-import { ColumnOption } from '../types/multiColumnMeasures';
+import { ColumnOption } from '../types/multiColumnMeasureTypes';
 import { UsePersistedMultiColumnCardsOutput } from './usePersistedMultiColumnCards';
 
 /**

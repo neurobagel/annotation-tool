@@ -1,5 +1,5 @@
 import { useStandardizedTerms } from '../stores/FreshNewStore';
-import { AvailableTerm } from '../types/multiColumnMeasures';
+import { AvailableTerm } from '../types/multiColumnMeasureTypes';
 
 /**
  * Returns the terms for a multi-column variable and flags those already mapped
