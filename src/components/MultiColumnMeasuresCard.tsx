@@ -11,16 +11,16 @@ import {
   TextField,
 } from '@mui/material';
 import { matchSorter } from 'match-sorter';
-import { MultiColumnMeasuresTerm, MultiColumnMeasuresTermCard } from '../utils/internal_types';
+import { AvailableTerm, CardDisplay, ColumnOption } from '../types/multiColumnMeasureTypes';
 
 interface TermCardProps {
-  card: MultiColumnMeasuresTermCard;
+  card: CardDisplay;
   cardIndex: number;
-  mappedColumnHeaders: { [columnId: string]: string };
-  availableTerms: MultiColumnMeasuresTerm[];
-  columnOptions: Array<{ id: string; label: string; disabled: boolean }>;
-  onTermSelect: (term: MultiColumnMeasuresTerm | null) => void;
-  onColumnSelect: (columnId: string | null) => void;
+  availableTerms: AvailableTerm[];
+  columnOptions: ColumnOption[];
+  mappedColumnHeaders: Record<string, string>;
+  onTermSelect: (termId: string | null) => void;
+  onColumnSelect: (termId: string, columnId: string | null) => void;
   onRemoveColumn: (columnId: string) => void;
   onRemoveCard: () => void;
 }
@@ -28,18 +28,15 @@ interface TermCardProps {
 function MultiColumnMeasuresCard({
   card,
   cardIndex,
-  mappedColumnHeaders,
   availableTerms,
   columnOptions,
+  mappedColumnHeaders,
   onTermSelect,
   onColumnSelect,
   onRemoveColumn,
   onRemoveCard,
 }: TermCardProps) {
-  const filterOptions = (
-    items: MultiColumnMeasuresTerm[],
-    { inputValue }: { inputValue: string }
-  ) =>
+  const filterOptions = (items: AvailableTerm[], { inputValue }: { inputValue: string }) =>
     matchSorter(items, inputValue, {
       keys: [
         (option) =>
@@ -66,11 +63,11 @@ function MultiColumnMeasuresCard({
             <Autocomplete
               data-cy={`multi-column-measures-card-${cardIndex}-title-dropdown`}
               options={availableTerms}
-              getOptionLabel={(option: MultiColumnMeasuresTerm) =>
+              getOptionLabel={(option) =>
                 option.abbreviation ? `${option.abbreviation} - ${option.label}` : option.label
               }
               getOptionDisabled={(option) => option.disabled || false}
-              onChange={(_, newValue) => onTermSelect(newValue)}
+              onChange={(_, newValue) => onTermSelect(newValue?.id || null)}
               filterOptions={filterOptions}
               renderInput={(params) => (
                 <TextField
@@ -103,7 +100,11 @@ function MultiColumnMeasuresCard({
                 options={columnOptions}
                 getOptionLabel={(option) => option.label}
                 getOptionDisabled={(option) => option.disabled || false}
-                onChange={(_, newValue) => onColumnSelect(newValue?.id || null)}
+                onChange={(_, newValue) => {
+                  if (newValue && card.term) {
+                    onColumnSelect(card.term.id, newValue.id);
+                  }
+                }}
                 renderInput={(params) => (
                   <TextField
                     // eslint-disable-next-line react/jsx-props-no-spreading
