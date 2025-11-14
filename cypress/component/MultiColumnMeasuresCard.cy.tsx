@@ -4,7 +4,7 @@ const props = {
   card: {
     id: '1',
     term: {
-      identifier: 'nb:coolTerm',
+      id: 'nb:coolTerm',
       label: 'cool',
     },
     mappedColumns: ['1'],
@@ -16,12 +16,14 @@ const props = {
   },
   availableTerms: [
     {
-      identifier: 'nb:someIdentifier',
+      id: 'nb:someIdentifier',
       label: 'some',
+      disabled: false,
     },
     {
-      identifier: 'nb:anotherIdentifier',
+      id: 'nb:anotherIdentifier',
       label: 'another',
+      disabled: false,
     },
   ],
   columnOptions: [
@@ -71,7 +73,7 @@ describe('MultiColumnMeasuresCard', () => {
       />
     );
     cy.get('[data-cy=multi-column-measures-card-1-columns-dropdown]').type('age{downArrow}{enter}');
-    cy.get('@onColumnSelect').should('have.been.calledWith', '2');
+    cy.get('@onColumnSelect').should('have.been.calledWith', 'nb:coolTerm', '2');
   });
   it('fires onRemoveColumn with the appropriate payload when a chip is deleted', () => {
     const spy = cy.spy().as('onRemoveColumn');
