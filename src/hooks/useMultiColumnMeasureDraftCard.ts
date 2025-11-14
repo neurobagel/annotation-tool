@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useStandardizedTerms } from '../stores/FreshNewStore';
-import { MultiColumnMeasureCard } from './usePersistedMultiColumnCards';
+import { UsePersistedMultiColumnCardsOutput } from './usePersistedMultiColumnCards';
 
 export interface DraftCard {
   id: string;
   termId?: string | null;
 }
 
-interface UseMultiColumnDraftCardsOutput {
+interface UseMultiColumnDraftCardOutput {
   hasDraft: boolean;
-  draftMeasureCards: MultiColumnMeasureCard[];
+  draftMeasureCards: UsePersistedMultiColumnCardsOutput[];
   createDraft: () => void;
   updateDraftTerm: (cardId: string, termId: string | null) => void;
   removeDraft: (cardId: string) => void;
@@ -22,7 +22,7 @@ interface UseMultiColumnDraftCardsOutput {
  */
 export function useMultiColumnMeasureDraftCard(
   activeVariableId: string
-): UseMultiColumnDraftCardsOutput {
+): UseMultiColumnDraftCardOutput {
   const [draftCard, setDraftCard] = useState<DraftCard | null>(null);
   const standardizedTerms = useStandardizedTerms();
 
@@ -30,7 +30,7 @@ export function useMultiColumnMeasureDraftCard(
     setDraftCard(null);
   }, [activeVariableId]);
 
-  const draftMeasureCards: MultiColumnMeasureCard[] = draftCard
+  const draftMeasureCards: UsePersistedMultiColumnCardsOutput[] = draftCard
     ? [
         {
           id: draftCard.id,
