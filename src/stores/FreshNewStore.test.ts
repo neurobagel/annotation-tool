@@ -556,7 +556,7 @@ describe('userUpdatesColumnDescription', () => {
     expect(result.current.columns['2'].description).toBeUndefined();
   });
 
-  it('should set description to null when null is provided', async () => {
+  it('should set description to null when description is cleared', async () => {
     const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
       type: 'text/tab-separated-values',
     });
@@ -770,7 +770,7 @@ describe('userUpdatesColumnDataType', () => {
     expect(result.current.columns['0'].levels).toBeDefined();
   });
 
-  it('should clear dataType, levels, and units when dataType is null', async () => {
+  it('should clear dataType, levels, and units when dataType is set to null', async () => {
     const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
       type: 'text/tab-separated-values',
     });
@@ -930,7 +930,7 @@ describe('userUpdatesColumnStandardizedVariable', () => {
     expect(result.current.columns['0'].levels).toBeUndefined();
   });
 
-  it('should initialize isPartOf for multi-column measure variables', async () => {
+  it('should initialize isPartOf when column is mapped to Collection type variables', async () => {
     const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
       type: 'text/tab-separated-values',
     });
@@ -1010,7 +1010,7 @@ describe('userUpdatesColumnStandardizedVariable', () => {
     expect(result.current.columns['0'].isPartOf).toBeUndefined();
   });
 
-  it('should clear standardized variable when null is provided', async () => {
+  it('should set standardized variable foreign key to null when column is unmapped from all standardized variables', async () => {
     const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
       type: 'text/tab-separated-values',
     });

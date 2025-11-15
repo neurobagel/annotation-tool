@@ -40,9 +40,16 @@ function ColumnAnnotation() {
     // Data type is editable when:
     // 1. No standardized variable is selected, OR
     // 2. The selected standardized variable is a multi-column measure
+    const selectedStandardizedVariable = column.standardizedVariable
+      ? standardizedVariables[column.standardizedVariable]
+      : undefined;
     const isDataTypeEditable =
       !column.standardizedVariable ||
-      standardizedVariables[column.standardizedVariable]?.is_multi_column_measure === true;
+      selectedStandardizedVariable?.is_multi_column_measure === true;
+
+    const inferredDataTypeLabel = isDataTypeEditable
+      ? null
+      : selectedStandardizedVariable?.variable_type || column.dataType || null;
 
     return {
       columnId,
@@ -51,6 +58,7 @@ function ColumnAnnotation() {
       dataType: column.dataType || null,
       standardizedVariableId: column.standardizedVariable || null,
       isDataTypeEditable,
+      inferredDataTypeLabel,
     };
   });
 
@@ -74,6 +82,7 @@ function ColumnAnnotation() {
             standardizedVariableId={columnData.standardizedVariableId}
             standardizedVariableOptions={standardizedVariableOptions}
             isDataTypeEditable={columnData.isDataTypeEditable}
+            inferredDataTypeLabel={columnData.inferredDataTypeLabel}
             onDescriptionChange={userUpdatesColumnDescription}
             onDataTypeChange={handleDataTypeChange}
             onStandardizedVariableChange={handleStandardizedVariableChange}

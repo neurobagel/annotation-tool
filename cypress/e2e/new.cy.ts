@@ -83,18 +83,40 @@ describe('Main user flow', () => {
     cy.get('[data-cy="1-description"]').should('be.visible');
     cy.get('[data-cy="1-description"]').type('some cool new description');
     // Test that a single column standardized variable like "age" will be disabled once mapped to a column
-    cy.get('[data-cy="0-column-annotation-card-standardized-variable-dropdown"]').type(
-      'age{downArrow}{enter}'
-    );
+    cy.get('[data-cy="0-column-annotation-card-standardized-variable-dropdown"]').click();
+    cy.focused().type('age');
+    cy.get('ul[role="listbox"]')
+      .last()
+      .within(() => {
+        cy.get('[role="option"]').contains('Age').click();
+      });
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').click();
-    cy.get('[role="option"]').contains('Age').should('have.attr', 'aria-disabled', 'true');
+    cy.get('ul[role="listbox"]')
+      .last()
+      .within(() => {
+        cy.get('[role="option"]').contains('Age').should('have.attr', 'aria-disabled', 'true');
+      });
 
     // Switch the column assignment to another variable and assert that age is now enabled again
-    cy.get('[data-cy="0-column-annotation-card-standardized-variable-dropdown"]').type(
-      'participant{downArrow}{enter}'
+    cy.get('[data-cy="0-column-annotation-card-standardized-variable-dropdown"]').click();
+    cy.focused().type('{selectAll}{backspace}participant');
+    cy.get('ul[role="listbox"]')
+      .last()
+      .within(() => {
+        cy.get('[role="option"]').contains('Participant ID').click();
+      });
+    cy.get('[data-cy="0-column-annotation-card-standardized-variable-dropdown"] input').should(
+      'have.value',
+      'Participant ID'
     );
+    cy.get('[data-cy="0-column-annotation-card-data-type"]').should('contain', 'Identifier');
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').click();
-    cy.get('[role="option"]').contains('Age').should('not.have.attr', 'aria-disabled', 'true');
+    cy.focused().type('{selectAll}{backspace}');
+    cy.get('ul[role="listbox"]')
+      .last()
+      .within(() => {
+        cy.get('[role="option"]').contains('Age').should('not.have.attr', 'aria-disabled', 'true');
+      });
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
       'age{downArrow}{enter}'
     );

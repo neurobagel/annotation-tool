@@ -212,25 +212,30 @@ export function parseTsvContent(content: string): { headers: string[]; data: str
 }
 
 /**
- * Applies data type changes to a column draft (for use with Immer produce).
- * It mutates the draft directly.
+ * Returns a copy of the column with data type dependent fields updated.
+ * Safe to use with Immer since the original object remains untouched.
  */
-export function applyDataTypeToColumn(
-  draft: {
-    dataType?: DataType | null;
-    levels?: { [key: string]: { description: string; standardizedTerm: string } } | null;
-    units?: string;
-  },
+interface ColumnDataShape {
+  dataType?: DataType | null;
+  levels?: { [key: string]: { description: string; standardizedTerm: string } } | null;
+  units?: string;
+}
+
+export function applyDataTypeToColumn<T extends ColumnDataShape>(
+  column: T,
   dataType: DataType | null,
   allValues: string[]
-): void {
-  draft.dataType = dataType;
+): T {
+  const updatedColumn: T = {
+    ...column,
+    dataType,
+  };
 
   if (dataType === DataType.categorical) {
     const uniqueValues = Array.from(new Set(allValues));
 
-    if (!draft.levels) {
-      draft.levels = uniqueValues.reduce(
+    if (!column.levels) {
+      updatedColumn.levels = uniqueValues.reduce(
         (acc, value) => ({
           ...acc,
           [value]: { description: '', standardizedTerm: '' },
@@ -239,16 +244,18 @@ export function applyDataTypeToColumn(
       );
     }
 
-    delete draft.units;
+    delete updatedColumn.units;
   } else if (dataType === DataType.continuous) {
-    if (draft.units === undefined) {
-      draft.units = '';
+    if (updatedColumn.units === undefined) {
+      updatedColumn.units = '';
     }
-    delete draft.levels;
+    delete updatedColumn.levels;
   } else {
-    delete draft.levels;
-    delete draft.units;
+    delete updatedColumn.levels;
+    delete updatedColumn.units;
   }
+
+  return updatedColumn;
 }
 
 export function applyDataDictionaryToColumns(

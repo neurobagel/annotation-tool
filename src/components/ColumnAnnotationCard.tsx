@@ -22,6 +22,7 @@ interface ColumnAnnotationCardProps {
   standardizedVariableId: string | null;
   standardizedVariableOptions: StandardizedVariableOption[];
   isDataTypeEditable: boolean;
+  inferredDataTypeLabel: string | null;
   onDescriptionChange: (columnId: string, newDescription: string | null) => void;
   onDataTypeChange: (columnId: string, newDataType: 'Categorical' | 'Continuous' | null) => void;
   onStandardizedVariableChange: (columnId: string, newId: string | null) => void;
@@ -35,6 +36,7 @@ function ColumnAnnotationCard({
   standardizedVariableId,
   standardizedVariableOptions,
   isDataTypeEditable,
+  inferredDataTypeLabel,
   onDescriptionChange,
   onDataTypeChange,
   onStandardizedVariableChange,
@@ -84,7 +86,7 @@ function ColumnAnnotationCard({
                 </ToggleButtonGroup>
               ) : (
                 <Typography variant="body1" data-cy={`${id}-column-annotation-card-data-type`}>
-                  {dataType}
+                  {inferredDataTypeLabel || dataType || 'Unknown'}
                   <Tooltip
                     sx={{ fontSize: '1.2rem' }}
                     placement="right"
