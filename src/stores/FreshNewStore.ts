@@ -222,6 +222,28 @@ const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
       }));
     },
 
+    userUpdatesColumnIsPartOf(columnID, termId) {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          if (termId) {
+            draft[columnID].isPartOf = termId;
+          } else {
+            delete draft[columnID].isPartOf;
+          }
+        }),
+      }));
+    },
+
+    userUpdatesMultiColumnMeasureCards(termId, isCollection) {
+      set((state) => ({
+        standardizedTerms: produce(state.standardizedTerms, (draft) => {
+          if (draft[termId]) {
+            draft[termId].isCollection = isCollection;
+          }
+        }),
+      }));
+    },
+
     reset: () => {
       set((state) => ({
         ...initialState,

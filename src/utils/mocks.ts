@@ -964,56 +964,67 @@ export const mockFreshStandardizedTerms = {
     standardizedVariableId: 'nb:Sex',
     id: 'snomed:248153007',
     label: 'Male',
+    isCollection: false,
   },
   'snomed:248152002': {
     standardizedVariableId: 'nb:Sex',
     id: 'snomed:248152002',
     label: 'Female',
+    isCollection: false,
   },
   'snomed:32570681000036106': {
     standardizedVariableId: 'nb:Sex',
     id: 'snomed:32570681000036106',
     label: 'Other',
+    isCollection: false,
   },
   'snomed:1231282002': {
     standardizedVariableId: 'nb:Diagnosis',
     id: 'snomed:1231282002',
     label: 'Self-limited familial neonatal-infantile epilepsy',
+    isCollection: false,
   },
   'snomed:1237571004': {
     standardizedVariableId: 'nb:Diagnosis',
     id: 'snomed:1237571004',
     label: 'Self-limited familial infantile epilepsy',
+    isCollection: false,
   },
   'snomed:1259106002': {
     standardizedVariableId: 'nb:Diagnosis',
     id: 'snomed:1259106002',
     label: 'Alexander disease type I',
+    isCollection: false,
   },
   'snomed:406506008': {
     standardizedVariableId: 'nb:Diagnosis',
     id: 'snomed:406506008',
     label: 'Attention deficit hyperactivity disorder',
+    isCollection: false,
   },
   'snomed:1303696008': {
     standardizedVariableId: 'nb:Assessment',
     id: 'snomed:1303696008',
     label: 'Robson Ten Group Classification System',
+    isCollection: false,
   },
   'snomed:1304062007': {
     standardizedVariableId: 'nb:Assessment',
     id: 'snomed:1304062007',
     label: 'Malnutrition Screening Tool',
+    isCollection: false,
   },
   'snomed:1332329009': {
     standardizedVariableId: 'nb:Assessment',
     id: 'snomed:1332329009',
     label: 'Interviewer led Chronic Respiratory Questionnaire',
+    isCollection: false,
   },
   'snomed:273712001': {
     standardizedVariableId: 'nb:Assessment',
     id: 'snomed:273712001',
     label: 'Previous IQ assessment by pronunciation',
+    isCollection: false,
   },
 };
 

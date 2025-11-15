@@ -133,6 +133,7 @@ export function convertStandardizedTerms(
             id: termIdentifier,
             label: name,
             ...restTermFields,
+            isCollection: false,
           },
         };
       });
