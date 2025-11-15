@@ -10,7 +10,12 @@ interface MultiColumnMeasureTabsProps {
 
 function MultiColumnMeasureTabs({ variables, value, onChange }: MultiColumnMeasureTabsProps) {
   return (
-    <Tabs value={value} onChange={onChange} aria-label="Multi-column measures tabs">
+    <Tabs
+      value={value}
+      onChange={onChange}
+      aria-label="Multi-column measures tabs"
+      data-cy="multi-column-measures-tabs"
+    >
       {variables.map((variable, index) => (
         <Tab
           data-cy={`multi-column-measures-tab-${variable.name}`}

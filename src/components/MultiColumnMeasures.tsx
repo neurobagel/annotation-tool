@@ -100,7 +100,7 @@ function MultiColumnMeasures() {
             />
 
             <div className="flex flex-col">
-              <div className="w-full h-[65vh] overflow-y-auto">
+              <div className="w-full max-h-[65vh] overflow-y-auto">
                 <div className="space-y-4">
                   {cardData.map((card, index) => (
                     <div key={card.id} className="w-full">

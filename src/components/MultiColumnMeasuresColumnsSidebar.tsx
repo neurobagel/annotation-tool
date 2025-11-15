@@ -20,7 +20,11 @@ function MultiColumnMeasuresColumnsSidebar({
   const theme = useTheme();
 
   return (
-    <Card className="w-full shadow-lg" elevation={3} data-cy="multi-column-measures-columns-card">
+    <Card
+      className="w-full shadow-lg"
+      elevation={3}
+      data-cy="multi-column-measures-columns-side-bar"
+    >
       <CardHeader className="bg-gray-50" title={`${variableName}: all columns`} />
       <CardContent className="text-center">
         <div className="max-h-[500px] overflow-auto">
