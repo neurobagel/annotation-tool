@@ -43,7 +43,7 @@ describe('useMultiColumnMeasureCardData', () => {
     mockedUseColumns.mockReturnValue(columns);
     mockedUseTermsForVariable.mockReturnValue([{ id: 'term-1', label: 'Term 1', disabled: true }]);
     mockedUseColumnOptionsForVariable.mockReturnValue([
-      { id: 'col-1', label: 'Column 1', disabled: false },
+      { id: 'col-1', label: 'Column 1', isPartOfCollection: false },
     ]);
 
     const { result } = renderHook(() =>
@@ -57,7 +57,7 @@ describe('useMultiColumnMeasureCardData', () => {
     expect(card.mappedColumnHeaders['col-1']).toBe('Column 1');
     expect(result.current.variableAllMappedColumns).toEqual(['col-1']);
     expect(result.current.columnOptions).toEqual([
-      { id: 'col-1', label: 'Column 1', disabled: false },
+      { id: 'col-1', label: 'Column 1', isPartOfCollection: false },
     ]);
   });
 
@@ -76,7 +76,7 @@ describe('useMultiColumnMeasureCardData', () => {
     mockedUseColumns.mockReturnValue(columns);
     mockedUseTermsForVariable.mockReturnValue([{ id: 'term-1', label: 'Term 1', disabled: false }]);
     mockedUseColumnOptionsForVariable.mockReturnValue([
-      { id: 'col-1', label: 'Column 1', disabled: false },
+      { id: 'col-1', label: 'Column 1', isPartOfCollection: false },
     ]);
 
     const { result } = renderHook(() => useMultiColumnMeasureCardData('var-1', combinedCards, []));

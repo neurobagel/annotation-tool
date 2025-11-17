@@ -133,8 +133,9 @@ export type FreshDataStoreActions = {
     columnID: string,
     standardizedVariableId: string | null
   ) => void;
-  userUpdatesColumnIsPartOf: (columnID: string, termId: string | null) => void;
-  userUpdatesMultiColumnMeasureCards: (termId: string, isCollection: boolean) => void;
+  userUpdatesColumnToCollectionMapping: (columnID: string, termId: string | null) => void;
+  userCreatesCollection: (termId: string) => void;
+  userDeletesCollection: (termId: string) => void;
   reset: () => void;
 };
 

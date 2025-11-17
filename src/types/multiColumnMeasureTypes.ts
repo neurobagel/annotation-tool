@@ -17,7 +17,7 @@ export interface CardDisplay {
 export interface ColumnOption {
   id: string;
   label: string;
-  disabled: boolean;
+  isPartOfCollection: boolean;
 }
 
 export interface MultiColumnCardData {

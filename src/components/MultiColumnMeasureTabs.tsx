@@ -4,14 +4,18 @@ import { StandardizedVariable } from '../../datamodel';
 
 interface MultiColumnMeasureTabsProps {
   variables: StandardizedVariable[];
-  value: number;
+  selectedTabIndex: number;
   onChange: (event: SyntheticEvent, newValue: number) => void;
 }
 
-function MultiColumnMeasureTabs({ variables, value, onChange }: MultiColumnMeasureTabsProps) {
+function MultiColumnMeasureTabs({
+  variables,
+  selectedTabIndex,
+  onChange,
+}: MultiColumnMeasureTabsProps) {
   return (
     <Tabs
-      value={value}
+      value={selectedTabIndex}
       onChange={onChange}
       aria-label="Multi-column measures tabs"
       data-cy="multi-column-measures-tabs"

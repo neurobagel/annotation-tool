@@ -21,10 +21,7 @@ export function useMultiColumnMeasureCardData(
 ): UseMultiColumnMeasureCardDataOutput {
   const columns = useColumns();
   const availableTermsForVariable = useTermsForMultiColumnMeasureVariable(variableId);
-  const columnOptionsForVariable = useColumnOptionsForMultiColumnMeasureVariable(
-    variableId,
-    persistedCards
-  );
+  const columnOptionsForVariable = useColumnOptionsForMultiColumnMeasureVariable(variableId);
 
   const cardData: MultiColumnCardData[] = !variableId
     ? []

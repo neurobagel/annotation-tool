@@ -19,7 +19,7 @@ interface TermCardProps {
   availableTerms: AvailableTerm[];
   columnOptions: ColumnOption[];
   mappedColumnHeaders: Record<string, string>;
-  onTermSelect: (termId: string | null) => void;
+  onCreateCollection: (termId: string | null) => void;
   onColumnSelect: (termId: string, columnId: string | null) => void;
   onRemoveColumn: (columnId: string) => void;
   onRemoveCard: () => void;
@@ -31,7 +31,7 @@ function MultiColumnMeasuresCard({
   availableTerms,
   columnOptions,
   mappedColumnHeaders,
-  onTermSelect,
+  onCreateCollection,
   onColumnSelect,
   onRemoveColumn,
   onRemoveCard,
@@ -67,7 +67,7 @@ function MultiColumnMeasuresCard({
                 option.abbreviation ? `${option.abbreviation} - ${option.label}` : option.label
               }
               getOptionDisabled={(option) => option.disabled || false}
-              onChange={(_, newValue) => onTermSelect(newValue?.id || null)}
+              onChange={(_, newValue) => onCreateCollection(newValue?.id || null)}
               filterOptions={filterOptions}
               renderInput={(params) => (
                 <TextField
@@ -99,7 +99,7 @@ function MultiColumnMeasuresCard({
                 data-cy={`multi-column-measures-card-${cardIndex}-columns-dropdown`}
                 options={columnOptions}
                 getOptionLabel={(option) => option.label}
-                getOptionDisabled={(option) => option.disabled || false}
+                getOptionDisabled={(option) => option.isPartOfCollection || false}
                 onChange={(_, newValue) => {
                   if (newValue && card.term) {
                     onColumnSelect(card.term.id, newValue.id);

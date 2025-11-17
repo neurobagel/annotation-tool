@@ -21,7 +21,7 @@ function MultiColumnMeasures() {
   } = useMultiColumnMeasureTabs();
   const activeVariableId = activeVariable?.id || '';
   const persistedCards = usePersistedMultiColumnCards(activeVariableId);
-  const { draftMeasureCards, createDraft, updateDraftTerm, removeDraft, hasDraft } =
+  const { draftMeasureCards, createDraft, createCollectionFromDraft, removeDraft, hasDraft } =
     useMultiColumnMeasureDraftCard(activeVariableId);
   const combinedCards = [...persistedCards, ...draftMeasureCards];
   const { cardData, variableAllMappedColumns } = useMultiColumnMeasureCardData(
@@ -43,39 +43,37 @@ function MultiColumnMeasures() {
   };
 
   const handleAddNewCard = () => {
+    if (!canAddDraft) return;
     createDraft();
   };
 
-  const handleTermSelect = (cardId: string, termId: string | null) => {
+  const handleCreateCollection = (cardId: string, termId: string | null) => {
     if (!termId) return;
-    updateDraftTerm(cardId, termId);
+    createCollectionFromDraft(cardId, termId);
   };
 
-  const handleColumnSelect = (cardId: string, termId: string, columnId: string | null) => {
+  const handleColumnSelect = (termId: string, columnId: string | null) => {
     if (!columnId) return;
-    actions.userUpdatesColumnIsPartOf(columnId, termId);
-    actions.userUpdatesMultiColumnMeasureCards(termId, true);
-    removeDraft(cardId);
+    actions.userUpdatesColumnToCollectionMapping(columnId, termId);
   };
 
   const handleRemoveColumn = (columnId: string) => {
-    actions.userUpdatesColumnIsPartOf(columnId, null);
+    actions.userUpdatesColumnToCollectionMapping(columnId, null);
   };
 
   const handleRemoveCard = (cardId: string) => {
     const card = combinedCards.find((c) => c.id === cardId);
     if (card?.term) {
       card.mappedColumns.forEach((colId) => {
-        actions.userUpdatesColumnIsPartOf(colId, null);
+        actions.userUpdatesColumnToCollectionMapping(colId, null);
       });
-      actions.userUpdatesMultiColumnMeasureCards(card.term.id, false);
+      actions.userDeletesCollection(card.term.id);
     } else {
       removeDraft(cardId);
     }
   };
 
   const handleUnassignColumn = (columnId: string) => {
-    actions.userUpdatesColumnIsPartOf(columnId, null);
     actions.userUpdatesColumnStandardizedVariable(columnId, null);
   };
 
@@ -95,7 +93,7 @@ function MultiColumnMeasures() {
           <div className="flex-1 min-w-0">
             <MultiColumnMeasureTabs
               variables={multiColumnVariables}
-              value={activeTab}
+              selectedTabIndex={activeTab}
               onChange={handleTabChange}
             />
 
@@ -110,10 +108,8 @@ function MultiColumnMeasures() {
                         availableTerms={card.availableTerms}
                         columnOptions={card.columnOptions}
                         mappedColumnHeaders={card.mappedColumnHeaders}
-                        onTermSelect={(termId) => handleTermSelect(card.id, termId)}
-                        onColumnSelect={(termId, columnId) =>
-                          handleColumnSelect(card.id, termId, columnId)
-                        }
+                        onCreateCollection={(termId) => handleCreateCollection(card.id, termId)}
+                        onColumnSelect={(termId, columnId) => handleColumnSelect(termId, columnId)}
                         onRemoveColumn={handleRemoveColumn}
                         onRemoveCard={() => handleRemoveCard(card.id)}
                       />

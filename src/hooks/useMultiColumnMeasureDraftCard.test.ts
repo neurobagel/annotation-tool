@@ -1,23 +1,39 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useStandardizedTerms } from '~/stores/FreshNewStore';
+import { useFreshDataActions } from '~/stores/FreshNewStore';
+import { FreshDataStoreActions } from '../../datamodel';
 import { useMultiColumnMeasureDraftCard } from './useMultiColumnMeasureDraftCard';
 
 vi.mock('~/stores/FreshNewStore', () => ({
-  useStandardizedTerms: vi.fn(),
+  useFreshDataActions: vi.fn(),
 }));
 
-const mockedUseStandardizedTerms = vi.mocked(useStandardizedTerms);
+const mockedUseFreshDataActions = vi.mocked(useFreshDataActions);
+const createMockActions = (): FreshDataStoreActions => ({
+  loadConfig: vi.fn(),
+  appFetchesConfigOptions: vi.fn(),
+  userSelectsConfig: vi.fn(),
+  userUploadsDataTableFile: vi.fn(),
+  userUploadsDataDictionaryFile: vi.fn(),
+  userUpdatesColumnDescription: vi.fn(),
+  userUpdatesColumnDataType: vi.fn(),
+  userUpdatesColumnStandardizedVariable: vi.fn(),
+  userUpdatesColumnToCollectionMapping: vi.fn(),
+  userCreatesCollection: vi.fn(),
+  userDeletesCollection: vi.fn(),
+  reset: vi.fn(),
+});
 
 describe('useMultiColumnMeasureDraftCard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should create, update, and remove a draft card', () => {
-    mockedUseStandardizedTerms.mockReturnValue({
-      'term-1': { id: 'term-1', label: 'Term 1', standardizedVariableId: 'var-1' },
-    });
+  it('should create, promote, and remove a draft card', () => {
+    const mockActions = createMockActions();
+    const mockAction = vi.fn();
+    mockActions.userCreatesCollection = mockAction;
+    mockedUseFreshDataActions.mockReturnValue(mockActions);
 
     const { result } = renderHook(() => useMultiColumnMeasureDraftCard('var-1'));
 
@@ -33,10 +49,11 @@ describe('useMultiColumnMeasureDraftCard', () => {
     const draftId = result.current.draftMeasureCards[0].id;
 
     act(() => {
-      result.current.updateDraftTerm(draftId, 'term-1');
+      result.current.createCollectionFromDraft(draftId, 'term-1');
     });
 
-    expect(result.current.draftMeasureCards[0].term?.id).toBe('term-1');
+    expect(mockAction).toHaveBeenCalledWith('term-1');
+    expect(result.current.hasDraft).toBe(false);
 
     act(() => {
       result.current.removeDraft(draftId);
@@ -47,7 +64,7 @@ describe('useMultiColumnMeasureDraftCard', () => {
   });
 
   it('should reset the draft when the active variable changes', () => {
-    mockedUseStandardizedTerms.mockReturnValue({});
+    mockedUseFreshDataActions.mockReturnValue(createMockActions());
 
     const { result, rerender } = renderHook(
       ({ variableId }) => useMultiColumnMeasureDraftCard(variableId),
@@ -66,7 +83,7 @@ describe('useMultiColumnMeasureDraftCard', () => {
   });
 
   it('should not create multiple drafts', () => {
-    mockedUseStandardizedTerms.mockReturnValue({});
+    mockedUseFreshDataActions.mockReturnValue(createMockActions());
 
     const { result } = renderHook(() => useMultiColumnMeasureDraftCard('var-1'));
 

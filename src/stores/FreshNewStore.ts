@@ -222,7 +222,7 @@ const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
       }));
     },
 
-    userUpdatesColumnIsPartOf(columnID, termId) {
+    userUpdatesColumnToCollectionMapping(columnID, termId) {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
           if (termId) {
@@ -234,11 +234,29 @@ const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
       }));
     },
 
-    userUpdatesMultiColumnMeasureCards(termId, isCollection) {
+    userCreatesCollection(termId) {
       set((state) => ({
         standardizedTerms: produce(state.standardizedTerms, (draft) => {
           if (draft[termId]) {
-            draft[termId].isCollection = isCollection;
+            draft[termId].isCollection = true;
+          }
+        }),
+      }));
+    },
+
+    userDeletesCollection(termId) {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          Object.entries(draft).reduce((acc, [columnId, column]) => {
+            if (column.isPartOf === termId) {
+              delete draft[columnId].isPartOf;
+            }
+            return acc;
+          }, null as null);
+        }),
+        standardizedTerms: produce(state.standardizedTerms, (draft) => {
+          if (draft[termId]) {
+            draft[termId].isCollection = false;
           }
         }),
       }));

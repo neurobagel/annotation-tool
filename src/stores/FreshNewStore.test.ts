@@ -129,6 +129,7 @@ describe('userSelectsConfig', () => {
     const { result } = renderHook(() => ({
       actions: useFreshDataActions(),
       standardizedTerms: useStandardizedTerms(),
+      columns: useColumns(),
     }));
 
     await act(async () => {
@@ -1092,7 +1093,7 @@ describe('userUpdatesColumnStandardizedVariable', () => {
   });
 });
 
-describe('userUpdatesColumnIsPartOf', () => {
+describe('userUpdatesColumnToCollectionMapping', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -1137,7 +1138,7 @@ describe('userUpdatesColumnIsPartOf', () => {
     const result = await prepareMultiColumnAssessment();
 
     act(() => {
-      result.current.actions.userUpdatesColumnIsPartOf('0', 'snomed:1303696008');
+      result.current.actions.userUpdatesColumnToCollectionMapping('0', 'snomed:1303696008');
     });
 
     expect(result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
@@ -1147,20 +1148,20 @@ describe('userUpdatesColumnIsPartOf', () => {
     const result = await prepareMultiColumnAssessment();
 
     act(() => {
-      result.current.actions.userUpdatesColumnIsPartOf('0', 'snomed:1303696008');
+      result.current.actions.userUpdatesColumnToCollectionMapping('0', 'snomed:1303696008');
     });
 
     expect(result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
 
     act(() => {
-      result.current.actions.userUpdatesColumnIsPartOf('0', null);
+      result.current.actions.userUpdatesColumnToCollectionMapping('0', null);
     });
 
     expect(result.current.columns['0'].isPartOf).toBeUndefined();
   });
 });
 
-describe('userUpdatesMultiColumnMeasureCards', () => {
+describe('userCreatesCollection', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -1189,26 +1190,56 @@ describe('userUpdatesMultiColumnMeasureCards', () => {
     expect(result.current.standardizedTerms['snomed:1303696008'].isCollection).toBe(false);
 
     act(() => {
-      result.current.actions.userUpdatesMultiColumnMeasureCards('snomed:1303696008', true);
+      result.current.actions.userCreatesCollection('snomed:1303696008');
     });
 
     expect(result.current.standardizedTerms['snomed:1303696008'].isCollection).toBe(true);
   });
+});
 
-  it('should set isCollection to false when toggled off', async () => {
+describe('userDeletesCollection', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const initializeTerms = async () => {
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockFreshConfigFile,
+      termsData: mockFreshTermsData,
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      standardizedTerms: useStandardizedTerms(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    return result;
+  };
+
+  it('should set isCollection to false when toggled off and remove column mappings', async () => {
     const result = await initializeTerms();
 
     act(() => {
-      result.current.actions.userUpdatesMultiColumnMeasureCards('snomed:1303696008', true);
+      result.current.actions.userCreatesCollection('snomed:1303696008');
     });
 
     expect(result.current.standardizedTerms['snomed:1303696008'].isCollection).toBe(true);
 
     act(() => {
-      result.current.actions.userUpdatesMultiColumnMeasureCards('snomed:1303696008', false);
+      result.current.actions.userUpdatesColumnToCollectionMapping('0', 'snomed:1303696008');
+    });
+
+    act(() => {
+      result.current.actions.userDeletesCollection('snomed:1303696008');
     });
 
     expect(result.current.standardizedTerms['snomed:1303696008'].isCollection).toBe(false);
+    expect(result.current.columns['0'].isPartOf).toBeUndefined();
   });
 });
 

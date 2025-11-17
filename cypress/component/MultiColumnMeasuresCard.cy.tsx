@@ -27,11 +27,11 @@ const props = {
     },
   ],
   columnOptions: [
-    { id: '1', label: 'participant_id', disabled: true },
-    { id: '2', label: 'age', disabled: false },
-    { id: '3', label: 'sex', disabled: false },
+    { id: '1', label: 'participant_id', isPartOfCollection: true },
+    { id: '2', label: 'age', isPartOfCollection: false },
+    { id: '3', label: 'sex', isPartOfCollection: false },
   ],
-  onTermSelect: () => {},
+  onCreateCollection: () => {},
   onColumnSelect: () => {},
   onRemoveColumn: () => {},
   onRemoveCard: () => {},
@@ -46,7 +46,7 @@ describe('MultiColumnMeasuresCard', () => {
         mappedColumnHeaders={props.mappedColumnHeaders}
         availableTerms={props.availableTerms}
         columnOptions={props.columnOptions}
-        onTermSelect={props.onTermSelect}
+        onCreateCollection={props.onCreateCollection}
         onColumnSelect={props.onColumnSelect}
         onRemoveColumn={props.onRemoveColumn}
         onRemoveCard={props.onRemoveCard}
@@ -66,7 +66,7 @@ describe('MultiColumnMeasuresCard', () => {
         mappedColumnHeaders={props.mappedColumnHeaders}
         availableTerms={props.availableTerms}
         columnOptions={props.columnOptions}
-        onTermSelect={props.onTermSelect}
+        onCreateCollection={props.onCreateCollection}
         onColumnSelect={spy}
         onRemoveColumn={props.onRemoveColumn}
         onRemoveCard={props.onRemoveCard}
@@ -84,7 +84,7 @@ describe('MultiColumnMeasuresCard', () => {
         mappedColumnHeaders={props.mappedColumnHeaders}
         availableTerms={props.availableTerms}
         columnOptions={props.columnOptions}
-        onTermSelect={props.onTermSelect}
+        onCreateCollection={props.onCreateCollection}
         onColumnSelect={props.onColumnSelect}
         onRemoveColumn={spy}
         onRemoveCard={props.onRemoveCard}
@@ -104,7 +104,7 @@ describe('MultiColumnMeasuresCard', () => {
         mappedColumnHeaders={props.mappedColumnHeaders}
         availableTerms={props.availableTerms}
         columnOptions={props.columnOptions}
-        onTermSelect={props.onTermSelect}
+        onCreateCollection={props.onCreateCollection}
         onColumnSelect={props.onColumnSelect}
         onRemoveColumn={props.onRemoveColumn}
         onRemoveCard={spy}

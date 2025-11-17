@@ -68,14 +68,17 @@ describe('MultiColumnMeasures', () => {
       standardizedTerms,
     }));
 
-    cy.spy(useFreshDataStore.getState().actions, 'userUpdatesColumnIsPartOf').as(
-      'userUpdatesColumnIsPartOfSpy'
+    cy.spy(useFreshDataStore.getState().actions, 'userUpdatesColumnToCollectionMapping').as(
+      'userUpdatesColumnToCollectionMappingSpy'
     );
     cy.spy(useFreshDataStore.getState().actions, 'userUpdatesColumnStandardizedVariable').as(
       'userUpdatesColumnStandardizedVariableSpy'
     );
-    cy.spy(useFreshDataStore.getState().actions, 'userUpdatesMultiColumnMeasureCards').as(
-      'userUpdatesMultiColumnMeasureCardsSpy'
+    cy.spy(useFreshDataStore.getState().actions, 'userCreatesCollection').as(
+      'userCreatesCollectionSpy'
+    );
+    cy.spy(useFreshDataStore.getState().actions, 'userDeletesCollection').as(
+      'userDeletesCollectionSpy'
     );
 
     cy.mount(<MultiColumnMeasures />);
@@ -94,7 +97,7 @@ describe('MultiColumnMeasures', () => {
       .and('contain', '1 column assigned');
   });
 
-  it('should fire userUpdatesColumnIsPartOf when a column is mapped to a term', () => {
+  it('should map a column to a collection when selected', () => {
     cy.get('[data-cy="add-term-card-button"]').click();
     cy.get('[data-cy="multi-column-measures-card-1-title-dropdown"]').should('be.visible');
     cy.get('[data-cy="multi-column-measures-card-1-title-dropdown"]').type(
@@ -103,36 +106,31 @@ describe('MultiColumnMeasures', () => {
     cy.get('[data-cy="multi-column-measures-card-1-columns-dropdown"]').type(
       'another column{downArrow}{enter}'
     );
-    cy.get('@userUpdatesColumnIsPartOfSpy').should('have.been.calledWith', '2', 'nb:AnotherTerm');
-    cy.get('@userUpdatesMultiColumnMeasureCardsSpy').should(
+    cy.get('@userUpdatesColumnToCollectionMappingSpy').should(
       'have.been.calledWith',
-      'nb:AnotherTerm',
-      true
+      '2',
+      'nb:AnotherTerm'
     );
+    cy.get('@userCreatesCollectionSpy').should('have.been.calledWith', 'nb:AnotherTerm');
     cy.get('[data-cy="mapped-column-2"]').should('be.visible').and('contain', 'another column');
   });
 
-  it('should fire userUpdatesColumnIsPartOf when a column is removed from a term card', () => {
+  it('should unmap a column when its chip is removed', () => {
     cy.get('[data-cy="mapped-column-1"]').should('be.visible').and('contain', 'some column');
     cy.get('[data-cy="mapped-column-1"] svg').click();
-    cy.get('@userUpdatesColumnIsPartOfSpy').should('have.been.calledWith', '1', null);
+    cy.get('@userUpdatesColumnToCollectionMappingSpy').should('have.been.calledWith', '1', null);
     cy.get('[data-cy="mapped-column-1"]').should('not.exist');
   });
 
-  it('should fire userUpdatesColumnIsPartOf when a populated term card is removed', () => {
+  it('should delete a collection when its card is removed', () => {
     cy.get('[data-cy="remove-card-0-button"]').click();
-    cy.get('@userUpdatesColumnIsPartOfSpy').should('have.been.calledWith', '1', null);
-    cy.get('@userUpdatesMultiColumnMeasureCardsSpy').should(
-      'have.been.calledWith',
-      'nb:SomeTerm',
-      false
-    );
+    cy.get('@userUpdatesColumnToCollectionMappingSpy').should('have.been.calledWith', '1', null);
+    cy.get('@userDeletesCollectionSpy').should('have.been.calledWith', 'nb:SomeTerm');
     cy.get('[data-cy="mapped-column-1"]').should('not.exist');
   });
   it('should fire userUpdatesColumnStandardizedVariable when a column is unassigned', () => {
     cy.get('[data-cy="unassign-column-1"]').click();
     cy.get('@userUpdatesColumnStandardizedVariableSpy').should('have.been.calledWith', '1', null);
-    cy.get('@userUpdatesColumnIsPartOfSpy').should('have.been.calledWith', '1', null);
     cy.get('[data-cy="mapped-column-1"]').should('not.exist');
   });
 });
