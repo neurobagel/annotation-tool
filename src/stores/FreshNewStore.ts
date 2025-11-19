@@ -309,6 +309,14 @@ const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
       }));
     },
 
+    userUpdatesColumnFormat(columnID, formatId) {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          draft[columnID].format = formatId ?? undefined;
+        }),
+      }));
+    },
+
     reset: () => {
       set((state) => ({
         ...initialState,
