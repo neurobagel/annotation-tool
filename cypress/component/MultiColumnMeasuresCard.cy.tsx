@@ -4,7 +4,7 @@ const props = {
   card: {
     id: '1',
     term: {
-      identifier: 'nb:coolTerm',
+      id: 'nb:coolTerm',
       label: 'cool',
     },
     mappedColumns: ['1'],
@@ -16,20 +16,22 @@ const props = {
   },
   availableTerms: [
     {
-      identifier: 'nb:someIdentifier',
+      id: 'nb:someIdentifier',
       label: 'some',
+      disabled: false,
     },
     {
-      identifier: 'nb:anotherIdentifier',
+      id: 'nb:anotherIdentifier',
       label: 'another',
+      disabled: false,
     },
   ],
   columnOptions: [
-    { id: '1', label: 'participant_id', disabled: true },
-    { id: '2', label: 'age', disabled: false },
-    { id: '3', label: 'sex', disabled: false },
+    { id: '1', label: 'participant_id', isPartOfCollection: true },
+    { id: '2', label: 'age', isPartOfCollection: false },
+    { id: '3', label: 'sex', isPartOfCollection: false },
   ],
-  onTermSelect: () => {},
+  onCreateCollection: () => {},
   onColumnSelect: () => {},
   onRemoveColumn: () => {},
   onRemoveCard: () => {},
@@ -44,7 +46,7 @@ describe('MultiColumnMeasuresCard', () => {
         mappedColumnHeaders={props.mappedColumnHeaders}
         availableTerms={props.availableTerms}
         columnOptions={props.columnOptions}
-        onTermSelect={props.onTermSelect}
+        onCreateCollection={props.onCreateCollection}
         onColumnSelect={props.onColumnSelect}
         onRemoveColumn={props.onRemoveColumn}
         onRemoveCard={props.onRemoveCard}
@@ -64,14 +66,14 @@ describe('MultiColumnMeasuresCard', () => {
         mappedColumnHeaders={props.mappedColumnHeaders}
         availableTerms={props.availableTerms}
         columnOptions={props.columnOptions}
-        onTermSelect={props.onTermSelect}
+        onCreateCollection={props.onCreateCollection}
         onColumnSelect={spy}
         onRemoveColumn={props.onRemoveColumn}
         onRemoveCard={props.onRemoveCard}
       />
     );
     cy.get('[data-cy=multi-column-measures-card-1-columns-dropdown]').type('age{downArrow}{enter}');
-    cy.get('@onColumnSelect').should('have.been.calledWith', '2');
+    cy.get('@onColumnSelect').should('have.been.calledWith', 'nb:coolTerm', '2');
   });
   it('fires onRemoveColumn with the appropriate payload when a chip is deleted', () => {
     const spy = cy.spy().as('onRemoveColumn');
@@ -82,7 +84,7 @@ describe('MultiColumnMeasuresCard', () => {
         mappedColumnHeaders={props.mappedColumnHeaders}
         availableTerms={props.availableTerms}
         columnOptions={props.columnOptions}
-        onTermSelect={props.onTermSelect}
+        onCreateCollection={props.onCreateCollection}
         onColumnSelect={props.onColumnSelect}
         onRemoveColumn={spy}
         onRemoveCard={props.onRemoveCard}
@@ -102,7 +104,7 @@ describe('MultiColumnMeasuresCard', () => {
         mappedColumnHeaders={props.mappedColumnHeaders}
         availableTerms={props.availableTerms}
         columnOptions={props.columnOptions}
-        onTermSelect={props.onTermSelect}
+        onCreateCollection={props.onCreateCollection}
         onColumnSelect={props.onColumnSelect}
         onRemoveColumn={props.onRemoveColumn}
         onRemoveCard={spy}

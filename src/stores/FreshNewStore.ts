@@ -222,6 +222,46 @@ const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
       }));
     },
 
+    userUpdatesColumnToCollectionMapping(columnID, termId) {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          if (termId) {
+            draft[columnID].isPartOf = termId;
+          } else {
+            delete draft[columnID].isPartOf;
+          }
+        }),
+      }));
+    },
+
+    userCreatesCollection(termId) {
+      set((state) => ({
+        standardizedTerms: produce(state.standardizedTerms, (draft) => {
+          if (draft[termId]) {
+            draft[termId].isCollection = true;
+          }
+        }),
+      }));
+    },
+
+    userDeletesCollection(termId) {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          Object.entries(draft).reduce((acc, [columnId, column]) => {
+            if (column.isPartOf === termId) {
+              delete draft[columnId].isPartOf;
+            }
+            return acc;
+          }, null as null);
+        }),
+        standardizedTerms: produce(state.standardizedTerms, (draft) => {
+          if (draft[termId]) {
+            draft[termId].isCollection = false;
+          }
+        }),
+      }));
+    },
+
     reset: () => {
       set((state) => ({
         ...initialState,

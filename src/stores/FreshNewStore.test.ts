@@ -129,6 +129,7 @@ describe('userSelectsConfig', () => {
     const { result } = renderHook(() => ({
       actions: useFreshDataActions(),
       standardizedTerms: useStandardizedTerms(),
+      columns: useColumns(),
     }));
 
     await act(async () => {
@@ -1089,6 +1090,156 @@ describe('userUpdatesColumnStandardizedVariable', () => {
     expect(result.current.columns['0'].dataType).toBeNull();
     expect(result.current.columns['0'].levels).toBeUndefined();
     expect(result.current.columns['0'].units).toBeUndefined();
+  });
+});
+
+describe('userUpdatesColumnToCollectionMapping', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const prepareMultiColumnAssessment = async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['assessment'],
+      data: [['100'], ['110'], ['120']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockFreshConfigFile,
+      termsData: mockFreshTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnStandardizedVariable('0', 'nb:Assessment');
+    });
+
+    return result;
+  };
+
+  it('should set isPartOf when provided a term identifier', async () => {
+    const result = await prepareMultiColumnAssessment();
+
+    act(() => {
+      result.current.actions.userUpdatesColumnToCollectionMapping('0', 'snomed:1303696008');
+    });
+
+    expect(result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
+  });
+
+  it('should delete isPartOf when null is provided', async () => {
+    const result = await prepareMultiColumnAssessment();
+
+    act(() => {
+      result.current.actions.userUpdatesColumnToCollectionMapping('0', 'snomed:1303696008');
+    });
+
+    expect(result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
+
+    act(() => {
+      result.current.actions.userUpdatesColumnToCollectionMapping('0', null);
+    });
+
+    expect(result.current.columns['0'].isPartOf).toBeUndefined();
+  });
+});
+
+describe('userCreatesCollection', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const initializeTerms = async () => {
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockFreshConfigFile,
+      termsData: mockFreshTermsData,
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      standardizedTerms: useStandardizedTerms(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    return result;
+  };
+
+  it('should set isCollection to true for the provided term', async () => {
+    const result = await initializeTerms();
+
+    expect(result.current.standardizedTerms['snomed:1303696008'].isCollection).toBe(false);
+
+    act(() => {
+      result.current.actions.userCreatesCollection('snomed:1303696008');
+    });
+
+    expect(result.current.standardizedTerms['snomed:1303696008'].isCollection).toBe(true);
+  });
+});
+
+describe('userDeletesCollection', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const initializeTerms = async () => {
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockFreshConfigFile,
+      termsData: mockFreshTermsData,
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      standardizedTerms: useStandardizedTerms(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    return result;
+  };
+
+  it('should set isCollection to false when toggled off and remove column mappings', async () => {
+    const result = await initializeTerms();
+
+    act(() => {
+      result.current.actions.userCreatesCollection('snomed:1303696008');
+    });
+
+    expect(result.current.standardizedTerms['snomed:1303696008'].isCollection).toBe(true);
+
+    act(() => {
+      result.current.actions.userUpdatesColumnToCollectionMapping('0', 'snomed:1303696008');
+    });
+
+    act(() => {
+      result.current.actions.userDeletesCollection('snomed:1303696008');
+    });
+
+    expect(result.current.standardizedTerms['snomed:1303696008'].isCollection).toBe(false);
+    expect(result.current.columns['0'].isPartOf).toBeUndefined();
   });
 });
 

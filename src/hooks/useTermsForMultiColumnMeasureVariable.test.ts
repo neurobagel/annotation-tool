@@ -1,0 +1,55 @@
+import { renderHook } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { useStandardizedTerms } from '~/stores/FreshNewStore';
+import type { StandardizedTerms } from '../../datamodel';
+import { useTermsForMultiColumnMeasureVariable } from './useTermsForMultiColumnMeasureVariable';
+
+vi.mock('~/stores/FreshNewStore', () => ({
+  useStandardizedTerms: vi.fn(),
+}));
+
+const mockedUseStandardizedTerms = vi.mocked(useStandardizedTerms);
+
+describe('useTermsForMultiColumnMeasureVariable', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should return terms for a variable with disabled reflecting isCollection', () => {
+    const terms: StandardizedTerms = {
+      'term-1': {
+        id: 'term-1',
+        label: 'Term 1',
+        standardizedVariableId: 'var-1',
+        isCollection: true,
+      },
+      'term-2': {
+        id: 'term-2',
+        label: 'Term 2',
+        standardizedVariableId: 'var-1',
+        isCollection: false,
+      },
+      'term-3': {
+        id: 'term-3',
+        label: 'Term 3',
+        standardizedVariableId: 'var-2',
+        isCollection: false,
+      },
+    };
+    mockedUseStandardizedTerms.mockReturnValue(terms);
+
+    const { result } = renderHook(() => useTermsForMultiColumnMeasureVariable('var-1'));
+
+    expect(result.current).toHaveLength(2);
+    expect(result.current.find((term) => term.id === 'term-1')?.disabled).toBe(true);
+    expect(result.current.find((term) => term.id === 'term-2')?.disabled).toBe(false);
+  });
+
+  it('should return empty array when variableId is empty', () => {
+    mockedUseStandardizedTerms.mockReturnValue({});
+
+    const { result } = renderHook(() => useTermsForMultiColumnMeasureVariable(''));
+
+    expect(result.current).toEqual([]);
+  });
+});
