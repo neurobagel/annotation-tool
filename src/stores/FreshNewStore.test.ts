@@ -1317,6 +1317,65 @@ describe('userUpdatesColumnLevelDescription', () => {
   });
 });
 
+describe('userUpdatesColumnLevelTerm', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const setupCategoricalColumn = async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['category'],
+      data: [['A'], ['B'], ['C']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('0', DataType.categorical);
+    });
+
+    return result;
+  };
+
+  it('should assign standardized terms to a level when provided', async () => {
+    const result = await setupCategoricalColumn();
+
+    act(() => {
+      result.current.actions.userUpdatesColumnLevelTerm('0', 'A', 'nb:Term1');
+    });
+
+    expect(result.current.columns['0'].levels?.A.standardizedTerm).toBe('nb:Term1');
+  });
+
+  it('should clear standardized terms when null is provided', async () => {
+    const result = await setupCategoricalColumn();
+
+    act(() => {
+      result.current.actions.userUpdatesColumnLevelTerm('0', 'B', 'nb:Term2');
+    });
+
+    expect(result.current.columns['0'].levels?.B.standardizedTerm).toBe('nb:Term2');
+
+    act(() => {
+      result.current.actions.userUpdatesColumnLevelTerm('0', 'B', null);
+    });
+
+    expect(result.current.columns['0'].levels?.B.standardizedTerm).toBe('');
+  });
+});
+
 describe('userUpdatesColumnUnits', () => {
   beforeEach(() => {
     vi.clearAllMocks();
