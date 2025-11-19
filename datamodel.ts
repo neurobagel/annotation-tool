@@ -136,6 +136,7 @@ export type FreshDataStoreActions = {
   userUpdatesColumnToCollectionMapping: (columnID: string, termId: string | null) => void;
   userCreatesCollection: (termId: string) => void;
   userDeletesCollection: (termId: string) => void;
+  userUpdatesColumnLevelDescription: (columnID: string, value: string, description: string) => void;
   reset: () => void;
 };
 

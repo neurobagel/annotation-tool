@@ -262,6 +262,16 @@ const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
       }));
     },
 
+    userUpdatesColumnLevelDescription(columnID, value, description) {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          if (draft[columnID].levels) {
+            draft[columnID].levels[value].description = description;
+          }
+        }),
+      }));
+    },
+
     reset: () => {
       set((state) => ({
         ...initialState,
