@@ -65,8 +65,8 @@ const appendUnannotatedColumn = (
 
 /**
  * Groups columns for the Value Annotation page.
- * - Annotated group: columns keyed by standardized variable ID with labels
- * - Unannotated group: columns bucketed by data type (categorical, continuous, other)
+ * - Annotated group: columns grouped by standardized variable ID with labels
+ * - Unannotated group: columns grouped by data type (categorical, continuous, other)
  */
 export function useValueAnnotationColumns() {
   const columns = useColumns();
