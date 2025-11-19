@@ -272,6 +272,14 @@ const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
       }));
     },
 
+    userUpdatesColumnUnits(columnID, units) {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          draft[columnID].units = units;
+        }),
+      }));
+    },
+
     reset: () => {
       set((state) => ({
         ...initialState,
