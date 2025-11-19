@@ -1243,6 +1243,80 @@ describe('userDeletesCollection', () => {
   });
 });
 
+describe('userUpdatesColumnLevelDescription', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should update level descriptions for a column', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['category'],
+      data: [['A'], ['B'], ['C']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('0', DataType.categorical);
+      result.current.actions.userUpdatesColumnLevelDescription('0', 'A', 'Group A');
+    });
+
+    expect(result.current.columns['0'].levels?.A.description).toBe('Group A');
+    expect(result.current.columns['0'].levels?.B.description).toBe('');
+  });
+
+  it('should ignore updates when the level entry is absent', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['category'],
+      data: [['A'], ['B'], ['C']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('0', DataType.categorical);
+    });
+
+    expect(result.current.columns['0'].levels).toBeDefined();
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('0', DataType.continuous);
+    });
+
+    expect(result.current.columns['0'].levels).toBeUndefined();
+
+    act(() => {
+      result.current.actions.userUpdatesColumnLevelDescription('0', 'C', 'Category C');
+    });
+
+    expect(result.current.columns['0'].levels).toBeUndefined();
+  });
+});
+
 describe('reset', () => {
   beforeEach(() => {
     vi.clearAllMocks();
