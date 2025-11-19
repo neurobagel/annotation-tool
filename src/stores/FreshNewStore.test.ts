@@ -1383,6 +1383,117 @@ describe('userUpdatesColumnUnits', () => {
   });
 });
 
+describe('userUpdatesColumnMissingValues', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const setupCategoricalColumn = async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['category'],
+      data: [['A'], ['B'], ['C']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('0', DataType.categorical);
+    });
+
+    return result;
+  };
+
+  it('should add missing values and remove them from levels for categorical columns', async () => {
+    const result = await setupCategoricalColumn();
+
+    act(() => {
+      result.current.actions.userUpdatesColumnMissingValues('0', 'A', true);
+    });
+
+    expect(result.current.columns['0'].missingValues).toEqual(['A']);
+    expect(result.current.columns['0'].levels?.A).toBeUndefined();
+
+    act(() => {
+      result.current.actions.userUpdatesColumnMissingValues('0', 'B', true);
+    });
+
+    expect(result.current.columns['0'].missingValues).toEqual(['A', 'B']);
+    expect(result.current.columns['0'].levels?.B).toBeUndefined();
+  });
+
+  it('should remove missing values and reintroduce levels when toggled off', async () => {
+    const result = await setupCategoricalColumn();
+
+    act(() => {
+      result.current.actions.userUpdatesColumnMissingValues('0', 'A', true);
+      result.current.actions.userUpdatesColumnMissingValues('0', 'B', true);
+    });
+
+    expect(result.current.columns['0'].missingValues).toEqual(['A', 'B']);
+
+    act(() => {
+      result.current.actions.userUpdatesColumnMissingValues('0', 'A', false);
+    });
+
+    expect(result.current.columns['0'].missingValues).toEqual(['B']);
+    expect(result.current.columns['0'].levels?.A).toEqual({
+      description: '',
+      standardizedTerm: '',
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnMissingValues('0', 'B', false);
+    });
+
+    expect(result.current.columns['0'].missingValues).toEqual([]);
+    expect(result.current.columns['0'].levels?.B).toEqual({
+      description: '',
+      standardizedTerm: '',
+    });
+  });
+
+  it('should handle non-categorical columns without touching levels', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['value'],
+      data: [['1'], ['2'], ['3']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('0', DataType.continuous);
+      result.current.actions.userUpdatesColumnMissingValues('0', 'N/A', true);
+    });
+
+    expect(result.current.columns['0'].missingValues).toEqual(['N/A']);
+    expect(result.current.columns['0'].levels).toBeUndefined();
+  });
+});
+
 describe('reset', () => {
   beforeEach(() => {
     vi.clearAllMocks();
