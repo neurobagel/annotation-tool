@@ -1,6 +1,6 @@
 name: tests
 permissions:
-  contents: write
+  contents: read
   statuses: write
 
 on:
