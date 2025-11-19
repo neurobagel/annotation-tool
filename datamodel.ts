@@ -138,6 +138,7 @@ export type FreshDataStoreActions = {
   userDeletesCollection: (termId: string) => void;
   userUpdatesColumnLevelDescription: (columnID: string, value: string, description: string) => void;
   userUpdatesColumnUnits: (columnID: string, units: string) => void;
+  userUpdatesColumnMissingValues: (columnID: string, value: string, isMissing: boolean) => void;
   reset: () => void;
 };
 
