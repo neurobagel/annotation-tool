@@ -26,7 +26,8 @@ export function useMultiColumnMeasureTabs(): ActiveMultiColumnVariable {
     }
   }, [activeTab, variables.length]);
 
-  const activeVariable = variables[Math.min(activeTab, variables.length - 1)] ?? variables[0];
+  const activeVariable =
+    variables.length > 0 ? variables[Math.min(activeTab, variables.length - 1)] : undefined;
 
   return {
     variables,
