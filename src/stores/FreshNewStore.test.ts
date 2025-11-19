@@ -1494,6 +1494,78 @@ describe('userUpdatesColumnMissingValues', () => {
   });
 });
 
+describe('userUpdatesColumnFormat', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should set and update the format for a column', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['age'],
+      data: [['25'], ['30'], ['35']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnFormat('0', 'nb:FromFloat');
+    });
+
+    expect(result.current.columns['0'].format).toBe('nb:FromFloat');
+
+    act(() => {
+      result.current.actions.userUpdatesColumnFormat('0', 'nb:FromISO8601');
+    });
+
+    expect(result.current.columns['0'].format).toBe('nb:FromISO8601');
+  });
+
+  it('should clear the format when null is passed', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['age'],
+      data: [['25'], ['30'], ['35']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnFormat('0', 'nb:FromFloat');
+    });
+
+    expect(result.current.columns['0'].format).toBe('nb:FromFloat');
+
+    act(() => {
+      result.current.actions.userUpdatesColumnFormat('0', null);
+    });
+
+    expect(result.current.columns['0'].format).toBeUndefined();
+  });
+});
+
 describe('reset', () => {
   beforeEach(() => {
     vi.clearAllMocks();
