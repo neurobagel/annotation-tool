@@ -272,6 +272,18 @@ const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
       }));
     },
 
+    userUpdatesColumnLevelTerm(columnID, value, termId) {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          if (!draft[columnID].levels || !draft[columnID].levels[value]) {
+            return;
+          }
+
+          draft[columnID].levels[value].standardizedTerm = termId ?? '';
+        }),
+      }));
+    },
+
     userUpdatesColumnUnits(columnID, units) {
       set((state) => ({
         columns: produce(state.columns, (draft) => {

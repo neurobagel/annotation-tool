@@ -137,9 +137,10 @@ export type FreshDataStoreActions = {
   userCreatesCollection: (termId: string) => void;
   userDeletesCollection: (termId: string) => void;
   userUpdatesColumnLevelDescription: (columnID: string, value: string, description: string) => void;
+  userUpdatesColumnLevelTerm: (columnID: string, value: string, termId: string | null) => void;
   userUpdatesColumnUnits: (columnID: string, units: string) => void;
-  userUpdatesColumnMissingValues: (columnID: string, value: string, isMissing: boolean) => void;
   userUpdatesColumnFormat: (columnID: string, formatId: string | null) => void;
+  userUpdatesColumnMissingValues: (columnID: string, value: string, isMissing: boolean) => void;
   reset: () => void;
 };
 
