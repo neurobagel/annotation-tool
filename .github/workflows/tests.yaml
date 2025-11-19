@@ -1,4 +1,8 @@
 name: tests
+permissions:
+  contents: write
+  actions: write
+  statuses: write
 
 on:
   push:
