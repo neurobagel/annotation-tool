@@ -1317,6 +1317,72 @@ describe('userUpdatesColumnLevelDescription', () => {
   });
 });
 
+describe('userUpdatesColumnUnits', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should set units for a column', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['age'],
+      data: [['25'], ['30'], ['35']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnUnits('0', 'years');
+    });
+
+    expect(result.current.columns['0'].units).toBe('years');
+  });
+
+  it('should overwrite existing units', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['age'],
+      data: [['25'], ['30'], ['35']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useFreshDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnUnits('0', 'years');
+    });
+
+    expect(result.current.columns['0'].units).toBe('years');
+
+    act(() => {
+      result.current.actions.userUpdatesColumnUnits('0', 'months');
+    });
+
+    expect(result.current.columns['0'].units).toBe('months');
+  });
+});
+
 describe('reset', () => {
   beforeEach(() => {
     vi.clearAllMocks();
