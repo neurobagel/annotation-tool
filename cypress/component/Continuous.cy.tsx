@@ -1,20 +1,21 @@
 import Continuous from '../../src/components/Continuous';
-import useDataStore from '../../src/stores/data';
-import { mockConfig } from '../../src/utils/mocks';
 
-const props = {
+const baseProps = {
   columnID: '1',
   units: 'some units',
   uniqueValues: ['1', '2', '3', '4', '5'],
   missingValues: [],
-  format: {
-    termURL: 'nb:FromBounded',
-    label: 'bounded',
-  },
-  standardizedVariable: {
-    identifier: 'nb:Age',
-    label: 'Age',
-  },
+  formatId: 'nb:FromBounded',
+  formatOptions: [
+    { id: 'nb:FromFloat', label: 'float', examples: ['31.5'] },
+    { id: 'nb:FromEuro', label: 'euro', examples: ['31,5'] },
+    { id: 'nb:FromBounded', label: 'bounded', examples: ['30+'] },
+    { id: 'nb:FromRange', label: 'range', examples: ['30-35'] },
+    { id: 'nb:FromISO8601', label: 'iso8601', examples: ['31Y6M'] },
+  ],
+  showUnits: true,
+  showFormat: true,
+  showMissingToggle: true,
   onUpdateUnits: () => {},
   onToggleMissingValue: () => {},
   onUpdateFormat: () => {},
@@ -23,53 +24,23 @@ const props = {
 describe('Continuous', () => {
   // Helper function to get the value of a specific row
   const rowValue = (rowIdx: number) =>
-    cy.get(`[data-cy="${props.columnID}-continuous-table"] tbody tr:eq(${rowIdx}) td:eq(0)`);
+    cy.get(`[data-cy="${baseProps.columnID}-continuous-table"] tbody tr:eq(${rowIdx}) td:eq(0)`);
 
-  beforeEach(() => {
-    useDataStore.setState({
-      formatOptions: {
-        'nb:Age': [
-          {
-            termURL: 'nb:FromFloat',
-            label: 'float',
-            examples: ['31.5'],
-          },
-          {
-            termURL: 'nb:FromEuro',
-            label: 'euro',
-            examples: ['31,5'],
-          },
-          {
-            termURL: 'nb:FromBounded',
-            label: 'bounded',
-            examples: ['30+'],
-          },
-          {
-            termURL: 'nb:FromRange',
-            label: 'range',
-            examples: ['30-35'],
-          },
-          {
-            termURL: 'nb:FromISO8601',
-            label: 'iso8601',
-            examples: ['31Y6M'],
-          },
-        ],
-      },
-    });
-  });
-  it('renders the component correctly for an annotated column', () => {
+  it('should render the component correctly for an annotated column', () => {
     cy.mount(
       <Continuous
-        columnID={props.columnID}
-        units={props.units}
-        uniqueValues={props.uniqueValues}
-        missingValues={props.missingValues}
-        format={props.format}
-        standardizedVariable={props.standardizedVariable}
-        onUpdateUnits={props.onUpdateUnits}
-        onToggleMissingValue={props.onToggleMissingValue}
-        onUpdateFormat={props.onUpdateFormat}
+        columnID={baseProps.columnID}
+        units={baseProps.units}
+        uniqueValues={baseProps.uniqueValues}
+        missingValues={baseProps.missingValues}
+        formatId={baseProps.formatId}
+        formatOptions={baseProps.formatOptions}
+        showUnits={baseProps.showUnits}
+        showFormat={baseProps.showFormat}
+        showMissingToggle={baseProps.showMissingToggle}
+        onUpdateUnits={baseProps.onUpdateUnits}
+        onToggleMissingValue={baseProps.onToggleMissingValue}
+        onUpdateFormat={baseProps.onUpdateFormat}
       />
     );
     cy.get('[data-cy="1-description"]').should('be.visible').and('contain', 'some units');
@@ -77,18 +48,21 @@ describe('Continuous', () => {
     cy.get('[data-cy="1-3-missing-value-button-group"]').should('be.visible');
     cy.get('[data-cy="1-format-dropdown"]').should('be.visible');
   });
-  it('renders the component correctly for a unannotated column', () => {
+  it('should render the component correctly for a unannotated column', () => {
     cy.mount(
       <Continuous
-        columnID={props.columnID}
-        units={props.units}
-        uniqueValues={props.uniqueValues}
-        missingValues={props.missingValues}
-        format={props.format}
-        standardizedVariable={null}
-        onUpdateUnits={props.onUpdateUnits}
-        onToggleMissingValue={props.onToggleMissingValue}
-        onUpdateFormat={props.onUpdateFormat}
+        columnID={baseProps.columnID}
+        units={baseProps.units}
+        uniqueValues={baseProps.uniqueValues}
+        missingValues={baseProps.missingValues}
+        formatId={baseProps.formatId}
+        formatOptions={baseProps.formatOptions}
+        showUnits
+        showFormat={false}
+        showMissingToggle={false}
+        onUpdateUnits={baseProps.onUpdateUnits}
+        onToggleMissingValue={baseProps.onToggleMissingValue}
+        onUpdateFormat={baseProps.onUpdateFormat}
       />
     );
     cy.get('[data-cy="1-description"]').should('be.visible').and('contain', 'some units');
@@ -96,18 +70,20 @@ describe('Continuous', () => {
     cy.get('[data-cy="1-format-dropdown"]').should('not.exist');
     cy.get('[data-cy="1-continuous-table"]').should('be.visible');
   });
-  it('fires the onUpdateUnits event handler with the appropriate payload when the description is changed', () => {
+  it('should fire the onUpdateUnits event handler with the appropriate payload when the description is changed', () => {
     const spy = cy.spy().as('spy');
     cy.mount(
       <Continuous
-        columnID={props.columnID}
-        units={props.units}
-        uniqueValues={props.uniqueValues}
-        missingValues={props.missingValues}
-        format={props.format}
+        columnID={baseProps.columnID}
+        units={baseProps.units}
+        uniqueValues={baseProps.uniqueValues}
+        missingValues={baseProps.missingValues}
+        formatId={baseProps.formatId}
+        formatOptions={baseProps.formatOptions}
+        showUnits={baseProps.showUnits}
         onUpdateUnits={spy}
-        onToggleMissingValue={props.onToggleMissingValue}
-        onUpdateFormat={props.onUpdateFormat}
+        onToggleMissingValue={baseProps.onToggleMissingValue}
+        onUpdateFormat={baseProps.onUpdateFormat}
       />
     );
     cy.get('[data-cy="1-description"]').should('be.visible');
@@ -115,55 +91,57 @@ describe('Continuous', () => {
     cy.get('[data-cy="1-description"]').type('new units');
     cy.get('@spy').should('have.been.calledWith', '1', 'new units');
   });
-  it('fires the onToggleMissingValue event handler with the appropriate payload when the missing value button is clicked', () => {
+  it('should fire the onToggleMissingValue event handler with the appropriate payload when the missing value button is clicked', () => {
     const spy = cy.spy().as('spy');
     cy.mount(
       <Continuous
-        columnID={props.columnID}
-        units={props.units}
-        uniqueValues={props.uniqueValues}
-        missingValues={props.missingValues}
-        format={props.format}
-        standardizedVariable={props.standardizedVariable}
-        onUpdateUnits={props.onUpdateUnits}
+        columnID={baseProps.columnID}
+        units={baseProps.units}
+        uniqueValues={baseProps.uniqueValues}
+        missingValues={baseProps.missingValues}
+        formatId={baseProps.formatId}
+        formatOptions={baseProps.formatOptions}
+        showMissingToggle
+        onUpdateUnits={baseProps.onUpdateUnits}
         onToggleMissingValue={spy}
-        onUpdateFormat={props.onUpdateFormat}
+        onUpdateFormat={baseProps.onUpdateFormat}
       />
     );
     cy.get('[data-cy="1-3-missing-value-yes"]').click();
     cy.get('@spy').should('have.been.calledWith', '1', '3', true);
   });
-  it('fires the onUpdateFormat event handler with the appropriate payload when the format is changed', () => {
-    useDataStore.setState({ config: mockConfig });
+  it('should fire the onUpdateFormat event handler with the appropriate payload when the format is changed', () => {
     const spy = cy.spy().as('spy');
     cy.mount(
       <Continuous
-        columnID={props.columnID}
-        units={props.units}
-        uniqueValues={props.uniqueValues}
-        missingValues={props.missingValues}
-        format={props.format}
-        standardizedVariable={props.standardizedVariable}
-        onUpdateUnits={props.onUpdateUnits}
-        onToggleMissingValue={props.onToggleMissingValue}
+        columnID={baseProps.columnID}
+        units={baseProps.units}
+        uniqueValues={baseProps.uniqueValues}
+        missingValues={baseProps.missingValues}
+        formatId={baseProps.formatId}
+        formatOptions={baseProps.formatOptions}
+        showFormat
+        onUpdateUnits={baseProps.onUpdateUnits}
+        onToggleMissingValue={baseProps.onToggleMissingValue}
         onUpdateFormat={spy}
       />
     );
     cy.get('[data-cy="1-format-dropdown"]').type('float{downarrow}{enter}');
-    cy.get('@spy').should('have.been.calledWith', '1', { termURL: 'nb:FromFloat', label: 'float' });
+    cy.get('@spy').should('have.been.calledWith', '1', 'nb:FromFloat');
   });
-  it('sorts values in natural order', () => {
+  it('should sort values in natural order', () => {
     cy.mount(
       <Continuous
-        columnID={props.columnID}
-        units={props.units}
+        columnID={baseProps.columnID}
+        units={baseProps.units}
         uniqueValues={['1', '9', '22', '19', '99', '2']}
         missingValues={[]}
-        format={props.format}
-        standardizedVariable={props.standardizedVariable}
-        onUpdateUnits={props.onUpdateUnits}
-        onToggleMissingValue={props.onToggleMissingValue}
-        onUpdateFormat={props.onUpdateFormat}
+        formatId={baseProps.formatId}
+        formatOptions={baseProps.formatOptions}
+        showMissingToggle
+        onUpdateUnits={baseProps.onUpdateUnits}
+        onToggleMissingValue={baseProps.onToggleMissingValue}
+        onUpdateFormat={baseProps.onUpdateFormat}
       />
     );
 
@@ -194,18 +172,19 @@ describe('Continuous', () => {
     rowValue(5).should('contain', '99');
   });
 
-  it('sorts values by missing status', () => {
+  it('should sort values by missing status', () => {
     cy.mount(
       <Continuous
-        columnID={props.columnID}
-        units={props.units}
+        columnID={baseProps.columnID}
+        units={baseProps.units}
         uniqueValues={['22', '1', '19', '9', '99', '2']}
         missingValues={['9', '22']}
-        format={props.format}
-        standardizedVariable={props.standardizedVariable}
-        onUpdateUnits={props.onUpdateUnits}
-        onToggleMissingValue={props.onToggleMissingValue}
-        onUpdateFormat={props.onUpdateFormat}
+        formatId={baseProps.formatId}
+        formatOptions={baseProps.formatOptions}
+        showMissingToggle
+        onUpdateUnits={baseProps.onUpdateUnits}
+        onToggleMissingValue={baseProps.onToggleMissingValue}
+        onUpdateFormat={baseProps.onUpdateFormat}
       />
     );
 
