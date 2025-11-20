@@ -1,10 +1,57 @@
-import { mockColumns, mockConfig, mockDataTable } from '~/utils/mocks';
-import ValueAnnotationTabs from '../../src/components/ValueAnnotationTabs';
-import useDataStore from '../../src/stores/data';
+import { DataType } from '../../datamodel';
+import ValueAnnotationTabs, {
+  type ValueAnnotationTabColumn,
+} from '../../src/components/ValueAnnotationTabs';
+
+const columnOrder = ['1', '2'];
+
+const columns: Record<string, ValueAnnotationTabColumn> = {
+  '1': {
+    id: '1',
+    name: 'age',
+    dataType: DataType.continuous,
+    uniqueValues: ['25', '30', '35'],
+    levels: {},
+    missingValues: [],
+    units: '',
+    formatId: 'nb:FromFloat',
+    termOptions: [],
+    formatOptions: [
+      { id: 'nb:FromFloat', label: 'float', examples: ['31.5'] },
+      { id: 'nb:FromEuro', label: 'euro', examples: ['31,5'] },
+    ],
+    showStandardizedTerm: false,
+    showMissingToggle: true,
+    showFormat: true,
+    showUnits: true,
+  },
+  '2': {
+    id: '2',
+    name: 'sex',
+    dataType: DataType.categorical,
+    uniqueValues: ['M', 'F', 'N/A'],
+    levels: {
+      M: { description: 'Male', standardizedTerm: 'term:male' },
+      F: { description: 'Female', standardizedTerm: 'term:female' },
+    },
+    missingValues: ['N/A'],
+    units: '',
+    formatId: null,
+    termOptions: [
+      { id: 'term:male', label: 'Male' },
+      { id: 'term:female', label: 'Female' },
+    ],
+    formatOptions: [],
+    showStandardizedTerm: true,
+    showMissingToggle: true,
+    showFormat: false,
+    showUnits: true,
+  },
+};
 
 const props = {
-  columns: mockColumns,
-  dataTable: mockDataTable,
+  columns,
+  columnOrder,
   onUpdateDescription: () => {},
   onUpdateUnits: () => {},
   onToggleMissingValue: () => {},
@@ -13,33 +60,11 @@ const props = {
 };
 
 describe('ValueAnnotationTabs', () => {
-  beforeEach(() => {
-    useDataStore.setState({
-      config: mockConfig,
-      formatOptions: {
-        'nb:Age': [
-          {
-            termURL: 'nb:FromFloat',
-            label: 'float',
-            examples: ['31.5'],
-          },
-          {
-            termURL: 'nb:FromEuro',
-            label: 'euro',
-            examples: ['31,5'],
-          },
-        ],
-      },
-      termOptions: {
-        'nb:Sex': [{ identifier: 'test', label: 'test' }],
-      },
-    });
-  });
-  it('renders the component correctly', () => {
+  it('should render the component correctly', () => {
     cy.mount(
       <ValueAnnotationTabs
         columns={props.columns}
-        dataTable={props.dataTable}
+        columnOrder={props.columnOrder}
         onUpdateDescription={props.onUpdateDescription}
         onUpdateUnits={props.onUpdateUnits}
         onToggleMissingValue={props.onToggleMissingValue}
@@ -48,19 +73,16 @@ describe('ValueAnnotationTabs', () => {
       />
     );
     cy.get('[data-cy="value-annotation-tabs"]').should('be.visible');
-    cy.get('[data-cy="1-tab"]').should('be.visible').and('contain', 'participant_id');
-    cy.get('[data-cy="2-tab"]').should('be.visible').and('contain', 'age');
-    cy.get('[data-cy="3-tab"]').should('be.visible').and('contain', 'sex');
-    cy.get('[data-cy="4-tab"]').should('be.visible').and('contain', 'group_dx');
-    cy.get('[data-cy="5-tab"]').should('be.visible').and('contain', 'group');
-    cy.get('[data-cy="6-tab"]').should('be.visible').and('contain', 'iq');
+    cy.get('[data-cy="1-tab"]').should('be.visible').and('contain', 'age');
+    cy.get('[data-cy="2-tab"]').should('be.visible').and('contain', 'sex');
   });
-  it('fires onUpdateDescription with the appropriate payload when the description is updated', () => {
-    const spy = cy.spy().as('spy');
+
+  it('should fire onUpdateDescription when editing a level description', () => {
+    const spy = cy.spy().as('updateDescription');
     cy.mount(
       <ValueAnnotationTabs
         columns={props.columns}
-        dataTable={props.dataTable}
+        columnOrder={props.columnOrder}
         onUpdateDescription={spy}
         onUpdateUnits={props.onUpdateUnits}
         onToggleMissingValue={props.onToggleMissingValue}
@@ -68,18 +90,19 @@ describe('ValueAnnotationTabs', () => {
         onUpdateLevelTerm={props.onUpdateLevelTerm}
       />
     );
-    cy.get('[data-cy="3-tab"]').click();
-    cy.get('[data-cy="3-M-description"]').should('be.visible');
-    cy.get('[data-cy="3-M-description"]').first().clear();
-    cy.get('[data-cy="3-M-description"]').type('new units');
-    cy.get('@spy').should('have.been.calledWith', '3', 'M', 'new units');
+    cy.get('[data-cy="2-tab"]').click();
+    cy.get('[data-cy="2-M-description"]').should('be.visible');
+    cy.get('[data-cy="2-M-description"] textarea').first().clear();
+    cy.get('[data-cy="2-M-description"]').type('updated');
+    cy.get('@updateDescription').should('have.been.calledWith', '2', 'M', 'updated');
   });
-  it('fires onUpdateUnits with the appropriate payload when the units field is updated', () => {
-    const spy = cy.spy().as('spy');
+
+  it('should fire onUpdateUnits when editing units', () => {
+    const spy = cy.spy().as('updateUnits');
     cy.mount(
       <ValueAnnotationTabs
         columns={props.columns}
-        dataTable={props.dataTable}
+        columnOrder={props.columnOrder}
         onUpdateDescription={props.onUpdateDescription}
         onUpdateUnits={spy}
         onToggleMissingValue={props.onToggleMissingValue}
@@ -87,17 +110,19 @@ describe('ValueAnnotationTabs', () => {
         onUpdateLevelTerm={props.onUpdateLevelTerm}
       />
     );
-    cy.get('[data-cy="2-tab"]').click();
-    cy.get('[data-cy="2-description"]').should('be.visible');
-    cy.get('[data-cy="2-description"]').type('new units');
-    cy.get('@spy').should('have.been.calledWith', '2', 'new units');
+    cy.get('[data-cy="1-tab"]').click();
+    cy.get('[data-cy="1-description"]').should('be.visible');
+    cy.get('[data-cy="1-description"] textarea').first().clear();
+    cy.get('[data-cy="1-description"]').type('years');
+    cy.get('@updateUnits').should('have.been.calledWith', '1', 'years');
   });
-  it('fires onToggleMissingValue with the appropriate payload when the missing value button is clicked', () => {
-    const spy = cy.spy().as('spy');
+
+  it('should fire onToggleMissingValue when toggling missing values', () => {
+    const spy = cy.spy().as('toggleMissing');
     cy.mount(
       <ValueAnnotationTabs
         columns={props.columns}
-        dataTable={props.dataTable}
+        columnOrder={props.columnOrder}
         onUpdateDescription={props.onUpdateDescription}
         onUpdateUnits={props.onUpdateUnits}
         onToggleMissingValue={spy}
@@ -105,16 +130,17 @@ describe('ValueAnnotationTabs', () => {
         onUpdateLevelTerm={props.onUpdateLevelTerm}
       />
     );
-    cy.get('[data-cy="2-tab"]').click();
-    cy.get('[data-cy="2-23-missing-value-yes"]').click();
-    cy.get('@spy').should('have.been.calledWith', '2', '23', true);
+    cy.get('[data-cy="1-tab"]').click();
+    cy.get('[data-cy="1-35-missing-value-yes"]').click();
+    cy.get('@toggleMissing').should('have.been.calledWith', '1', '35', true);
   });
-  it('fires onUpdateFormat with the appropriate payload when the format field is updated', () => {
-    const spy = cy.spy().as('spy');
+
+  it('should fire onUpdateFormat when selecting a format', () => {
+    const spy = cy.spy().as('updateFormat');
     cy.mount(
       <ValueAnnotationTabs
         columns={props.columns}
-        dataTable={props.dataTable}
+        columnOrder={props.columnOrder}
         onUpdateDescription={props.onUpdateDescription}
         onUpdateUnits={props.onUpdateUnits}
         onToggleMissingValue={props.onToggleMissingValue}
@@ -122,16 +148,27 @@ describe('ValueAnnotationTabs', () => {
         onUpdateLevelTerm={props.onUpdateLevelTerm}
       />
     );
-    cy.get('[data-cy="2-tab"]').click();
-    cy.get('[data-cy="2-format-dropdown"]').type('euro{downArrow}{Enter}');
-    cy.get('@spy').should('have.been.calledWith', '2', { termURL: 'nb:FromEuro', label: 'euro' });
+    cy.get('[data-cy="1-tab"]').click();
+    cy.get('[data-cy="1-format-dropdown"]').type('euro{downArrow}{Enter}');
+    cy.get('@updateFormat').should('have.been.calledWith', '1', 'nb:FromEuro');
   });
-  it('fires onUpdateLevelTerm with the appropriate payload when the level term is updated', () => {
-    const spy = cy.spy().as('spy');
+
+  it('should fire onUpdateLevelTerm when selecting a standardized term', () => {
+    const spy = cy.spy().as('updateLevelTerm');
+    const columnsWithoutTerm = {
+      ...props.columns,
+      '2': {
+        ...props.columns['2'],
+        levels: {
+          M: { description: 'Male', standardizedTerm: 'term:male' },
+          F: { description: 'Female', standardizedTerm: undefined },
+        },
+      },
+    };
     cy.mount(
       <ValueAnnotationTabs
-        columns={props.columns}
-        dataTable={props.dataTable}
+        columns={columnsWithoutTerm}
+        columnOrder={props.columnOrder}
         onUpdateDescription={props.onUpdateDescription}
         onUpdateUnits={props.onUpdateUnits}
         onToggleMissingValue={props.onToggleMissingValue}
@@ -139,11 +176,8 @@ describe('ValueAnnotationTabs', () => {
         onUpdateLevelTerm={spy}
       />
     );
-    cy.get('[data-cy="3-tab"]').click();
-    cy.get('[data-cy="3-F-term-dropdown"]').type('test{downArrow}{Enter}');
-    cy.get('@spy').should('have.been.calledWith', '3', 'F', {
-      identifier: 'test',
-      label: 'test',
-    });
+    cy.get('[data-cy="2-tab"]').click();
+    cy.get('[data-cy="2-F-term-dropdown"]').type('Female{downArrow}{Enter}');
+    cy.get('@updateLevelTerm').should('have.been.calledWith', '2', 'F', 'term:female');
   });
 });
