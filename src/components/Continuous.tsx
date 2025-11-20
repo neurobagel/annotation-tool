@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Paper,
   Table,
   TableBody,
@@ -6,13 +7,11 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Autocomplete,
   TextField,
 } from '@mui/material';
 import { useState } from 'react';
 import { useSortedValues } from '~/hooks';
-import useDataStore from '~/stores/data';
-import { StandardizedVariable, TermFormat } from '~/utils/internal_types';
+import { FormatOption } from '~/hooks/useFormatOptions';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueGroupButton from './MissingValueGroupButton';
 import SortCell from './SortCell';
@@ -22,16 +21,21 @@ interface ContinuousProps {
   units: string;
   uniqueValues: string[];
   missingValues: string[];
-  format?: TermFormat;
-  standardizedVariable?: StandardizedVariable | null;
+  formatId?: string | null;
+  formatOptions: FormatOption[];
+  showUnits?: boolean;
+  showFormat?: boolean;
+  showMissingToggle?: boolean;
   onUpdateUnits: (columnID: string, units: string) => void;
   onToggleMissingValue: (columnID: string, value: string, isMissing: boolean) => void;
-  onUpdateFormat: (columnID: string, format: { termURL: string; label: string } | null) => void;
+  onUpdateFormat: (columnID: string, formatId: string | null) => void;
 }
 
 const defaultProps = {
-  standardizedVariable: null,
-  format: null,
+  formatId: null,
+  showUnits: true,
+  showFormat: true,
+  showMissingToggle: false,
 };
 
 function Continuous({
@@ -39,23 +43,15 @@ function Continuous({
   units,
   uniqueValues,
   missingValues,
-  format,
-  standardizedVariable,
+  formatId = null,
+  formatOptions,
+  showUnits = true,
+  showFormat = true,
+  showMissingToggle = false,
   onUpdateUnits,
   onToggleMissingValue,
   onUpdateFormat,
 }: ContinuousProps) {
-  const columns = useDataStore((state) => state.columns);
-  const formatOptions = useDataStore((state) => state.formatOptions);
-
-  const columnIsMultiColumnMeasure = useDataStore((state) =>
-    state.isMultiColumnMeasureStandardizedVariable(standardizedVariable)
-  );
-
-  const showFormat = standardizedVariable && !columnIsMultiColumnMeasure;
-  // Don't show units when the variable is a multi column measure and its data type is null
-  const showUnits = !(columnIsMultiColumnMeasure && columns[columnID].variableType === null);
-
   const [sortBy, setSortBy] = useState<'value' | 'missing'>('value');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
@@ -85,11 +81,11 @@ function Continuous({
                         setSortDir('asc');
                       }
                     }}
-                    width={standardizedVariable ? '60%' : undefined}
+                    width={showMissingToggle ? '60%' : undefined}
                     isActive={sortBy === 'value'}
                     dataCy={`${columnID}-sort-values-button`}
                   />
-                  {standardizedVariable && (
+                  {showMissingToggle && (
                     <SortCell
                       label="Treat as missing value"
                       sortDir={sortDir}
@@ -115,7 +111,7 @@ function Continuous({
                     <TableCell align="left" data-cy={`${columnID}-${value}-${index}-value`}>
                       {value}
                     </TableCell>
-                    {standardizedVariable && (
+                    {showMissingToggle && (
                       <TableCell align="center">
                         <MissingValueGroupButton
                           // eslint-disable-next-line react/no-array-index-key
@@ -150,7 +146,7 @@ function Continuous({
           {showFormat && (
             <Autocomplete
               data-cy={`${columnID}-format-dropdown`}
-              options={formatOptions[standardizedVariable.identifier] || []}
+              options={formatOptions}
               getOptionLabel={(option) => option.label}
               renderOption={(props, option) => (
                 // eslint-disable-next-line react/jsx-props-no-spreading
@@ -165,21 +161,9 @@ function Continuous({
                   </div>
                 </li>
               )}
-              value={
-                (formatOptions[standardizedVariable.identifier] || []).find(
-                  (opt) => opt.termURL === format?.termURL
-                ) || null
-              }
+              value={formatOptions.find((opt) => opt.id === formatId) || null}
               onChange={(_, newValue) => {
-                onUpdateFormat(
-                  columnID,
-                  newValue
-                    ? {
-                        termURL: newValue.termURL,
-                        label: newValue.label,
-                      }
-                    : null
-                );
+                onUpdateFormat(columnID, newValue?.id ?? null);
               }}
               renderInput={(params) => (
                 // eslint-disable-next-line react/jsx-props-no-spreading
