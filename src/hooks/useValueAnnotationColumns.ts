@@ -1,7 +1,7 @@
-import { DataType, Columns, StandardizedVariables } from '../../datamodel';
+import { DataType, Columns, StandardizedVariables, VariableType } from '../../datamodel';
 import { useColumns, useStandardizedVariables } from '../stores/FreshNewStore';
 
-interface ColumnGroupColumn {
+export interface ColumnGroupColumn {
   id: string;
   column: Columns[string];
 }
@@ -77,6 +77,11 @@ export function useValueAnnotationColumns() {
       const entry = { id: columnId, column };
 
       if (column.standardizedVariable) {
+        const standardizedVariable = standardizedVariables[column.standardizedVariable];
+        if (standardizedVariable?.variable_type === VariableType.identifier) {
+          return acc;
+        }
+
         return {
           ...acc,
           annotatedGroups: appendAnnotatedColumn(

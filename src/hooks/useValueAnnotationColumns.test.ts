@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useColumns, useStandardizedVariables } from '~/stores/FreshNewStore';
 import type { Columns, StandardizedVariables } from '../../datamodel';
-import { DataType } from '../../datamodel';
+import { DataType, VariableType } from '../../datamodel';
 import { useValueAnnotationColumns } from './useValueAnnotationColumns';
 
 vi.mock('~/stores/FreshNewStore', () => ({
@@ -41,10 +41,22 @@ describe('useValueAnnotationColumns', () => {
         dataType: DataType.categorical,
         standardizedVariable: 'nb:Sex',
       },
+      '4': {
+        id: '4',
+        name: 'Participant ID',
+        allValues: [],
+        dataType: DataType.categorical,
+        standardizedVariable: 'nb:ParticipantID',
+      },
     };
     const variables: StandardizedVariables = {
       'nb:Age': { id: 'nb:Age', name: 'Age' },
       'nb:Sex': { id: 'nb:Sex', name: 'Sex' },
+      'nb:ParticipantID': {
+        id: 'nb:ParticipantID',
+        name: 'Participant ID',
+        variable_type: VariableType.identifier,
+      },
     };
 
     mockedUseColumns.mockReturnValue(columns);
