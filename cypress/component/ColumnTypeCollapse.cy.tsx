@@ -47,7 +47,7 @@ const groupedColumns: ColumnGroupColumn[] = [
 ];
 
 describe('ColumnTypeCollapse', () => {
-  it('renders non-multi-column groups and toggles visibility', () => {
+  it('should render non-multi-column groups and toggles visibility', () => {
     cy.mount(
       <ColumnTypeCollapse
         label="continuous"
@@ -63,7 +63,7 @@ describe('ColumnTypeCollapse', () => {
     cy.get('[data-cy="side-column-nav-bar-continuous-participant_id"]').should('not.be.visible');
   });
 
-  it('renders multi-column grouped variables', () => {
+  it('should render multi-column grouped variables', () => {
     cy.mount(
       <ColumnTypeCollapse
         label="assessment tool"
@@ -91,7 +91,7 @@ describe('ColumnTypeCollapse', () => {
     );
   });
 
-  it('fires onSelect when header is clicked', () => {
+  it('should fire onSelect when header is clicked', () => {
     const spy = cy.spy().as('onSelect');
     cy.mount(
       <ColumnTypeCollapse
