@@ -1,11 +1,18 @@
+import { useState } from 'react';
 import { DataType } from '../../datamodel';
 import ValueAnnotationTabs, {
-  type ValueAnnotationTabColumn,
+  type ValueAnnotationTabMetadata,
 } from '../../src/components/ValueAnnotationTabs';
+import type { ActiveValueAnnotationColumn } from '../../src/hooks/useValueAnnotationColumn';
 
 const columnOrder = ['1', '2'];
 
-const columns: Record<string, ValueAnnotationTabColumn> = {
+const columnsMeta: Record<string, ValueAnnotationTabMetadata> = {
+  '1': { id: '1', name: 'age', dataType: DataType.continuous },
+  '2': { id: '2', name: 'sex', dataType: DataType.categorical },
+};
+
+const columnData: Record<string, ActiveValueAnnotationColumn> = {
   '1': {
     id: '1',
     name: 'age',
@@ -50,8 +57,9 @@ const columns: Record<string, ValueAnnotationTabColumn> = {
 };
 
 const props = {
-  columns,
   columnOrder,
+  columnsMeta,
+  columnData,
   onUpdateDescription: () => {},
   onUpdateUnits: () => {},
   onToggleMissingValue: () => {},
@@ -59,12 +67,59 @@ const props = {
   onUpdateLevelTerm: () => {},
 };
 
+type TestHarnessProps = {
+  initialActiveColumnId?: string;
+  columnOrder: string[];
+  columnsMeta: typeof columnsMeta;
+  columnData: typeof columnData;
+  onUpdateDescription: (columnID: string, value: string, description: string) => void;
+  onUpdateUnits: (columnID: string, units: string) => void;
+  onToggleMissingValue: (columnID: string, value: string, isMissing: boolean) => void;
+  onUpdateFormat: (columnID: string, formatId: string | null) => void;
+  onUpdateLevelTerm: (columnID: string, value: string, termId: string | null) => void;
+};
+
+function TestHarness({
+  initialActiveColumnId,
+  columnOrder: order,
+  columnsMeta: meta,
+  columnData: data,
+  onUpdateDescription,
+  onUpdateUnits,
+  onToggleMissingValue,
+  onUpdateFormat,
+  onUpdateLevelTerm,
+}: TestHarnessProps) {
+  const initialId = initialActiveColumnId ?? order[0] ?? '1';
+  const [activeColumnId, setActiveColumnId] = useState(initialId);
+
+  return (
+    <ValueAnnotationTabs
+      columnOrder={order}
+      columnsMeta={meta}
+      activeColumnId={activeColumnId}
+      activeColumn={data[activeColumnId]}
+      onChangeActiveColumn={setActiveColumnId}
+      onUpdateDescription={onUpdateDescription}
+      onUpdateUnits={onUpdateUnits}
+      onToggleMissingValue={onToggleMissingValue}
+      onUpdateFormat={onUpdateFormat}
+      onUpdateLevelTerm={onUpdateLevelTerm}
+    />
+  );
+}
+
+TestHarness.defaultProps = {
+  initialActiveColumnId: '1',
+};
+
 describe('ValueAnnotationTabs', () => {
   it('should render the component correctly', () => {
     cy.mount(
-      <ValueAnnotationTabs
-        columns={props.columns}
+      <TestHarness
         columnOrder={props.columnOrder}
+        columnsMeta={props.columnsMeta}
+        columnData={props.columnData}
         onUpdateDescription={props.onUpdateDescription}
         onUpdateUnits={props.onUpdateUnits}
         onToggleMissingValue={props.onToggleMissingValue}
@@ -80,9 +135,11 @@ describe('ValueAnnotationTabs', () => {
   it('should fire onUpdateDescription when editing a level description', () => {
     const spy = cy.spy().as('updateDescription');
     cy.mount(
-      <ValueAnnotationTabs
-        columns={props.columns}
+      <TestHarness
+        initialActiveColumnId="2"
         columnOrder={props.columnOrder}
+        columnsMeta={props.columnsMeta}
+        columnData={props.columnData}
         onUpdateDescription={spy}
         onUpdateUnits={props.onUpdateUnits}
         onToggleMissingValue={props.onToggleMissingValue}
@@ -90,7 +147,6 @@ describe('ValueAnnotationTabs', () => {
         onUpdateLevelTerm={props.onUpdateLevelTerm}
       />
     );
-    cy.get('[data-cy="2-tab"]').click();
     cy.get('[data-cy="2-M-description"]').should('be.visible');
     cy.get('[data-cy="2-M-description"] textarea').first().clear();
     cy.get('[data-cy="2-M-description"]').type('updated');
@@ -100,9 +156,10 @@ describe('ValueAnnotationTabs', () => {
   it('should fire onUpdateUnits when editing units', () => {
     const spy = cy.spy().as('updateUnits');
     cy.mount(
-      <ValueAnnotationTabs
-        columns={props.columns}
+      <TestHarness
         columnOrder={props.columnOrder}
+        columnsMeta={props.columnsMeta}
+        columnData={props.columnData}
         onUpdateDescription={props.onUpdateDescription}
         onUpdateUnits={spy}
         onToggleMissingValue={props.onToggleMissingValue}
@@ -120,9 +177,10 @@ describe('ValueAnnotationTabs', () => {
   it('should fire onToggleMissingValue when toggling missing values', () => {
     const spy = cy.spy().as('toggleMissing');
     cy.mount(
-      <ValueAnnotationTabs
-        columns={props.columns}
+      <TestHarness
         columnOrder={props.columnOrder}
+        columnsMeta={props.columnsMeta}
+        columnData={props.columnData}
         onUpdateDescription={props.onUpdateDescription}
         onUpdateUnits={props.onUpdateUnits}
         onToggleMissingValue={spy}
@@ -138,9 +196,10 @@ describe('ValueAnnotationTabs', () => {
   it('should fire onUpdateFormat when selecting a format', () => {
     const spy = cy.spy().as('updateFormat');
     cy.mount(
-      <ValueAnnotationTabs
-        columns={props.columns}
+      <TestHarness
         columnOrder={props.columnOrder}
+        columnsMeta={props.columnsMeta}
+        columnData={props.columnData}
         onUpdateDescription={props.onUpdateDescription}
         onUpdateUnits={props.onUpdateUnits}
         onToggleMissingValue={props.onToggleMissingValue}
@@ -155,10 +214,10 @@ describe('ValueAnnotationTabs', () => {
 
   it('should fire onUpdateLevelTerm when selecting a standardized term', () => {
     const spy = cy.spy().as('updateLevelTerm');
-    const columnsWithoutTerm = {
-      ...props.columns,
+    const dataWithoutTerm = {
+      ...props.columnData,
       '2': {
-        ...props.columns['2'],
+        ...props.columnData['2'],
         levels: {
           M: { description: 'Male', standardizedTerm: 'term:male' },
           F: { description: 'Female', standardizedTerm: undefined },
@@ -166,9 +225,11 @@ describe('ValueAnnotationTabs', () => {
       },
     };
     cy.mount(
-      <ValueAnnotationTabs
-        columns={columnsWithoutTerm}
+      <TestHarness
+        initialActiveColumnId="2"
         columnOrder={props.columnOrder}
+        columnsMeta={props.columnsMeta}
+        columnData={dataWithoutTerm}
         onUpdateDescription={props.onUpdateDescription}
         onUpdateUnits={props.onUpdateUnits}
         onToggleMissingValue={props.onToggleMissingValue}
@@ -176,7 +237,6 @@ describe('ValueAnnotationTabs', () => {
         onUpdateLevelTerm={spy}
       />
     );
-    cy.get('[data-cy="2-tab"]').click();
     cy.get('[data-cy="2-F-term-dropdown"]').type('Female{downArrow}{Enter}');
     cy.get('@updateLevelTerm').should('have.been.calledWith', '2', 'F', 'term:female');
   });
