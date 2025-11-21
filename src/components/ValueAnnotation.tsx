@@ -1,46 +1,47 @@
 import { Paper, Typography, List, ListItem, ListItemText } from '@mui/material';
 import { useState } from 'react';
-import useDataStore from '../stores/data';
+import { useColumnsMetadata } from '../hooks/useColumnsMetadata';
+import { useValueAnnotationColumn } from '../hooks/useValueAnnotationColumn';
+import { useValueAnnotationNavData } from '../hooks/useValueAnnotationNavData';
+import { useFreshDataActions } from '../stores/FreshNewStore';
 import { ValueAnnotationInstructions } from '../utils/instructions';
-import { Columns } from '../utils/internal_types';
 import Instruction from './Instruction';
 import SideColumnNavBar from './SideColumnNavBar';
 import ValueAnnotationTabs from './ValueAnnotationTabs';
 
 function ValueAnnotation() {
   const {
-    columns,
-    dataTable,
-    updateColumnLevelDescription,
-    updateColumnUnits,
-    updateColumnMissingValues,
-    updateColumnFormat,
-    updateColumnLevelTerm,
-  } = useDataStore();
+    userUpdatesColumnLevelDescription,
+    userUpdatesColumnUnits,
+    userUpdatesColumnMissingValues,
+    userUpdatesColumnFormat,
+    userUpdatesColumnLevelTerm,
+  } = useFreshDataActions();
   const [selectedColumnIds, setSelectedColumnIds] = useState<string[]>([]);
+  const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
+  const navData = useValueAnnotationNavData();
 
   const handleSelect = (params: {
     columnIDs: string[];
     dataType?: 'Categorical' | 'Continuous' | null;
   }) => {
     setSelectedColumnIds(params.columnIDs);
+    setActiveColumnId((current) => {
+      if (params.columnIDs.length === 0) {
+        return null;
+      }
+      if (!current || !params.columnIDs.includes(current)) {
+        return params.columnIDs[0];
+      }
+      return current;
+    });
   };
 
-  const filteredColumns = selectedColumnIds.reduce(
-    (acc, columnId) => ({
-      ...acc,
-      [columnId]: columns[columnId],
-    }),
-    {} as Columns
-  );
+  const columnMetadata = useColumnsMetadata(selectedColumnIds);
 
-  const filteredDataTable = selectedColumnIds.reduce(
-    (acc, columnId) => ({
-      ...acc,
-      [columnId]: dataTable[columnId],
-    }),
-    {} as Record<string, string[]>
-  );
+  const unknownDataTypeColumns = selectedColumnIds.filter((id) => !columnMetadata[id]?.dataType);
+
+  const activeColumn = useValueAnnotationColumn(activeColumnId);
 
   const renderContent = () => {
     if (selectedColumnIds.length === 0) {
@@ -54,10 +55,6 @@ function ValueAnnotation() {
         </Paper>
       );
     }
-
-    const unknownDataTypeColumns = selectedColumnIds.filter(
-      (id) => !filteredColumns[id].variableType
-    );
 
     if (unknownDataTypeColumns.length !== 0) {
       return (
@@ -73,7 +70,7 @@ function ValueAnnotation() {
             <List dense sx={{ listStyleType: 'disc', pl: 4 }}>
               {unknownDataTypeColumns.map((columnId) => (
                 <ListItem key={columnId} sx={{ display: 'list-item' }}>
-                  <ListItemText primary={filteredColumns[columnId].header} />
+                  <ListItemText primary={columnMetadata[columnId]?.name || columnId} />
                 </ListItem>
               ))}
             </List>
@@ -82,15 +79,26 @@ function ValueAnnotation() {
       );
     }
 
+    if (!activeColumn || !activeColumnId) {
+      return (
+        <Paper elevation={3} className="flex h-full items-center justify-center shadow-lg">
+          <Typography variant="h6">Selected column data is unavailable.</Typography>
+        </Paper>
+      );
+    }
+
     return (
       <ValueAnnotationTabs
-        columns={filteredColumns}
-        dataTable={filteredDataTable}
-        onUpdateDescription={updateColumnLevelDescription}
-        onUpdateUnits={updateColumnUnits}
-        onToggleMissingValue={updateColumnMissingValues}
-        onUpdateFormat={updateColumnFormat}
-        onUpdateLevelTerm={updateColumnLevelTerm}
+        columnOrder={selectedColumnIds}
+        columnsMeta={columnMetadata}
+        activeColumnId={activeColumnId}
+        activeColumn={activeColumn}
+        onChangeActiveColumn={setActiveColumnId}
+        onUpdateDescription={userUpdatesColumnLevelDescription}
+        onUpdateUnits={userUpdatesColumnUnits}
+        onToggleMissingValue={userUpdatesColumnMissingValues}
+        onUpdateFormat={userUpdatesColumnFormat}
+        onUpdateLevelTerm={userUpdatesColumnLevelTerm}
       />
     );
   };
@@ -104,7 +112,8 @@ function ValueAnnotation() {
       </div>
       <div className="flex w-full max-h-[calc(100vh-320px)] space-x-4">
         <SideColumnNavBar
-          columns={columns}
+          annotatedGroups={navData.annotatedGroups}
+          unannotatedGroups={navData.unannotatedGroups}
           onSelect={handleSelect}
           selectedColumnId={selectedColumnIds[0] || null}
         />
