@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useColumns } from '../stores/FreshNewStore';
 
 /**
@@ -5,7 +6,15 @@ import { useColumns } from '../stores/FreshNewStore';
  */
 export function useColumnUniqueValues(columnId: string): string[] {
   const column = useColumns()[columnId];
-  return Array.from(new Set(column.allValues));
+  const allValues = column?.allValues;
+
+  return useMemo(() => {
+    if (!allValues) {
+      return [];
+    }
+
+    return Array.from(new Set(allValues));
+  }, [allValues]);
 }
 
 export default useColumnUniqueValues;
