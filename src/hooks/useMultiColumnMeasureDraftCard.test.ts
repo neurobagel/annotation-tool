@@ -9,19 +9,8 @@ vi.mock('~/stores/FreshNewStore', () => ({
 }));
 
 const mockedUseFreshDataActions = vi.mocked(useFreshDataActions);
-const createMockActions = (): FreshDataStoreActions => ({
-  loadConfig: vi.fn(),
-  appFetchesConfigOptions: vi.fn(),
-  userSelectsConfig: vi.fn(),
-  userUploadsDataTableFile: vi.fn(),
-  userUploadsDataDictionaryFile: vi.fn(),
-  userUpdatesColumnDescription: vi.fn(),
-  userUpdatesColumnDataType: vi.fn(),
-  userUpdatesColumnStandardizedVariable: vi.fn(),
-  userUpdatesColumnToCollectionMapping: vi.fn(),
+const createMockActions = (): Pick<FreshDataStoreActions, 'userCreatesCollection'> => ({
   userCreatesCollection: vi.fn(),
-  userDeletesCollection: vi.fn(),
-  reset: vi.fn(),
 });
 
 describe('useMultiColumnMeasureDraftCard', () => {
@@ -33,7 +22,7 @@ describe('useMultiColumnMeasureDraftCard', () => {
     const mockActions = createMockActions();
     const mockAction = vi.fn();
     mockActions.userCreatesCollection = mockAction;
-    mockedUseFreshDataActions.mockReturnValue(mockActions);
+    mockedUseFreshDataActions.mockReturnValue(mockActions as FreshDataStoreActions);
 
     const { result } = renderHook(() => useMultiColumnMeasureDraftCard('var-1'));
 
@@ -64,7 +53,7 @@ describe('useMultiColumnMeasureDraftCard', () => {
   });
 
   it('should reset the draft when the active variable changes', () => {
-    mockedUseFreshDataActions.mockReturnValue(createMockActions());
+    mockedUseFreshDataActions.mockReturnValue(createMockActions() as FreshDataStoreActions);
 
     const { result, rerender } = renderHook(
       ({ variableId }) => useMultiColumnMeasureDraftCard(variableId),
@@ -83,7 +72,7 @@ describe('useMultiColumnMeasureDraftCard', () => {
   });
 
   it('should not create multiple drafts', () => {
-    mockedUseFreshDataActions.mockReturnValue(createMockActions());
+    mockedUseFreshDataActions.mockReturnValue(createMockActions() as FreshDataStoreActions);
 
     const { result } = renderHook(() => useMultiColumnMeasureDraftCard('var-1'));
 

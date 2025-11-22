@@ -1,18 +1,25 @@
-import { mockColumns } from '~/utils/mocks';
 import ColumnTypeCollapse from '../../src/components/ColumnTypeCollapse';
 import ExpandableSection from '../../src/components/ExpandableSection';
+import type { ColumnGroupColumn } from '../../src/hooks/useValueAnnotationColumns';
 
-// TestComponent to wrap ColumnTypeCollapse in an ExpandableSection since the linter doesn't like passing children as props
+const mockColumnGroup: ColumnGroupColumn[] = [
+  {
+    id: '1',
+    column: {
+      id: '1',
+      name: 'participant_id',
+      allValues: [],
+    },
+  },
+];
+
 function TestComponent({ defaultExpanded }: { defaultExpanded: boolean }) {
   return (
     <ExpandableSection title="some title" defaultExpanded={defaultExpanded}>
       <ColumnTypeCollapse
-        dataType={'Continuous' as 'Categorical' | 'Continuous' | null}
-        standardizedVariable={{
-          identifier: 'nb:ParticipantID',
-          label: 'Subject ID',
-        }}
-        columns={mockColumns}
+        label="subject id"
+        dataType="Continuous"
+        columns={mockColumnGroup}
         onSelect={() => {}}
         selectedColumnId="1"
       />

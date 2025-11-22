@@ -43,7 +43,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="datadictionary-toggle-preview-button"]').click();
     cy.get('[data-cy="next-button"]').click();
   });
-  it('should step through the upload, column annotation, and multi-column measures views and go through the basic user flow', () => {
+  it('should step through the upload, column annotation, multi-column measures, and value annotation views and go through the basic user flow', () => {
     cy.visit('http://localhost:5173');
     cy.get('[data-cy="next-button"]').click();
 
@@ -171,6 +171,34 @@ describe('Main user flow', () => {
       'contain.text',
       '1 column assigned'
     );
+    cy.get('[data-cy="next-button"]').click();
+
+    // Value Annotation view
+    cy.get('[data-cy="side-column-nav-bar-annotated"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar"]').should('not.contain', 'Participant id');
+    cy.get('[data-cy="side-column-nav-bar-unannotated"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-unannotated"]').click();
+    cy.get('[data-cy="side-column-nav-bar-continuous"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-categorical"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-categorical-group_dx"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-categorical-select-button"]').click();
+    cy.get('[data-cy="3-categorical"]')
+      .should('be.visible')
+      .and('contain', 'ADHD')
+      .and('contain', 'PD');
+    cy.get('[data-cy="side-column-nav-bar-sex-sex"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-age-select-button"]').click();
+    cy.get('[data-cy="1-continuous"]').should('be.visible');
+    cy.get('[data-cy="1-format-dropdown"]').type('float{downArrow}{enter}');
+    cy.get('[data-cy="1-description"]').should('be.visible');
+    cy.get('[data-cy="1-description"]').type('some cool unit');
+    cy.get('[data-cy="side-column-nav-bar-sex-select-button"]').click();
+    cy.get('[data-cy="2-categorical"]')
+      .should('be.visible')
+      .and('contain', 'M')
+      .and('contain', 'F');
+    cy.get('[data-cy="side-column-nav-bar-other"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-age-age"]').should('be.visible');
     cy.get('[data-cy="next-button"]').click();
   });
 });

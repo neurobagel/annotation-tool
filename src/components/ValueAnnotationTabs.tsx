@@ -1,110 +1,136 @@
 import { Paper, Tab, Tabs } from '@mui/material';
-import { useState, useEffect } from 'react';
-import { Columns, TermFormat } from '../utils/internal_types';
+import type { SyntheticEvent } from 'react';
+import { DataType } from '../../datamodel';
+import type { ColumnMetadataSummary } from '../hooks/useColumnsMetadata';
+import type { ActiveValueAnnotationColumn } from '../hooks/useValueAnnotationColumn';
 import Categorical from './Categorical';
 import Continuous from './Continuous';
 
+export type ValueAnnotationTabMetadata = ColumnMetadataSummary;
+
 interface ValueAnnotationTabsProps {
-  columns: Columns;
-  dataTable: Record<string, string[]>;
+  columnOrder: string[];
+  columnsMeta: Record<string, ValueAnnotationTabMetadata>;
+  activeColumnId: string | null;
+  activeColumn: ActiveValueAnnotationColumn | null;
+  onChangeActiveColumn: (columnId: string) => void;
   onUpdateDescription: (columnID: string, value: string, description: string) => void;
   onUpdateUnits: (columnID: string, units: string) => void;
   onToggleMissingValue: (columnID: string, value: string, isMissing: boolean) => void;
-  onUpdateFormat: (columnID: string, format: TermFormat | null) => void;
-  onUpdateLevelTerm: (
-    columnID: string,
-    value: string,
-    term: { identifier: string; label: string } | null
-  ) => void;
+  onUpdateFormat: (columnID: string, formatId: string | null) => void;
+  onUpdateLevelTerm: (columnID: string, value: string, termId: string | null) => void;
 }
 
 function ValueAnnotationTabs({
-  columns,
-  dataTable,
+  columnOrder,
+  columnsMeta,
+  activeColumnId,
+  activeColumn,
+  onChangeActiveColumn,
   onUpdateDescription,
   onUpdateUnits,
   onToggleMissingValue,
   onUpdateFormat,
   onUpdateLevelTerm,
 }: ValueAnnotationTabsProps) {
-  const [selectedColumnId, setSelectedColumnId] = useState<string | null>(null);
-  const columnEntries = Object.entries(columns);
-  const columnIds = Object.keys(columns);
-  useEffect(() => {
-    if (columnIds.length > 0 && (!selectedColumnId || !columnIds.includes(selectedColumnId))) {
-      setSelectedColumnId(columnIds[0]);
-    }
-  }, [columnIds, selectedColumnId]);
-
-  const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
-    setSelectedColumnId(newValue);
+  const handleTabChange = (_: SyntheticEvent, newValue: string) => {
+    onChangeActiveColumn(newValue);
   };
 
-  if (columnIds.length === 0) {
+  if (columnOrder.length === 0) {
     return <Paper elevation={3}>No columns to display</Paper>;
+  }
+
+  if (!activeColumnId || !activeColumn) {
+    return (
+      <Paper elevation={3} className="h-full flex flex-col">
+        <Tabs
+          data-cy="value-annotation-tabs"
+          value={false}
+          onChange={handleTabChange}
+          variant="scrollable"
+          scrollButtons="auto"
+        >
+          {columnOrder.map((columnId) => {
+            const column = columnsMeta[columnId];
+            if (!column) {
+              return null;
+            }
+
+            return (
+              <Tab
+                key={columnId}
+                value={columnId}
+                label={column.name || columnId}
+                data-cy={`${columnId}-tab`}
+              />
+            );
+          })}
+        </Tabs>
+        <div className="flex-1 items-center justify-center flex p-2">
+          <Paper elevation={0} className="p-6 text-center">
+            <p>No column selected.</p>
+          </Paper>
+        </div>
+      </Paper>
+    );
   }
 
   return (
     <Paper elevation={3} className="h-full flex flex-col">
       <Tabs
         data-cy="value-annotation-tabs"
-        value={selectedColumnId || false}
+        value={activeColumnId}
         onChange={handleTabChange}
         variant="scrollable"
         scrollButtons="auto"
       >
-        {columnIds.map((columnId) => (
-          <Tab
-            key={columnId}
-            value={columnId}
-            label={columns[columnId].header || columnId}
-            data-cy={`${columnId}-tab`}
-          />
-        ))}
-      </Tabs>
-      <div className="flex-1 overflow-auto p-2">
-        {columnEntries.map(([columnId, column]) => {
-          const uniqueValues = dataTable[columnId] ? Array.from(new Set(dataTable[columnId])) : [];
+        {columnOrder.map((columnId) => {
+          const column = columnsMeta[columnId];
+          if (!column) {
+            return null;
+          }
 
           return (
-            <div
+            <Tab
               key={columnId}
-              role="tabpanel"
-              hidden={selectedColumnId !== columnId}
-              id={`tabpanel-${columnId}`}
-              aria-labelledby={`tab-${columnId}`}
-            >
-              {selectedColumnId === columnId && (
-                <div className="h-full">
-                  {column.variableType === 'Categorical' ? (
-                    <Categorical
-                      columnID={columnId}
-                      uniqueValues={uniqueValues}
-                      levels={column.levels || {}}
-                      standardizedVariable={column.standardizedVariable}
-                      missingValues={column.missingValues || []}
-                      onUpdateDescription={onUpdateDescription}
-                      onToggleMissingValue={onToggleMissingValue}
-                      onUpdateLevelTerm={onUpdateLevelTerm}
-                    />
-                  ) : (
-                    <Continuous
-                      columnID={columnId}
-                      units={column.units || ''}
-                      missingValues={column.missingValues || []}
-                      uniqueValues={uniqueValues}
-                      format={column.format}
-                      standardizedVariable={column.standardizedVariable}
-                      onUpdateUnits={onUpdateUnits}
-                      onToggleMissingValue={onToggleMissingValue}
-                      onUpdateFormat={onUpdateFormat}
-                    />
-                  )}
-                </div>
-              )}
-            </div>
+              value={columnId}
+              label={column.name || columnId}
+              data-cy={`${columnId}-tab`}
+            />
           );
         })}
+      </Tabs>
+      <div className="flex-1 overflow-auto p-2">
+        {activeColumn.dataType === DataType.categorical ? (
+          <Categorical
+            columnID={activeColumn.id}
+            uniqueValues={activeColumn.uniqueValues}
+            levels={activeColumn.levels}
+            missingValues={activeColumn.missingValues}
+            termOptions={activeColumn.termOptions}
+            showStandardizedTerm={activeColumn.showStandardizedTerm}
+            showMissingToggle={activeColumn.showMissingToggle}
+            onUpdateDescription={onUpdateDescription}
+            onToggleMissingValue={onToggleMissingValue}
+            onUpdateLevelTerm={onUpdateLevelTerm}
+          />
+        ) : (
+          <Continuous
+            columnID={activeColumn.id}
+            units={activeColumn.units}
+            missingValues={activeColumn.missingValues}
+            uniqueValues={activeColumn.uniqueValues}
+            formatId={activeColumn.formatId}
+            formatOptions={activeColumn.formatOptions}
+            showFormat={activeColumn.showFormat}
+            showUnits={activeColumn.showUnits}
+            showMissingToggle={activeColumn.showMissingToggle}
+            onUpdateUnits={onUpdateUnits}
+            onToggleMissingValue={onToggleMissingValue}
+            onUpdateFormat={onUpdateFormat}
+          />
+        )}
       </div>
     </Paper>
   );

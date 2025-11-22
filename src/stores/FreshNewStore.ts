@@ -262,6 +262,73 @@ const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
       }));
     },
 
+    userUpdatesColumnLevelDescription(columnID, value, description) {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          if (draft[columnID].levels) {
+            draft[columnID].levels[value].description = description;
+          }
+        }),
+      }));
+    },
+
+    userUpdatesColumnLevelTerm(columnID, value, termId) {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          if (!draft[columnID].levels || !draft[columnID].levels[value]) {
+            return;
+          }
+
+          draft[columnID].levels[value].standardizedTerm = termId ?? '';
+        }),
+      }));
+    },
+
+    userUpdatesColumnUnits(columnID, units) {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          draft[columnID].units = units;
+        }),
+      }));
+    },
+
+    userUpdatesColumnMissingValues(columnID, value, isMissing) {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          const column = draft[columnID];
+          if (!column) {
+            return;
+          }
+
+          const existingMissingValues = column.missingValues ?? [];
+          const updatedMissingValues = isMissing
+            ? Array.from(new Set([...existingMissingValues, value]))
+            : existingMissingValues.filter((missingValue) => missingValue !== value);
+
+          column.missingValues = updatedMissingValues;
+
+          if (column.dataType === DataType.categorical && column.levels) {
+            if (isMissing) {
+              delete column.levels[value];
+            } else if (!column.levels[value]) {
+              column.levels[value] = {
+                description: '',
+                standardizedTerm: '',
+              };
+            }
+          }
+        }),
+      }));
+    },
+
+    userUpdatesColumnFormat(columnID, formatId) {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          draft[columnID].format = formatId ?? undefined;
+        }),
+      }));
+    },
+
     reset: () => {
       set((state) => ({
         ...initialState,
