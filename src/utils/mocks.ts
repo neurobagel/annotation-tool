@@ -1,6 +1,11 @@
 // TODO: Remove duplicate mocks once store refactoring is done
-import { VariableType as FreshVariableType } from 'datamodel';
 import { ConfigFile, FreshConfigFile } from '~/utils/external_types';
+import {
+  Columns as FreshColumns,
+  DataDictionary as FreshDataDictionary,
+  DataType as FreshDataType,
+  VariableType as FreshVariableType,
+} from '../../datamodel';
 import { Config, VariableType, Columns } from './internal_types';
 
 export const mockDataTable = {
@@ -201,21 +206,126 @@ export const mockDataDictionaryWithDescription = {
 export const mockDataDictionaryWithNoDescription = {
   participant_id: {
     Description: '',
+    Annotations: {
+      IsAbout: {
+        TermURL: 'nb:ParticipantID',
+        Label: 'Participant ID',
+      },
+      VariableType: 'Identifier' as VariableType,
+    },
   },
   age: {
     Description: '',
+    Annotations: {
+      IsAbout: {
+        TermURL: 'nb:Age',
+        Label: 'Age',
+      },
+      Format: {
+        TermURL: 'nb:FromFloat',
+        Label: 'float',
+      },
+      VariableType: 'Continuous' as VariableType,
+    },
+    Units: '',
   },
   sex: {
     Description: '',
+    Levels: {
+      F: {
+        Description: 'Female',
+        TermURL: 'snomed:248152002',
+      },
+      M: {
+        Description: 'Male',
+        TermURL: 'snomed:248153007',
+      },
+    },
+    Annotations: {
+      IsAbout: {
+        TermURL: 'nb:Sex',
+        Label: 'Sex',
+      },
+      Levels: {
+        F: {
+          TermURL: 'snomed:248152002',
+          Label: 'Female',
+        },
+        M: {
+          TermURL: 'snomed:248153007',
+          Label: 'Male',
+        },
+      },
+      MissingValues: ['N/A'],
+      VariableType: 'Categorical' as VariableType,
+    },
   },
   group_dx: {
     Description: '',
+    Levels: {
+      ADHD: {
+        Description: 'Attention deficit hyperactivity disorder',
+        TermURL: 'snomed:406506008',
+      },
+      PD: {
+        Description: 'Parkinsons',
+        TermURL: 'snomed:870288002',
+      },
+    },
+    Annotations: {
+      IsAbout: {
+        TermURL: 'nb:Diagnosis',
+        Label: 'Diagnosis',
+      },
+      VariableType: 'Categorical' as VariableType,
+      Levels: {
+        ADHD: {
+          TermURL: 'snomed:406506008',
+          Label: 'Attention deficit hyperactivity disorder',
+        },
+        PD: {
+          TermURL: 'snomed:870288002',
+          Label: 'Parkinsonism caused by methanol',
+        },
+      },
+    },
   },
   group: {
     Description: '',
+    Levels: {
+      HC: {
+        Description: 'Healthy control',
+        TermURL: 'ncit:C94342',
+      },
+    },
+    Annotations: {
+      IsAbout: {
+        TermURL: 'nb:Diagnosis',
+        Label: 'Diagnosis',
+      },
+      VariableType: 'Categorical' as VariableType,
+      Levels: {
+        HC: {
+          TermURL: 'ncit:C94342',
+          Label: 'Healthy Control',
+        },
+      },
+      MissingValues: ['Patient', 'N/A'],
+    },
   },
   iq: {
     Description: '',
+    Annotations: {
+      IsAbout: {
+        TermURL: 'nb:Assessment',
+        Label: 'Assessment Tool',
+      },
+      IsPartOf: {
+        TermURL: 'snomed:273712001',
+        Label: 'Previous IQ assessment by pronunciation',
+      },
+      VariableType: 'Collection' as VariableType,
+    },
   },
 };
 
@@ -342,6 +452,141 @@ export const mockDataDictionaryWithAnnotations = {
       },
       VariableType: 'Collection' as VariableType,
     },
+  },
+};
+
+// TODO: clean up the mocks
+export const mockFreshDataDictionaryWithDescription =
+  mockDataDictionaryWithDescription as FreshDataDictionary;
+export const mockFreshDataDictionaryWithNoDescription =
+  mockDataDictionaryWithNoDescription as FreshDataDictionary;
+export const mockFreshDataDictionaryWithAnnotations =
+  mockDataDictionaryWithAnnotations as FreshDataDictionary;
+
+export const mockFreshInvalidDataDictionary: FreshDataDictionary = {
+  column_without_description: {
+    // Missing Description violates schema
+    Levels: {
+      value: { Description: 'Some value' },
+    },
+  } as unknown as FreshDataDictionary[string],
+  column_with_invalid_levels: {
+    Description: 'Column with invalid levels',
+    Levels: {} as unknown as { [key: string]: { Description: string; TermURL?: string } },
+    Annotations: {
+      IsAbout: {
+        TermURL: 'nb:Invalid',
+        Label: 'Invalid',
+      },
+      VariableType: FreshVariableType.categorical,
+      Levels: {
+        value: {
+          // Missing TermURL/Label for annotation level
+          // TermURL intentionally omitted
+          Label: 'Invalid',
+        } as unknown as { TermURL: string; Label: string },
+      },
+    },
+  },
+};
+
+export const mockFreshAnnotatedColumns: FreshColumns = {
+  '1': {
+    id: '1',
+    name: 'participant_id',
+    allValues: [],
+    description: 'A participant ID',
+    dataType: null,
+    standardizedVariable: 'nb:ParticipantID',
+  },
+  '2': {
+    id: '2',
+    name: 'age',
+    allValues: [],
+    description: 'Age of the participant',
+    dataType: FreshDataType.continuous,
+    standardizedVariable: 'nb:Age',
+    units: '',
+    format: 'nb:FromFloat',
+  },
+  '3': {
+    id: '3',
+    name: 'sex',
+    allValues: [],
+    description: 'Sex of the participant',
+    dataType: FreshDataType.categorical,
+    standardizedVariable: 'nb:Sex',
+    levels: {
+      F: { description: 'Female', standardizedTerm: 'snomed:248152002' },
+      M: { description: 'Male', standardizedTerm: 'snomed:248153007' },
+    },
+    missingValues: ['N/A'],
+  },
+  '4': {
+    id: '4',
+    name: 'group_dx',
+    allValues: [],
+    description: 'Diagnosis of the participant',
+    dataType: FreshDataType.categorical,
+    standardizedVariable: 'nb:Diagnosis',
+    levels: {
+      ADHD: {
+        description: 'Attention deficit hyperactivity disorder',
+        standardizedTerm: 'snomed:406506008',
+      },
+      PD: {
+        description: 'Parkinsons',
+        standardizedTerm: 'snomed:870288002',
+      },
+    },
+  },
+  '5': {
+    id: '5',
+    name: 'group',
+    allValues: [],
+    description: 'The group assignment of the participant in a study.',
+    dataType: FreshDataType.categorical,
+    standardizedVariable: 'nb:Diagnosis',
+    levels: {
+      HC: { description: 'Healthy control', standardizedTerm: 'ncit:C94342' },
+    },
+    missingValues: ['Patient', 'N/A'],
+  },
+  '6': {
+    id: '6',
+    name: 'iq',
+    allValues: [],
+    description: 'iq test score of the participant',
+    dataType: null,
+    standardizedVariable: 'nb:Assessment',
+    isPartOf: 'snomed:273712001',
+  },
+};
+
+export const mockFreshColumnsWithNoDescription: FreshColumns = {
+  '1': {
+    ...mockFreshAnnotatedColumns['1'],
+    description: '',
+  },
+  '2': {
+    ...mockFreshAnnotatedColumns['2'],
+    description: '',
+  },
+  '3': {
+    ...mockFreshAnnotatedColumns['3'],
+    description: '',
+  },
+  '4': {
+    ...mockFreshAnnotatedColumns['4'],
+    description: '',
+  },
+  '5': {
+    ...mockFreshAnnotatedColumns['5'],
+    description: '',
+  },
+  '6': {
+    ...mockFreshAnnotatedColumns['6'],
+    description: '',
   },
 };
 
@@ -862,6 +1107,22 @@ export const mockFreshTermsData = {
           id: '406506008',
           name: 'Attention deficit hyperactivity disorder',
         },
+        {
+          id: '870288002',
+          name: 'Parkinsonism caused by methanol',
+        },
+      ],
+    },
+    {
+      namespace_prefix: 'ncit',
+      namespace_url: 'http://ncithesaurus.nci.nih.gov/',
+      vocabulary_name: 'NCIT',
+      version: '1.0.0',
+      terms: [
+        {
+          id: 'C94342',
+          name: 'Healthy Control',
+        },
       ],
     },
   ],
@@ -1002,6 +1263,12 @@ export const mockFreshStandardizedTerms = {
     label: 'Attention deficit hyperactivity disorder',
     isCollection: false,
   },
+  'snomed:870288002': {
+    standardizedVariableId: 'nb:Diagnosis',
+    id: 'snomed:870288002',
+    label: 'Parkinsonism caused by methanol',
+    isCollection: false,
+  },
   'snomed:1303696008': {
     standardizedVariableId: 'nb:Assessment',
     id: 'snomed:1303696008',
@@ -1024,6 +1291,12 @@ export const mockFreshStandardizedTerms = {
     standardizedVariableId: 'nb:Assessment',
     id: 'snomed:273712001',
     label: 'Previous IQ assessment by pronunciation',
+    isCollection: false,
+  },
+  'ncit:C94342': {
+    standardizedVariableId: 'nb:Diagnosis',
+    id: 'ncit:C94342',
+    label: 'Healthy Control',
     isCollection: false,
   },
 };
