@@ -118,4 +118,29 @@ describe('useValueAnnotationColumn', () => {
     expect(result.current?.dataType).toBe(DataType.continuous);
     expect(result.current?.showStandardizedTerm).toBe(false);
   });
+
+  it('hides missing toggle when there are no unique values', () => {
+    mockedUseColumns.mockReturnValue({
+      '2': {
+        id: '2',
+        name: 'age',
+        allValues: [],
+        dataType: DataType.continuous,
+        standardizedVariable: 'nb:Age',
+      },
+    });
+    mockedUseStandardizedVariables.mockReturnValue({
+      'nb:Age': {
+        id: 'nb:Age',
+        name: 'Age',
+      },
+    });
+    mockedUseColumnUniqueValues.mockReturnValue([]);
+    mockedUseTermOptions.mockReturnValue([]);
+    mockedUseFormatOptions.mockReturnValue([]);
+
+    const { result } = renderHook(() => useValueAnnotationColumn('2'));
+
+    expect(result.current?.showMissingToggle).toBe(false);
+  });
 });

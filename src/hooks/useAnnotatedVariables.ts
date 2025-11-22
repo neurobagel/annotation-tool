@@ -22,12 +22,12 @@ export function useAnnotatedVariables(): AnnotatedVariableGroup[] {
         return acc;
       }
 
-      const existing = acc[standardizedVariableId];
+      const existingGroup = acc[standardizedVariableId];
       const variable = standardizedVariables[standardizedVariableId];
-      const nextGroup = existing
+      const nextGroup = existingGroup
         ? {
-            ...existing,
-            columnIds: [...existing.columnIds, columnId],
+            ...existingGroup,
+            columnIds: [...existingGroup.columnIds, columnId],
           }
         : {
             standardizedVariableId,

@@ -1270,7 +1270,7 @@ describe('userUpdatesColumnLevelDescription', () => {
 
     act(() => {
       result.current.actions.userUpdatesColumnDataType('0', DataType.categorical);
-      result.current.actions.userUpdatesColumnLevelDescription('0', 'A', 'Group A');
+      result.current.actions.userUpdatesValueDescription('0', 'A', 'Group A');
     });
 
     expect(result.current.columns['0'].levels?.A.description).toBe('Group A');
@@ -1310,7 +1310,7 @@ describe('userUpdatesColumnLevelDescription', () => {
     expect(result.current.columns['0'].levels).toBeUndefined();
 
     act(() => {
-      result.current.actions.userUpdatesColumnLevelDescription('0', 'C', 'Category C');
+      result.current.actions.userUpdatesValueDescription('0', 'C', 'Category C');
     });
 
     expect(result.current.columns['0'].levels).toBeUndefined();
@@ -1353,7 +1353,7 @@ describe('userUpdatesColumnLevelTerm', () => {
     const result = await setupCategoricalColumn();
 
     act(() => {
-      result.current.actions.userUpdatesColumnLevelTerm('0', 'A', 'nb:Term1');
+      result.current.actions.userUpdatesValueStandardizedTerm('0', 'A', 'nb:Term1');
     });
 
     expect(result.current.columns['0'].levels?.A.standardizedTerm).toBe('nb:Term1');
@@ -1363,13 +1363,13 @@ describe('userUpdatesColumnLevelTerm', () => {
     const result = await setupCategoricalColumn();
 
     act(() => {
-      result.current.actions.userUpdatesColumnLevelTerm('0', 'B', 'nb:Term2');
+      result.current.actions.userUpdatesValueStandardizedTerm('0', 'B', 'nb:Term2');
     });
 
     expect(result.current.columns['0'].levels?.B.standardizedTerm).toBe('nb:Term2');
 
     act(() => {
-      result.current.actions.userUpdatesColumnLevelTerm('0', 'B', null);
+      result.current.actions.userUpdatesValueStandardizedTerm('0', 'B', null);
     });
 
     expect(result.current.columns['0'].levels?.B.standardizedTerm).toBe('');
