@@ -428,6 +428,8 @@ describe('userUploadsDataDictionaryFile', () => {
     expect(columns['5'].description).toBe('iq test score of the participant');
     expect(columns['5'].standardizedVariable).toBe('nb:Assessment');
     expect(columns['5'].isPartOf).toBe('snomed:273712001');
+    expect(columns['5'].dataType).toBeUndefined();
+    expect(columns['5'].units).toBeUndefined();
 
     expect(result.current.uploadedDataDictionary.fileName).toBe('mock.json');
     expect(result.current.uploadedDataDictionary.dataDictionary).toBeDefined();
@@ -965,6 +967,8 @@ describe('userUpdatesColumnStandardizedVariable', () => {
     });
 
     expect(result.current.columns['0'].standardizedVariable).toBe('nb:Assessment');
+    expect(result.current.columns['0'].dataType).toBeNull();
+    expect(result.current.columns['0'].units).toBeUndefined();
     expect(result.current.columns['0'].isPartOf).toBe('');
   });
 
