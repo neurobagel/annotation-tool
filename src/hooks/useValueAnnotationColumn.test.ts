@@ -92,13 +92,13 @@ describe('useValueAnnotationColumn', () => {
     });
   });
 
-  it('should hide standardized term when the standardized variable is multi-column measure', () => {
+  it('defaults multi-column measure columns to continuous data type', () => {
     mockedUseColumns.mockReturnValue({
       '1': {
         id: '1',
         name: 'measurement',
         allValues: [],
-        dataType: DataType.categorical,
+        dataType: null,
         standardizedVariable: 'nb:Assessment',
       },
     });
@@ -115,6 +115,7 @@ describe('useValueAnnotationColumn', () => {
 
     const { result } = renderHook(() => useValueAnnotationColumn('1'));
 
+    expect(result.current?.dataType).toBe(DataType.continuous);
     expect(result.current?.showStandardizedTerm).toBe(false);
   });
 });

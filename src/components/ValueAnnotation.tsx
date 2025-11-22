@@ -39,8 +39,9 @@ function ValueAnnotation() {
 
   const columnMetadata = useColumnsMetadata(selectedColumnIds);
 
-  const unknownDataTypeColumns = selectedColumnIds.filter((id) => !columnMetadata[id]?.dataType);
-
+  const unknownDataTypeColumns = selectedColumnIds.filter(
+    (id) => !columnMetadata[id]?.dataType && !columnMetadata[id]?.isMultiColumnMeasure
+  );
   const activeColumn = useValueAnnotationColumn(activeColumnId);
 
   const renderContent = () => {
@@ -56,6 +57,7 @@ function ValueAnnotation() {
       );
     }
 
+    // Multi-column measure groups intentionally lack a data type; they render as continuous by default.
     if (unknownDataTypeColumns.length !== 0) {
       return (
         <Paper

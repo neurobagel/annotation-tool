@@ -43,17 +43,21 @@ export function useValueAnnotationColumn(
     : null;
   const termOptions = useTermOptions(standardizedVariableId ?? '');
   const formatOptions = useFormatOptions(standardizedVariableId ?? '');
+  const isMultiColumnMeasure = Boolean(standardizedVariable?.is_multi_column_measure);
 
   return useMemo(() => {
     if (!column) {
       return null;
     }
 
-    const dataType = column.dataType ?? null;
+    // Multi-column measure variables (Collection) do not receive a dataType from the store.
+    // To mirror the legacy behavior (which rendered the continuous component for these groups),
+    // default them to continuous when the user hasn't manually selected a type.
+    const dataType = column.dataType ?? (isMultiColumnMeasure ? DataType.continuous : null);
     const showStandardizedTerm =
       dataType === DataType.categorical &&
       Boolean(standardizedVariableId) &&
-      !standardizedVariable?.is_multi_column_measure &&
+      !isMultiColumnMeasure &&
       termOptions.length > 0;
 
     const showFormat = dataType === DataType.continuous && formatOptions.length > 0;
@@ -79,7 +83,7 @@ export function useValueAnnotationColumn(
   }, [
     column,
     formatOptions,
-    standardizedVariable?.is_multi_column_measure,
+    isMultiColumnMeasure,
     standardizedVariableId,
     termOptions,
     uniqueValues,
