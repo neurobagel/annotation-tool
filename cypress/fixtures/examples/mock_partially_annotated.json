@@ -1,0 +1,93 @@
+{
+  "participant_id": {
+    "Description": "A participant ID",
+    "Annotations": {
+      "IsAbout": {
+        "TermURL": "nb:ParticipantID",
+        "Label": "Participant ID"
+      },
+      "VariableType": "Identifier"
+    }
+  },
+  "age": {
+    "Description": "some cool new description",
+    "Units": "some cool unit",
+    "Annotations": {
+      "IsAbout": {
+        "TermURL": "nb:Age",
+        "Label": "Age"
+      },
+      "VariableType": "Continuous",
+      "Format": {
+        "TermURL": "nb:FromFloat",
+        "Label": "float"
+      }
+    }
+  },
+  "sex": {
+    "Description": "",
+    "Levels": {
+      "M": {
+        "Description": ""
+      },
+      "F": {
+        "Description": ""
+      },
+      "N/A": {
+        "Description": ""
+      }
+    },
+    "Annotations": {
+      "IsAbout": {
+        "TermURL": "nb:Sex",
+        "Label": "Sex"
+      },
+      "VariableType": "Categorical",
+      "Levels": {
+        "M": {},
+        "F": {},
+        "N/A": {}
+      }
+    }
+  },
+  "group_dx": {
+    "Description": "",
+    "Levels": {
+      "ADHD": {
+        "Description": ""
+      },
+      "PD": {
+        "Description": ""
+      }
+    }
+  },
+  "group": {
+    "Description": "",
+    "Levels": {
+      "HC": {
+        "Description": ""
+      },
+      "N/A": {
+        "Description": ""
+      },
+      "Patient": {
+        "Description": ""
+      }
+    },
+    "Annotations": {
+      "IsAbout": {
+        "TermURL": "nb:Diagnosis",
+        "Label": "Diagnosis"
+      },
+      "VariableType": "Categorical",
+      "Levels": {
+        "HC": {},
+        "N/A": {},
+        "Patient": {}
+      }
+    }
+  },
+  "iq": {
+    "Description": ""
+  }
+}
