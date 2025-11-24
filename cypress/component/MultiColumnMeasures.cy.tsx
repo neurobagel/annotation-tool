@@ -1,9 +1,9 @@
 import MultiColumnMeasures from '../../src/components/MultiColumnMeasures';
-import { useFreshDataStore } from '../../src/stores/FreshNewStore';
+import { useDataStore } from '../../src/stores/data';
 
 describe('MultiColumnMeasures', () => {
   beforeEach(() => {
-    useFreshDataStore.setState((state) => ({
+    useDataStore.setState((state) => ({
       ...state,
       columns: {},
       standardizedVariables: {},
@@ -61,25 +61,21 @@ describe('MultiColumnMeasures', () => {
       },
     };
 
-    useFreshDataStore.setState((state) => ({
+    useDataStore.setState((state) => ({
       ...state,
       columns,
       standardizedVariables,
       standardizedTerms,
     }));
 
-    cy.spy(useFreshDataStore.getState().actions, 'userUpdatesColumnToCollectionMapping').as(
+    cy.spy(useDataStore.getState().actions, 'userUpdatesColumnToCollectionMapping').as(
       'userUpdatesColumnToCollectionMappingSpy'
     );
-    cy.spy(useFreshDataStore.getState().actions, 'userUpdatesColumnStandardizedVariable').as(
+    cy.spy(useDataStore.getState().actions, 'userUpdatesColumnStandardizedVariable').as(
       'userUpdatesColumnStandardizedVariableSpy'
     );
-    cy.spy(useFreshDataStore.getState().actions, 'userCreatesCollection').as(
-      'userCreatesCollectionSpy'
-    );
-    cy.spy(useFreshDataStore.getState().actions, 'userDeletesCollection').as(
-      'userDeletesCollectionSpy'
-    );
+    cy.spy(useDataStore.getState().actions, 'userCreatesCollection').as('userCreatesCollectionSpy');
+    cy.spy(useDataStore.getState().actions, 'userDeletesCollection').as('userDeletesCollectionSpy');
 
     cy.mount(<MultiColumnMeasures />);
   });

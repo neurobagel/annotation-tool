@@ -1,5 +1,5 @@
 import { Button } from '@mui/material';
-import { View } from '../../datamodel';
+import { View } from '../../internal_types';
 import useViewStore from '../stores/view';
 
 const defaultProps = {

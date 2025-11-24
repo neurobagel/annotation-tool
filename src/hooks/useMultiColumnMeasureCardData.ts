@@ -1,4 +1,4 @@
-import { useColumns } from '../stores/FreshNewStore';
+import { useColumns } from '../stores/data';
 import { MultiColumnCardData } from '../types/multiColumnMeasureTypes';
 import { useColumnOptionsForMultiColumnMeasureVariable } from './useColumnOptionsForMultiColumnMeasureVariable';
 import { UsePersistedMultiColumnCardsOutput } from './usePersistedMultiColumnCards';

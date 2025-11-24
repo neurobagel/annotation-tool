@@ -1,10 +1,12 @@
-import { DataType, VariableType, type Columns, type StandardizedVariables } from '../../datamodel';
-import ValueAnnotation from '../../src/components/ValueAnnotation';
-import { useFreshDataStore } from '../../src/stores/FreshNewStore';
 import {
-  mockFreshStandardizedTerms,
-  mockFreshStandardizedFormats,
-} from '../../src/utils/freshMocks';
+  DataType,
+  VariableType,
+  type Columns,
+  type StandardizedVariables,
+} from '../../internal_types';
+import ValueAnnotation from '../../src/components/ValueAnnotation';
+import { useDataStore } from '../../src/stores/data';
+import { mockStandardizedTerms, mockStandardizedFormats } from '../../src/utils/mocks';
 
 const createColumns = (): Columns => ({
   '1': {
@@ -86,19 +88,19 @@ const standardizedVariables: StandardizedVariables = {
 
 describe('ValueAnnotation', () => {
   beforeEach(() => {
-    useFreshDataStore.setState((state) => ({
+    useDataStore.setState((state) => ({
       ...state,
       columns: createColumns(),
       standardizedVariables,
       standardizedTerms: {
-        ...mockFreshStandardizedTerms,
+        ...mockStandardizedTerms,
         'term:subscaleA': {
           standardizedVariableId: 'nb:Assessment',
           id: 'term:subscaleA',
           label: 'Previous IQ assessment by pronunciation',
         },
       },
-      standardizedFormats: mockFreshStandardizedFormats,
+      standardizedFormats: mockStandardizedFormats,
     }));
   });
 
@@ -140,7 +142,7 @@ describe('ValueAnnotation', () => {
     cy.get('[data-cy="side-column-nav-bar-unannotated"]').click();
     cy.get('[data-cy="side-column-nav-bar-other-select-button"]').click();
     cy.then(() => {
-      useFreshDataStore.setState((state) => {
+      useDataStore.setState((state) => {
         const updatedColumns = { ...state.columns };
         delete updatedColumns['6'];
 

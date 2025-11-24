@@ -12,7 +12,7 @@ import {
   useTheme,
 } from '@mui/material';
 import React, { useState } from 'react';
-import { DataDictionary } from '../../datamodel';
+import { DataDictionary } from '../../internal_types';
 
 function CustomDataDictionaryPreview({ dataDictionary }: { dataDictionary: DataDictionary }) {
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());

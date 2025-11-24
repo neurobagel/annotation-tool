@@ -5,7 +5,7 @@ import { useMultiColumnMeasureCardData } from '../hooks/useMultiColumnMeasureCar
 import { useMultiColumnMeasureDraftCard } from '../hooks/useMultiColumnMeasureDraftCard';
 import { useMultiColumnMeasureTabs } from '../hooks/useMultiColumnMeasureTabs';
 import { usePersistedMultiColumnCards } from '../hooks/usePersistedMultiColumnCards';
-import { useColumns, useFreshDataActions } from '../stores/FreshNewStore';
+import { useColumns, useDataActions } from '../stores/data';
 import { MultiColumnMeasuresInstructions } from '../utils/instructions';
 import Instruction from './Instruction';
 import MultiColumnMeasureTabs from './MultiColumnMeasureTabs';
@@ -30,7 +30,7 @@ function MultiColumnMeasures() {
     persistedCards
   );
   const columns = useColumns();
-  const actions = useFreshDataActions();
+  const actions = useDataActions();
   const currentVariableColumns = activeVariable
     ? Object.entries(columns)
         .filter(([_, column]) => column.standardizedVariable === activeVariable.id)

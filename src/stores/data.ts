@@ -1,14 +1,7 @@
 import { produce, current } from 'immer';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import {
-  FreshDataStoreState,
-  FreshDataStoreActions,
-  Columns,
-  DataDictionary,
-  DataType,
-  VariableType,
-} from '../../datamodel';
+import { Columns, DataDictionary, DataType, VariableType, DataStore } from '../../internal_types';
 import {
   fetchAvailableConfigs,
   fetchConfig,
@@ -19,11 +12,7 @@ import {
   parseTsvContent,
   applyDataDictionaryToColumns,
   applyDataTypeToColumn,
-} from '../utils/store-utils';
-
-type FreshDataStore = FreshDataStoreState & {
-  actions: FreshDataStoreActions;
-};
+} from '../utils/data-utils';
 
 const initialState = {
   columns: {},
@@ -40,7 +29,7 @@ const initialState = {
   },
 };
 
-const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
+const useDataStore = create<DataStore>()((set, get) => ({
   ...initialState,
   actions: {
     loadConfig: async (configName: string) => {
@@ -344,21 +333,20 @@ const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
   },
 }));
 
-export const useColumns = () => useFreshDataStore((state) => state.columns);
-export const useStandardizedVariables = () =>
-  useFreshDataStore((state) => state.standardizedVariables);
-export const useStandardizedTerms = () => useFreshDataStore((state) => state.standardizedTerms);
-export const useStandardizedFormats = () => useFreshDataStore((state) => state.standardizedFormats);
+export const useColumns = () => useDataStore((state) => state.columns);
+export const useStandardizedVariables = () => useDataStore((state) => state.standardizedVariables);
+export const useStandardizedTerms = () => useDataStore((state) => state.standardizedTerms);
+export const useStandardizedFormats = () => useDataStore((state) => state.standardizedFormats);
 export const useUploadedDataTableFileName = () =>
-  useFreshDataStore((state) => state.uploadedDataTableFileName);
+  useDataStore((state) => state.uploadedDataTableFileName);
 export const useUploadedDataDictionary = () =>
-  useFreshDataStore((state) => state.uploadedDataDictionary);
-export const useIsConfigLoading = () => useFreshDataStore((state) => state.isConfigLoading);
-export const useConfig = () => useFreshDataStore((state) => state.config);
-export const useConfigOptions = () => useFreshDataStore((state) => state.configOptions);
-export const useFreshDataActions = () => useFreshDataStore((state) => state.actions);
+  useDataStore((state) => state.uploadedDataDictionary);
+export const useIsConfigLoading = () => useDataStore((state) => state.isConfigLoading);
+export const useConfig = () => useDataStore((state) => state.config);
+export const useConfigOptions = () => useDataStore((state) => state.configOptions);
+export const useDataActions = () => useDataStore((state) => state.actions);
 
 // Export the raw store for testing purposes
-export { useFreshDataStore };
+export { useDataStore };
 
-export default devtools(useFreshDataStore);
+export default devtools(useDataStore);

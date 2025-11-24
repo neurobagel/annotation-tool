@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import type { StandardizedVariable } from '../../datamodel';
+import type { StandardizedVariable } from '../../internal_types';
 import { useMultiColumnMeasureTabs } from './useMultiColumnMeasureTabs';
 import { useMultiColumnMeasureVariables } from './useMultiColumnMeasureVariables';
 

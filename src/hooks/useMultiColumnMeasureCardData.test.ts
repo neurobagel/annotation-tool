@@ -1,13 +1,13 @@
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { Columns } from '../../datamodel';
-import { useColumns } from '../stores/FreshNewStore';
+import type { Columns } from '../../internal_types';
+import { useColumns } from '../stores/data';
 import { useColumnOptionsForMultiColumnMeasureVariable } from './useColumnOptionsForMultiColumnMeasureVariable';
 import { useMultiColumnMeasureCardData } from './useMultiColumnMeasureCardData';
 import type { UsePersistedMultiColumnCardsOutput } from './usePersistedMultiColumnCards';
 import { useTermsForMultiColumnMeasureVariable } from './useTermsForMultiColumnMeasureVariable';
 
-vi.mock('../stores/FreshNewStore', () => ({
+vi.mock('../stores/data', () => ({
   useColumns: vi.fn(),
 }));
 vi.mock('./useColumnOptionsForMultiColumnMeasureVariable', () => ({

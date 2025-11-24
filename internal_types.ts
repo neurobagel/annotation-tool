@@ -124,7 +124,7 @@ export interface UploadedDataDictionaryFile {
   dataDictionary: DataDictionary;
 }
 
-export type FreshDataStoreState = {
+export type DataStoreState = {
   columns: Columns;
   standardizedVariables: StandardizedVariables;
   standardizedTerms: StandardizedTerms;
@@ -136,7 +136,7 @@ export type FreshDataStoreState = {
   uploadedDataDictionary: UploadedDataDictionaryFile;
 };
 
-export type FreshDataStoreActions = {
+export type DataStoreActions = {
   loadConfig: (configName: string) => Promise<void>;
   appFetchesConfigOptions: () => Promise<void>;
   userSelectsConfig: (userSelectedConfig: string | null) => Promise<void>;
@@ -163,6 +163,6 @@ export type FreshDataStoreActions = {
   reset: () => void;
 };
 
-export type FreshDataStore = FreshDataStoreState & {
-  actions: FreshDataStoreActions;
+export type DataStore = DataStoreState & {
+  actions: DataStoreActions;
 };

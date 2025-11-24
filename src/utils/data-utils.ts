@@ -8,7 +8,7 @@ import {
   Columns,
   VariableType,
   DataType,
-} from '../../datamodel';
+} from '../../internal_types';
 import assessmentTerms from '../assets/default_config/assessment.json';
 import defaultConfigData from '../assets/default_config/config.json';
 import diagnosisTerms from '../assets/default_config/diagnosis.json';

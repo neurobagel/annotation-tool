@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { StandardizedVariable } from '../../datamodel';
+import { StandardizedVariable } from '../../internal_types';
 import { useMultiColumnMeasureVariables } from './useMultiColumnMeasureVariables';
 
 export interface ActiveMultiColumnVariable {

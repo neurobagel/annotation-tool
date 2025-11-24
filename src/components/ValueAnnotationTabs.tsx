@@ -1,6 +1,6 @@
 import { Paper, Tab, Tabs } from '@mui/material';
 import type { SyntheticEvent } from 'react';
-import { DataType } from '../../datamodel';
+import { DataType } from '../../internal_types';
 import type { ColumnMetadataSummary } from '../hooks/useColumnsMetadata';
 import type { ActiveValueAnnotationColumn } from '../hooks/useValueAnnotationColumn';
 import Categorical from './Categorical';

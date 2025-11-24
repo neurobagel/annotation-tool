@@ -1,5 +1,5 @@
-import type { StandardizedVariable } from '../../datamodel';
-import { useColumns, useStandardizedVariables } from '../stores/FreshNewStore';
+import type { StandardizedVariable } from '../../internal_types';
+import { useColumns, useStandardizedVariables } from '../stores/data';
 
 export interface AnnotatedVariableGroup {
   standardizedVariableId: string;

@@ -1,7 +1,7 @@
-import { DataType, Columns } from '../../datamodel';
+import { DataType, Columns } from '../../internal_types';
 import ColumnAnnotation from '../../src/components/ColumnAnnotation';
-import { useFreshDataStore } from '../../src/stores/FreshNewStore';
-import { mockFreshStandardizedVariables } from '../../src/utils/freshMocks';
+import { useDataStore } from '../../src/stores/data';
+import { mockStandardizedVariables } from '../../src/utils/mocks';
 
 const createMockColumns = (): Columns => ({
   '1': {
@@ -40,9 +40,9 @@ const createMockColumns = (): Columns => ({
 
 describe('ColumnAnnotation', () => {
   beforeEach(() => {
-    useFreshDataStore.setState({
+    useDataStore.setState({
       columns: createMockColumns(),
-      standardizedVariables: mockFreshStandardizedVariables,
+      standardizedVariables: mockStandardizedVariables,
     });
   });
 

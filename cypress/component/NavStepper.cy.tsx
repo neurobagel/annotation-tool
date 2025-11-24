@@ -1,4 +1,4 @@
-import { View } from '../../datamodel';
+import { View } from '../../internal_types';
 import NavStepper from '../../src/components/NavStepper';
 
 const props = {

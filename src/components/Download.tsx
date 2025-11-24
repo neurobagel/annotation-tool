@@ -10,11 +10,11 @@ import {
   Link,
 } from '@mui/material';
 import { useState } from 'react';
-import { View } from '../../datamodel';
+import { View } from '../../internal_types';
 import emoji from '../assets/download-emoji.png';
 import { useGenerateDataDictionary } from '../hooks/useGenerateDataDictionary';
 import { useSchemaValidation } from '../hooks/useSchemaValidation';
-import { useFreshDataActions, useUploadedDataTableFileName } from '../stores/FreshNewStore';
+import { useDataActions, useUploadedDataTableFileName } from '../stores/data';
 import useViewStore from '../stores/view';
 import DataDictionaryPreview from './DataDictionaryPreview';
 
@@ -23,7 +23,7 @@ function Download() {
   const [forceAllowDownload, setForceAllowDownload] = useState(false);
 
   const uploadedDataTableFileName = useUploadedDataTableFileName();
-  const { reset } = useFreshDataActions();
+  const { reset } = useDataActions();
   const setCurrentView = useViewStore((state) => state.setCurrentView);
 
   const dataDictionary = useGenerateDataDictionary();

@@ -4,7 +4,7 @@ import type {
   ValueAnnotationNavAnnotatedGroup,
   ValueAnnotationNavData,
 } from '~/hooks/useValueAnnotationNavData';
-import { DataType } from '../../datamodel';
+import { DataType } from '../../internal_types';
 import ColumnTypeCollapse from './ColumnTypeCollapse';
 import ExpandableSection from './ExpandableSection';
 

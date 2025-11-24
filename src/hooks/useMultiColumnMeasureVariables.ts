@@ -1,5 +1,5 @@
-import { StandardizedVariable } from '../../datamodel';
-import { useColumns, useStandardizedVariables } from '../stores/FreshNewStore';
+import { StandardizedVariable } from '../../internal_types';
+import { useColumns, useStandardizedVariables } from '../stores/data';
 
 /**
  * Returns list of multi-column measure variables that have at least one mapped column.

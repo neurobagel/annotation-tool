@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DataType } from '../../datamodel';
+import { DataType } from '../../internal_types';
 import ValueAnnotationTabs, {
   type ValueAnnotationTabMetadata,
 } from '../../src/components/ValueAnnotationTabs';

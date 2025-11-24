@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useColumnsMetadata } from '../hooks/useColumnsMetadata';
 import { useValueAnnotationColumn } from '../hooks/useValueAnnotationColumn';
 import { useValueAnnotationNavData } from '../hooks/useValueAnnotationNavData';
-import { useFreshDataActions } from '../stores/FreshNewStore';
+import { useDataActions } from '../stores/data';
 import { ValueAnnotationInstructions } from '../utils/instructions';
 import Instruction from './Instruction';
 import SideColumnNavBar from './SideColumnNavBar';
@@ -16,7 +16,7 @@ function ValueAnnotation() {
     userUpdatesColumnMissingValues,
     userUpdatesColumnFormat,
     userUpdatesValueStandardizedTerm: userUpdatesColumnLevelTerm,
-  } = useFreshDataActions();
+  } = useDataActions();
   const [selectedColumnIds, setSelectedColumnIds] = useState<string[]>([]);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
   const navData = useValueAnnotationNavData();

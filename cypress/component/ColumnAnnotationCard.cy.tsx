@@ -1,4 +1,4 @@
-import { DataType } from '../../datamodel';
+import { DataType } from '../../internal_types';
 import ColumnAnnotationCard from '../../src/components/ColumnAnnotationCard';
 
 const props = {

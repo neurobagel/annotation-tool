@@ -1,6 +1,6 @@
 import Ajv from 'ajv';
 import { useMemo } from 'react';
-import { DataDictionary } from '../../datamodel';
+import { DataDictionary } from '../../internal_types';
 import schema from '../assets/neurobagel_data_dictionary.schema.json';
 
 export function useSchemaValidation(dataDictionary: DataDictionary) {

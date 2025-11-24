@@ -5,13 +5,13 @@ import {
   DataType,
   StandardizedTerms,
   VariableType,
-} from '../../datamodel';
+} from '../../internal_types';
 import {
   useColumns,
   useStandardizedFormats,
   useStandardizedTerms,
   useStandardizedVariables,
-} from '../stores/FreshNewStore';
+} from '../stores/data';
 
 const mapDataTypeToVariableType = (dataType?: DataType | null): VariableType | undefined => {
   if (dataType === DataType.categorical) {

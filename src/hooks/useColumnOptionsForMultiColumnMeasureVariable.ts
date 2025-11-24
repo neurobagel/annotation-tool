@@ -1,4 +1,4 @@
-import { useColumns, useStandardizedTerms } from '~/stores/FreshNewStore';
+import { useColumns, useStandardizedTerms } from '~/stores/data';
 import { ColumnOption } from '../types/multiColumnMeasureTypes';
 
 /**

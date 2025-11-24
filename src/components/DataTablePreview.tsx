@@ -8,7 +8,7 @@ import {
   TableRow,
   TablePagination,
 } from '@mui/material';
-import { DataTable } from 'datamodel';
+import { DataTable } from 'internal_types';
 import { v4 as uuidv4 } from 'uuid';
 import { useTablePagination } from '../hooks/useTablePagination';
 

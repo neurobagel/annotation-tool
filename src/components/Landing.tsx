@@ -1,5 +1,5 @@
 import { Typography } from '@mui/material';
-import { View } from '../../datamodel';
+import { View } from '../../internal_types';
 import landingEmoji from '../assets/landing-emoji.png';
 import logo from '../assets/logo.svg';
 import NavigationButton from './NavigationButton';

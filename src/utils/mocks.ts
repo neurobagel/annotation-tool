@@ -1,4 +1,4 @@
-import { Columns, DataDictionary, VariableType, DataType } from '../../datamodel';
+import { Columns, DataDictionary, VariableType, DataType } from '../../internal_types';
 import { ConfigFile } from './external_types';
 
 export const mockGitHubResponse = [
@@ -9,7 +9,7 @@ export const mockGitHubResponse = [
   { type: 'dir', name: 'TestConfig' },
 ];
 
-export const mockFreshDataDictionaryWithAnnotations = {
+export const mockDataDictionaryWithAnnotations = {
   participant_id: {
     Description: 'A participant ID',
     Annotations: {
@@ -135,7 +135,7 @@ export const mockFreshDataDictionaryWithAnnotations = {
   },
 };
 
-export const mockFreshDataDictionaryWithNoDescription = {
+export const mockDataDictionaryWithNoDescription = {
   participant_id: {
     Description: '',
     Annotations: {
@@ -261,7 +261,7 @@ export const mockFreshDataDictionaryWithNoDescription = {
   },
 };
 
-export const mockFreshInvalidDataDictionary: DataDictionary = {
+export const mockInvalidDataDictionary: DataDictionary = {
   column_without_description: {
     Levels: {
       value: { Description: 'Some value' },
@@ -285,7 +285,7 @@ export const mockFreshInvalidDataDictionary: DataDictionary = {
   },
 };
 
-export const mockFreshAnnotatedColumns: Columns = {
+export const mockAnnotatedColumns: Columns = {
   '1': {
     id: '1',
     name: 'participant_id',
@@ -358,34 +358,34 @@ export const mockFreshAnnotatedColumns: Columns = {
   },
 };
 
-export const mockFreshColumnsWithNoDescription: Columns = {
+export const mockColumnsWithNoDescription: Columns = {
   '1': {
-    ...mockFreshAnnotatedColumns['1'],
+    ...mockAnnotatedColumns['1'],
     description: '',
   },
   '2': {
-    ...mockFreshAnnotatedColumns['2'],
+    ...mockAnnotatedColumns['2'],
     description: '',
   },
   '3': {
-    ...mockFreshAnnotatedColumns['3'],
+    ...mockAnnotatedColumns['3'],
     description: '',
   },
   '4': {
-    ...mockFreshAnnotatedColumns['4'],
+    ...mockAnnotatedColumns['4'],
     description: '',
   },
   '5': {
-    ...mockFreshAnnotatedColumns['5'],
+    ...mockAnnotatedColumns['5'],
     description: '',
   },
   '6': {
-    ...mockFreshAnnotatedColumns['6'],
+    ...mockAnnotatedColumns['6'],
     description: '',
   },
 };
 
-export const mockFreshStandardizedVariables = {
+export const mockStandardizedVariables = {
   'nb:ParticipantID': {
     id: 'nb:ParticipantID',
     name: 'Participant ID',
@@ -448,7 +448,7 @@ export const mockFreshStandardizedVariables = {
   },
 };
 
-export const mockFreshStandardizedTerms = {
+export const mockStandardizedTerms = {
   'snomed:248153007': {
     standardizedVariableId: 'nb:Sex',
     id: 'snomed:248153007',
@@ -529,7 +529,7 @@ export const mockFreshStandardizedTerms = {
   },
 };
 
-export const mockFreshStandardizedFormats = {
+export const mockStandardizedFormats = {
   'nb:FromFloat': {
     standardizedVariableId: 'nb:Age',
     identifier: 'nb:FromFloat',
@@ -563,7 +563,7 @@ export const mockFreshStandardizedFormats = {
 };
 
 // Mocked based on mock.tsv
-export const mockFreshColumnsAfterDataTableUpload = {
+export const mockColumnsAfterDataTableUpload = {
   '0': {
     id: '0',
     name: 'participant_id',
@@ -609,8 +609,8 @@ export const mockFreshColumnsAfterDataTableUpload = {
   },
 };
 
-// Expected DataTable output from mockFreshColumnsAfterDataTableUpload
-export const mockFreshDataTableFromColumns = {
+// Expected DataTable output from mockColumnsAfterDataTableUpload
+export const mockDataTableFromColumns = {
   participant_id: [
     'sub-718211',
     'sub-718213',

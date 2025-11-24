@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { View } from '../../datamodel';
+import { View } from '../../internal_types';
 import { steps } from '../utils/constants';
 
 type NavigationProps = {

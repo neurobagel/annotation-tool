@@ -3,7 +3,7 @@
 // to the `slots.stepIcon` prop, and defining a simple function inline is the most
 // straightforward way to achieve this. The performance impact is minimal in this case.
 import { Stepper, Step, StepLabel, StepConnector, useTheme, SvgIcon } from '@mui/material';
-import { View } from '../../datamodel';
+import { View } from '../../internal_types';
 import { steps } from '../utils/constants';
 
 function NavStepper({ currentView }: { currentView: View }) {

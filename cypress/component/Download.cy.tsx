@@ -1,15 +1,15 @@
 import Ajv from 'ajv';
 import Download from '../../src/components/Download';
-import { useFreshDataStore } from '../../src/stores/FreshNewStore';
+import { useDataStore } from '../../src/stores/data';
 import {
-  mockFreshDataDictionaryWithNoDescription,
-  mockFreshDataDictionaryWithAnnotations,
-  mockFreshAnnotatedColumns,
-  mockFreshColumnsWithNoDescription,
-  mockFreshStandardizedVariables,
-  mockFreshStandardizedTerms,
-  mockFreshStandardizedFormats,
-} from '../../src/utils/freshMocks';
+  mockDataDictionaryWithNoDescription,
+  mockDataDictionaryWithAnnotations,
+  mockAnnotatedColumns,
+  mockColumnsWithNoDescription,
+  mockStandardizedVariables,
+  mockStandardizedTerms,
+  mockStandardizedFormats,
+} from '../../src/utils/mocks';
 
 interface ValidateFunction {
   (data: unknown): boolean;
@@ -18,20 +18,17 @@ interface ValidateFunction {
 
 describe('Download', () => {
   beforeEach(() => {
-    useFreshDataStore.getState().actions.reset();
+    useDataStore.getState().actions.reset();
   });
 
-  const initializeStore = (params: {
-    columns: typeof mockFreshAnnotatedColumns;
-    fileName?: string;
-  }) => {
+  const initializeStore = (params: { columns: typeof mockAnnotatedColumns; fileName?: string }) => {
     const { columns, fileName = 'someFileName.tsv' } = params;
-    useFreshDataStore.setState((state) => ({
+    useDataStore.setState((state) => ({
       ...state,
       columns,
-      standardizedVariables: mockFreshStandardizedVariables,
-      standardizedTerms: mockFreshStandardizedTerms,
-      standardizedFormats: mockFreshStandardizedFormats,
+      standardizedVariables: mockStandardizedVariables,
+      standardizedTerms: mockStandardizedTerms,
+      standardizedFormats: mockStandardizedFormats,
       uploadedDataTableFileName: fileName,
     }));
   };
@@ -80,23 +77,23 @@ describe('Download', () => {
   });
 
   it('should generate valid data dictionary with descriptions provided by user', () => {
-    initializeStore({ columns: mockFreshAnnotatedColumns });
+    initializeStore({ columns: mockAnnotatedColumns });
 
     cy.mount(<Download />);
     cy.get('[data-cy="download-datadictionary-button"]').click();
     cy.readFile('cypress/downloads/someFileName_annotated.json').then((fileContent) => {
-      expect(fileContent).to.deep.equal(mockFreshDataDictionaryWithAnnotations);
+      expect(fileContent).to.deep.equal(mockDataDictionaryWithAnnotations);
     });
   });
 
   it('should generate valid data dictionary even if no descriptions were provided by user', () => {
-    initializeStore({ columns: mockFreshColumnsWithNoDescription });
+    initializeStore({ columns: mockColumnsWithNoDescription });
 
     cy.mount(<Download />);
 
     cy.get('[data-cy="download-datadictionary-button"]').click();
     cy.readFile('cypress/downloads/someFileName_annotated.json').then((fileContent) => {
-      expect(fileContent).to.deep.equal(mockFreshDataDictionaryWithNoDescription);
+      expect(fileContent).to.deep.equal(mockDataDictionaryWithNoDescription);
     });
   });
 });

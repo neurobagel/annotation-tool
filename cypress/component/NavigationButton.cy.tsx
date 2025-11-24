@@ -1,4 +1,4 @@
-import { View } from '../../datamodel';
+import { View } from '../../internal_types';
 import NavigationButton from '../../src/components/NavigationButton';
 import useStore from '../../src/stores/view';
 

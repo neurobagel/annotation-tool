@@ -2,19 +2,19 @@ import { act, renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import mockDataDictionaryRaw from '../../cypress/fixtures/examples/mock.json?raw';
 import mockTsvRaw from '../../cypress/fixtures/examples/mock.tsv?raw';
-import { DataType } from '../../datamodel';
+import { DataType } from '../../internal_types';
+import * as storeUtils from '../utils/data-utils';
 import {
   mockAvailableConfigOptions,
   mockConfigFile,
   mockTermsData,
-  mockFreshStandardizedVariables,
-  mockFreshStandardizedTerms,
-  mockFreshStandardizedFormats,
-  mockFreshColumnsAfterDataTableUpload,
-} from '../utils/freshMocks';
-import * as storeUtils from '../utils/store-utils';
+  mockStandardizedVariables,
+  mockStandardizedTerms,
+  mockStandardizedFormats,
+  mockColumnsAfterDataTableUpload,
+} from '../utils/mocks';
 import {
-  useFreshDataActions,
+  useDataActions,
   useConfigOptions,
   useStandardizedVariables,
   useStandardizedTerms,
@@ -23,7 +23,7 @@ import {
   useColumns,
   useUploadedDataTableFileName,
   useUploadedDataDictionary,
-} from './FreshNewStore';
+} from './data';
 
 const mockedFetchAvailableConfigs = vi.spyOn(storeUtils, 'fetchAvailableConfigs');
 const mockedFetchConfig = vi.spyOn(storeUtils, 'fetchConfig');
@@ -38,7 +38,7 @@ describe('appFetchesConfigOptions', () => {
     mockedFetchAvailableConfigs.mockResolvedValueOnce(mockAvailableConfigOptions);
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       configOptions: useConfigOptions(),
     }));
 
@@ -54,7 +54,7 @@ describe('appFetchesConfigOptions', () => {
     mockedFetchAvailableConfigs.mockRejectedValueOnce(new Error('Network error'));
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       configOptions: useConfigOptions(),
     }));
 
@@ -78,7 +78,7 @@ describe('userSelectsConfig', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       config: useConfig(),
       standardizedVariables: useStandardizedVariables(),
       standardizedTerms: useStandardizedTerms(),
@@ -91,9 +91,9 @@ describe('userSelectsConfig', () => {
 
     expect(mockedFetchConfig).toHaveBeenCalledWith('Neurobagel');
     expect(result.current.config).toBe('Neurobagel');
-    expect(result.current.standardizedVariables).toEqual(mockFreshStandardizedVariables);
-    expect(result.current.standardizedTerms).toEqual(mockFreshStandardizedTerms);
-    expect(result.current.standardizedFormats).toEqual(mockFreshStandardizedFormats);
+    expect(result.current.standardizedVariables).toEqual(mockStandardizedVariables);
+    expect(result.current.standardizedTerms).toEqual(mockStandardizedTerms);
+    expect(result.current.standardizedFormats).toEqual(mockStandardizedFormats);
   });
 
   it('should correctly map standardized variables with all properties', async () => {
@@ -103,7 +103,7 @@ describe('userSelectsConfig', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       standardizedVariables: useStandardizedVariables(),
     }));
 
@@ -127,7 +127,7 @@ describe('userSelectsConfig', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       standardizedTerms: useStandardizedTerms(),
       columns: useColumns(),
     }));
@@ -163,7 +163,7 @@ describe('userSelectsConfig', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       standardizedFormats: useStandardizedFormats(),
     }));
 
@@ -214,7 +214,7 @@ describe('userUploadsDataTableFile', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
       fileName: useUploadedDataTableFileName(),
     }));
@@ -225,7 +225,7 @@ describe('userUploadsDataTableFile', () => {
 
     expect(mockedReadFile).toHaveBeenCalledWith(mockFile);
     expect(mockedParseTsvContent).toHaveBeenCalledWith(mockTsvRaw);
-    expect(result.current.columns).toEqual(mockFreshColumnsAfterDataTableUpload);
+    expect(result.current.columns).toEqual(mockColumnsAfterDataTableUpload);
     expect(result.current.fileName).toBe('mock.tsv');
   });
 
@@ -250,7 +250,7 @@ value4\tvalue5\t
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -273,7 +273,7 @@ value4\tvalue5\t
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -301,7 +301,7 @@ value4\tvalue5\t
     mockedReadFile.mockRejectedValueOnce(new Error('File read error'));
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
       fileName: useUploadedDataTableFileName(),
     }));
@@ -325,7 +325,7 @@ value4\tvalue5\t
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
       fileName: useUploadedDataTableFileName(),
     }));
@@ -360,7 +360,7 @@ describe('userUploadsDataDictionaryFile', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
       standardizedVariables: useStandardizedVariables(),
       standardizedTerms: useStandardizedTerms(),
@@ -449,7 +449,7 @@ describe('userUploadsDataDictionaryFile', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -491,7 +491,7 @@ describe('userUploadsDataDictionaryFile', () => {
     mockedReadFile.mockRejectedValueOnce(new Error('File read error'));
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       uploadedDataDictionary: useUploadedDataDictionary(),
     }));
 
@@ -512,7 +512,7 @@ describe('userUploadsDataDictionaryFile', () => {
     mockedReadFile.mockResolvedValueOnce(invalidJson);
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       uploadedDataDictionary: useUploadedDataDictionary(),
     }));
 
@@ -542,7 +542,7 @@ describe('userUpdatesColumnDescription', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -571,7 +571,7 @@ describe('userUpdatesColumnDescription', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -612,7 +612,7 @@ describe('userUpdatesColumnDataType', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -646,7 +646,7 @@ describe('userUpdatesColumnDataType', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -686,7 +686,7 @@ describe('userUpdatesColumnDataType', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -715,7 +715,7 @@ describe('userUpdatesColumnDataType', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -750,7 +750,7 @@ describe('userUpdatesColumnDataType', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -785,7 +785,7 @@ describe('userUpdatesColumnDataType', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -827,7 +827,7 @@ B`;
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -866,7 +866,7 @@ describe('userUpdatesColumnStandardizedVariable', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
       standardizedVariables: useStandardizedVariables(),
     }));
@@ -906,7 +906,7 @@ describe('userUpdatesColumnStandardizedVariable', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -945,7 +945,7 @@ describe('userUpdatesColumnStandardizedVariable', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -984,7 +984,7 @@ describe('userUpdatesColumnStandardizedVariable', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -1027,7 +1027,7 @@ describe('userUpdatesColumnStandardizedVariable', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -1069,7 +1069,7 @@ describe('userUpdatesColumnStandardizedVariable', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -1114,7 +1114,7 @@ describe('userUpdatesColumnToCollectionMapping', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -1177,7 +1177,7 @@ describe('userCreatesCollection', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       standardizedTerms: useStandardizedTerms(),
     }));
 
@@ -1213,7 +1213,7 @@ describe('userDeletesCollection', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       standardizedTerms: useStandardizedTerms(),
       columns: useColumns(),
     }));
@@ -1264,7 +1264,7 @@ describe('userUpdatesColumnLevelDescription', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -1293,7 +1293,7 @@ describe('userUpdatesColumnLevelDescription', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -1338,7 +1338,7 @@ describe('userUpdatesColumnLevelTerm', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -1397,7 +1397,7 @@ describe('userUpdatesColumnUnits', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -1424,7 +1424,7 @@ describe('userUpdatesColumnUnits', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -1463,7 +1463,7 @@ describe('userUpdatesColumnMissingValues', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -1539,7 +1539,7 @@ describe('userUpdatesColumnMissingValues', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -1574,7 +1574,7 @@ describe('userUpdatesColumnFormat', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -1607,7 +1607,7 @@ describe('userUpdatesColumnFormat', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
     }));
 
@@ -1641,7 +1641,7 @@ describe('reset', () => {
     });
 
     const { result } = renderHook(() => ({
-      actions: useFreshDataActions(),
+      actions: useDataActions(),
       columns: useColumns(),
       uploadedDataTableFileName: useUploadedDataTableFileName(),
       uploadedDataDictionary: useUploadedDataDictionary(),
@@ -1719,8 +1719,8 @@ describe('reset', () => {
 
     // Verify config state is preserved
     expect(result.current.config).toBe('Neurobagel');
-    expect(result.current.standardizedVariables).toEqual(mockFreshStandardizedVariables);
-    expect(result.current.standardizedTerms).toEqual(mockFreshStandardizedTerms);
-    expect(result.current.standardizedFormats).toEqual(mockFreshStandardizedFormats);
+    expect(result.current.standardizedVariables).toEqual(mockStandardizedVariables);
+    expect(result.current.standardizedTerms).toEqual(mockStandardizedTerms);
+    expect(result.current.standardizedFormats).toEqual(mockStandardizedFormats);
   });
 });

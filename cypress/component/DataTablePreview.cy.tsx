@@ -1,12 +1,9 @@
 import DataTablePreview from '../../src/components/DataTablePreview';
-import {
-  mockFreshDataTableFromColumns,
-  mockFreshColumnsAfterDataTableUpload,
-} from '../../src/utils/freshMocks';
+import { mockDataTableFromColumns, mockColumnsAfterDataTableUpload } from '../../src/utils/mocks';
 
 const props = {
-  dataTable: mockFreshDataTableFromColumns,
-  columns: mockFreshColumnsAfterDataTableUpload,
+  dataTable: mockDataTableFromColumns,
+  columns: mockColumnsAfterDataTableUpload,
 };
 
 describe('DataTablePreview', () => {

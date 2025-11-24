@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { useFreshDataActions } from '../stores/FreshNewStore';
+import { useDataActions } from '../stores/data';
 import { UsePersistedMultiColumnCardsOutput } from './usePersistedMultiColumnCards';
 
 export interface DraftCard {
@@ -23,7 +23,7 @@ export function useMultiColumnMeasureDraftCard(
   activeVariableId: string
 ): UseMultiColumnDraftCardOutput {
   const [draftCard, setDraftCard] = useState<DraftCard | null>(null);
-  const { userCreatesCollection } = useFreshDataActions();
+  const { userCreatesCollection } = useDataActions();
 
   useEffect(() => {
     setDraftCard(null);
