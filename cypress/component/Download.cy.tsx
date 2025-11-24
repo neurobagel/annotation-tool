@@ -9,7 +9,7 @@ import {
   mockFreshStandardizedVariables,
   mockFreshStandardizedTerms,
   mockFreshStandardizedFormats,
-} from '../../src/utils/mocks';
+} from '../../src/utils/freshMocks';
 
 interface ValidateFunction {
   (data: unknown): boolean;

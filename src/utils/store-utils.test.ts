@@ -7,14 +7,13 @@ import { Columns, DataDictionary, StandardizedVariables, DataType } from '../../
 import { fetchConfigGitHubURL, githubRawBaseURL } from './constants';
 import {
   mockGitHubResponse,
-  mockConfigFile,
   mockTermsData,
-  mockFreshConfigFile,
+  mockConfigFile,
   mockFreshStandardizedVariables,
   mockFreshStandardizedTerms,
   mockFreshStandardizedFormats,
   mockFreshColumnsAfterDataTableUpload,
-} from './mocks';
+} from './freshMocks';
 import {
   fetchAvailableConfigs,
   fetchConfig,
@@ -170,8 +169,8 @@ describe('fetchConfig', () => {
 describe('convertStandardizedVariables', () => {
   it('should convert standardized variables config array to StandardizedVariables object', () => {
     const result = convertStandardizedVariables(
-      mockFreshConfigFile.standardized_variables,
-      mockFreshConfigFile.namespace_prefix
+      mockConfigFile.standardized_variables,
+      mockConfigFile.namespace_prefix
     );
 
     expect(result).toBeDefined();
@@ -182,8 +181,8 @@ describe('convertStandardizedVariables', () => {
 
   it("should correctly map a standardized variable's properties", () => {
     const result = convertStandardizedVariables(
-      mockFreshConfigFile.standardized_variables,
-      mockFreshConfigFile.namespace_prefix
+      mockConfigFile.standardized_variables,
+      mockConfigFile.namespace_prefix
     );
 
     const ageVariable = result['nb:Age'];
@@ -199,8 +198,8 @@ describe('convertStandardizedTerms', () => {
   it('should correctly convert termsData to StandardizedTerms object', () => {
     const result = convertStandardizedTerms(
       mockTermsData,
-      mockFreshConfigFile.standardized_variables,
-      mockFreshConfigFile.namespace_prefix
+      mockConfigFile.standardized_variables,
+      mockConfigFile.namespace_prefix
     );
 
     expect(result).toBeDefined();
@@ -210,8 +209,8 @@ describe('convertStandardizedTerms', () => {
   it("should correctly map a standardized variable's terms", () => {
     const result = convertStandardizedTerms(
       mockTermsData,
-      mockFreshConfigFile.standardized_variables,
-      mockFreshConfigFile.namespace_prefix
+      mockConfigFile.standardized_variables,
+      mockConfigFile.namespace_prefix
     );
 
     const adhdTerm = result['snomed:406506008'];
@@ -226,8 +225,8 @@ describe('convertStandardizedTerms', () => {
 describe('convertStandardizedFormats', () => {
   it('should convert formats to StandardizedFormats object', () => {
     const result = convertStandardizedFormats(
-      mockFreshConfigFile.standardized_variables,
-      mockFreshConfigFile.namespace_prefix
+      mockConfigFile.standardized_variables,
+      mockConfigFile.namespace_prefix
     );
 
     expect(result).toBeDefined();
@@ -236,8 +235,8 @@ describe('convertStandardizedFormats', () => {
 
   it('should correctly map a format', () => {
     const result = convertStandardizedFormats(
-      mockFreshConfigFile.standardized_variables,
-      mockFreshConfigFile.namespace_prefix
+      mockConfigFile.standardized_variables,
+      mockConfigFile.namespace_prefix
     );
 
     const floatFormat = result['nb:FromFloat'];
@@ -250,8 +249,8 @@ describe('convertStandardizedFormats', () => {
 
   it('should map all age formats', () => {
     const result = convertStandardizedFormats(
-      mockFreshConfigFile.standardized_variables,
-      mockFreshConfigFile.namespace_prefix
+      mockConfigFile.standardized_variables,
+      mockConfigFile.namespace_prefix
     );
 
     expect(result['nb:FromFloat']).toBeDefined();

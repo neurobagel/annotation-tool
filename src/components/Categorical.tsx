@@ -12,8 +12,8 @@ import {
 } from '@mui/material';
 import { matchSorter } from 'match-sorter';
 import { useState } from 'react';
-import { useSortedValues } from '~/hooks';
 import type { TermOption } from '~/hooks/useTermOptions';
+import { useSortedValues } from '../hooks/useSortedValues';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueGroupButton from './MissingValueGroupButton';
 import SortCell from './SortCell';

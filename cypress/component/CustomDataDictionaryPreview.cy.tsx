@@ -1,5 +1,5 @@
 import CustomDataDictionaryPreview from '../../src/components/CustomDataDictionaryPreview';
-import { mockFreshDataDictionaryWithAnnotations } from '../../src/utils/mocks';
+import { mockFreshDataDictionaryWithAnnotations } from '../../src/utils/freshMocks';
 
 describe('CustomDataDictionaryPreview', () => {
   beforeEach(() => {

@@ -4,7 +4,7 @@ import { useColumns } from '../stores/FreshNewStore';
 import {
   mockFreshColumnsAfterDataTableUpload,
   mockFreshDataTableFromColumns,
-} from '../utils/mocks';
+} from '../utils/freshMocks';
 import { useDataTable } from './useDataTable';
 
 // Mock the store hook that the useDataTable hook depends on

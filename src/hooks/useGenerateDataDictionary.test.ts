@@ -7,7 +7,7 @@ import {
   useStandardizedTerms,
   useStandardizedVariables,
 } from '../stores/FreshNewStore';
-import { mockFreshDataDictionaryWithAnnotations } from '../utils/mocks';
+import { mockFreshDataDictionaryWithAnnotations } from '../utils/freshMocks';
 import { useGenerateDataDictionary } from './useGenerateDataDictionary';
 
 vi.mock('../stores/FreshNewStore', () => ({

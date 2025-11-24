@@ -1,7 +1,7 @@
 import { DataType, Columns } from '../../datamodel';
 import ColumnAnnotation from '../../src/components/ColumnAnnotation';
 import { useFreshDataStore } from '../../src/stores/FreshNewStore';
-import { mockFreshStandardizedVariables } from '../../src/utils/mocks';
+import { mockFreshStandardizedVariables } from '../../src/utils/freshMocks';
 
 const createMockColumns = (): Columns => ({
   '1': {

@@ -1,7 +1,10 @@
 import { DataType, VariableType, type Columns, type StandardizedVariables } from '../../datamodel';
 import ValueAnnotation from '../../src/components/ValueAnnotation';
 import { useFreshDataStore } from '../../src/stores/FreshNewStore';
-import { mockFreshStandardizedTerms, mockFreshStandardizedFormats } from '../../src/utils/mocks';
+import {
+  mockFreshStandardizedTerms,
+  mockFreshStandardizedFormats,
+} from '../../src/utils/freshMocks';
 
 const createColumns = (): Columns => ({
   '1': {

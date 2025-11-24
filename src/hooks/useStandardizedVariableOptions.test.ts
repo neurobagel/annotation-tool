@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useColumns, useStandardizedVariables } from '~/stores/FreshNewStore';
-import { mockFreshStandardizedVariables } from '~/utils/mocks';
+import { mockFreshStandardizedVariables } from '~/utils/freshMocks';
 import { useStandardizedVariableOptions } from './useStandardizedVariableOptions';
 
 vi.mock('~/stores/FreshNewStore', () => ({

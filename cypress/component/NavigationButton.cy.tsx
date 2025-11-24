@@ -1,6 +1,6 @@
+import { View } from '../../datamodel';
 import NavigationButton from '../../src/components/NavigationButton';
 import useStore from '../../src/stores/view';
-import { View } from '../../src/utils/internal_types';
 
 const props = {
   backView: View.Upload,

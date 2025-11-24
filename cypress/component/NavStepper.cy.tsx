@@ -1,5 +1,5 @@
+import { View } from '../../datamodel';
 import NavStepper from '../../src/components/NavStepper';
-import { View } from '../../src/utils/internal_types';
 
 const props = {
   currentView: View.ValueAnnotation,

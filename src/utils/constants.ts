@@ -2,7 +2,7 @@ import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import FactCheckIcon from '@mui/icons-material/FactCheck';
 import ViewAgendaIcon from '@mui/icons-material/ViewAgenda';
-import { View, StepConfig } from './internal_types';
+import { View, StepConfig } from '../../datamodel';
 
 export const steps: StepConfig[] = [
   { label: 'Upload', view: View.Upload, icon: CloudUploadIcon },

@@ -5,13 +5,13 @@ import mockTsvRaw from '../../cypress/fixtures/examples/mock.tsv?raw';
 import { DataType } from '../../datamodel';
 import {
   mockAvailableConfigOptions,
-  mockFreshConfigFile,
-  mockFreshTermsData,
+  mockConfigFile,
+  mockTermsData,
   mockFreshStandardizedVariables,
   mockFreshStandardizedTerms,
   mockFreshStandardizedFormats,
   mockFreshColumnsAfterDataTableUpload,
-} from '../utils/mocks';
+} from '../utils/freshMocks';
 import * as storeUtils from '../utils/store-utils';
 import {
   useFreshDataActions,
@@ -73,8 +73,8 @@ describe('userSelectsConfig', () => {
   });
   it('should update all store states on success', async () => {
     mockedFetchConfig.mockResolvedValueOnce({
-      config: mockFreshConfigFile,
-      termsData: mockFreshTermsData,
+      config: mockConfigFile,
+      termsData: mockTermsData,
     });
 
     const { result } = renderHook(() => ({
@@ -98,8 +98,8 @@ describe('userSelectsConfig', () => {
 
   it('should correctly map standardized variables with all properties', async () => {
     mockedFetchConfig.mockResolvedValueOnce({
-      config: mockFreshConfigFile,
-      termsData: mockFreshTermsData,
+      config: mockConfigFile,
+      termsData: mockTermsData,
     });
 
     const { result } = renderHook(() => ({
@@ -122,8 +122,8 @@ describe('userSelectsConfig', () => {
 
   it('should correctly map terms from multiple vocabularies', async () => {
     mockedFetchConfig.mockResolvedValueOnce({
-      config: mockFreshConfigFile,
-      termsData: mockFreshTermsData,
+      config: mockConfigFile,
+      termsData: mockTermsData,
     });
 
     const { result } = renderHook(() => ({
@@ -158,8 +158,8 @@ describe('userSelectsConfig', () => {
 
   it('should correctly map formats with proper identifiers', async () => {
     mockedFetchConfig.mockResolvedValueOnce({
-      config: mockFreshConfigFile,
-      termsData: mockFreshTermsData,
+      config: mockConfigFile,
+      termsData: mockTermsData,
     });
 
     const { result } = renderHook(() => ({
@@ -375,8 +375,8 @@ describe('userUploadsDataDictionaryFile', () => {
 
     // Load config to have standardized variables, terms, and formats
     mockedFetchConfig.mockResolvedValueOnce({
-      config: mockFreshConfigFile,
-      termsData: mockFreshTermsData,
+      config: mockConfigFile,
+      termsData: mockTermsData,
     });
 
     await act(async () => {
@@ -459,8 +459,8 @@ describe('userUploadsDataDictionaryFile', () => {
 
     // Load config
     mockedFetchConfig.mockResolvedValueOnce({
-      config: mockFreshConfigFile,
-      termsData: mockFreshTermsData,
+      config: mockConfigFile,
+      termsData: mockTermsData,
     });
 
     await act(async () => {
@@ -876,8 +876,8 @@ describe('userUpdatesColumnStandardizedVariable', () => {
     });
 
     mockedFetchConfig.mockResolvedValueOnce({
-      config: mockFreshConfigFile,
-      termsData: mockFreshTermsData,
+      config: mockConfigFile,
+      termsData: mockTermsData,
     });
 
     await act(async () => {
@@ -915,8 +915,8 @@ describe('userUpdatesColumnStandardizedVariable', () => {
     });
 
     mockedFetchConfig.mockResolvedValueOnce({
-      config: mockFreshConfigFile,
-      termsData: mockFreshTermsData,
+      config: mockConfigFile,
+      termsData: mockTermsData,
     });
 
     await act(async () => {
@@ -954,8 +954,8 @@ describe('userUpdatesColumnStandardizedVariable', () => {
     });
 
     mockedFetchConfig.mockResolvedValueOnce({
-      config: mockFreshConfigFile,
-      termsData: mockFreshTermsData,
+      config: mockConfigFile,
+      termsData: mockTermsData,
     });
 
     await act(async () => {
@@ -993,8 +993,8 @@ describe('userUpdatesColumnStandardizedVariable', () => {
     });
 
     mockedFetchConfig.mockResolvedValueOnce({
-      config: mockFreshConfigFile,
-      termsData: mockFreshTermsData,
+      config: mockConfigFile,
+      termsData: mockTermsData,
     });
 
     await act(async () => {
@@ -1036,8 +1036,8 @@ describe('userUpdatesColumnStandardizedVariable', () => {
     });
 
     mockedFetchConfig.mockResolvedValueOnce({
-      config: mockFreshConfigFile,
-      termsData: mockFreshTermsData,
+      config: mockConfigFile,
+      termsData: mockTermsData,
     });
 
     await act(async () => {
@@ -1078,8 +1078,8 @@ describe('userUpdatesColumnStandardizedVariable', () => {
     });
 
     mockedFetchConfig.mockResolvedValueOnce({
-      config: mockFreshConfigFile,
-      termsData: mockFreshTermsData,
+      config: mockConfigFile,
+      termsData: mockTermsData,
     });
 
     await act(async () => {
@@ -1123,8 +1123,8 @@ describe('userUpdatesColumnToCollectionMapping', () => {
     });
 
     mockedFetchConfig.mockResolvedValueOnce({
-      config: mockFreshConfigFile,
-      termsData: mockFreshTermsData,
+      config: mockConfigFile,
+      termsData: mockTermsData,
     });
 
     await act(async () => {
@@ -1172,8 +1172,8 @@ describe('userCreatesCollection', () => {
 
   const initializeTerms = async () => {
     mockedFetchConfig.mockResolvedValueOnce({
-      config: mockFreshConfigFile,
-      termsData: mockFreshTermsData,
+      config: mockConfigFile,
+      termsData: mockTermsData,
     });
 
     const { result } = renderHook(() => ({
@@ -1208,8 +1208,8 @@ describe('userDeletesCollection', () => {
 
   const initializeTerms = async () => {
     mockedFetchConfig.mockResolvedValueOnce({
-      config: mockFreshConfigFile,
-      termsData: mockFreshTermsData,
+      config: mockConfigFile,
+      termsData: mockTermsData,
     });
 
     const { result } = renderHook(() => ({
@@ -1636,8 +1636,8 @@ describe('reset', () => {
 
   it('should reset columns and uploaded files while preserving config state', async () => {
     mockedFetchConfig.mockResolvedValueOnce({
-      config: mockFreshConfigFile,
-      termsData: mockFreshTermsData,
+      config: mockConfigFile,
+      termsData: mockTermsData,
     });
 
     const { result } = renderHook(() => ({

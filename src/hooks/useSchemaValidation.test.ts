@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   mockFreshInvalidDataDictionary,
   mockFreshDataDictionaryWithAnnotations,
-} from '../utils/mocks';
+} from '../utils/freshMocks';
 import { useSchemaValidation } from './useSchemaValidation';
 
 describe('useSchemaValidation', () => {
