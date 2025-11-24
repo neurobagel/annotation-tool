@@ -1,3 +1,18 @@
+export enum View {
+  Landing = 'landing',
+  Upload = 'upload',
+  ColumnAnnotation = 'columnAnnotation',
+  MultiColumnMeasures = 'multiColumnMeasures',
+  ValueAnnotation = 'valueAnnotation',
+  Download = 'download',
+}
+
+export type StepConfig = {
+  label: string;
+  view: View;
+  icon: React.ComponentType;
+};
+
 export enum VariableType {
   identifier = 'Identifier',
   categorical = 'Categorical',
