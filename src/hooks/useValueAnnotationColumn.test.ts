@@ -119,7 +119,7 @@ describe('useValueAnnotationColumn', () => {
     expect(result.current?.showStandardizedTerm).toBe(false);
   });
 
-  it('hides missing toggle when there are no unique values', () => {
+  it('hides missing values toggle when there are no unique values', () => {
     mockedUseColumns.mockReturnValue({
       '2': {
         id: '2',
