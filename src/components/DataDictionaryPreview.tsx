@@ -1,6 +1,6 @@
 import ReactJson from '@microlink/react-json-view';
 import { Paper, useTheme } from '@mui/material';
-import { DataDictionary } from '../../datamodel';
+import { DataDictionary } from '../utils/internal_types';
 
 function DataDictionaryPreview({ dataDictionary }: { dataDictionary: DataDictionary }) {
   const theme = useTheme();

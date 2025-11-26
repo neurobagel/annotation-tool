@@ -1,7 +1,7 @@
-import { useColumns, useStandardizedVariables, useFreshDataActions } from '~/stores/FreshNewStore';
-import { DataType } from '../../datamodel';
+import { useColumns, useStandardizedVariables, useDataActions } from '~/stores/data';
 import { useStandardizedVariableOptions } from '../hooks/useStandardizedVariableOptions';
 import { ColumnAnnotationInstructions } from '../utils/instructions';
+import { DataType } from '../utils/internal_types';
 import ColumnAnnotationCard from './ColumnAnnotationCard';
 import Instruction from './Instruction';
 
@@ -12,7 +12,7 @@ function ColumnAnnotation() {
     userUpdatesColumnDescription,
     userUpdatesColumnStandardizedVariable,
     userUpdatesColumnDataType,
-  } = useFreshDataActions();
+  } = useDataActions();
   const standardizedVariableOptions = useStandardizedVariableOptions();
 
   const columnsArray = Object.entries(columns);

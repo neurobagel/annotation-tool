@@ -1,5 +1,11 @@
 import axios from 'axios';
 import Papa from 'papaparse';
+import assessmentTerms from '../assets/default_config/assessment.json';
+import defaultConfigData from '../assets/default_config/config.json';
+import diagnosisTerms from '../assets/default_config/diagnosis.json';
+import sexTerms from '../assets/default_config/sex.json';
+import { fetchConfigGitHubURL, githubRawBaseURL } from './constants';
+import { ConfigFile, VocabConfig, ConfigFileStandardizedVariable } from './external_types';
 import {
   StandardizedVariables,
   StandardizedTerms,
@@ -8,17 +14,7 @@ import {
   Columns,
   VariableType,
   DataType,
-} from '../../datamodel';
-import assessmentTerms from '../assets/default_config/assessment.json';
-import defaultConfigData from '../assets/default_config/config.json';
-import diagnosisTerms from '../assets/default_config/diagnosis.json';
-import sexTerms from '../assets/default_config/sex.json';
-import { fetchConfigGitHubURL, githubRawBaseURL } from './constants';
-import {
-  FreshConfigFile,
-  VocabConfig,
-  FreshConfigFileStandardizedVariable,
-} from './external_types';
+} from './internal_types';
 
 export async function fetchAvailableConfigs(): Promise<string[]> {
   try {
@@ -36,7 +32,7 @@ export async function fetchAvailableConfigs(): Promise<string[]> {
 // Helper function to load config from a given path
 async function loadConfigFromPath(
   configPath: string
-): Promise<{ config: FreshConfigFile; termsData: Record<string, VocabConfig[]> }> {
+): Promise<{ config: ConfigFile; termsData: Record<string, VocabConfig[]> }> {
   const configResponse = await axios.get(configPath);
   const configArray = configResponse.data;
   const config = configArray[0];
@@ -45,7 +41,7 @@ async function loadConfigFromPath(
   const termFiles = new Set<string>();
   const variables = config.standardized_variables;
 
-  variables.forEach((variable: FreshConfigFileStandardizedVariable) => {
+  variables.forEach((variable: ConfigFileStandardizedVariable) => {
     if (variable.terms_file) {
       termFiles.add(variable.terms_file);
     }
@@ -72,14 +68,14 @@ async function loadConfigFromPath(
 
 export async function fetchConfig(
   selectedConfig: string
-): Promise<{ config: FreshConfigFile; termsData: Record<string, VocabConfig[]> }> {
+): Promise<{ config: ConfigFile; termsData: Record<string, VocabConfig[]> }> {
   try {
     return await loadConfigFromPath(`${githubRawBaseURL}${selectedConfig}/config.json`);
   } catch (error) {
     // TODO: show a notif error
     // Fallback to default config when remote fetching fails
     try {
-      const config = (defaultConfigData as FreshConfigFile[])[0];
+      const config = (defaultConfigData as ConfigFile[])[0];
       const termsData: Record<string, VocabConfig[]> = {
         'assessment.json': assessmentTerms as VocabConfig[],
         'diagnosis.json': diagnosisTerms as VocabConfig[],
@@ -87,13 +83,13 @@ export async function fetchConfig(
       };
       return { config, termsData };
     } catch (fallbackError) {
-      return { config: {} as FreshConfigFile, termsData: {} };
+      return { config: {} as ConfigFile, termsData: {} };
     }
   }
 }
 
 export function convertStandardizedVariables(
-  variables: FreshConfigFileStandardizedVariable[],
+  variables: ConfigFileStandardizedVariable[],
   namespacePrefix: string
 ): StandardizedVariables {
   return variables.reduce((acc, variable) => {
@@ -112,7 +108,7 @@ export function convertStandardizedVariables(
 
 export function convertStandardizedTerms(
   termsData: Record<string, VocabConfig[]>,
-  variables: FreshConfigFileStandardizedVariable[],
+  variables: ConfigFileStandardizedVariable[],
   variableNamespacePrefix: string
 ): StandardizedTerms {
   return Object.entries(termsData).reduce((acc, [fileName, vocabsArray]) => {
@@ -147,7 +143,7 @@ export function convertStandardizedTerms(
 }
 
 export function convertStandardizedFormats(
-  variables: FreshConfigFileStandardizedVariable[],
+  variables: ConfigFileStandardizedVariable[],
   namespacePrefix: string
 ): StandardizedFormats {
   return variables.reduce((acc, variable) => {

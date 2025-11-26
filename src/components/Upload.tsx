@@ -2,12 +2,12 @@ import { useEffect } from 'react';
 import { useDataTable } from '../hooks/useDataTable';
 import {
   useConfig,
-  useFreshDataActions,
+  useDataActions,
   useIsConfigLoading,
   useUploadedDataTableFileName,
   useConfigOptions,
   useUploadedDataDictionary,
-} from '../stores/FreshNewStore';
+} from '../stores/data';
 import { UploadInstructions } from '../utils/instructions';
 import ConfigCard from './ConfigCard';
 import DataDictionaryPreview from './DataDictionaryPreview';
@@ -29,7 +29,7 @@ function Upload({ disableConfig }: UploadProps) {
     userUploadsDataTableFile,
     reset,
     userUploadsDataDictionaryFile,
-  } = useFreshDataActions();
+  } = useDataActions();
   const configOptions = useConfigOptions();
   const selectedConfig = useConfig();
   const isConfigLoading = useIsConfigLoading();

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import type { StandardizedTerms } from '../../datamodel';
-import { useStandardizedTerms } from '../stores/FreshNewStore';
+import { useStandardizedTerms } from '../stores/data';
+import type { StandardizedTerms } from '../utils/internal_types';
 import { useAnnotatedVariables } from './useAnnotatedVariables';
 import type { ColumnGroupColumn, UnannotatedColumnGroup } from './useValueAnnotationColumns';
 import { useValueAnnotationColumns } from './useValueAnnotationColumns';

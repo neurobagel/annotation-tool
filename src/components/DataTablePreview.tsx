@@ -8,8 +8,8 @@ import {
   TableRow,
   TablePagination,
 } from '@mui/material';
-import { DataTable } from 'datamodel';
 import { v4 as uuidv4 } from 'uuid';
+import { DataTable } from '~/utils/internal_types';
 import { useTablePagination } from '../hooks/useTablePagination';
 
 function DataTablePreview({ dataTable }: { dataTable: DataTable }) {

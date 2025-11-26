@@ -1,4 +1,4 @@
-import { useColumns, useStandardizedVariables } from '~/stores/FreshNewStore';
+import { useColumns, useStandardizedVariables } from '~/stores/data';
 
 export interface StandardizedVariableOption {
   id: string;

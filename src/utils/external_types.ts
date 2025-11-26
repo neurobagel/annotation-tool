@@ -1,7 +1,5 @@
-// TODO: Remove duplicate types once store refactoring is done
 // --- Raw config file types (used for parsing config files from disk/network) ---
-import { VariableType as FreshVariableType } from 'datamodel';
-import { VariableType } from './internal_types';
+import { VariableType } from '~/utils/internal_types';
 
 // A term as it appears in a terms file (raw config)
 export type TermsFileStandardizedTerm = {
@@ -43,19 +41,6 @@ export type ConfigFileStandardizedVariable = {
   same_as?: string | null;
 };
 
-export type FreshConfigFileStandardizedVariable = {
-  id: string;
-  name: string;
-  variable_type?: FreshVariableType;
-  terms_file?: string | null;
-  formats?: ConfigFileTermFormat[] | null;
-  required?: boolean;
-  description?: string;
-  is_multi_column_measure?: boolean;
-  can_have_multiple_columns?: boolean;
-  same_as?: string | null;
-};
-
 // The config file as it appears on disk/network (raw config)
 export interface ConfigFile {
   vocabulary_name: string;
@@ -63,12 +48,4 @@ export interface ConfigFile {
   namespace_url: string;
   version: string;
   standardized_variables: ConfigFileStandardizedVariable[];
-}
-
-export interface FreshConfigFile {
-  vocabulary_name: string;
-  namespace_prefix: string;
-  namespace_url: string;
-  version: string;
-  standardized_variables: FreshConfigFileStandardizedVariable[];
 }

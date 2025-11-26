@@ -1,5 +1,5 @@
-import { DataType } from '../../datamodel';
 import ColumnAnnotationCard from '../../src/components/ColumnAnnotationCard';
+import { DataType } from '../../src/utils/internal_types';
 
 const props = {
   id: '1',

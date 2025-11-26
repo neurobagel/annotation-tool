@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import type { DataType } from '../../datamodel';
-import { useColumns, useStandardizedVariables } from '../stores/FreshNewStore';
+import { useColumns, useStandardizedVariables } from '../stores/data';
+import type { DataType } from '../utils/internal_types';
 
 export interface ColumnMetadataSummary {
   id: string;

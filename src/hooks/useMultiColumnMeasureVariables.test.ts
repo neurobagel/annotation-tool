@@ -1,10 +1,10 @@
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useColumns, useStandardizedVariables } from '~/stores/FreshNewStore';
-import type { Columns, StandardizedVariables } from '../../datamodel';
+import { useColumns, useStandardizedVariables } from '~/stores/data';
+import type { Columns, StandardizedVariables } from '../utils/internal_types';
 import { useMultiColumnMeasureVariables } from './useMultiColumnMeasureVariables';
 
-vi.mock('~/stores/FreshNewStore', () => ({
+vi.mock('~/stores/data', () => ({
   useColumns: vi.fn(),
   useStandardizedVariables: vi.fn(),
 }));

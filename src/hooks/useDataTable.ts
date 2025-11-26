@@ -1,8 +1,8 @@
 /**
  * Hook to generate DataTable from the Columns in the store.
  */
-import { DataTable } from 'datamodel';
-import { useColumns } from '../stores/FreshNewStore';
+import { DataTable } from '~/utils/internal_types';
+import { useColumns } from '../stores/data';
 
 export function useDataTable(): DataTable {
   const columns = useColumns();

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useColumns } from '../stores/FreshNewStore';
+import { useColumns } from '../stores/data';
 
 /**
  * Returns the unique values for a column.

@@ -1,4 +1,4 @@
-import { useColumns, useStandardizedVariables } from '~/stores/FreshNewStore';
+import { useColumns, useStandardizedVariables } from '~/stores/data';
 
 /**
  * Returns true if there are any multi-column measure variables that have at least one mapped column.

@@ -10,7 +10,7 @@ import NavigationButton from './components/NavigationButton';
 import Upload from './components/Upload';
 import ValueAnnotation from './components/ValueAnnotation';
 import { useHasMultiColumnMeasures } from './hooks/useHasMultiColumnMeasures';
-import { useUploadedDataTableFileName } from './stores/FreshNewStore';
+import { useUploadedDataTableFileName } from './stores/data';
 import useViewStore, { getNavigationProps } from './stores/view';
 import { View } from './utils/internal_types';
 

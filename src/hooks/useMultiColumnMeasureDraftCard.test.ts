@@ -1,15 +1,15 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useFreshDataActions } from '~/stores/FreshNewStore';
-import { FreshDataStoreActions } from '../../datamodel';
+import { useDataActions } from '~/stores/data';
+import { DataStoreActions } from '../utils/internal_types';
 import { useMultiColumnMeasureDraftCard } from './useMultiColumnMeasureDraftCard';
 
-vi.mock('~/stores/FreshNewStore', () => ({
-  useFreshDataActions: vi.fn(),
+vi.mock('~/stores/data', () => ({
+  useDataActions: vi.fn(),
 }));
 
-const mockedUseFreshDataActions = vi.mocked(useFreshDataActions);
-const createMockActions = (): Pick<FreshDataStoreActions, 'userCreatesCollection'> => ({
+const mockedUseDataActions = vi.mocked(useDataActions);
+const createMockActions = (): Pick<DataStoreActions, 'userCreatesCollection'> => ({
   userCreatesCollection: vi.fn(),
 });
 
@@ -22,7 +22,7 @@ describe('useMultiColumnMeasureDraftCard', () => {
     const mockActions = createMockActions();
     const mockAction = vi.fn();
     mockActions.userCreatesCollection = mockAction;
-    mockedUseFreshDataActions.mockReturnValue(mockActions as FreshDataStoreActions);
+    mockedUseDataActions.mockReturnValue(mockActions as DataStoreActions);
 
     const { result } = renderHook(() => useMultiColumnMeasureDraftCard('var-1'));
 
@@ -53,7 +53,7 @@ describe('useMultiColumnMeasureDraftCard', () => {
   });
 
   it('should reset the draft when the active variable changes', () => {
-    mockedUseFreshDataActions.mockReturnValue(createMockActions() as FreshDataStoreActions);
+    mockedUseDataActions.mockReturnValue(createMockActions() as DataStoreActions);
 
     const { result, rerender } = renderHook(
       ({ variableId }) => useMultiColumnMeasureDraftCard(variableId),
@@ -72,7 +72,7 @@ describe('useMultiColumnMeasureDraftCard', () => {
   });
 
   it('should not create multiple drafts', () => {
-    mockedUseFreshDataActions.mockReturnValue(createMockActions() as FreshDataStoreActions);
+    mockedUseDataActions.mockReturnValue(createMockActions() as DataStoreActions);
 
     const { result } = renderHook(() => useMultiColumnMeasureDraftCard('var-1'));
 

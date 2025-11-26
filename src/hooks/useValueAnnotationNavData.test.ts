@@ -1,12 +1,12 @@
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { DataType } from '../../datamodel';
-import { useStandardizedTerms } from '../stores/FreshNewStore';
+import { useStandardizedTerms } from '../stores/data';
+import { DataType } from '../utils/internal_types';
 import { useAnnotatedVariables } from './useAnnotatedVariables';
 import { useValueAnnotationColumns } from './useValueAnnotationColumns';
 import { useValueAnnotationNavData } from './useValueAnnotationNavData';
 
-vi.mock('../stores/FreshNewStore', () => ({
+vi.mock('../stores/data', () => ({
   useStandardizedTerms: vi.fn(),
 }));
 

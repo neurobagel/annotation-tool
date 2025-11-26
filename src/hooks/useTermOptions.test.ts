@@ -1,10 +1,10 @@
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useStandardizedTerms } from '~/stores/FreshNewStore';
-import type { StandardizedTerms } from '../../datamodel';
+import { useStandardizedTerms } from '~/stores/data';
+import type { StandardizedTerms } from '../utils/internal_types';
 import { useTermOptions } from './useTermOptions';
 
-vi.mock('~/stores/FreshNewStore', () => ({
+vi.mock('~/stores/data', () => ({
   useStandardizedTerms: vi.fn(),
 }));
 

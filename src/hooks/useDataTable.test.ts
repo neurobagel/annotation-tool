@@ -1,14 +1,11 @@
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useColumns } from '../stores/FreshNewStore';
-import {
-  mockFreshColumnsAfterDataTableUpload,
-  mockFreshDataTableFromColumns,
-} from '../utils/mocks';
+import { useColumns } from '../stores/data';
+import { mockColumnsAfterDataTableUpload, mockDataTableFromColumns } from '../utils/mocks';
 import { useDataTable } from './useDataTable';
 
 // Mock the store hook that the useDataTable hook depends on
-vi.mock('../stores/FreshNewStore', () => ({
+vi.mock('../stores/data', () => ({
   useColumns: vi.fn(),
 }));
 
@@ -20,15 +17,15 @@ describe('useDataTable', () => {
   });
 
   it('should transform columns into DataTable format with headers as keys', () => {
-    mockedUseColumns.mockReturnValue(mockFreshColumnsAfterDataTableUpload);
+    mockedUseColumns.mockReturnValue(mockColumnsAfterDataTableUpload);
 
     const { result } = renderHook(() => useDataTable());
 
-    expect(result.current).toEqual(mockFreshDataTableFromColumns);
+    expect(result.current).toEqual(mockDataTableFromColumns);
   });
 
   it('should preserve column order based on numeric column IDs', () => {
-    mockedUseColumns.mockReturnValue(mockFreshColumnsAfterDataTableUpload);
+    mockedUseColumns.mockReturnValue(mockColumnsAfterDataTableUpload);
 
     const { result } = renderHook(() => useDataTable());
 

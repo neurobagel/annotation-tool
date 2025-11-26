@@ -1,10 +1,10 @@
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useColumns, useStandardizedVariables } from '~/stores/FreshNewStore';
-import { mockFreshStandardizedVariables } from '~/utils/mocks';
+import { useColumns, useStandardizedVariables } from '~/stores/data';
+import { mockStandardizedVariables } from '~/utils/mocks';
 import { useStandardizedVariableOptions } from './useStandardizedVariableOptions';
 
-vi.mock('~/stores/FreshNewStore', () => ({
+vi.mock('~/stores/data', () => ({
   useColumns: vi.fn(),
   useStandardizedVariables: vi.fn(),
 }));
@@ -30,11 +30,11 @@ describe('useStandardizedVariableOptions', () => {
         allValues: [],
       },
     });
-    mockedUseStandardizedVariables.mockReturnValue(mockFreshStandardizedVariables);
+    mockedUseStandardizedVariables.mockReturnValue(mockStandardizedVariables);
 
     const { result } = renderHook(() => useStandardizedVariableOptions());
 
-    expect(result.current).toHaveLength(Object.keys(mockFreshStandardizedVariables).length);
+    expect(result.current).toHaveLength(Object.keys(mockStandardizedVariables).length);
     expect(result.current.every((option) => option.disabled === false)).toBe(true);
   });
 
@@ -53,7 +53,7 @@ describe('useStandardizedVariableOptions', () => {
         standardizedVariable: 'nb:Assessment',
       },
     });
-    mockedUseStandardizedVariables.mockReturnValue(mockFreshStandardizedVariables);
+    mockedUseStandardizedVariables.mockReturnValue(mockStandardizedVariables);
 
     const { result } = renderHook(() => useStandardizedVariableOptions());
 
@@ -75,7 +75,7 @@ describe('useStandardizedVariableOptions', () => {
         standardizedVariable: 'nb:Diagnosis',
       },
     });
-    mockedUseStandardizedVariables.mockReturnValue(mockFreshStandardizedVariables);
+    mockedUseStandardizedVariables.mockReturnValue(mockStandardizedVariables);
 
     const { result } = renderHook(() => useStandardizedVariableOptions());
 
@@ -109,7 +109,7 @@ describe('useStandardizedVariableOptions', () => {
         standardizedVariable: 'nb:Age',
       },
     });
-    mockedUseStandardizedVariables.mockReturnValue(mockFreshStandardizedVariables);
+    mockedUseStandardizedVariables.mockReturnValue(mockStandardizedVariables);
 
     const { result } = renderHook(() => useStandardizedVariableOptions());
 
@@ -135,7 +135,7 @@ describe('useStandardizedVariableOptions', () => {
         standardizedVariable: 'nb:ParticipantID',
       },
     });
-    mockedUseStandardizedVariables.mockReturnValue(mockFreshStandardizedVariables);
+    mockedUseStandardizedVariables.mockReturnValue(mockStandardizedVariables);
 
     const { result } = renderHook(() => useStandardizedVariableOptions());
 
@@ -158,7 +158,7 @@ describe('useStandardizedVariableOptions', () => {
         standardizedVariable: 'nb:ParticipantID',
       },
     });
-    mockedUseStandardizedVariables.mockReturnValue(mockFreshStandardizedVariables);
+    mockedUseStandardizedVariables.mockReturnValue(mockStandardizedVariables);
 
     const { result } = renderHook(() => useStandardizedVariableOptions());
 

@@ -1,16 +1,16 @@
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { DataType, VariableType } from '../../datamodel';
 import {
   useColumns,
   useStandardizedFormats,
   useStandardizedTerms,
   useStandardizedVariables,
-} from '../stores/FreshNewStore';
-import { mockFreshDataDictionaryWithAnnotations } from '../utils/mocks';
+} from '../stores/data';
+import { DataType, VariableType } from '../utils/internal_types';
+import { mockDataDictionaryWithAnnotations } from '../utils/mocks';
 import { useGenerateDataDictionary } from './useGenerateDataDictionary';
 
-vi.mock('../stores/FreshNewStore', () => ({
+vi.mock('../stores/data', () => ({
   useColumns: vi.fn(),
   useStandardizedVariables: vi.fn(),
   useStandardizedTerms: vi.fn(),
@@ -392,6 +392,6 @@ describe('useGenerateDataDictionary', () => {
     });
 
     const { result } = renderHook(() => useGenerateDataDictionary());
-    expect(result.current).toEqual(mockFreshDataDictionaryWithAnnotations);
+    expect(result.current).toEqual(mockDataDictionaryWithAnnotations);
   });
 });

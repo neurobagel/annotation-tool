@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { DataType } from '../../datamodel';
-import { useColumns, useStandardizedVariables } from '../stores/FreshNewStore';
+import { useColumns, useStandardizedVariables } from '../stores/data';
+import { DataType } from '../utils/internal_types';
 import { useColumnUniqueValues } from './useColumnUniqueValues';
 import type { FormatOption } from './useFormatOptions';
 import { useFormatOptions } from './useFormatOptions';

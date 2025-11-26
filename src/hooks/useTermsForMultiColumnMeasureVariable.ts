@@ -1,4 +1,4 @@
-import { useStandardizedTerms } from '../stores/FreshNewStore';
+import { useStandardizedTerms } from '../stores/data';
 import { AvailableTerm } from '../types/multiColumnMeasureTypes';
 
 /**

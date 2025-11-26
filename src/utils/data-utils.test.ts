@@ -3,18 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import mockDataDictionaryRaw from '../../cypress/fixtures/examples/mock.json?raw';
 import mockTsvRaw from '../../cypress/fixtures/examples/mock.tsv?raw';
 import mockTsvWithEmptyLineRaw from '../../cypress/fixtures/examples/mock_with_empty_line.tsv?raw';
-import { Columns, DataDictionary, StandardizedVariables, DataType } from '../../datamodel';
 import { fetchConfigGitHubURL, githubRawBaseURL } from './constants';
-import {
-  mockGitHubResponse,
-  mockConfigFile,
-  mockTermsData,
-  mockFreshConfigFile,
-  mockFreshStandardizedVariables,
-  mockFreshStandardizedTerms,
-  mockFreshStandardizedFormats,
-  mockFreshColumnsAfterDataTableUpload,
-} from './mocks';
 import {
   fetchAvailableConfigs,
   fetchConfig,
@@ -25,7 +14,17 @@ import {
   parseTsvContent,
   applyDataDictionaryToColumns,
   applyDataTypeToColumn,
-} from './store-utils';
+} from './data-utils';
+import { Columns, DataDictionary, StandardizedVariables, DataType } from './internal_types';
+import {
+  mockGitHubResponse,
+  mockTermsData,
+  mockConfigFile,
+  mockStandardizedVariables,
+  mockStandardizedTerms,
+  mockStandardizedFormats,
+  mockColumnsAfterDataTableUpload,
+} from './mocks';
 
 // Mock axios
 vi.mock('axios');
@@ -170,8 +169,8 @@ describe('fetchConfig', () => {
 describe('convertStandardizedVariables', () => {
   it('should convert standardized variables config array to StandardizedVariables object', () => {
     const result = convertStandardizedVariables(
-      mockFreshConfigFile.standardized_variables,
-      mockFreshConfigFile.namespace_prefix
+      mockConfigFile.standardized_variables,
+      mockConfigFile.namespace_prefix
     );
 
     expect(result).toBeDefined();
@@ -182,8 +181,8 @@ describe('convertStandardizedVariables', () => {
 
   it("should correctly map a standardized variable's properties", () => {
     const result = convertStandardizedVariables(
-      mockFreshConfigFile.standardized_variables,
-      mockFreshConfigFile.namespace_prefix
+      mockConfigFile.standardized_variables,
+      mockConfigFile.namespace_prefix
     );
 
     const ageVariable = result['nb:Age'];
@@ -199,8 +198,8 @@ describe('convertStandardizedTerms', () => {
   it('should correctly convert termsData to StandardizedTerms object', () => {
     const result = convertStandardizedTerms(
       mockTermsData,
-      mockFreshConfigFile.standardized_variables,
-      mockFreshConfigFile.namespace_prefix
+      mockConfigFile.standardized_variables,
+      mockConfigFile.namespace_prefix
     );
 
     expect(result).toBeDefined();
@@ -210,8 +209,8 @@ describe('convertStandardizedTerms', () => {
   it("should correctly map a standardized variable's terms", () => {
     const result = convertStandardizedTerms(
       mockTermsData,
-      mockFreshConfigFile.standardized_variables,
-      mockFreshConfigFile.namespace_prefix
+      mockConfigFile.standardized_variables,
+      mockConfigFile.namespace_prefix
     );
 
     const adhdTerm = result['snomed:406506008'];
@@ -226,8 +225,8 @@ describe('convertStandardizedTerms', () => {
 describe('convertStandardizedFormats', () => {
   it('should convert formats to StandardizedFormats object', () => {
     const result = convertStandardizedFormats(
-      mockFreshConfigFile.standardized_variables,
-      mockFreshConfigFile.namespace_prefix
+      mockConfigFile.standardized_variables,
+      mockConfigFile.namespace_prefix
     );
 
     expect(result).toBeDefined();
@@ -236,8 +235,8 @@ describe('convertStandardizedFormats', () => {
 
   it('should correctly map a format', () => {
     const result = convertStandardizedFormats(
-      mockFreshConfigFile.standardized_variables,
-      mockFreshConfigFile.namespace_prefix
+      mockConfigFile.standardized_variables,
+      mockConfigFile.namespace_prefix
     );
 
     const floatFormat = result['nb:FromFloat'];
@@ -250,8 +249,8 @@ describe('convertStandardizedFormats', () => {
 
   it('should map all age formats', () => {
     const result = convertStandardizedFormats(
-      mockFreshConfigFile.standardized_variables,
-      mockFreshConfigFile.namespace_prefix
+      mockConfigFile.standardized_variables,
+      mockConfigFile.namespace_prefix
     );
 
     expect(result['nb:FromFloat']).toBeDefined();
@@ -329,11 +328,11 @@ describe('applyDataDictionaryToColumns', () => {
     const mockDataDict = JSON.parse(mockDataDictionaryRaw);
 
     const result = applyDataDictionaryToColumns(
-      mockFreshColumnsAfterDataTableUpload,
+      mockColumnsAfterDataTableUpload,
       mockDataDict,
-      mockFreshStandardizedVariables,
-      mockFreshStandardizedTerms,
-      mockFreshStandardizedFormats
+      mockStandardizedVariables,
+      mockStandardizedTerms,
+      mockStandardizedFormats
     );
 
     expect(result['0'].description).toBe('A participant ID');
@@ -411,9 +410,9 @@ describe('applyDataDictionaryToColumns', () => {
     const result = applyDataDictionaryToColumns(
       mockColumns as unknown as Columns,
       mockDataDict as unknown as DataDictionary,
-      mockFreshStandardizedVariables as unknown as StandardizedVariables,
-      mockFreshStandardizedTerms,
-      mockFreshStandardizedFormats
+      mockStandardizedVariables as unknown as StandardizedVariables,
+      mockStandardizedTerms,
+      mockStandardizedFormats
     );
 
     expect(result['0'].description).toBe('Sex of the participant');
@@ -456,9 +455,9 @@ describe('applyDataDictionaryToColumns', () => {
     const result = applyDataDictionaryToColumns(
       mockColumns as unknown as Columns,
       mockDataDict as unknown as DataDictionary,
-      mockFreshStandardizedVariables as unknown as StandardizedVariables,
-      mockFreshStandardizedTerms,
-      mockFreshStandardizedFormats
+      mockStandardizedVariables as unknown as StandardizedVariables,
+      mockStandardizedTerms,
+      mockStandardizedFormats
     );
 
     expect(result['0'].description).toBe('IQ test score');
@@ -496,9 +495,9 @@ describe('applyDataDictionaryToColumns', () => {
     const result = applyDataDictionaryToColumns(
       mockColumns as unknown as Columns,
       mockDataDict as unknown as DataDictionary,
-      mockFreshStandardizedVariables as unknown as StandardizedVariables,
-      mockFreshStandardizedTerms,
-      mockFreshStandardizedFormats
+      mockStandardizedVariables as unknown as StandardizedVariables,
+      mockStandardizedTerms,
+      mockStandardizedFormats
     );
 
     expect(result['0'].format).toBe('nb:FromFloat');
@@ -530,9 +529,9 @@ describe('applyDataDictionaryToColumns', () => {
     const result = applyDataDictionaryToColumns(
       mockColumns,
       mockDataDict,
-      mockFreshStandardizedVariables,
-      mockFreshStandardizedTerms,
-      mockFreshStandardizedFormats
+      mockStandardizedVariables,
+      mockStandardizedTerms,
+      mockStandardizedFormats
     );
 
     expect(result['0'].description).toBeUndefined();
@@ -563,9 +562,9 @@ describe('applyDataDictionaryToColumns', () => {
     const result = applyDataDictionaryToColumns(
       mockColumns,
       mockDataDict,
-      mockFreshStandardizedVariables,
-      mockFreshStandardizedTerms,
-      mockFreshStandardizedFormats
+      mockStandardizedVariables,
+      mockStandardizedTerms,
+      mockStandardizedFormats
     );
 
     expect(result['0'].description).toBe('Test column');
@@ -600,9 +599,9 @@ describe('applyDataDictionaryToColumns', () => {
     const result = applyDataDictionaryToColumns(
       mockColumns,
       mockDataDict,
-      mockFreshStandardizedVariables,
-      mockFreshStandardizedTerms,
-      mockFreshStandardizedFormats
+      mockStandardizedVariables,
+      mockStandardizedTerms,
+      mockStandardizedFormats
     );
 
     expect(result['0'].standardizedVariable).toBe('nb:Assessment');
@@ -637,9 +636,9 @@ describe('applyDataDictionaryToColumns', () => {
     const result = applyDataDictionaryToColumns(
       mockColumns,
       mockDataDict,
-      mockFreshStandardizedVariables,
-      mockFreshStandardizedTerms,
-      mockFreshStandardizedFormats
+      mockStandardizedVariables,
+      mockStandardizedTerms,
+      mockStandardizedFormats
     );
 
     expect(result['0'].standardizedVariable).toBe('nb:Age');
@@ -679,9 +678,9 @@ describe('applyDataDictionaryToColumns', () => {
     const result = applyDataDictionaryToColumns(
       mockColumns as unknown as Columns,
       mockDataDict as unknown as DataDictionary,
-      mockFreshStandardizedVariables as unknown as StandardizedVariables,
-      mockFreshStandardizedTerms,
-      mockFreshStandardizedFormats
+      mockStandardizedVariables as unknown as StandardizedVariables,
+      mockStandardizedTerms,
+      mockStandardizedFormats
     );
 
     expect(result['0'].levels).toBeDefined();
@@ -709,9 +708,9 @@ describe('applyDataDictionaryToColumns', () => {
     const result = applyDataDictionaryToColumns(
       mockColumns as unknown as Columns,
       mockDataDict as unknown as DataDictionary,
-      mockFreshStandardizedVariables as unknown as StandardizedVariables,
-      mockFreshStandardizedTerms,
-      mockFreshStandardizedFormats
+      mockStandardizedVariables as unknown as StandardizedVariables,
+      mockStandardizedTerms,
+      mockStandardizedFormats
     );
 
     expect(result).not.toBe(mockColumns);
