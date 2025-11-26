@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useColumns, useStandardizedTerms } from '~/stores/data';
-import type { Columns, StandardizedTerms } from '../../internal_types';
+import type { Columns, StandardizedTerms } from '../utils/internal_types';
 import { useColumnOptionsForMultiColumnMeasureVariable } from './useColumnOptionsForMultiColumnMeasureVariable';
 
 vi.mock('~/stores/data', () => ({

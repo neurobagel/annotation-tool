@@ -1,6 +1,6 @@
-import { DataType, Columns } from '../../internal_types';
 import ColumnAnnotation from '../../src/components/ColumnAnnotation';
 import { useDataStore } from '../../src/stores/data';
+import { DataType, Columns } from '../../src/utils/internal_types';
 import { mockStandardizedVariables } from '../../src/utils/mocks';
 
 const createMockColumns = (): Columns => ({

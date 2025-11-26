@@ -1,7 +1,7 @@
 /**
  * Hook to generate DataTable from the Columns in the store.
  */
-import { DataTable } from 'internal_types';
+import { DataTable } from '~/utils/internal_types';
 import { useColumns } from '../stores/data';
 
 export function useDataTable(): DataTable {

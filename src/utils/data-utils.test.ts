@@ -3,7 +3,6 @@ import { describe, it, expect, vi } from 'vitest';
 import mockDataDictionaryRaw from '../../cypress/fixtures/examples/mock.json?raw';
 import mockTsvRaw from '../../cypress/fixtures/examples/mock.tsv?raw';
 import mockTsvWithEmptyLineRaw from '../../cypress/fixtures/examples/mock_with_empty_line.tsv?raw';
-import { Columns, DataDictionary, StandardizedVariables, DataType } from '../../internal_types';
 import { fetchConfigGitHubURL, githubRawBaseURL } from './constants';
 import {
   fetchAvailableConfigs,
@@ -16,6 +15,7 @@ import {
   applyDataDictionaryToColumns,
   applyDataTypeToColumn,
 } from './data-utils';
+import { Columns, DataDictionary, StandardizedVariables, DataType } from './internal_types';
 import {
   mockGitHubResponse,
   mockTermsData,

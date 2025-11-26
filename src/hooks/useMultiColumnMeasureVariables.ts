@@ -1,5 +1,5 @@
-import { StandardizedVariable } from '../../internal_types';
 import { useColumns, useStandardizedVariables } from '../stores/data';
+import { StandardizedVariable } from '../utils/internal_types';
 
 /**
  * Returns list of multi-column measure variables that have at least one mapped column.

@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { DataType } from '../../internal_types';
 import { useColumns, useStandardizedVariables } from '../stores/data';
+import { DataType } from '../utils/internal_types';
 import { useColumnUniqueValues } from './useColumnUniqueValues';
 import { useFormatOptions } from './useFormatOptions';
 import { useTermOptions } from './useTermOptions';

@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { DataType } from '../../internal_types';
 import { useStandardizedTerms } from '../stores/data';
+import { DataType } from '../utils/internal_types';
 import { useAnnotatedVariables } from './useAnnotatedVariables';
 import { useValueAnnotationColumns } from './useValueAnnotationColumns';
 import { useValueAnnotationNavData } from './useValueAnnotationNavData';

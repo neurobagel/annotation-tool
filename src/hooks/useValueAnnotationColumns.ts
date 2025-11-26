@@ -1,5 +1,5 @@
-import { DataType, Columns, StandardizedVariables, VariableType } from '../../internal_types';
 import { useColumns, useStandardizedVariables } from '../stores/data';
+import { DataType, Columns, StandardizedVariables, VariableType } from '../utils/internal_types';
 
 export interface ColumnGroupColumn {
   id: string;

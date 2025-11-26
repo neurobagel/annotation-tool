@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useDataActions } from '~/stores/data';
-import { DataStoreActions } from '../../internal_types';
+import { DataStoreActions } from '../utils/internal_types';
 import { useMultiColumnMeasureDraftCard } from './useMultiColumnMeasureDraftCard';
 
 vi.mock('~/stores/data', () => ({

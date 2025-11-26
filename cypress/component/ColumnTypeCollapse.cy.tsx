@@ -1,6 +1,6 @@
-import { DataType } from '../../internal_types';
 import ColumnTypeCollapse from '../../src/components/ColumnTypeCollapse';
 import type { ColumnGroupColumn } from '../../src/hooks/useValueAnnotationColumns';
+import { DataType } from '../../src/utils/internal_types';
 
 const baseColumns: ColumnGroupColumn[] = [
   {

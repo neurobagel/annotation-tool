@@ -1,11 +1,11 @@
+import ValueAnnotation from '../../src/components/ValueAnnotation';
+import { useDataStore } from '../../src/stores/data';
 import {
   DataType,
   VariableType,
   type Columns,
   type StandardizedVariables,
-} from '../../internal_types';
-import ValueAnnotation from '../../src/components/ValueAnnotation';
-import { useDataStore } from '../../src/stores/data';
+} from '../../src/utils/internal_types';
 import { mockStandardizedTerms, mockStandardizedFormats } from '../../src/utils/mocks';
 
 const createColumns = (): Columns => ({

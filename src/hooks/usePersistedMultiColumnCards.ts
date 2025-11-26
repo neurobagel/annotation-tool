@@ -1,5 +1,5 @@
-import { StandardizedTerm } from '../../internal_types';
 import { useColumns, useStandardizedTerms } from '../stores/data';
+import { StandardizedTerm } from '../utils/internal_types';
 
 export interface UsePersistedMultiColumnCardsOutput {
   id: string; // termId for persisted cards

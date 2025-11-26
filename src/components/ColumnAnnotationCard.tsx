@@ -10,7 +10,7 @@ import {
   Autocomplete,
   Tooltip,
 } from '@mui/material';
-import { DataType } from 'internal_types';
+import { DataType } from '~/utils/internal_types';
 import { StandardizedVariableOption } from '../hooks/useStandardizedVariableOptions';
 import DescriptionEditor from './DescriptionEditor';
 

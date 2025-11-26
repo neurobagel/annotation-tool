@@ -1,12 +1,12 @@
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { DataType, VariableType } from '../../internal_types';
 import {
   useColumns,
   useStandardizedFormats,
   useStandardizedTerms,
   useStandardizedVariables,
 } from '../stores/data';
+import { DataType, VariableType } from '../utils/internal_types';
 import { mockDataDictionaryWithAnnotations } from '../utils/mocks';
 import { useGenerateDataDictionary } from './useGenerateDataDictionary';
 

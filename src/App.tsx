@@ -1,6 +1,5 @@
 import { useTheme } from '@mui/material/styles';
 import { useEffect } from 'react';
-import { View } from '../internal_types';
 import AppTitle from './components/AppTitle';
 import ColumnAnnotation from './components/ColumnAnnotation';
 import Download from './components/Download';
@@ -13,6 +12,7 @@ import ValueAnnotation from './components/ValueAnnotation';
 import { useHasMultiColumnMeasures } from './hooks/useHasMultiColumnMeasures';
 import { useUploadedDataTableFileName } from './stores/data';
 import useViewStore, { getNavigationProps } from './stores/view';
+import { View } from './utils/internal_types';
 
 function App() {
   const currentView = useViewStore((state) => state.currentView);

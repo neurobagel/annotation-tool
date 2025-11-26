@@ -1,7 +1,7 @@
-import { DataType } from '../../internal_types';
 import SideColumnNavBar from '../../src/components/SideColumnNavBar';
 import type { UnannotatedColumnGroup } from '../../src/hooks/useValueAnnotationColumns';
 import type { ValueAnnotationNavAnnotatedGroup } from '../../src/hooks/useValueAnnotationNavData';
+import { DataType } from '../../src/utils/internal_types';
 
 const annotatedGroups: ValueAnnotationNavAnnotatedGroup[] = [
   {

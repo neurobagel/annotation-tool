@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useStandardizedFormats } from '~/stores/data';
-import type { StandardizedFormats } from '../../internal_types';
+import type { StandardizedFormats } from '../utils/internal_types';
 import { useFormatOptions } from './useFormatOptions';
 
 vi.mock('~/stores/data', () => ({

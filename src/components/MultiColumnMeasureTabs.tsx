@@ -1,6 +1,6 @@
 import { Tabs, Tab } from '@mui/material';
 import { SyntheticEvent } from 'react';
-import { StandardizedVariable } from '../../internal_types';
+import { StandardizedVariable } from '../utils/internal_types';
 
 interface MultiColumnMeasureTabsProps {
   variables: StandardizedVariable[];

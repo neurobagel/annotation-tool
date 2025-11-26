@@ -1,5 +1,5 @@
 // --- Raw config file types (used for parsing config files from disk/network) ---
-import { VariableType } from 'internal_types';
+import { VariableType } from '~/utils/internal_types';
 
 // A term as it appears in a terms file (raw config)
 export type TermsFileStandardizedTerm = {

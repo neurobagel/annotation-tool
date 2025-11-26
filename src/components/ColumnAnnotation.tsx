@@ -1,7 +1,7 @@
 import { useColumns, useStandardizedVariables, useDataActions } from '~/stores/data';
-import { DataType } from '../../internal_types';
 import { useStandardizedVariableOptions } from '../hooks/useStandardizedVariableOptions';
 import { ColumnAnnotationInstructions } from '../utils/instructions';
+import { DataType } from '../utils/internal_types';
 import ColumnAnnotationCard from './ColumnAnnotationCard';
 import Instruction from './Instruction';
 

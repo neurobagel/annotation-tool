@@ -2,8 +2,8 @@ import { act, renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import mockDataDictionaryRaw from '../../cypress/fixtures/examples/mock.json?raw';
 import mockTsvRaw from '../../cypress/fixtures/examples/mock.tsv?raw';
-import { DataType } from '../../internal_types';
 import * as storeUtils from '../utils/data-utils';
+import { DataType } from '../utils/internal_types';
 import {
   mockAvailableConfigOptions,
   mockConfigFile,

@@ -10,12 +10,12 @@ import {
   Link,
 } from '@mui/material';
 import { useState } from 'react';
-import { View } from '../../internal_types';
 import emoji from '../assets/download-emoji.png';
 import { useGenerateDataDictionary } from '../hooks/useGenerateDataDictionary';
 import { useSchemaValidation } from '../hooks/useSchemaValidation';
 import { useDataActions, useUploadedDataTableFileName } from '../stores/data';
 import useViewStore from '../stores/view';
+import { View } from '../utils/internal_types';
 import DataDictionaryPreview from './DataDictionaryPreview';
 
 function Download() {

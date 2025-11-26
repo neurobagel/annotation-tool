@@ -1,5 +1,5 @@
-import { Columns, DataDictionary, VariableType, DataType } from '../../internal_types';
 import { ConfigFile } from './external_types';
+import { Columns, DataDictionary, VariableType, DataType } from './internal_types';
 
 export const mockGitHubResponse = [
   { type: 'file', name: 'README.md' },

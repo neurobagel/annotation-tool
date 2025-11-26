@@ -1,17 +1,17 @@
 import { useMemo } from 'react';
 import {
-  Columns,
-  DataDictionary,
-  DataType,
-  StandardizedTerms,
-  VariableType,
-} from '../../internal_types';
-import {
   useColumns,
   useStandardizedFormats,
   useStandardizedTerms,
   useStandardizedVariables,
 } from '../stores/data';
+import {
+  Columns,
+  DataDictionary,
+  DataType,
+  StandardizedTerms,
+  VariableType,
+} from '../utils/internal_types';
 
 const mapDataTypeToVariableType = (dataType?: DataType | null): VariableType | undefined => {
   if (dataType === DataType.categorical) {

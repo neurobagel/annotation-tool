@@ -1,5 +1,11 @@
 import axios from 'axios';
 import Papa from 'papaparse';
+import assessmentTerms from '../assets/default_config/assessment.json';
+import defaultConfigData from '../assets/default_config/config.json';
+import diagnosisTerms from '../assets/default_config/diagnosis.json';
+import sexTerms from '../assets/default_config/sex.json';
+import { fetchConfigGitHubURL, githubRawBaseURL } from './constants';
+import { ConfigFile, VocabConfig, ConfigFileStandardizedVariable } from './external_types';
 import {
   StandardizedVariables,
   StandardizedTerms,
@@ -8,13 +14,7 @@ import {
   Columns,
   VariableType,
   DataType,
-} from '../../internal_types';
-import assessmentTerms from '../assets/default_config/assessment.json';
-import defaultConfigData from '../assets/default_config/config.json';
-import diagnosisTerms from '../assets/default_config/diagnosis.json';
-import sexTerms from '../assets/default_config/sex.json';
-import { fetchConfigGitHubURL, githubRawBaseURL } from './constants';
-import { ConfigFile, VocabConfig, ConfigFileStandardizedVariable } from './external_types';
+} from './internal_types';
 
 export async function fetchAvailableConfigs(): Promise<string[]> {
   try {

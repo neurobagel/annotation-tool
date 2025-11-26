@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { DataType } from '../../internal_types';
 import ValueAnnotationTabs, {
   type ValueAnnotationTabMetadata,
 } from '../../src/components/ValueAnnotationTabs';
 import type { ActiveValueAnnotationColumn } from '../../src/hooks/useValueAnnotationColumn';
+import { DataType } from '../../src/utils/internal_types';
 
 const columnOrder = ['1', '2'];
 

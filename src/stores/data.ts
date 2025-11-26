@@ -1,7 +1,6 @@
 import { produce, current } from 'immer';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { Columns, DataDictionary, DataType, VariableType, DataStore } from '../../internal_types';
 import {
   fetchAvailableConfigs,
   fetchConfig,
@@ -13,6 +12,13 @@ import {
   applyDataDictionaryToColumns,
   applyDataTypeToColumn,
 } from '../utils/data-utils';
+import {
+  Columns,
+  DataDictionary,
+  DataType,
+  VariableType,
+  DataStore,
+} from '../utils/internal_types';
 
 const initialState = {
   columns: {},

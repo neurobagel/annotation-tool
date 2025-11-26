@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { Columns } from '../../internal_types';
 import { useColumns } from '../stores/data';
+import type { Columns } from '../utils/internal_types';
 import { useColumnOptionsForMultiColumnMeasureVariable } from './useColumnOptionsForMultiColumnMeasureVariable';
 import { useMultiColumnMeasureCardData } from './useMultiColumnMeasureCardData';
 import type { UsePersistedMultiColumnCardsOutput } from './usePersistedMultiColumnCards';
