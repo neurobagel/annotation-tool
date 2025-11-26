@@ -262,7 +262,7 @@ const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
       }));
     },
 
-    userUpdatesColumnLevelDescription(columnID, value, description) {
+    userUpdatesValueDescription(columnID, value, description) {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
           if (draft[columnID].levels) {
@@ -272,7 +272,7 @@ const useFreshDataStore = create<FreshDataStore>()((set, get) => ({
       }));
     },
 
-    userUpdatesColumnLevelTerm(columnID, value, termId) {
+    userUpdatesValueStandardizedTerm(columnID, value, termId) {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
           if (!draft[columnID].levels || !draft[columnID].levels[value]) {

@@ -1,12 +1,14 @@
 import Ajv from 'ajv';
 import Download from '../../src/components/Download';
-import useDataStore from '../../src/stores/data';
+import { useFreshDataStore } from '../../src/stores/FreshNewStore';
 import {
-  mockColumns,
-  mockInitialColumns,
-  mockDataDictionaryWithNoDescription,
-  mockDataDictionaryWithAnnotations,
-  mockConfig,
+  mockFreshDataDictionaryWithNoDescription,
+  mockFreshDataDictionaryWithAnnotations,
+  mockFreshAnnotatedColumns,
+  mockFreshColumnsWithNoDescription,
+  mockFreshStandardizedVariables,
+  mockFreshStandardizedTerms,
+  mockFreshStandardizedFormats,
 } from '../../src/utils/mocks';
 
 interface ValidateFunction {
@@ -15,7 +17,25 @@ interface ValidateFunction {
 }
 
 describe('Download', () => {
-  it('renders the component correctly', () => {
+  beforeEach(() => {
+    useFreshDataStore.getState().actions.reset();
+  });
+
+  const initializeStore = (params: {
+    columns: typeof mockFreshAnnotatedColumns;
+    fileName?: string;
+  }) => {
+    const { columns, fileName = 'someFileName.tsv' } = params;
+    useFreshDataStore.setState((state) => ({
+      ...state,
+      columns,
+      standardizedVariables: mockFreshStandardizedVariables,
+      standardizedTerms: mockFreshStandardizedTerms,
+      standardizedFormats: mockFreshStandardizedFormats,
+      uploadedDataTableFileName: fileName,
+    }));
+  };
+  it('should render the component correctly', () => {
     cy.mount(<Download />);
 
     cy.get('[data-cy="download"]').should('be.visible');
@@ -35,7 +55,7 @@ describe('Download', () => {
     cy.get('[data-cy="download-datadictionary-button"]').should('be.visible');
   });
 
-  it('renders the component correctly when the data dictionary is invalid', () => {
+  it('should render the component correctly when the data dictionary is invalid', () => {
     // Create a stub validation function that always returns false (invalid)
     const validateStub = cy.stub().returns(false) as ValidateFunction;
     // Add mock validation errors to the stub
@@ -59,29 +79,24 @@ describe('Download', () => {
     cy.get('[data-cy="download-datadictionary-button"]').should('be.enabled');
   });
 
-  it('generates valid data dictionary with descriptions provided by user', () => {
-    useDataStore.setState({
-      columns: mockColumns,
-    });
-    useDataStore.setState({ config: mockConfig });
-    useDataStore.setState({ uploadedDataTableFileName: 'someFileName.tsv' });
+  it('should generate valid data dictionary with descriptions provided by user', () => {
+    initializeStore({ columns: mockFreshAnnotatedColumns });
 
     cy.mount(<Download />);
     cy.get('[data-cy="download-datadictionary-button"]').click();
     cy.readFile('cypress/downloads/someFileName_annotated.json').then((fileContent) => {
-      expect(fileContent).to.deep.equal(mockDataDictionaryWithAnnotations);
+      expect(fileContent).to.deep.equal(mockFreshDataDictionaryWithAnnotations);
     });
   });
 
-  it('generates valid data dictionary even if no descriptions were provided by user', () => {
-    useDataStore.setState({ columns: mockInitialColumns });
-    useDataStore.setState({ uploadedDataTableFileName: 'someFileName.tsv' });
+  it('should generate valid data dictionary even if no descriptions were provided by user', () => {
+    initializeStore({ columns: mockFreshColumnsWithNoDescription });
 
     cy.mount(<Download />);
 
     cy.get('[data-cy="download-datadictionary-button"]').click();
     cy.readFile('cypress/downloads/someFileName_annotated.json').then((fileContent) => {
-      expect(fileContent).to.deep.equal(mockDataDictionaryWithNoDescription);
+      expect(fileContent).to.deep.equal(mockFreshDataDictionaryWithNoDescription);
     });
   });
 });

@@ -11,11 +11,11 @@ import ValueAnnotationTabs from './ValueAnnotationTabs';
 
 function ValueAnnotation() {
   const {
-    userUpdatesColumnLevelDescription,
+    userUpdatesValueDescription: userUpdatesColumnLevelDescription,
     userUpdatesColumnUnits,
     userUpdatesColumnMissingValues,
     userUpdatesColumnFormat,
-    userUpdatesColumnLevelTerm,
+    userUpdatesValueStandardizedTerm: userUpdatesColumnLevelTerm,
   } = useFreshDataActions();
   const [selectedColumnIds, setSelectedColumnIds] = useState<string[]>([]);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
@@ -39,8 +39,13 @@ function ValueAnnotation() {
 
   const columnMetadata = useColumnsMetadata(selectedColumnIds);
 
-  const unknownDataTypeColumns = selectedColumnIds.filter((id) => !columnMetadata[id]?.dataType);
-
+  const unknownDataTypeColumns = selectedColumnIds.filter((id) => {
+    const metadata = columnMetadata[id];
+    if (!metadata) {
+      return false;
+    }
+    return !metadata.dataType && !metadata.isMultiColumnMeasure;
+  });
   const activeColumn = useValueAnnotationColumn(activeColumnId);
 
   const renderContent = () => {
@@ -56,6 +61,7 @@ function ValueAnnotation() {
       );
     }
 
+    // Multi-column measure groups intentionally lack a data type; they render as continuous by default.
     if (unknownDataTypeColumns.length !== 0) {
       return (
         <Paper
@@ -79,9 +85,15 @@ function ValueAnnotation() {
       );
     }
 
+    // Covers the case where a selected column has no metadata yet (e.g., empty columns).
+    // essentially when useValueAnnotationColumn returns null.
     if (!activeColumn || !activeColumnId) {
       return (
-        <Paper elevation={3} className="flex h-full items-center justify-center shadow-lg">
+        <Paper
+          elevation={3}
+          className="flex h-full items-center justify-center shadow-lg"
+          data-cy="column-data-unavailable"
+        >
           <Typography variant="h6">Selected column data is unavailable.</Typography>
         </Paper>
       );

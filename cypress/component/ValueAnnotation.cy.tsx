@@ -120,7 +120,7 @@ describe('ValueAnnotation', () => {
       .and('contain', 'unknown_type');
   });
 
-  it('should not leak units edits between continuous columns', () => {
+  it('[regression]: should not leak units edits between continuous columns', () => {
     cy.mount(<ValueAnnotation />);
     cy.get('[data-cy="side-column-nav-bar-age-select-button"]').click();
     cy.get('[data-cy="2-description"]').should('be.visible');
@@ -130,5 +130,25 @@ describe('ValueAnnotation', () => {
     cy.get('[data-cy="side-column-nav-bar-continuous-select-button"]').click();
     cy.get('[data-cy="1-description"]').should('be.visible');
     cy.get('[data-cy="1-description"]').should('not.contain', 'Years');
+  });
+
+  it('should show unavailable message when selected column data is missing', () => {
+    cy.mount(<ValueAnnotation />);
+    cy.get('[data-cy="side-column-nav-bar-unannotated"]').click();
+    cy.get('[data-cy="side-column-nav-bar-other-select-button"]').click();
+    cy.then(() => {
+      useFreshDataStore.setState((state) => {
+        const updatedColumns = { ...state.columns };
+        delete updatedColumns['6'];
+
+        return {
+          ...state,
+          columns: updatedColumns,
+        };
+      });
+    });
+    cy.get('[data-cy="column-data-unavailable"]')
+      .should('be.visible')
+      .and('contain', 'Selected column data is unavailable.');
   });
 });

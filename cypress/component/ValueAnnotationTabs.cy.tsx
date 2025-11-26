@@ -8,8 +8,8 @@ import type { ActiveValueAnnotationColumn } from '../../src/hooks/useValueAnnota
 const columnOrder = ['1', '2'];
 
 const columnsMeta: Record<string, ValueAnnotationTabMetadata> = {
-  '1': { id: '1', name: 'age', dataType: DataType.continuous },
-  '2': { id: '2', name: 'sex', dataType: DataType.categorical },
+  '1': { id: '1', name: 'age', dataType: DataType.continuous, isMultiColumnMeasure: false },
+  '2': { id: '2', name: 'sex', dataType: DataType.categorical, isMultiColumnMeasure: false },
 };
 
 const columnData: Record<string, ActiveValueAnnotationColumn> = {

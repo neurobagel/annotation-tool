@@ -11,8 +11,9 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import emoji from '../assets/download-emoji.png';
-import { useDataDictionary, useSchemaValidation } from '../hooks';
-import useDataStore from '../stores/data';
+import { useGenerateDataDictionary } from '../hooks/useGenerateDataDictionary';
+import { useSchemaValidation } from '../hooks/useSchemaValidation';
+import { useFreshDataActions, useUploadedDataTableFileName } from '../stores/FreshNewStore';
 import useViewStore from '../stores/view';
 import { View } from '../utils/internal_types';
 import DataDictionaryPreview from './DataDictionaryPreview';
@@ -21,11 +22,11 @@ function Download() {
   const [dictionaryCollapsed, setDictionaryCollapsed] = useState(false);
   const [forceAllowDownload, setForceAllowDownload] = useState(false);
 
-  const uploadedDataTableFileName = useDataStore((state) => state.uploadedDataTableFileName);
-  const reset = useDataStore((state) => state.reset);
+  const uploadedDataTableFileName = useUploadedDataTableFileName();
+  const { reset } = useFreshDataActions();
   const setCurrentView = useViewStore((state) => state.setCurrentView);
 
-  const dataDictionary = useDataDictionary();
+  const dataDictionary = useGenerateDataDictionary();
   const { schemaValid, schemaErrors } = useSchemaValidation(dataDictionary);
 
   const handleDownload = () => {

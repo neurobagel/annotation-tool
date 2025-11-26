@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useColumns } from '../stores/FreshNewStore';
 
 /**
- * Returns unique column values for.
+ * Returns the unique values for a column.
  */
 export function useColumnUniqueValues(columnId: string): string[] {
   const column = useColumns()[columnId];
