@@ -5,7 +5,6 @@
     "author": "Neurobagel Bot <bot@neurobagel.org>",
     "noVersionPrefix": false,
     "plugins": [
-        "git-tag",
         "released",
         "first-time-contributor",
         [
@@ -14,6 +13,14 @@
                 "username": ["dependabot[bot]", "pre-commit-ci[bot]"],
                 "subject": "[pre-commit.ci]",
                 "labels": ["_bot", "skip-release"]
+            }
+        ],
+        [
+            "npm",
+            {
+                "setRcToken": false,
+                "exact": true,
+                "forcePublish": false
             }
         ]
     ],

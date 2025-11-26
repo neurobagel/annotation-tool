@@ -95,7 +95,11 @@ export function useGenerateDataDictionary(): DataDictionary {
             VariableType: resolvedVariableType,
           };
 
-          if (column.dataType === DataType.categorical && column.levels) {
+          if (
+            column.dataType === DataType.categorical &&
+            column.levels &&
+            resolvedVariableType !== VariableType.collection
+          ) {
             entry.Annotations.Levels = buildAnnotationLevelsDictionary(
               column.levels,
               standardizedTerms

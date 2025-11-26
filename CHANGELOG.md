@@ -1,3 +1,29 @@
+# v0.4.4 (Thu Nov 06 2025)
+
+#### 🐛 Bug Fixes
+
+- [FIX] Keep query string after user selects dropdown option [#344](https://github.com/neurobagel/annotation-tool/pull/344) ([@surchs](https://github.com/surchs))
+- [FIX] Ensure dropdown options match complete substring [#341](https://github.com/neurobagel/annotation-tool/pull/341) ([@surchs](https://github.com/surchs))
+
+#### Authors: 1
+
+- Sebastian Urchs ([@surchs](https://github.com/surchs))
+
+---
+
+# v0.4.3 (Mon Oct 27 2025)
+
+#### 🐛 Bug Fixes
+
+- [FIX] Fixed output dictionary variableType being overwritten for Collection type columns [#313](https://github.com/neurobagel/annotation-tool/pull/313) ([@rmanaem](https://github.com/rmanaem))
+- [FIX] Preserve original term options ordering in `Categorical` component [#315](https://github.com/neurobagel/annotation-tool/pull/315) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.4.2 (Thu Oct 16 2025)
 
 #### 🚀 Enhancements
