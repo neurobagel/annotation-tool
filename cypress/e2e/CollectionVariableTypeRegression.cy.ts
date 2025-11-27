@@ -15,7 +15,7 @@ describe('Regression tests for collection variable type', () => {
   });
   it('Maps a column to assessment tool', () => {
     // Column Annotation view
-    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
+    cy.get('[data-cy="0-column-annotation-card-standardized-variable-dropdown"]').type(
       'assess{downArrow}{enter}'
     );
     cy.get('[data-cy="next-button"]').click();
@@ -39,10 +39,10 @@ describe('Regression tests for collection variable type', () => {
   });
   it('Maps a column to assessment tool and selects Continuous data type', () => {
     // Column Annotation view
-    cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').type(
+    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
       'assess{downArrow}{enter}'
     );
-    cy.get('[data-cy="2-column-annotation-card-data-type-continuous-button"]').click();
+    cy.get('[data-cy="1-column-annotation-card-data-type-continuous-button"]').click();
     cy.get('[data-cy="next-button"]').click();
 
     // Multi-column measure view
@@ -62,10 +62,10 @@ describe('Regression tests for collection variable type', () => {
   });
   it('Maps a column to assessment tool and selects Categorical data type', () => {
     // Column Annotation view
-    cy.get('[data-cy="3-column-annotation-card-standardized-variable-dropdown"]').type(
+    cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').type(
       'assess{downArrow}{enter}'
     );
-    cy.get('[data-cy="3-column-annotation-card-data-type-categorical-button"]').click();
+    cy.get('[data-cy="2-column-annotation-card-data-type-categorical-button"]').click();
     cy.get('[data-cy="next-button"]').click();
 
     // Multi-column measure view
@@ -73,14 +73,14 @@ describe('Regression tests for collection variable type', () => {
 
     // Value Annotation view
     cy.get('[data-cy="side-column-nav-bar-assessment tool-select-button"]').click();
-    cy.get('[data-cy="3-tab"]').click();
-    cy.get('[data-cy="3-M-description"]').type('Male');
-    cy.get('[data-cy="3-F-description"]').type('Female');
+    cy.get('[data-cy="2-tab"]').click();
+    cy.get('[data-cy="2-M-description"]').type('Male');
+    cy.get('[data-cy="2-F-description"]').type('Female');
     // TODO: We have to put this wait here because the description debounce save will break if we click the
     // missing value button before the description is finished saving. This is a bug!
     // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(5000);
-    cy.get('[data-cy="3-N/A-missing-value-yes"]').click();
+    cy.get('[data-cy="2-N/A-missing-value-yes"]').click();
     cy.get('[data-cy="next-button"]').click();
 
     // Download view

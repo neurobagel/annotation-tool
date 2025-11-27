@@ -10,75 +10,45 @@ import {
   Autocomplete,
   Tooltip,
 } from '@mui/material';
-import useDataStore from '~/stores/data';
-import { StandardizedVariable, Config, VariableType } from '../utils/internal_types';
+import { DataType } from '~/utils/internal_types';
+import { StandardizedVariableOption } from '../hooks/useStandardizedVariableOptions';
 import DescriptionEditor from './DescriptionEditor';
 
 interface ColumnAnnotationCardProps {
   id: string;
-  header: string;
+  name: string;
   description: string | null;
-  variableType: VariableType;
-  standardizedVariable: StandardizedVariable | null;
-  standardizedVariableOptions: Config;
+  dataType: DataType | null;
+  standardizedVariableId: string | null;
+  standardizedVariableOptions: StandardizedVariableOption[];
+  isDataTypeEditable: boolean;
+  inferredDataTypeLabel: string | null;
   onDescriptionChange: (columnId: string, newDescription: string | null) => void;
   onDataTypeChange: (columnId: string, newDataType: 'Categorical' | 'Continuous' | null) => void;
-  onStandardizedVariableChange: (
-    columnId: string,
-    newStandardizedVariable: StandardizedVariable | null
-  ) => void;
+  onStandardizedVariableChange: (columnId: string, newId: string | null) => void;
 }
 
 function ColumnAnnotationCard({
   id,
-  header,
+  name,
   description,
-  variableType,
-  standardizedVariable,
+  dataType,
+  standardizedVariableId,
   standardizedVariableOptions,
+  isDataTypeEditable,
+  inferredDataTypeLabel,
   onDescriptionChange,
   onDataTypeChange,
   onStandardizedVariableChange,
 }: ColumnAnnotationCardProps) {
-  const columnIsMultiColumnMeasure = useDataStore((state) =>
-    state.isMultiColumnMeasureStandardizedVariable(standardizedVariable)
-  );
-  const mappedSingleColumnStandardizedVariables = useDataStore(
-    (state) => state.mappedSingleColumnStandardizedVariables
-  );
-
-  // TODO: think of what to call this, since it doesn't receive
-  // VariableType in the strict sense - it's more like a BIDSType
-  const handleDataTypeChange = (
-    _: React.MouseEvent<HTMLElement>,
-    newDataType: 'Categorical' | 'Continuous' | null
-  ) => {
-    onDataTypeChange(id, newDataType);
-  };
-
-  const handleStandardizedVariableChange = (
-    _: React.ChangeEvent<unknown>,
-    newValue: string | null
-  ) => {
-    const newStandardizedVariable = newValue
-      ? Object.values(standardizedVariableOptions).find((sv) => sv.label === newValue) || null
+  const selectedOption =
+    standardizedVariableId !== null
+      ? standardizedVariableOptions.find((option) => option.id === standardizedVariableId) || null
       : null;
-
-    onStandardizedVariableChange(id, newStandardizedVariable);
-  };
-
-  const isDataTypePredefined =
-    !!standardizedVariable &&
-    Object.values(standardizedVariableOptions).some(
-      (option) => option.identifier === standardizedVariable.identifier
-    ) &&
-    // Treat multi column measures differently
-    // allow user to select a data type even when the standardized variable is selected
-    !columnIsMultiColumnMeasure;
 
   return (
     <Card data-cy={`${id}-column-annotation-card`} className="mx-auto w-full max-w-5xl shadow-lg">
-      <CardHeader title={header} className="bg-gray-50" />
+      <CardHeader title={name} className="bg-gray-50" />
       <CardContent>
         <DescriptionEditor
           label="Column description"
@@ -93,11 +63,11 @@ function ColumnAnnotationCard({
               Data type
             </Typography>
             <div>
-              {!isDataTypePredefined ? (
+              {isDataTypeEditable ? (
                 <ToggleButtonGroup
                   data-cy={`${id}-column-annotation-card-data-type`}
-                  value={variableType}
-                  onChange={handleDataTypeChange}
+                  value={dataType}
+                  onChange={(_, newDataType) => onDataTypeChange(id, newDataType)}
                   exclusive
                   color="primary"
                 >
@@ -116,7 +86,7 @@ function ColumnAnnotationCard({
                 </ToggleButtonGroup>
               ) : (
                 <Typography variant="body1" data-cy={`${id}-column-annotation-card-data-type`}>
-                  {variableType}
+                  {inferredDataTypeLabel || dataType || 'Unknown'}
                   <Tooltip
                     sx={{ fontSize: '1.2rem' }}
                     placement="right"
@@ -138,12 +108,12 @@ function ColumnAnnotationCard({
             </Typography>
             <Autocomplete
               data-cy={`${id}-column-annotation-card-standardized-variable-dropdown`}
-              value={standardizedVariable?.label || ''}
-              onChange={handleStandardizedVariableChange}
-              options={Object.values(standardizedVariableOptions).map((value) => value.label)}
-              getOptionDisabled={(option) =>
-                mappedSingleColumnStandardizedVariables.map((sVar) => sVar.label).includes(option)
-              }
+              value={selectedOption}
+              onChange={(_, newValue) => onStandardizedVariableChange(id, newValue?.id ?? null)}
+              options={standardizedVariableOptions}
+              getOptionDisabled={(option) => option.disabled}
+              getOptionLabel={(option) => option.label}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
               renderInput={(params) => (
                 <TextField
                   // eslint-disable-next-line react/jsx-props-no-spreading

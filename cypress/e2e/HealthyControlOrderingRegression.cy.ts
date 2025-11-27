@@ -17,15 +17,15 @@ describe('Regression tests', () => {
     cy.get('[data-cy="next-button"]').click();
 
     // Column Annotation view
-    cy.get('[data-cy="4-column-annotation-card-standardized-variable-dropdown"]').type(
+    cy.get('[data-cy="3-column-annotation-card-standardized-variable-dropdown"]').type(
       'diagnosis{downArrow}{enter}'
     );
     cy.get('[data-cy="next-button"]').click();
 
     // Value Annotation view
     cy.get('[data-cy="side-column-nav-bar-diagnosis-select-button"]').click();
-    cy.get('[data-cy="4-tab"]').click();
-    cy.get('[data-cy="4-ADHD-term-dropdown"]').click();
+    cy.get('[data-cy="3-tab"]').click();
+    cy.get('[data-cy="3-ADHD-term-dropdown"]').click();
     cy.get('[role="listbox"]').should('be.visible');
     cy.get('[role="option"]').first().should('contain', 'Healthy Control');
   });

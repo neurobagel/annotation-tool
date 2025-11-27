@@ -1,18 +1,16 @@
 import Categorical from '../../src/components/Categorical';
-import useDataStore from '../../src/stores/data';
 
 const props = {
   columnID: '3',
   uniqueValues: ['F', 'M', 'N/A', 'Missing'],
   levels: {
-    F: { description: 'Female' },
-    M: { description: 'Male' },
+    F: { description: 'Female', standardizedTerm: undefined },
+    M: { description: 'Male', standardizedTerm: undefined },
   },
   missingValues: ['N/A', 'Missing'],
-  standardizedVariable: {
-    identifier: 'nb:Diagnosis',
-    label: 'Diagnosis',
-  },
+  termOptions: [{ id: 'test', label: 'test' }],
+  showStandardizedTerm: true,
+  showMissingToggle: true,
   onUpdateDescription: () => {},
   onToggleMissingValue: () => {},
   onUpdateLevelTerm: () => {},
@@ -23,21 +21,16 @@ describe('Categorical', () => {
   const rowValue = (rowIdx: number) =>
     cy.get(`[data-cy="${props.columnID}-categorical-table"] tbody tr:eq(${rowIdx}) td:eq(0)`);
 
-  beforeEach(() => {
-    useDataStore.setState({
-      termOptions: {
-        'nb:Diagnosis': [{ label: 'test', identifier: 'test' }],
-      },
-    });
-  });
-  it('renders the component correctly', () => {
+  it('should render the component correctly', () => {
     cy.mount(
       <Categorical
         columnID={props.columnID}
         uniqueValues={props.uniqueValues}
         missingValues={props.missingValues}
-        standardizedVariable={props.standardizedVariable}
         levels={props.levels}
+        termOptions={props.termOptions}
+        showStandardizedTerm={props.showStandardizedTerm}
+        showMissingToggle={props.showMissingToggle}
         onUpdateDescription={props.onUpdateDescription}
         onToggleMissingValue={props.onToggleMissingValue}
         onUpdateLevelTerm={props.onUpdateLevelTerm}
@@ -51,15 +44,17 @@ describe('Categorical', () => {
     cy.get('[data-cy="3-F"]').should('be.visible').and('contain', 'F');
     cy.get('[data-cy="3-F-description"]').should('be.visible').and('contain', 'Female');
   });
-  it('fires the onUpdateDescription event handler with the appropriate payload when the description is changed', () => {
+  it('should fire the onUpdateDescription event handler with the appropriate payload when the description is changed', () => {
     const spy = cy.spy().as('spy');
     cy.mount(
       <Categorical
         columnID={props.columnID}
         uniqueValues={props.uniqueValues}
         missingValues={props.missingValues}
-        standardizedVariable={props.standardizedVariable}
         levels={props.levels}
+        termOptions={props.termOptions}
+        showStandardizedTerm={props.showStandardizedTerm}
+        showMissingToggle={props.showMissingToggle}
         onUpdateDescription={spy}
         onToggleMissingValue={props.onToggleMissingValue}
         onUpdateLevelTerm={props.onUpdateLevelTerm}
@@ -70,34 +65,35 @@ describe('Categorical', () => {
     cy.get('[data-cy="3-F-description"]').type('new description');
     cy.get('@spy').should('have.been.calledWith', '3', 'F', 'new description');
   });
-  it('fires the onUpdateLevelTerm event handler with the appropriate payload when the level term is changed', () => {
+  it('should fire the onUpdateLevelTerm event handler with the appropriate payload when the level term is changed', () => {
     const spy = cy.spy().as('spy');
     cy.mount(
       <Categorical
         columnID={props.columnID}
         uniqueValues={props.uniqueValues}
         missingValues={props.missingValues}
-        standardizedVariable={props.standardizedVariable}
         levels={props.levels}
+        termOptions={props.termOptions}
+        showStandardizedTerm={props.showStandardizedTerm}
+        showMissingToggle={props.showMissingToggle}
         onUpdateDescription={props.onUpdateDescription}
         onToggleMissingValue={props.onToggleMissingValue}
         onUpdateLevelTerm={spy}
       />
     );
     cy.get('[data-cy="3-F-term-dropdown"]').type('test{downArrow}{Enter}');
-    cy.get('@spy').should('have.been.calledWith', '3', 'F', {
-      identifier: 'test',
-      label: 'test',
-    });
+    cy.get('@spy').should('have.been.calledWith', '3', 'F', 'test');
   });
-  it('sorts values alphabetically', () => {
+  it('should sort values alphabetically', () => {
     cy.mount(
       <Categorical
         columnID={props.columnID}
         uniqueValues={props.uniqueValues}
         missingValues={[]}
-        standardizedVariable={props.standardizedVariable}
         levels={props.levels}
+        termOptions={props.termOptions}
+        showStandardizedTerm={props.showStandardizedTerm}
+        showMissingToggle={props.showMissingToggle}
         onUpdateDescription={props.onUpdateDescription}
         onToggleMissingValue={props.onToggleMissingValue}
         onUpdateLevelTerm={props.onUpdateLevelTerm}
@@ -125,14 +121,16 @@ describe('Categorical', () => {
     rowValue(3).should('contain', 'N/A');
   });
 
-  it('sorts values by missing status', () => {
+  it('should sort values by missing status', () => {
     cy.mount(
       <Categorical
         columnID={props.columnID}
         uniqueValues={props.uniqueValues}
         missingValues={props.missingValues}
-        standardizedVariable={props.standardizedVariable}
         levels={props.levels}
+        termOptions={props.termOptions}
+        showStandardizedTerm={props.showStandardizedTerm}
+        showMissingToggle={props.showMissingToggle}
         onUpdateDescription={props.onUpdateDescription}
         onToggleMissingValue={props.onToggleMissingValue}
         onUpdateLevelTerm={props.onUpdateLevelTerm}
@@ -166,14 +164,16 @@ describe('Categorical', () => {
     rowValue(2).should('contain', 'Missing');
     rowValue(3).should('contain', 'N/A');
   });
-  it('Displays the tooltip when hovering over an option', () => {
+  it('should display the tooltip when hovering over an option', () => {
     cy.mount(
       <Categorical
         columnID={props.columnID}
         uniqueValues={props.uniqueValues}
         missingValues={props.missingValues}
-        standardizedVariable={props.standardizedVariable}
         levels={props.levels}
+        termOptions={props.termOptions}
+        showStandardizedTerm={props.showStandardizedTerm}
+        showMissingToggle={props.showMissingToggle}
         onUpdateDescription={props.onUpdateDescription}
         onToggleMissingValue={props.onToggleMissingValue}
         onUpdateLevelTerm={props.onUpdateLevelTerm}

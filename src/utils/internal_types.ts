@@ -1,27 +1,93 @@
-export type DataTable = {
+export enum View {
+  Landing = 'landing',
+  Upload = 'upload',
+  ColumnAnnotation = 'columnAnnotation',
+  MultiColumnMeasures = 'multiColumnMeasures',
+  ValueAnnotation = 'valueAnnotation',
+  Download = 'download',
+}
+
+export type StepConfig = {
+  label: string;
+  view: View;
+  icon: React.ComponentType;
+};
+
+export enum VariableType {
+  identifier = 'Identifier',
+  categorical = 'Categorical',
+  continuous = 'Continuous',
+  collection = 'Collection',
+}
+
+export enum DataType {
+  categorical = 'Categorical',
+  continuous = 'Continuous',
+}
+
+export interface DataTable {
   [key: string]: string[];
-};
+}
 
-export type Column = {
-  header: string;
+interface Column {
+  id: string;
+  name: string;
+  allValues: string[]; // because we want to show the datable preview
   description?: string | null;
-  variableType?: VariableType;
-  standardizedVariable?: StandardizedVariable | null;
-  isPartOf?: {
-    termURL?: string;
-    label?: string;
-  };
-  levels?: { [key: string]: { description: string; label?: string; termURL?: string } } | null;
+  dataType?: DataType | null;
+  isPartOf?: string; // foreign key (primary key in terms table) to standardized term in the terms for the corresponding standardized variable
+  levels?: { [key: string]: { description: string; standardizedTerm: string } } | null; // foreign key to standardized term
   units?: string;
+  standardizedVariable?: string | null; // foreign key to standardized variable
   missingValues?: string[];
-  format?: TermFormat;
-};
+  format?: string; // foreign key to term format
+}
 
-export type Columns = {
+export interface Columns {
   [key: string]: Column;
-};
+}
 
-export type ColumnEntry = [string, Column];
+export interface StandardizedVariable {
+  id: string;
+  name: string;
+  variable_type?: VariableType;
+  required?: boolean;
+  description?: string;
+  is_multi_column_measure?: boolean;
+  can_have_multiple_columns?: boolean;
+  same_as?: string | null;
+}
+
+export interface StandardizedVariables {
+  [key: string]: StandardizedVariable;
+}
+
+// Includes all terms in one place
+export interface StandardizedTerm {
+  standardizedVariableId: string; // foreign key (primary key in the standardized variable table) to standardized variable
+  id: string;
+  label: string;
+  abbreviation?: string;
+  description?: string;
+  same_as?: string;
+  status?: string;
+  isCollection?: boolean;
+}
+
+export interface StandardizedTerms {
+  [key: string]: StandardizedTerm;
+}
+
+interface StandardizedFormat {
+  standardizedVariableId: string; // foreign key (primary key in the standardized variable table) to standardized variable
+  identifier: string;
+  label: string;
+  examples?: string[];
+}
+
+export interface StandardizedFormats {
+  [key: string]: StandardizedFormat;
+}
 
 export interface DataDictionary {
   [key: string]: {
@@ -53,75 +119,50 @@ export interface DataDictionary {
   };
 }
 
-export interface StandardizedVariable {
-  identifier: string;
-  label: string;
+export interface UploadedDataDictionaryFile {
+  fileName: string;
+  dataDictionary: DataDictionary;
 }
 
-export interface StandardizedVariableConfig extends StandardizedVariable {
-  variable_type?: VariableType;
-  terms?: StandardizedTerm[] | null;
-  formats?: TermFormat[];
-  required?: boolean;
-  description?: string;
-  is_multi_column_measure?: boolean;
-  can_have_multiple_columns?: boolean;
-  same_as?: string | null;
-}
-
-export interface StandardizedVariableCollection {
-  [key: string]: StandardizedVariable;
-}
-
-// TODO: reduce the depth and try to have a single object for all configuration
-// The main config object used in the app
-export interface Config {
-  [key: string]: StandardizedVariableConfig;
-}
-
-export interface StandardizedTerm {
-  identifier: string;
-  label: string;
-  abbreviation?: string;
-  description?: string;
-  same_as?: string;
-  status?: string;
-}
-
-export interface TermFormat {
-  termURL: string;
-  label: string;
-  examples?: string[];
-}
-
-export interface MultiColumnMeasuresTerm extends StandardizedTerm {
-  disabled?: boolean;
-}
-
-export interface MultiColumnMeasuresTermCard {
-  id: string;
-  term: MultiColumnMeasuresTerm | null;
-  mappedColumns: string[];
-}
-
-export enum View {
-  Landing = 'landing',
-  Upload = 'upload',
-  ColumnAnnotation = 'columnAnnotation',
-  MultiColumnMeasures = 'multiColumnMeasures',
-  ValueAnnotation = 'valueAnnotation',
-  Download = 'download',
-}
-
-export type StepConfig = {
-  label: string;
-  view: View;
-  icon: React.ComponentType;
+export type DataStoreState = {
+  columns: Columns;
+  standardizedVariables: StandardizedVariables;
+  standardizedTerms: StandardizedTerms;
+  standardizedFormats: StandardizedFormats;
+  uploadedDataTableFileName: string | null;
+  isConfigLoading: boolean;
+  config: string;
+  configOptions: string[];
+  uploadedDataDictionary: UploadedDataDictionaryFile;
 };
 
-export type ConfigLoaderOptions = {
-  excludeDefault?: boolean;
-  defaultConfigName?: string;
+export type DataStoreActions = {
+  loadConfig: (configName: string) => Promise<void>;
+  appFetchesConfigOptions: () => Promise<void>;
+  userSelectsConfig: (userSelectedConfig: string | null) => Promise<void>;
+  userUploadsDataTableFile: (dataTableFile: File) => Promise<void>;
+  userUploadsDataDictionaryFile: (dataDictionaryFile: File) => Promise<void>;
+  userUpdatesColumnDescription: (columnID: string, description: string | null) => void;
+  userUpdatesColumnDataType: (columnID: string, dataType: DataType | null) => void;
+  userUpdatesColumnStandardizedVariable: (
+    columnID: string,
+    standardizedVariableId: string | null
+  ) => void;
+  userUpdatesColumnToCollectionMapping: (columnID: string, termId: string | null) => void;
+  userCreatesCollection: (termId: string) => void;
+  userDeletesCollection: (termId: string) => void;
+  userUpdatesValueDescription: (columnID: string, value: string, description: string) => void;
+  userUpdatesValueStandardizedTerm: (
+    columnID: string,
+    value: string,
+    termId: string | null
+  ) => void;
+  userUpdatesColumnUnits: (columnID: string, units: string) => void;
+  userUpdatesColumnFormat: (columnID: string, formatId: string | null) => void;
+  userUpdatesColumnMissingValues: (columnID: string, value: string, isMissing: boolean) => void;
+  reset: () => void;
 };
 
-export type VariableType = 'Continuous' | 'Categorical' | 'Collection' | 'Identifier' | null;
+export type DataStore = DataStoreState & {
+  actions: DataStoreActions;
+};

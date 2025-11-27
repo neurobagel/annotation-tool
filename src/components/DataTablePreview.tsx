@@ -9,19 +9,19 @@ import {
   TablePagination,
 } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
-import { useTablePagination } from '../hooks';
-import { DataTable, Columns, Column } from '../utils/internal_types';
+import { DataTable } from '~/utils/internal_types';
+import { useTablePagination } from '../hooks/useTablePagination';
 
-function DataTablePreview({ dataTable, columns }: { dataTable: DataTable; columns: Columns }) {
+function DataTablePreview({ dataTable }: { dataTable: DataTable }) {
   const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage } = useTablePagination(5);
 
-  const headers = Object.values(columns).map((column: Column) => column.header);
+  const headers = Object.keys(dataTable);
 
-  // Transform column-based data into row-based data for rendering
+  // Transform data into row-based format for rendering
   const rowData =
-    Object.keys(dataTable).length > 0
-      ? Object.values(dataTable)[0].map((_, rowIndex) =>
-          Object.keys(dataTable).map((colKey) => dataTable[colKey][rowIndex])
+    headers.length > 0
+      ? dataTable[headers[0]].map((_, rowIndex) =>
+          headers.map((header) => dataTable[header][rowIndex])
         )
       : [];
 

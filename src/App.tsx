@@ -9,16 +9,17 @@ import NavStepper from './components/NavStepper';
 import NavigationButton from './components/NavigationButton';
 import Upload from './components/Upload';
 import ValueAnnotation from './components/ValueAnnotation';
-import useDataStore from './stores/data';
+import { useHasMultiColumnMeasures } from './hooks/useHasMultiColumnMeasures';
+import { useUploadedDataTableFileName } from './stores/data';
 import useViewStore, { getNavigationProps } from './stores/view';
 import { View } from './utils/internal_types';
 
 function App() {
   const currentView = useViewStore((state) => state.currentView);
   const setCurrentView = useViewStore((state) => state.setCurrentView);
-  const hasMultiColumnMeasures = useDataStore((state) => state.hasMultiColumnMeasures());
+  const hasMultiColumnMeasures = useHasMultiColumnMeasures();
 
-  const disableUploadNextButton = useDataStore((state) => state.uploadedDataTableFileName == null);
+  const disableUploadNextButton = useUploadedDataTableFileName() == null;
 
   const theme = useTheme();
   const appBarHeight = theme.mixins.toolbar.minHeight || 64;
