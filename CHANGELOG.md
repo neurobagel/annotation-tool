@@ -1,3 +1,24 @@
+# v0.4.5 (Mon Dec 01 2025)
+
+#### 🚀 Enhancements
+
+- Merge branch 'main' into dependabot/npm_and_yarn/development-dependencies-3544d204ce [#339](https://github.com/neurobagel/annotation-tool/pull/339) ([@rmanaem](https://github.com/rmanaem))
+
+#### 🏠 Internal
+
+- [REF] Normalize store structure and migrate flows [#359](https://github.com/neurobagel/annotation-tool/pull/359) ([@rmanaem](https://github.com/rmanaem) [@surchs](https://github.com/surchs))
+
+####  🧪 Tests
+
+- [MNT] Add permissions to GH workflows test and check [#354](https://github.com/neurobagel/annotation-tool/pull/354) ([@surchs](https://github.com/surchs))
+
+#### Authors: 2
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+- Sebastian Urchs ([@surchs](https://github.com/surchs))
+
+---
+
 # v0.4.4 (Thu Nov 06 2025)
 
 #### 🐛 Bug Fixes
