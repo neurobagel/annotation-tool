@@ -20,7 +20,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@fontsource/roboto": "^5.2.8",
+    "@fontsource/roboto": "^5.2.9",
     "@microlink/react-json-view": "^1.27.0",
     "@mui/icons-material": "^6.5.0",
     "@mui/material": "^6.4.8",
@@ -29,7 +29,7 @@
     "axios": "^1.13.2",
     "immer": "^10.2.0",
     "lodash": "^4.17.21",
-    "match-sorter": "^8.1.0",
+    "match-sorter": "^8.2.0",
     "natural-compare-lite": "^1.4.0",
     "papaparse": "^5.5.3",
     "react": "^19.2.0",
@@ -37,7 +37,7 @@
     "react-window": "^2.2.3",
     "seedrandom": "^3.0.5",
     "uuid": "^11.1.0",
-    "zustand": "^5.0.8"
+    "zustand": "^5.0.9"
   },
   "devDependencies": {
     "@cypress/code-coverage": "^3.14.7",
