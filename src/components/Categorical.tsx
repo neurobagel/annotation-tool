@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Paper,
   Table,
   TableBody,
@@ -6,15 +7,13 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Tooltip,
-  Autocomplete,
   TextField,
+  Tooltip,
 } from '@mui/material';
 import { matchSorter } from 'match-sorter';
 import { useState } from 'react';
-import { useSortedValues } from '~/hooks';
-import useDataStore from '~/stores/data';
-import { StandardizedVariable, StandardizedTerm } from '~/utils/internal_types';
+import type { TermOption } from '~/hooks/useTermOptions';
+import { useSortedValues } from '../hooks/useSortedValues';
 import DescriptionEditor from './DescriptionEditor';
 import MissingValueGroupButton from './MissingValueGroupButton';
 import SortCell from './SortCell';
@@ -23,20 +22,19 @@ import VirtualListbox from './VirtualListBox';
 interface CategoricalProps {
   columnID: string;
   uniqueValues: string[];
-  levels: { [key: string]: { description: string; label?: string; termURL?: string } };
+  levels: { [key: string]: { description: string; standardizedTerm?: string } };
   missingValues: string[];
-  standardizedVariable?: StandardizedVariable | null;
+  termOptions: TermOption[];
+  showStandardizedTerm?: boolean;
+  showMissingToggle?: boolean;
   onUpdateDescription: (columnId: string, value: string, description: string) => void;
   onToggleMissingValue: (columnId: string, value: string, isMissing: boolean) => void;
-  onUpdateLevelTerm: (
-    columnId: string,
-    value: string,
-    term: { identifier: string; label: string } | null
-  ) => void;
+  onUpdateLevelTerm: (columnId: string, value: string, termId: string | null) => void;
 }
 
 const defaultProps = {
-  standardizedVariable: null,
+  showStandardizedTerm: false,
+  showMissingToggle: false,
 };
 
 function Categorical({
@@ -44,25 +42,19 @@ function Categorical({
   uniqueValues,
   levels,
   missingValues,
-  standardizedVariable,
+  termOptions,
+  showStandardizedTerm = false,
+  showMissingToggle = false,
   onUpdateDescription,
   onToggleMissingValue,
   onUpdateLevelTerm,
 }: CategoricalProps) {
-  const isMultiColumnMeasureStandardizedVariable = useDataStore((state) =>
-    state.isMultiColumnMeasureStandardizedVariable(standardizedVariable)
-  );
-  const showStandardizedTerm = standardizedVariable && !isMultiColumnMeasureStandardizedVariable;
-
-  const termOptions = useDataStore((state) => state.termOptions);
-  const options = standardizedVariable ? termOptions[standardizedVariable.identifier] || [] : [];
-
   const [sortBy, setSortBy] = useState<'value' | 'missing'>('value');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   const { visibleValues } = useSortedValues(uniqueValues, missingValues, sortBy, sortDir);
 
-  const filterOptions = (items: StandardizedTerm[], { inputValue }: { inputValue: string }) =>
+  const filterOptions = (items: TermOption[], { inputValue }: { inputValue: string }) =>
     matchSorter(items, inputValue, {
       keys: [
         (option) =>
@@ -105,7 +97,7 @@ function Categorical({
                 Standardized Term
               </TableCell>
             )}
-            {standardizedVariable && (
+            {showMissingToggle && (
               <SortCell
                 label="Treat as missing value"
                 sortDir={sortDir}
@@ -141,15 +133,17 @@ function Categorical({
                 <TableCell align="left">
                   <Autocomplete
                     data-cy={`${columnID}-${value}-term-dropdown`}
-                    options={options}
-                    getOptionLabel={(option: StandardizedTerm) =>
+                    options={termOptions}
+                    getOptionLabel={(option: TermOption) =>
                       option.abbreviation
                         ? `${option.abbreviation} - ${option.label}`
                         : option.label
                     }
-                    value={options.find((opt) => opt.identifier === levels[value]?.termURL) || null}
+                    value={
+                      termOptions.find((opt) => opt.id === levels[value]?.standardizedTerm) || null
+                    }
                     onChange={(_, newValue) => {
-                      onUpdateLevelTerm(columnID, value, newValue);
+                      onUpdateLevelTerm(columnID, value, newValue?.id ?? null);
                     }}
                     filterOptions={filterOptions}
                     renderInput={(params) => (
@@ -191,7 +185,7 @@ function Categorical({
                   />
                 </TableCell>
               )}
-              {standardizedVariable && (
+              {showMissingToggle && (
                 <TableCell align="center">
                   <MissingValueGroupButton
                     value={value}

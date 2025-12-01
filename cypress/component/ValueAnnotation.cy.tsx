@@ -1,20 +1,110 @@
 import ValueAnnotation from '../../src/components/ValueAnnotation';
-import useDataStore from '../../src/stores/data';
-import { mockColumnsWithDataType, mockColumns, mockConfig } from '../../src/utils/mocks';
+import { useDataStore } from '../../src/stores/data';
+import {
+  DataType,
+  VariableType,
+  type Columns,
+  type StandardizedVariables,
+} from '../../src/utils/internal_types';
+import { mockStandardizedTerms, mockStandardizedFormats } from '../../src/utils/mocks';
+
+const createColumns = (): Columns => ({
+  '1': {
+    id: '1',
+    name: 'some_continuous_column',
+    allValues: ['5', '10'],
+    dataType: DataType.continuous,
+    missingValues: [],
+  },
+  '2': {
+    id: '2',
+    name: 'age',
+    allValues: ['21', '25'],
+    dataType: DataType.continuous,
+    standardizedVariable: 'nb:Age',
+    units: '',
+    format: 'nb:FromFloat',
+  },
+  '3': {
+    id: '3',
+    name: 'sex',
+    allValues: ['M', 'F', 'N/A'],
+    dataType: DataType.categorical,
+    levels: {
+      M: { description: 'Male', standardizedTerm: 'snomed:248153007' },
+      F: { description: 'Female', standardizedTerm: 'snomed:248152002' },
+    },
+    missingValues: ['N/A'],
+  },
+  '4': {
+    id: '4',
+    name: 'group_dx',
+    allValues: ['ADHD', 'PD'],
+    dataType: DataType.categorical,
+    standardizedVariable: 'nb:Diagnosis',
+    levels: {
+      ADHD: {
+        description: 'Attention deficit hyperactivity disorder',
+        standardizedTerm: 'snomed:406506008',
+      },
+      PD: { description: 'Parkinsons', standardizedTerm: 'snomed:870288002' },
+    },
+  },
+  '5': {
+    id: '5',
+    name: 'assessment_score',
+    allValues: ['10', '20'],
+    dataType: DataType.continuous,
+    standardizedVariable: 'nb:Assessment',
+    isPartOf: 'term:subscaleA',
+    units: 'points',
+  },
+  '6': {
+    id: '6',
+    name: 'unknown_type',
+    allValues: [''],
+    dataType: null,
+  },
+});
+
+const standardizedVariables: StandardizedVariables = {
+  'nb:Diagnosis': {
+    id: 'nb:Diagnosis',
+    name: 'Diagnosis',
+    variable_type: VariableType.categorical,
+  },
+  'nb:Assessment': {
+    id: 'nb:Assessment',
+    name: 'Assessment Tool',
+    variable_type: VariableType.collection,
+    is_multi_column_measure: true,
+  },
+  'nb:Age': {
+    id: 'nb:Age',
+    name: 'Age',
+    variable_type: VariableType.continuous,
+  },
+};
 
 describe('ValueAnnotation', () => {
   beforeEach(() => {
-    useDataStore.setState({
-      columns: { ...mockColumns, ...mockColumnsWithDataType },
-      config: mockConfig,
-    });
-
-    // Update derived state after setting up the store
-    const store = useDataStore.getState();
-    store.updateMappedStandardizedVariables();
-    store.updateMultiColumnMeasureVariableIdentifiers();
+    useDataStore.setState((state) => ({
+      ...state,
+      columns: createColumns(),
+      standardizedVariables,
+      standardizedTerms: {
+        ...mockStandardizedTerms,
+        'term:subscaleA': {
+          standardizedVariableId: 'nb:Assessment',
+          id: 'term:subscaleA',
+          label: 'Previous IQ assessment by pronunciation',
+        },
+      },
+      standardizedFormats: mockStandardizedFormats,
+    }));
   });
-  it('renders the component correctly', () => {
+
+  it('should render the component correctly', () => {
     cy.mount(<ValueAnnotation />);
     cy.get('[data-cy="no-column-selected"]')
       .should('be.visible')
@@ -22,7 +112,7 @@ describe('ValueAnnotation', () => {
     cy.get('[data-cy="side-column-nav-bar-diagnosis-select-button"]').click();
     cy.get('[data-cy="4-categorical"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-assessment tool-select-button"]').click();
-    cy.get('[data-cy="6-continuous"]').should('be.visible');
+    cy.get('[data-cy="5-continuous"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-unannotated"]').click();
     cy.get('[data-cy="side-column-nav-bar-categorical-select-button"]').click();
     cy.get('[data-cy="3-categorical"]').should('be.visible');
@@ -32,36 +122,38 @@ describe('ValueAnnotation', () => {
     cy.get('[data-cy="other"]')
       .should('be.visible')
       .and('contain', 'The following column do not have an assigned data type')
-      .and('contain', 'age');
+      .and('contain', 'unknown_type');
   });
-  it('asserts that there is no shared state between EditDescription components in Continuous component', () => {
-    /*
-     Set the data type of column 2 (age) to Continuous
-     to make sure there is no shared state between the
-    EditDescription in Continuous component
-    */
-    useDataStore.setState((state) => ({
-      columns: {
-        ...state.columns,
-        2: {
-          ...state.columns[2],
-          variableType: 'Continuous',
-        },
-      },
-    }));
 
-    // Update derived state after modifying columns
-    const store = useDataStore.getState();
-    store.updateMappedStandardizedVariables();
-
+  it('[regression]: should not leak units edits between continuous columns', () => {
     cy.mount(<ValueAnnotation />);
+    cy.get('[data-cy="side-column-nav-bar-age-select-button"]').click();
+    cy.get('[data-cy="2-description"]').should('be.visible');
+    cy.get('[data-cy="2-description"] textarea').first().clear();
+    cy.get('[data-cy="2-description"]').type('Years');
     cy.get('[data-cy="side-column-nav-bar-unannotated"]').click();
     cy.get('[data-cy="side-column-nav-bar-continuous-select-button"]').click();
     cy.get('[data-cy="1-description"]').should('be.visible');
-    cy.get('[data-cy="1-description"] textarea').first().clear();
-    cy.get('[data-cy="1-description"]').type('Years');
-    cy.get('[data-cy="2-tab"]').click();
-    cy.get('[data-cy="2-description"]').should('be.visible');
-    cy.get('[data-cy="2-description"]').should('not.contain', 'Years');
+    cy.get('[data-cy="1-description"]').should('not.contain', 'Years');
+  });
+
+  it('should show unavailable message when selected column data is missing', () => {
+    cy.mount(<ValueAnnotation />);
+    cy.get('[data-cy="side-column-nav-bar-unannotated"]').click();
+    cy.get('[data-cy="side-column-nav-bar-other-select-button"]').click();
+    cy.then(() => {
+      useDataStore.setState((state) => {
+        const updatedColumns = { ...state.columns };
+        delete updatedColumns['6'];
+
+        return {
+          ...state,
+          columns: updatedColumns,
+        };
+      });
+    });
+    cy.get('[data-cy="column-data-unavailable"]')
+      .should('be.visible')
+      .and('contain', 'Selected column data is unavailable.');
   });
 });

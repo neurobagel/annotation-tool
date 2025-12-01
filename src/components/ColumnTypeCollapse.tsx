@@ -2,24 +2,31 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { Typography, Collapse, List, ListItem, IconButton } from '@mui/material';
 import { capitalize } from 'lodash';
-import { useState } from 'react';
-import useDataStore from '~/stores/data';
-import { ColumnEntry, Columns, StandardizedVariable } from '../utils/internal_types';
+import { useMemo, useState } from 'react';
+import type { ColumnGroupColumn } from '~/hooks/useValueAnnotationColumns';
+
+interface MultiColumnGroup {
+  label: string;
+  columns: ColumnGroupColumn[];
+}
 
 interface ColumnTypeCollapseProps {
-  dataType?: 'Categorical' | 'Continuous' | null;
-  standardizedVariable?: StandardizedVariable | null;
-  columns: Columns;
+  label: string;
+  columns: ColumnGroupColumn[];
   onSelect: (params: {
     columnIDs: string[];
     dataType?: 'Categorical' | 'Continuous' | null;
   }) => void;
   selectedColumnId: string | null;
+  dataType?: 'Categorical' | 'Continuous' | null;
+  isMultiColumnMeasure?: boolean;
+  groupedColumns?: MultiColumnGroup[];
 }
 
 const ColumnTypeCollapseDefaultProps = {
   dataType: null,
-  standardizedVariable: null,
+  isMultiColumnMeasure: false,
+  groupedColumns: [],
 };
 
 /*
@@ -33,74 +40,69 @@ const ColumnTypeCollapseDefaultProps = {
    - Ability to select individual columns or entire groups (for assessment tools)
  */
 function ColumnTypeCollapse({
-  dataType = null,
-  standardizedVariable = null,
+  label,
   columns,
   onSelect,
   selectedColumnId,
+  dataType = null,
+  isMultiColumnMeasure = false,
+  groupedColumns = [],
 }: ColumnTypeCollapseProps) {
   const [showColumns, setShowColumns] = useState<boolean>(true);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
-  const columnIsMultiColumnMeasure = useDataStore((state) =>
-    state.isMultiColumnMeasureStandardizedVariable(standardizedVariable)
-  );
 
-  let columnsToDisplay;
-  // TODO: find a better name for the below variable
-  let labelToDisplay;
+  const labelToDisplay = label.toLocaleLowerCase();
 
-  if (standardizedVariable) {
-    columnsToDisplay = Object.entries(columns).filter(
-      ([_, column]) => column.standardizedVariable?.identifier === standardizedVariable.identifier
-    );
-    labelToDisplay = standardizedVariable.label.toLocaleLowerCase();
-  } else {
-    columnsToDisplay = Object.entries(columns).filter(
-      dataType
-        ? ([_, column]) =>
-            (column.standardizedVariable === null || column.standardizedVariable === undefined) &&
-            column.variableType === dataType
-        : ([_, column]) =>
-            (column.standardizedVariable === null || column.standardizedVariable === undefined) &&
-            (column.variableType === undefined || column.variableType === null)
-    );
-    labelToDisplay = dataType ? dataType.toLocaleLowerCase() : 'other';
-  }
+  const groupedColumnEntries = useMemo(() => {
+    if (!isMultiColumnMeasure) {
+      return [];
+    }
+
+    if (groupedColumns.length > 0) {
+      return groupedColumns;
+    }
+
+    const fallbackGroups: Record<string, ColumnGroupColumn[]> = {};
+    columns.forEach((entry) => {
+      const groupKey =
+        typeof entry.column.isPartOf === 'string' && entry.column.isPartOf.length > 0
+          ? entry.column.isPartOf
+          : 'Ungrouped';
+
+      if (!fallbackGroups[groupKey]) {
+        fallbackGroups[groupKey] = [];
+      }
+
+      fallbackGroups[groupKey].push(entry);
+    });
+
+    return Object.entries(fallbackGroups).map(([groupLabel, groupColumns]) => ({
+      label: groupLabel || 'Ungrouped',
+      columns: groupColumns,
+    }));
+  }, [columns, groupedColumns, isMultiColumnMeasure]);
 
   const handleSelect = () => {
-    if (columnsToDisplay.length > 0) {
-      // For assessment tool, find the first group and select it
-      if (columnIsMultiColumnMeasure) {
-        const groupedColumns: Record<string, ColumnEntry[]> = {};
-
-        columnsToDisplay.forEach(([columnId, column]) => {
-          const groupKey = column.isPartOf?.label || 'Ungrouped';
-          if (!groupedColumns[groupKey]) {
-            groupedColumns[groupKey] = [];
-          }
-          groupedColumns[groupKey].push([columnId, column]);
+    if (columns.length > 0) {
+      if (isMultiColumnMeasure && groupedColumnEntries.length > 0) {
+        const firstGroup = groupedColumnEntries[0];
+        onSelect({
+          columnIDs: firstGroup.columns.map((entry) => entry.id),
+          dataType,
         });
-
-        const firstGroupColumns = Object.values(groupedColumns)[0];
-        if (firstGroupColumns) {
-          onSelect({
-            columnIDs: firstGroupColumns.map(([id]) => id),
-            dataType,
-          });
-          return;
-        }
+        return;
       }
 
       onSelect({
-        columnIDs: columnsToDisplay.map(([id]) => id),
+        columnIDs: columns.map((entry) => entry.id),
         dataType,
       });
     }
   };
 
-  const handleGroupSelect = (groupColumns: ColumnEntry[]) => {
+  const handleGroupSelect = (groupColumns: ColumnGroupColumn[]) => {
     onSelect({
-      columnIDs: groupColumns.map(([id]) => id),
+      columnIDs: groupColumns.map((entry) => entry.id),
       dataType,
     });
   };
@@ -112,17 +114,7 @@ function ColumnTypeCollapse({
     }));
   };
 
-  if (columnIsMultiColumnMeasure) {
-    const groupedColumns: Record<string, ColumnEntry[]> = {};
-
-    columnsToDisplay.forEach(([columnId, column]) => {
-      const groupKey = column.isPartOf?.label || 'Ungrouped';
-      if (!groupedColumns[groupKey]) {
-        groupedColumns[groupKey] = [];
-      }
-      groupedColumns[groupKey].push([columnId, column]);
-    });
-
+  if (isMultiColumnMeasure) {
     return (
       <div data-cy={`side-column-nav-bar-${labelToDisplay}`}>
         <div className="flex items-center">
@@ -144,11 +136,11 @@ function ColumnTypeCollapse({
               flexGrow: 1,
               cursor: 'pointer',
               fontWeight:
-                selectedColumnId && columnsToDisplay.some(([id]) => id === selectedColumnId)
+                selectedColumnId && columns.some((entry) => entry.id === selectedColumnId)
                   ? 'bold'
                   : 'normal',
               color:
-                selectedColumnId && columnsToDisplay.some(([id]) => id === selectedColumnId)
+                selectedColumnId && columns.some((entry) => entry.id === selectedColumnId)
                   ? 'primary.main'
                   : '',
               '&:hover': {
@@ -161,12 +153,12 @@ function ColumnTypeCollapse({
         </div>
         <Collapse in={showColumns}>
           <List sx={{ pl: 2 }} className="space-y-3">
-            {Object.entries(groupedColumns).map(([groupName, groupColumns]) => {
+            {groupedColumnEntries.map(({ label: groupName, columns: groupColumns }) => {
               const isGroupExpanded = expandedGroups[groupName] || false;
-              const isGroupSelected = groupColumns.some(([id]) => id === selectedColumnId);
+              const isGroupSelected = groupColumns.some((entry) => entry.id === selectedColumnId);
 
               return (
-                <div key={groupName}>
+                <div key={`${labelToDisplay}-${groupName}`}>
                   <div className="flex items-center">
                     <IconButton
                       data-cy={`side-column-nav-bar-${labelToDisplay}-${groupName}-toggle-button`}
@@ -198,18 +190,18 @@ function ColumnTypeCollapse({
                   </div>
                   <Collapse in={isGroupExpanded}>
                     <List sx={{ pl: 4 }}>
-                      {groupColumns.map(([columnId, column]) => (
+                      {groupColumns.map((entry) => (
                         <ListItem
-                          data-cy={`side-column-nav-bar-${labelToDisplay}-${groupName}-${column.header}`}
-                          key={columnId}
+                          data-cy={`side-column-nav-bar-${labelToDisplay}-${groupName}-${entry.column.name}`}
+                          key={entry.id}
                           sx={{
                             pl: 4,
                             py: 0,
                             color: 'text.secondary',
-                            fontWeight: columnId === selectedColumnId ? 'bold' : 'normal',
+                            fontWeight: entry.id === selectedColumnId ? 'bold' : 'normal',
                           }}
                         >
-                          <Typography>{column.header}</Typography>
+                          <Typography>{entry.column.name || entry.id}</Typography>
                         </ListItem>
                       ))}
                     </List>
@@ -244,11 +236,11 @@ function ColumnTypeCollapse({
             flexGrow: 1,
             cursor: 'pointer',
             fontWeight:
-              selectedColumnId && columnsToDisplay.some(([id]) => id === selectedColumnId)
+              selectedColumnId && columns.some((entry) => entry.id === selectedColumnId)
                 ? 'bold'
                 : 'normal',
             color:
-              selectedColumnId && columnsToDisplay.some(([id]) => id === selectedColumnId)
+              selectedColumnId && columns.some((entry) => entry.id === selectedColumnId)
                 ? 'primary.main'
                 : '',
             '&:hover': {
@@ -261,18 +253,18 @@ function ColumnTypeCollapse({
       </div>
       <Collapse in={showColumns}>
         <List sx={{ pl: 4 }}>
-          {columnsToDisplay.map(([columnId, column]) => (
+          {columns.map((entry) => (
             <ListItem
-              data-cy={`side-column-nav-bar-${labelToDisplay}-${column.header}`}
-              key={columnId}
+              data-cy={`side-column-nav-bar-${labelToDisplay}-${entry.column.name}`}
+              key={entry.id}
               sx={{
                 pl: 4,
                 py: 0,
                 color: 'text.secondary',
-                fontWeight: columnId === selectedColumnId ? 'bold' : 'normal',
+                fontWeight: entry.id === selectedColumnId ? 'bold' : 'normal',
               }}
             >
-              <Typography>{column.header}</Typography>
+              <Typography>{entry.column.name || entry.id}</Typography>
             </ListItem>
           ))}
         </List>

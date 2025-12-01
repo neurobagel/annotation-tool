@@ -12,16 +12,16 @@ import {
 } from '@mui/material';
 import { matchSorter, rankings } from 'match-sorter';
 import { useState } from 'react';
-import { MultiColumnMeasuresTerm, MultiColumnMeasuresTermCard } from '../utils/internal_types';
+import { AvailableTerm, CardDisplay, ColumnOption } from '../types/multiColumnMeasureTypes';
 
 interface TermCardProps {
-  card: MultiColumnMeasuresTermCard;
+  card: CardDisplay;
   cardIndex: number;
-  mappedColumnHeaders: { [columnId: string]: string };
-  availableTerms: MultiColumnMeasuresTerm[];
-  columnOptions: Array<{ id: string; label: string; disabled: boolean }>;
-  onTermSelect: (term: MultiColumnMeasuresTerm | null) => void;
-  onColumnSelect: (columnId: string | null) => void;
+  availableTerms: AvailableTerm[];
+  columnOptions: ColumnOption[];
+  mappedColumnHeaders: Record<string, string>;
+  onCreateCollection: (termId: string | null) => void;
+  onColumnSelect: (termId: string, columnId: string | null) => void;
   onRemoveColumn: (columnId: string) => void;
   onRemoveCard: () => void;
 }
@@ -29,20 +29,17 @@ interface TermCardProps {
 function MultiColumnMeasuresCard({
   card,
   cardIndex,
-  mappedColumnHeaders,
   availableTerms,
   columnOptions,
-  onTermSelect,
+  mappedColumnHeaders,
+  onCreateCollection,
   onColumnSelect,
   onRemoveColumn,
   onRemoveCard,
 }: TermCardProps) {
   const [inputQueryString, setInputQueryString] = useState('');
 
-  const filterOptions = (
-    items: MultiColumnMeasuresTerm[],
-    { inputValue }: { inputValue: string }
-  ) =>
+  const filterOptions = (items: AvailableTerm[], { inputValue }: { inputValue: string }) =>
     matchSorter(items, inputValue, {
       keys: [
         (option) =>
@@ -70,11 +67,11 @@ function MultiColumnMeasuresCard({
             <Autocomplete
               data-cy={`multi-column-measures-card-${cardIndex}-title-dropdown`}
               options={availableTerms}
-              getOptionLabel={(option: MultiColumnMeasuresTerm) =>
+              getOptionLabel={(option) =>
                 option.abbreviation ? `${option.abbreviation} - ${option.label}` : option.label
               }
               getOptionDisabled={(option) => option.disabled || false}
-              onChange={(_, newValue) => onTermSelect(newValue)}
+              onChange={(_, newValue) => onCreateCollection(newValue?.id || null)}
               filterOptions={filterOptions}
               renderInput={(params) => (
                 <TextField
@@ -114,8 +111,12 @@ function MultiColumnMeasuresCard({
                   }
                 }}
                 getOptionLabel={(option) => option.label}
-                getOptionDisabled={(option) => option.disabled || false}
-                onChange={(_, newValue) => onColumnSelect(newValue?.id || null)}
+                getOptionDisabled={(option) => option.isPartOfCollection || false}
+                onChange={(_, newValue) => {
+                  if (newValue && card.term) {
+                    onColumnSelect(card.term.id, newValue.id);
+                  }
+                }}
                 renderInput={(params) => (
                   <TextField
                     // eslint-disable-next-line react/jsx-props-no-spreading
