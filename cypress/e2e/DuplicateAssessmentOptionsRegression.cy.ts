@@ -2,11 +2,11 @@ import defaultAssessmentTerms from '../../src/assets/default_config/assessment.j
 import defaultConfig from '../../src/assets/default_config/config.json';
 import { mockDataTableFilePath } from '../support/testConstants';
 
-const paddedAssessmentTerms = JSON.parse(JSON.stringify(defaultAssessmentTerms));
-paddedAssessmentTerms[0].terms = [
-  ...paddedAssessmentTerms[0].terms,
-  { id: 'somterm', name: 'Side of onset' },
-  { id: 'anotherterm', name: 'Side of onset' },
+const assessmentTerms = JSON.parse(JSON.stringify(defaultAssessmentTerms));
+assessmentTerms[0].terms = [
+  ...assessmentTerms[0].terms,
+  { id: 'someID', name: 'Same Name' },
+  { id: 'anotherID', name: 'Same Name' },
 ];
 
 describe('Duplicate Assessment Options Regression', () => {
@@ -28,7 +28,7 @@ describe('Duplicate Assessment Options Regression', () => {
       'GET',
       'https://raw.githubusercontent.com/neurobagel/communities/main/configs/Neurobagel/assessment.json',
       {
-        body: paddedAssessmentTerms,
+        body: assessmentTerms,
       }
     ).as('assessmentTerms');
   });
@@ -57,11 +57,11 @@ describe('Duplicate Assessment Options Regression', () => {
     // Multi-Column Measures view
     cy.get('[data-cy="add-term-card-button"]').click();
     cy.get('[data-cy="multi-column-measures-card-0-title-dropdown"]').click();
-    cy.get('[data-cy="multi-column-measures-card-0-title-dropdown"]').type('onset');
+    cy.get('[data-cy="multi-column-measures-card-0-title-dropdown"]').type('Same');
 
     cy.get('ul[role="listbox"]')
       .find('.MuiAutocomplete-option')
-      .filter((_, el) => el.textContent?.includes('Side of onset'))
+      .filter((_, el) => el.textContent?.includes('Same Name'))
       .should('have.length', 2);
   });
 });
