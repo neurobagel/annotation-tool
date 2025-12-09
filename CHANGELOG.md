@@ -1,3 +1,15 @@
+# v0.4.7 (Tue Dec 09 2025)
+
+#### 🐛 Bug Fixes
+
+- [FIX] Prevent value annotation layout from overflowing horizontally [#379](https://github.com/neurobagel/annotation-tool/pull/379) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.4.6 (Mon Dec 08 2025)
 
 #### 🐛 Bug Fixes
