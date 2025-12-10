@@ -72,6 +72,13 @@ function MultiColumnMeasuresCard({
               }
               getOptionDisabled={(option) => option.disabled || false}
               onChange={(_, newValue) => onCreateCollection(newValue?.id || null)}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              renderOption={(props, option) => (
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                <li {...props} key={option.id}>
+                  {option.abbreviation ? `${option.abbreviation} - ${option.label}` : option.label}
+                </li>
+              )}
               filterOptions={filterOptions}
               renderInput={(params) => (
                 <TextField

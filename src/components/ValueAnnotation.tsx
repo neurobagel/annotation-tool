@@ -122,14 +122,17 @@ function ValueAnnotation() {
           <ValueAnnotationInstructions />
         </Instruction>
       </div>
-      <div className="flex w-full max-h-[calc(100vh-320px)] space-x-4">
+      <div
+        className="flex w-full max-h-[calc(100vh-320px)] space-x-4"
+        data-cy="value-annotation-layout"
+      >
         <SideColumnNavBar
           annotatedGroups={navData.annotatedGroups}
           unannotatedGroups={navData.unannotatedGroups}
           onSelect={handleSelect}
           selectedColumnId={selectedColumnIds[0] || null}
         />
-        <div className="flex-1">{renderContent()}</div>
+        <div className="flex-1 min-w-0">{renderContent()}</div>
       </div>
     </div>
   );
