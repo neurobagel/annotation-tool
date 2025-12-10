@@ -23,7 +23,7 @@ const coolAssessmentTerms = [
   },
 ];
 
-describe('Config Switch Regression', () => {
+describe('Config Change Regression', () => {
   beforeEach(() => {
     // Serve two remote configs so we can swap from Neurobagel to Cool mid-flow
     cy.intercept('GET', 'https://api.github.com/repos/neurobagel/communities/contents/configs', {
@@ -78,7 +78,7 @@ describe('Config Switch Regression', () => {
     ).as('coolSex');
   });
 
-  it('Should update assessment vocabulary after switching configs', () => {
+  it('Should update assessment vocabulary after changing configs', () => {
     cy.visit('http://localhost:5173');
     cy.get('[data-cy="next-button"]').click();
 
@@ -107,7 +107,7 @@ describe('Config Switch Regression', () => {
     cy.get('[data-cy="back-button"]').click();
     cy.get('[data-cy="back-button"]').click();
 
-    // Upload view - Switch to "Cool" config and wait for its vocab to load
+    // Upload view - Change to "Cool" config and wait for its vocab to load
     cy.get('[data-cy="config-card-dropdown"]').type('cool{downArrow}{enter}');
     cy.wait(['@coolConfig', '@coolAssessment', '@coolDiagnosis', '@coolSex']);
 
