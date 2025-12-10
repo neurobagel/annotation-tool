@@ -132,6 +132,7 @@ function Categorical({
               {showStandardizedTerm && (
                 <TableCell align="left">
                   <Autocomplete
+                    disabled={missingValues.includes(value)}
                     data-cy={`${columnID}-${value}-term-dropdown`}
                     options={termOptions}
                     getOptionLabel={(option: TermOption) =>
