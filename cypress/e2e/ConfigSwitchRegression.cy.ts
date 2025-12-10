@@ -78,7 +78,7 @@ describe('Config Switch Regression', () => {
     ).as('coolSex');
   });
 
-  it('Shold update assessment vocabulary after switching configs', () => {
+  it('Should update assessment vocabulary after switching configs', () => {
     cy.visit('http://localhost:5173');
     cy.get('[data-cy="next-button"]').click();
 
