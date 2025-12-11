@@ -15,7 +15,14 @@ import {
   applyDataDictionaryToColumns,
   applyDataTypeToColumn,
 } from './data-utils';
-import { Columns, DataDictionary, StandardizedVariables, DataType } from './internal_types';
+import {
+  Columns,
+  DataDictionary,
+  StandardizedVariables,
+  StandardizedTerms,
+  DataType,
+  VariableType,
+} from './internal_types';
 import {
   mockGitHubResponse,
   mockTermsData,
@@ -424,6 +431,98 @@ describe('applyDataDictionaryToColumns', () => {
     expect(result['0'].levels?.F.description).toBe('Female');
     expect(result['0'].levels?.F.standardizedTerm).toBe('snomed:248152002');
     expect(result['0'].missingValues).toEqual(['N/A']);
+  });
+
+  it('should add level entries for TSV values when dictionary levels differ', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'diagnosis',
+        allValues: ['pd', 'hc'],
+        dataType: DataType.categorical,
+      },
+    };
+
+    const mockDataDict = {
+      diagnosis: {
+        Description: 'Diagnosis of the participant',
+        Levels: {
+          PD: { Description: 'Old PD' },
+          HC: { Description: 'Old HC' },
+        },
+        Annotations: {
+          VariableType: 'Categorical' as const,
+          Levels: {
+            PD: { TermURL: 'snomed:111' },
+            HC: { TermURL: 'snomed:222' },
+          },
+        },
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      {
+        'nb:Diagnosis': { variable_type: VariableType.categorical },
+      } as unknown as StandardizedVariables,
+      {
+        'snomed:111': { id: 'snomed:111' },
+        'snomed:222': { id: 'snomed:222' },
+      } as unknown as StandardizedTerms,
+      mockStandardizedFormats
+    );
+
+    expect(result['0'].levels?.pd).toBeDefined();
+    expect(result['0'].levels?.hc).toBeDefined();
+  });
+
+  it('should ignore dictionary levels that are not present in TSV values', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'diagnosis',
+        allValues: ['pd', 'hc'],
+        dataType: DataType.categorical,
+      },
+    };
+
+    const mockDataDict = {
+      diagnosis: {
+        Description: 'Diagnosis of the participant',
+        Levels: {
+          PD: { Description: 'Old PD' },
+          HC: { Description: 'Old HC' },
+          XYZ: { Description: 'Extra' },
+        },
+        Annotations: {
+          VariableType: 'Categorical' as const,
+          Levels: {
+            PD: { TermURL: 'snomed:111' },
+            HC: { TermURL: 'snomed:222' },
+            XYZ: { TermURL: 'snomed:333' },
+          },
+        },
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      {
+        'nb:Diagnosis': { variable_type: VariableType.categorical },
+      } as unknown as StandardizedVariables,
+      {
+        'snomed:111': { id: 'snomed:111' },
+        'snomed:222': { id: 'snomed:222' },
+        'snomed:333': { id: 'snomed:333' },
+      } as unknown as StandardizedTerms,
+      mockStandardizedFormats
+    );
+
+    expect(result['0'].levels?.PD).toBeUndefined();
+    expect(result['0'].levels?.HC).toBeUndefined();
+    expect(result['0'].levels?.XYZ).toBeUndefined();
   });
 
   it('should handle multi-column measures with IsPartOf', () => {
