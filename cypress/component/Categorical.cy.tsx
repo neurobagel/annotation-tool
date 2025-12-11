@@ -183,4 +183,21 @@ describe('Categorical', () => {
     cy.get('[data-cy="3-F-term-dropdown-option"]').trigger('mouseover');
     cy.get('[data-cy="3-F-term-tooltip"]').should('be.visible').and('contain.text', 'test');
   });
+  it('should disable the standardized term dropdown when the value is marked as missing', () => {
+    cy.mount(
+      <Categorical
+        columnID={props.columnID}
+        uniqueValues={props.uniqueValues}
+        missingValues={props.missingValues}
+        levels={props.levels}
+        termOptions={props.termOptions}
+        showStandardizedTerm={props.showStandardizedTerm}
+        showMissingToggle={props.showMissingToggle}
+        onUpdateDescription={props.onUpdateDescription}
+        onToggleMissingValue={props.onToggleMissingValue}
+        onUpdateLevelTerm={props.onUpdateLevelTerm}
+      />
+    );
+    cy.get('[data-cy="3-N/A-term-dropdown"] input').should('be.disabled');
+  });
 });
