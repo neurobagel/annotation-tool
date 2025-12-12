@@ -299,13 +299,16 @@ export function applyDataDictionaryToColumns(
         {
           // Create levels from data table values, then update those levels using
           // data dictionary entries only when keys match data table values.
-          const initialLevels = Array.from(new Set(column.allValues ?? [])).reduce(
-            (acc, value) => ({
-              ...acc,
-              [value]: { description: '', standardizedTerm: '' },
-            }),
-            {} as { [key: string]: { description: string; standardizedTerm: string } }
-          );
+          const missingValuesSet = new Set(column.missingValues ?? []);
+          const initialLevels = Array.from(new Set(column.allValues ?? []))
+            .filter((value) => !missingValuesSet.has(value))
+            .reduce(
+              (acc, value) => ({
+                ...acc,
+                [value]: { description: '', standardizedTerm: '' },
+              }),
+              {} as { [key: string]: { description: string; standardizedTerm: string } }
+            );
 
           const dictLevels = columnData.Levels ?? {};
 
