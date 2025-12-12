@@ -13,7 +13,7 @@ export function useColumnOptionsForMultiColumnMeasureVariable(variableId: string
 
   const collectionTermIds = new Set(
     Object.values(standardizedTerms)
-      .filter((term) => term.standardizedVariableId === variableId && term.isCollection)
+      .filter((term) => term.standardizedVariableId === variableId && term.collectionCreatedAt)
       .map((term) => term.id)
   );
 

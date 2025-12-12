@@ -1188,16 +1188,18 @@ describe('userCreatesCollection', () => {
     return result;
   };
 
-  it('should set isCollection to true for the provided term', async () => {
+  it('should set collectionCreatedAt when creating a collection', async () => {
     const result = await initializeTerms();
 
-    expect(result.current.standardizedTerms['snomed:1303696008'].isCollection).toBe(false);
+    expect(
+      result.current.standardizedTerms['snomed:1303696008'].collectionCreatedAt
+    ).toBeUndefined();
 
     act(() => {
       result.current.actions.userCreatesCollection('snomed:1303696008');
     });
 
-    expect(result.current.standardizedTerms['snomed:1303696008'].isCollection).toBe(true);
+    expect(result.current.standardizedTerms['snomed:1303696008'].collectionCreatedAt).toBeDefined();
   });
 });
 
@@ -1225,14 +1227,14 @@ describe('userDeletesCollection', () => {
     return result;
   };
 
-  it('should set isCollection to false when toggled off and remove column mappings', async () => {
+  it('should clear collectionCreatedAt when toggled off and remove column mappings', async () => {
     const result = await initializeTerms();
 
     act(() => {
       result.current.actions.userCreatesCollection('snomed:1303696008');
     });
 
-    expect(result.current.standardizedTerms['snomed:1303696008'].isCollection).toBe(true);
+    expect(result.current.standardizedTerms['snomed:1303696008'].collectionCreatedAt).toBeDefined();
 
     act(() => {
       result.current.actions.userUpdatesColumnToCollectionMapping('0', 'snomed:1303696008');
@@ -1242,7 +1244,9 @@ describe('userDeletesCollection', () => {
       result.current.actions.userDeletesCollection('snomed:1303696008');
     });
 
-    expect(result.current.standardizedTerms['snomed:1303696008'].isCollection).toBe(false);
+    expect(
+      result.current.standardizedTerms['snomed:1303696008'].collectionCreatedAt
+    ).toBeUndefined();
     expect(result.current.columns['0'].isPartOf).toBeUndefined();
   });
 });

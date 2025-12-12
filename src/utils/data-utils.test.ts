@@ -218,7 +218,7 @@ describe('convertStandardizedTerms', () => {
     expect(adhdTerm.id).toBe('snomed:406506008');
     expect(adhdTerm.label).toBe('Attention deficit hyperactivity disorder');
     expect(adhdTerm.standardizedVariableId).toBe('nb:Diagnosis');
-    expect(adhdTerm.isCollection).toBe(false);
+    expect(adhdTerm.collectionCreatedAt).toBeUndefined();
   });
 });
 

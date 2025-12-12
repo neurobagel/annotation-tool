@@ -15,25 +15,25 @@ describe('useTermsForMultiColumnMeasureVariable', () => {
     vi.clearAllMocks();
   });
 
-  it('should return terms for a variable with disabled reflecting isCollection', () => {
+  it('should return terms for a variable with disabled reflecting collectionCreatedAt', () => {
     const terms: StandardizedTerms = {
       'term-1': {
         id: 'term-1',
         label: 'Term 1',
         standardizedVariableId: 'var-1',
-        isCollection: true,
+        collectionCreatedAt: '1',
       },
       'term-2': {
         id: 'term-2',
         label: 'Term 2',
         standardizedVariableId: 'var-1',
-        isCollection: false,
+        collectionCreatedAt: undefined,
       },
       'term-3': {
         id: 'term-3',
         label: 'Term 3',
         standardizedVariableId: 'var-2',
-        isCollection: false,
+        collectionCreatedAt: undefined,
       },
     };
     mockedUseStandardizedTerms.mockReturnValue(terms);
