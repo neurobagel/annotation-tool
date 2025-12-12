@@ -53,7 +53,7 @@ describe('useColumnOptionsForMultiColumnMeasureVariable', () => {
         id: 'term-1',
         label: 'Term 1',
         standardizedVariableId: 'var-1',
-        isCollection: true,
+        collectionCreatedAt: '1',
       },
     };
 
