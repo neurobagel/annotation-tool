@@ -816,6 +816,40 @@ describe('applyDataDictionaryToColumns', () => {
     expect((mockColumns as Columns)['0'].description).toBeUndefined();
     expect(result['0'].description).toBe('Test description');
   });
+
+  it('should not include missing values in categorical levels', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'diagnosis',
+        allValues: ['hc', 'NA', 'pd'],
+      },
+    };
+
+    const mockDataDict = {
+      diagnosis: {
+        Description: 'Diagnosis of the participant',
+        Annotations: {
+          VariableType: 'Categorical' as const,
+          MissingValues: ['NA'],
+        },
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      {
+        'nb:Diagnosis': { variable_type: VariableType.categorical },
+      } as unknown as StandardizedVariables,
+      {} as unknown as StandardizedTerms,
+      mockStandardizedFormats
+    );
+
+    expect(result['0'].missingValues).toEqual(['NA']);
+    expect(result['0'].levels).toBeDefined();
+    expect(result['0'].levels?.NA).toBeUndefined();
+  });
 });
 
 describe('applyDataTypeToColumn', () => {
