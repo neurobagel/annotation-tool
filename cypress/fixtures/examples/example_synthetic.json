@@ -52,7 +52,8 @@
   "pheno_group": {
     "Description": "Group variable",
     "Levels": {
-      "PAT": "Patient"
+      "PAT": "Patient",
+      "ADHD": "Attention deficit hyperactivity disorder, predominantly hyperactive impulsive type"
     },
     "Annotations": {
       "IsAbout": {
@@ -63,6 +64,10 @@
         "PAT": {
           "TermURL": "snomed:406506008",
           "Label": "Attention deficit hyperactivity disorder"
+        },
+        "ADHD": {
+          "TermURL": "snomed:7461003",
+          "Label": "Attention deficit hyperactivity disorder, predominantly hyperactive impulsive type"
         }
       },
       "MissingValues": ["NA"]
