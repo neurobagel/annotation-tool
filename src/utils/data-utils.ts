@@ -340,6 +340,39 @@ export function applyDataDictionaryToColumns(
       case VariableType.collection:
         column.dataType = undefined;
 
+        // Infer collection data type from the presence of levels or units in the data dictionary.
+        if (columnData.Levels) {
+          column.dataType = DataType.categorical;
+          column.levels = Object.entries(columnData.Levels).reduce(
+            (acc, [levelKey, levelValue]) => {
+              const annotationLevel = columnData.Annotations?.Levels?.[levelKey];
+              const standardizedTerm =
+                annotationLevel?.TermURL && standardizedTerms[annotationLevel.TermURL]
+                  ? annotationLevel.TermURL
+                  : '';
+
+              return {
+                ...acc,
+                [levelKey]: {
+                  description: levelValue.Description || '',
+                  standardizedTerm,
+                },
+              };
+            },
+            {} as { [key: string]: { description: string; standardizedTerm: string } }
+          );
+        } else if (columnData.Units !== undefined) {
+          column.dataType = DataType.continuous;
+          column.units = columnData.Units;
+
+          if (columnData.Annotations?.Format?.TermURL) {
+            const formatId = columnData.Annotations.Format.TermURL;
+            if (standardizedFormats[formatId]) {
+              column.format = formatId;
+            }
+          }
+        }
+
         if (columnData.Annotations?.IsPartOf?.TermURL) {
           const termId = columnData.Annotations.IsPartOf.TermURL;
           if (standardizedTerms[termId]) {
