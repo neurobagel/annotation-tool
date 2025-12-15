@@ -3,7 +3,7 @@ import { AvailableTerm } from '../types/multiColumnMeasureTypes';
 
 /**
  * Returns the terms for a multi-column variable and flags those already mapped
- * via the `isCollection` field so the UI can disable them when creating new cards.
+ * via the `collectionCreatedAt` field so the UI can disable them when creating new cards.
  */
 export function useTermsForMultiColumnMeasureVariable(variableId: string): AvailableTerm[] {
   const standardizedTerms = useStandardizedTerms();
@@ -16,6 +16,6 @@ export function useTermsForMultiColumnMeasureVariable(variableId: string): Avail
       id: term.id,
       label: term.label,
       abbreviation: term.abbreviation,
-      disabled: term.isCollection ?? false,
+      disabled: Boolean(term.collectionCreatedAt),
     }));
 }

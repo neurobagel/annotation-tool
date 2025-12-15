@@ -22,7 +22,7 @@ export function usePersistedMultiColumnCards(
   if (!variableId) return [];
 
   const seedCards = Object.values(standardizedTerms)
-    .filter((term) => term.standardizedVariableId === variableId && term.isCollection)
+    .filter((term) => term.standardizedVariableId === variableId && term.collectionCreatedAt)
     .map<UsePersistedMultiColumnCardsOutput>((term) => ({
       id: term.id,
       term,
@@ -56,5 +56,9 @@ export function usePersistedMultiColumnCards(
     new Map(seedCards.map((card) => [card.id, card]))
   );
 
-  return Array.from(mappedCards.values());
+  return Array.from(mappedCards.values()).sort((a, b) => {
+    const aKey = a.term?.collectionCreatedAt ? Number(a.term.collectionCreatedAt) : Infinity;
+    const bKey = b.term?.collectionCreatedAt ? Number(b.term.collectionCreatedAt) : Infinity;
+    return aKey - bKey;
+  });
 }
