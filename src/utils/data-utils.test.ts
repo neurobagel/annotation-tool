@@ -505,6 +505,90 @@ describe('applyDataDictionaryToColumns', () => {
     expect(result['0'].units).toBe('years');
   });
 
+  it('should infer categorical data type for collection variables with levels', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'assessment_score',
+        allValues: ['good', 'bad'],
+      },
+    };
+
+    const mockDataDict = {
+      assessment_score: {
+        Description: 'Assessment score',
+        Levels: {
+          good: {
+            Description: 'Good',
+          },
+          bad: {
+            Description: 'Bad',
+          },
+        },
+        Annotations: {
+          IsAbout: {
+            TermURL: 'nb:Assessment',
+            Label: 'Assessment Tool',
+          },
+          VariableType: 'Collection' as const,
+          Levels: {
+            good: {
+              TermURL: 'snomed:1304062007',
+              Label: 'Good',
+            },
+          },
+        },
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      mockStandardizedVariables as unknown as StandardizedVariables,
+      mockStandardizedTerms,
+      mockStandardizedFormats
+    );
+
+    expect(result['0'].dataType).toBe('Categorical');
+    expect(result['0'].levels?.good.description).toBe('Good');
+    expect(result['0'].levels?.good.standardizedTerm).toBe('snomed:1304062007');
+  });
+
+  it('should infer continuous data type for collection variables with units', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'assessment_score',
+        allValues: ['10', '20'],
+      },
+    };
+
+    const mockDataDict = {
+      assessment_score: {
+        Description: 'Assessment score',
+        Units: 'points',
+        Annotations: {
+          IsAbout: {
+            TermURL: 'nb:Assessment',
+            Label: 'Assessment Tool',
+          },
+          VariableType: 'Collection' as const,
+        },
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      mockStandardizedVariables as unknown as StandardizedVariables,
+      mockStandardizedTerms,
+      mockStandardizedFormats
+    );
+
+    expect(result['0'].dataType).toBe('Continuous');
+    expect(result['0'].units).toBe('points');
+  });
+
   it('should not modify columns when column names do not match', () => {
     const mockColumns = {
       '0': {
