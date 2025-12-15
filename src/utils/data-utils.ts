@@ -296,19 +296,35 @@ export function applyDataDictionaryToColumns(
       case VariableType.categorical:
         column.dataType = DataType.categorical;
 
-        if (columnData.Levels) {
-          column.levels = Object.entries(columnData.Levels).reduce(
-            (acc, [levelKey, levelValue]) => {
-              const annotationLevel = columnData.Annotations?.Levels?.[levelKey];
+        {
+          // Create levels from data table values, then update those levels using
+          // data dictionary entries only when keys match data table values.
+          const missingValuesSet = new Set(column.missingValues ?? []);
+          const initialLevels = Array.from(new Set(column.allValues ?? []))
+            .filter((value) => !missingValuesSet.has(value))
+            .reduce(
+              (acc, value) => ({
+                ...acc,
+                [value]: { description: '', standardizedTerm: '' },
+              }),
+              {} as { [key: string]: { description: string; standardizedTerm: string } }
+            );
+
+          const dictLevels = columnData.Levels ?? {};
+
+          column.levels = Object.entries(initialLevels).reduce(
+            (acc, [value, level]) => {
+              const dictLevel = dictLevels[value];
+              const annotationLevel = columnData.Annotations?.Levels?.[value];
               const standardizedTerm =
                 annotationLevel?.TermURL && standardizedTerms[annotationLevel.TermURL]
                   ? annotationLevel.TermURL
-                  : '';
+                  : level.standardizedTerm;
 
               return {
                 ...acc,
-                [levelKey]: {
-                  description: levelValue.Description || '',
+                [value]: {
+                  description: dictLevel?.Description || level.description,
                   standardizedTerm,
                 },
               };
