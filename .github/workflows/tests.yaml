@@ -111,19 +111,19 @@ jobs:
         run: npm install
 
       - name: Download e2e coverage artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: e2eCov
           path: e2eCov
 
       - name: Download component coverage artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: compCov
           path: compCov
 
       - name: Download unit coverage artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: unitCov
           path: unitCov
