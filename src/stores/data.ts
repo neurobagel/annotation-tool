@@ -233,7 +233,7 @@ const useDataStore = create<DataStore>()((set, get) => ({
       set((state) => ({
         standardizedTerms: produce(state.standardizedTerms, (draft) => {
           if (draft[termId]) {
-            draft[termId].isCollection = true;
+            draft[termId].collectionCreatedAt = Date.now().toString();
           }
         }),
       }));
@@ -251,7 +251,7 @@ const useDataStore = create<DataStore>()((set, get) => ({
         }),
         standardizedTerms: produce(state.standardizedTerms, (draft) => {
           if (draft[termId]) {
-            draft[termId].isCollection = false;
+            draft[termId].collectionCreatedAt = undefined;
           }
         }),
       }));

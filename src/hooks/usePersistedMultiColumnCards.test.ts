@@ -23,13 +23,13 @@ describe('usePersistedMultiColumnCards', () => {
         id: 'term-1',
         label: 'Term 1',
         standardizedVariableId: 'var-1',
-        isCollection: true,
+        collectionCreatedAt: '1',
       },
       'term-2': {
         id: 'term-2',
         label: 'Term 2',
         standardizedVariableId: 'var-1',
-        isCollection: false,
+        collectionCreatedAt: undefined,
       },
     };
     const columns: Columns = {};
@@ -50,7 +50,7 @@ describe('usePersistedMultiColumnCards', () => {
         id: 'term-1',
         label: 'Term 1',
         standardizedVariableId: 'var-1',
-        isCollection: true,
+        collectionCreatedAt: '1',
       },
     };
     const columns: Columns = {
@@ -77,7 +77,7 @@ describe('usePersistedMultiColumnCards', () => {
         id: 'term-1',
         label: 'Term 1',
         standardizedVariableId: 'var-1',
-        isCollection: true,
+        collectionCreatedAt: '1',
       },
     };
     const columns: Columns = {
@@ -103,5 +103,34 @@ describe('usePersistedMultiColumnCards', () => {
     const { result } = renderHook(() => usePersistedMultiColumnCards('var-1'));
 
     expect(result.current[0].mappedColumns).toEqual([]);
+  });
+
+  it('should sort cards by creation time', () => {
+    const terms: StandardizedTerms = {
+      'term-1': {
+        id: 'term-1',
+        label: 'Term 1',
+        standardizedVariableId: 'var-1',
+        collectionCreatedAt: '100',
+      },
+      'term-2': {
+        id: 'term-2',
+        label: 'Term 2',
+        standardizedVariableId: 'var-1',
+        collectionCreatedAt: '50',
+      },
+      'term-3': {
+        id: 'term-3',
+        label: 'Term 3',
+        standardizedVariableId: 'var-1',
+        collectionCreatedAt: undefined,
+      },
+    };
+    mockedUseStandardizedTerms.mockReturnValue(terms);
+    mockedUseColumns.mockReturnValue({});
+
+    const { result } = renderHook(() => usePersistedMultiColumnCards('var-1'));
+
+    expect(result.current.map((c) => c.id)).toEqual(['term-2', 'term-1']);
   });
 });
