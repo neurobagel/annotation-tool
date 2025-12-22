@@ -217,6 +217,49 @@ interface ColumnDataShape {
   units?: string;
 }
 
+interface LevelMap {
+  [key: string]: { description: string; standardizedTerm: string };
+}
+
+function buildCategoricalLevels(
+  allValues: string[] | undefined,
+  missingValues: string[] | undefined,
+  dictLevels: { [key: string]: { Description: string; TermURL?: string } } | undefined,
+  annotationLevels: { [key: string]: { TermURL: string; Label: string } } | undefined,
+  standardizedTerms: StandardizedTerms
+): LevelMap {
+  const missingValuesSet = new Set(missingValues ?? []);
+  const initialLevels = Array.from(new Set(allValues ?? []))
+    .filter((value) => !missingValuesSet.has(value))
+    .reduce(
+      (acc, value) => ({
+        ...acc,
+        [value]: { description: '', standardizedTerm: '' },
+      }),
+      {} as LevelMap
+    );
+
+  const resolvedDictLevels = dictLevels ?? {};
+  const resolvedAnnotationLevels = annotationLevels ?? {};
+
+  return Object.entries(initialLevels).reduce((acc, [value, level]) => {
+    const dictLevel = resolvedDictLevels[value];
+    const annotationLevel = resolvedAnnotationLevels[value];
+    const standardizedTerm =
+      annotationLevel?.TermURL && standardizedTerms[annotationLevel.TermURL]
+        ? annotationLevel.TermURL
+        : level.standardizedTerm;
+
+    return {
+      ...acc,
+      [value]: {
+        description: dictLevel?.Description || level.description,
+        standardizedTerm,
+      },
+    };
+  }, {} as LevelMap);
+}
+
 export function applyDataTypeToColumn<T extends ColumnDataShape>(
   column: T,
   dataType: DataType | null,
@@ -296,42 +339,16 @@ export function applyDataDictionaryToColumns(
       case VariableType.categorical:
         column.dataType = DataType.categorical;
 
-        {
-          // Create levels from data table values, then update those levels using
-          // data dictionary entries only when keys match data table values.
-          const missingValuesSet = new Set(column.missingValues ?? []);
-          const initialLevels = Array.from(new Set(column.allValues ?? []))
-            .filter((value) => !missingValuesSet.has(value))
-            .reduce(
-              (acc, value) => ({
-                ...acc,
-                [value]: { description: '', standardizedTerm: '' },
-              }),
-              {} as { [key: string]: { description: string; standardizedTerm: string } }
-            );
+        // Create levels from data table values, then update those levels using
+        // data dictionary entries only when keys match data table values.
+        column.levels = buildCategoricalLevels(
+          column.allValues,
+          column.missingValues,
+          columnData.Levels,
+          columnData.Annotations?.Levels,
+          standardizedTerms
+        );
 
-          const dictLevels = columnData.Levels ?? {};
-
-          column.levels = Object.entries(initialLevels).reduce(
-            (acc, [value, level]) => {
-              const dictLevel = dictLevels[value];
-              const annotationLevel = columnData.Annotations?.Levels?.[value];
-              const standardizedTerm =
-                annotationLevel?.TermURL && standardizedTerms[annotationLevel.TermURL]
-                  ? annotationLevel.TermURL
-                  : level.standardizedTerm;
-
-              return {
-                ...acc,
-                [value]: {
-                  description: dictLevel?.Description || level.description,
-                  standardizedTerm,
-                },
-              };
-            },
-            {} as { [key: string]: { description: string; standardizedTerm: string } }
-          );
-        }
         break;
 
       case VariableType.continuous:
@@ -356,26 +373,15 @@ export function applyDataDictionaryToColumns(
       case VariableType.collection:
         column.dataType = undefined;
 
-        // Infer collection data type from the presence of levels or units in the data dictionary.
+        // Infer collection data type from the presence of levels or units in BIDS portion of the data dictionary.
         if (columnData.Levels) {
           column.dataType = DataType.categorical;
-          column.levels = Object.entries(columnData.Levels).reduce(
-            (acc, [levelKey, levelValue]) => {
-              const annotationLevel = columnData.Annotations?.Levels?.[levelKey];
-              const standardizedTerm =
-                annotationLevel?.TermURL && standardizedTerms[annotationLevel.TermURL]
-                  ? annotationLevel.TermURL
-                  : '';
-
-              return {
-                ...acc,
-                [levelKey]: {
-                  description: levelValue.Description || '',
-                  standardizedTerm,
-                },
-              };
-            },
-            {} as { [key: string]: { description: string; standardizedTerm: string } }
+          column.levels = buildCategoricalLevels(
+            column.allValues,
+            column.missingValues,
+            columnData.Levels,
+            columnData.Annotations?.Levels,
+            standardizedTerms
           );
         } else if (columnData.Units !== undefined) {
           column.dataType = DataType.continuous;

@@ -651,6 +651,79 @@ describe('applyDataDictionaryToColumns', () => {
     expect(result['0'].dataType).toBe('Categorical');
     expect(result['0'].levels?.good.description).toBe('Good');
     expect(result['0'].levels?.good.standardizedTerm).toBe('snomed:1304062007');
+    expect(result['0'].levels?.bad.standardizedTerm).toEqual('');
+  });
+
+  it('should ignore dictionary-only levels and missing values for collection variables', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'assessment_score',
+        allValues: ['good', 'bad', 'N/A'],
+      },
+    };
+
+    const mockDataDict = {
+      assessment_score: {
+        Description: 'Assessment score',
+        Levels: {
+          good: {
+            Description: 'Good',
+          },
+          bad: {
+            Description: 'Bad',
+          },
+          extra: {
+            Description: 'Extra',
+          },
+        },
+        Annotations: {
+          IsAbout: {
+            TermURL: 'nb:Assessment',
+            Label: 'Assessment Tool',
+          },
+          VariableType: 'Collection' as const,
+          Levels: {
+            good: {
+              TermURL: 'snomed:1304062007',
+              Label: 'Good',
+            },
+            extra: {
+              TermURL: 'snomed:999999',
+              Label: 'Extra',
+            },
+          },
+          MissingValues: ['N/A'],
+        },
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      mockStandardizedVariables as unknown as StandardizedVariables,
+      {
+        ...mockStandardizedTerms,
+        'snomed:1304062007': {
+          id: 'snomed:1304062007',
+          standardizedVariableId: 'nb:Assessment',
+          label: 'Good',
+        },
+        'snomed:999999': {
+          id: 'snomed:999999',
+          standardizedVariableId: 'nb:Assessment',
+          label: 'Extra',
+        },
+      },
+      mockStandardizedFormats
+    );
+
+    expect(result['0'].levels?.good.description).toBe('Good');
+    expect(result['0'].levels?.good.standardizedTerm).toBe('snomed:1304062007');
+    expect(result['0'].levels?.bad.description).toBe('Bad');
+    expect(result['0'].levels?.extra).toBeUndefined();
+    expect(result['0'].levels?.['N/A']).toBeUndefined();
+    expect(result['0'].missingValues).toEqual(['N/A']);
   });
 
   it('should infer continuous data type for collection variables with units', () => {
