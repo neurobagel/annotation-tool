@@ -27,26 +27,40 @@ function DescriptionEditor({
   const [editedDescription, setEditedDescription] = useState<string | null>(description);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Track a pending debounced save so we can flush it on unmount.
+  const pendingSaveRef = useRef(false);
+  const latestValueRef = useRef<string | null>(description);
+  const disabledRef = useRef(disabled);
+  const onDescriptionChangeRef = useRef(onDescriptionChange);
   const dataCy = levelValue ? `${columnID}-${levelValue}` : columnID;
+
+  disabledRef.current = disabled;
+  onDescriptionChangeRef.current = onDescriptionChange;
 
   // Reset component state when the prop changes (e.g., missing toggle).
   useEffect(() => {
     setEditedDescription(description);
+    latestValueRef.current = description;
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
+    pendingSaveRef.current = false;
     setSaveStatus('idle');
   }, [description, disabled]);
 
-  // Ensure pending timeouts are cleared when the component unmounts.
+  // Run any pending save on unmount so fast column switches don't drop edits.
   useEffect(
     () => () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
+
+      if (pendingSaveRef.current && !disabledRef.current) {
+        onDescriptionChangeRef.current(columnID, latestValueRef.current);
+      }
     },
-    []
+    [columnID]
   );
 
   /* 
@@ -59,12 +73,15 @@ function DescriptionEditor({
       if (disabled) {
         return;
       }
+      pendingSaveRef.current = true;
+      latestValueRef.current = value;
       setSaveStatus('saving');
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
       timeoutRef.current = setTimeout(() => {
         onDescriptionChange(columnID, value);
+        pendingSaveRef.current = false;
         setSaveStatus('saved');
         setTimeout(() => setSaveStatus('idle'), 1500);
       }, 500);
