@@ -12,6 +12,7 @@ import {
   convertStandardizedFormats,
   readFile,
   parseTsvContent,
+  buildCategoricalLevels,
   applyDataDictionaryToColumns,
   applyDataTypeToColumn,
 } from './data-utils';
@@ -327,6 +328,82 @@ describe('readFile + parseTsvContent integration', () => {
     expect(data).toHaveLength(12);
     expect(data[0]).toEqual(['sub-718211', '28.4', 'M', 'ADHD', '80']);
     expect(data[11]).toEqual(['sub-718225', '65', 'N/A', 'PD', '83']);
+  });
+});
+
+describe('buildCategoricalLevels', () => {
+  it('should create levels from allValues', () => {
+    const result = buildCategoricalLevels({
+      column: { allValues: ['A', 'B', 'A'], missingValues: [] },
+      columnData: { Description: '' },
+      standardizedTerms: {},
+    });
+
+    expect(Object.keys(result)).toEqual(['A', 'B']);
+    expect(result.A).toEqual({ description: '', standardizedTerm: '' });
+    expect(result.B).toEqual({ description: '', standardizedTerm: '' });
+  });
+
+  it('should exclude missing values from levels', () => {
+    const result = buildCategoricalLevels({
+      column: { allValues: ['A', 'N/A', 'B'], missingValues: ['N/A'] },
+      columnData: { Description: '' },
+      standardizedTerms: {},
+    });
+
+    expect(result.A).toEqual({ description: '', standardizedTerm: '' });
+    expect(result.B).toEqual({ description: '', standardizedTerm: '' });
+    expect(result['N/A']).toBeUndefined();
+  });
+
+  it('should apply dictionary descriptions only for matching values', () => {
+    const result = buildCategoricalLevels({
+      column: { allValues: ['A', 'B'], missingValues: [] },
+      columnData: {
+        Description: '',
+        Levels: {
+          A: { Description: 'Alpha' },
+          C: { Description: 'Charlie' },
+        },
+      },
+      standardizedTerms: {},
+    });
+
+    expect(result.A.description).toBe('Alpha');
+    expect(result.B.description).toBe('');
+    expect(result.C).toBeUndefined();
+  });
+
+  it('should apply standardized terms only when recognized and matching', () => {
+    const result = buildCategoricalLevels({
+      column: { allValues: ['A', 'B'], missingValues: [] },
+      columnData: {
+        Description: '',
+        Annotations: {
+          Levels: {
+            A: { TermURL: 'term:1', Label: 'Alpha' },
+            B: { TermURL: 'term:missing', Label: 'Beta' },
+            C: { TermURL: 'term:2', Label: 'Charlie' },
+          },
+        },
+      },
+      standardizedTerms: {
+        'term:1': {
+          standardizedVariableId: 'nb:Test',
+          id: 'term:1',
+          label: 'Alpha',
+        },
+        'term:2': {
+          standardizedVariableId: 'nb:Test',
+          id: 'term:2',
+          label: 'Charlie',
+        },
+      },
+    });
+
+    expect(result.A.standardizedTerm).toBe('term:1');
+    expect(result.B.standardizedTerm).toBe('');
+    expect(result.C).toBeUndefined();
   });
 });
 

@@ -221,15 +221,22 @@ interface LevelMap {
   [key: string]: { description: string; standardizedTerm: string };
 }
 
-function buildCategoricalLevels(
-  allValues: string[] | undefined,
-  missingValues: string[] | undefined,
-  dictLevels: { [key: string]: { Description: string; TermURL?: string } } | undefined,
-  annotationLevels: { [key: string]: { TermURL: string; Label: string } } | undefined,
-  standardizedTerms: StandardizedTerms
-): LevelMap {
-  const missingValuesSet = new Set(missingValues ?? []);
-  const initialLevels = Array.from(new Set(allValues ?? []))
+interface BuildCategoricalLevelsOptions {
+  column: {
+    allValues?: string[];
+    missingValues?: string[];
+  };
+  columnData: DataDictionary[string];
+  standardizedTerms: StandardizedTerms;
+}
+
+export function buildCategoricalLevels({
+  column,
+  columnData,
+  standardizedTerms,
+}: BuildCategoricalLevelsOptions): LevelMap {
+  const missingValuesSet = new Set(column.missingValues ?? []);
+  const initialLevels = Array.from(new Set(column.allValues ?? []))
     .filter((value) => !missingValuesSet.has(value))
     .reduce(
       (acc, value) => ({
@@ -239,12 +246,9 @@ function buildCategoricalLevels(
       {} as LevelMap
     );
 
-  const resolvedDictLevels = dictLevels ?? {};
-  const resolvedAnnotationLevels = annotationLevels ?? {};
-
   return Object.entries(initialLevels).reduce((acc, [value, level]) => {
-    const dictLevel = resolvedDictLevels[value];
-    const annotationLevel = resolvedAnnotationLevels[value];
+    const dictLevel = columnData.Levels?.[value];
+    const annotationLevel = columnData.Annotations?.Levels?.[value];
     const standardizedTerm =
       annotationLevel?.TermURL && standardizedTerms[annotationLevel.TermURL]
         ? annotationLevel.TermURL
@@ -341,13 +345,7 @@ export function applyDataDictionaryToColumns(
 
         // Create levels from data table values, then update those levels using
         // data dictionary entries only when keys match data table values.
-        column.levels = buildCategoricalLevels(
-          column.allValues,
-          column.missingValues,
-          columnData.Levels,
-          columnData.Annotations?.Levels,
-          standardizedTerms
-        );
+        column.levels = buildCategoricalLevels({ column, columnData, standardizedTerms });
 
         break;
 
@@ -376,13 +374,7 @@ export function applyDataDictionaryToColumns(
         // Infer collection data type from the presence of levels or units in BIDS portion of the data dictionary.
         if (columnData.Levels) {
           column.dataType = DataType.categorical;
-          column.levels = buildCategoricalLevels(
-            column.allValues,
-            column.missingValues,
-            columnData.Levels,
-            columnData.Annotations?.Levels,
-            standardizedTerms
-          );
+          column.levels = buildCategoricalLevels({ column, columnData, standardizedTerms });
         } else if (columnData.Units !== undefined) {
           column.dataType = DataType.continuous;
           column.units = columnData.Units;
