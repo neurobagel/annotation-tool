@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 const defaultProps = {
   label: null,
   levelValue: null,
+  disabled: false,
 };
 
 interface DescriptionEditorProps {
@@ -12,6 +13,7 @@ interface DescriptionEditorProps {
   onDescriptionChange: (columnID: string, description: string | null) => void;
   columnID: string;
   levelValue?: string;
+  disabled?: boolean;
 }
 
 function DescriptionEditor({
@@ -20,15 +22,32 @@ function DescriptionEditor({
   onDescriptionChange,
   columnID,
   levelValue,
+  disabled = false,
 }: DescriptionEditorProps) {
   const [editedDescription, setEditedDescription] = useState<string | null>(description);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const dataCy = levelValue ? `${columnID}-${levelValue}` : columnID;
 
+  // Reset component state when the prop changes (e.g., missing toggle).
   useEffect(() => {
     setEditedDescription(description);
-  }, [description]);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    setSaveStatus('idle');
+  }, [description, disabled]);
+
+  // Ensure pending timeouts are cleared when the component unmounts.
+  useEffect(
+    () => () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    },
+    []
+  );
 
   /* 
   This function ensures that we only update the description after the user stops typing
@@ -37,6 +56,9 @@ function DescriptionEditor({
   */
   const debouncedSave = useCallback(
     (value: string | null) => {
+      if (disabled) {
+        return;
+      }
       setSaveStatus('saving');
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
@@ -47,7 +69,7 @@ function DescriptionEditor({
         setTimeout(() => setSaveStatus('idle'), 1500);
       }, 500);
     },
-    [columnID, onDescriptionChange]
+    [columnID, disabled, onDescriptionChange]
   );
 
   const handleDescriptionChange = (value: string) => {
@@ -70,6 +92,7 @@ function DescriptionEditor({
         multiline
         rows={3}
         value={editedDescription || ''}
+        disabled={disabled}
         onChange={(e) => handleDescriptionChange(e.target.value)}
         variant="outlined"
         placeholder="Click to add description..."
