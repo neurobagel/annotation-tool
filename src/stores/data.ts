@@ -262,7 +262,7 @@ const useDataStore = create<DataStore>()((set, get) => ({
         columns: produce(state.columns, (draft) => {
           const column = draft[columnID];
           // Guard against missing columns or removed levels (e.g., toggled to missing).
-          if (!column || !column.levels || !column.levels[value]) {
+          if (!column?.levels?.[value]) {
             return;
           }
 
