@@ -217,6 +217,53 @@ interface ColumnDataShape {
   units?: string;
 }
 
+interface LevelMap {
+  [key: string]: { description: string; standardizedTerm: string };
+}
+
+interface BuildCategoricalLevelsOptions {
+  column: {
+    allValues?: string[];
+    missingValues?: string[];
+  };
+  columnData: DataDictionary[string];
+  standardizedTerms: StandardizedTerms;
+}
+
+export function buildCategoricalLevels({
+  column,
+  columnData,
+  standardizedTerms,
+}: BuildCategoricalLevelsOptions): LevelMap {
+  const missingValuesSet = new Set(column.missingValues ?? []);
+  const initialLevels = Array.from(new Set(column.allValues ?? []))
+    .filter((value) => !missingValuesSet.has(value))
+    .reduce(
+      (acc, value) => ({
+        ...acc,
+        [value]: { description: '', standardizedTerm: '' },
+      }),
+      {} as LevelMap
+    );
+
+  return Object.entries(initialLevels).reduce((acc, [value, level]) => {
+    const dictLevel = columnData.Levels?.[value];
+    const annotationLevel = columnData.Annotations?.Levels?.[value];
+    const standardizedTerm =
+      annotationLevel?.TermURL && standardizedTerms[annotationLevel.TermURL]
+        ? annotationLevel.TermURL
+        : level.standardizedTerm;
+
+    return {
+      ...acc,
+      [value]: {
+        description: dictLevel?.Description || level.description,
+        standardizedTerm,
+      },
+    };
+  }, {} as LevelMap);
+}
+
 export function applyDataTypeToColumn<T extends ColumnDataShape>(
   column: T,
   dataType: DataType | null,
@@ -296,42 +343,10 @@ export function applyDataDictionaryToColumns(
       case VariableType.categorical:
         column.dataType = DataType.categorical;
 
-        {
-          // Create levels from data table values, then update those levels using
-          // data dictionary entries only when keys match data table values.
-          const missingValuesSet = new Set(column.missingValues ?? []);
-          const initialLevels = Array.from(new Set(column.allValues ?? []))
-            .filter((value) => !missingValuesSet.has(value))
-            .reduce(
-              (acc, value) => ({
-                ...acc,
-                [value]: { description: '', standardizedTerm: '' },
-              }),
-              {} as { [key: string]: { description: string; standardizedTerm: string } }
-            );
+        // Create levels from data table values, then update those levels using
+        // data dictionary entries only when keys match data table values.
+        column.levels = buildCategoricalLevels({ column, columnData, standardizedTerms });
 
-          const dictLevels = columnData.Levels ?? {};
-
-          column.levels = Object.entries(initialLevels).reduce(
-            (acc, [value, level]) => {
-              const dictLevel = dictLevels[value];
-              const annotationLevel = columnData.Annotations?.Levels?.[value];
-              const standardizedTerm =
-                annotationLevel?.TermURL && standardizedTerms[annotationLevel.TermURL]
-                  ? annotationLevel.TermURL
-                  : level.standardizedTerm;
-
-              return {
-                ...acc,
-                [value]: {
-                  description: dictLevel?.Description || level.description,
-                  standardizedTerm,
-                },
-              };
-            },
-            {} as { [key: string]: { description: string; standardizedTerm: string } }
-          );
-        }
         break;
 
       case VariableType.continuous:
@@ -355,6 +370,22 @@ export function applyDataDictionaryToColumns(
 
       case VariableType.collection:
         column.dataType = undefined;
+
+        // Infer collection data type from the presence of levels or units in BIDS portion of the data dictionary.
+        if (columnData.Levels) {
+          column.dataType = DataType.categorical;
+          column.levels = buildCategoricalLevels({ column, columnData, standardizedTerms });
+        } else if (columnData.Units !== undefined) {
+          column.dataType = DataType.continuous;
+          column.units = columnData.Units;
+
+          if (columnData.Annotations?.Format?.TermURL) {
+            const formatId = columnData.Annotations.Format.TermURL;
+            if (standardizedFormats[formatId]) {
+              column.format = formatId;
+            }
+          }
+        }
 
         if (columnData.Annotations?.IsPartOf?.TermURL) {
           const termId = columnData.Annotations.IsPartOf.TermURL;
