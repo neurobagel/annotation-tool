@@ -1,5 +1,6 @@
 import { TextField, Typography } from '@mui/material';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 
 const defaultProps = {
   label: null,
@@ -26,72 +27,53 @@ function DescriptionEditor({
 }: DescriptionEditorProps) {
   const [editedDescription, setEditedDescription] = useState<string | null>(description);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  // Track a pending debounced save so we can flush it on unmount.
-  const pendingSaveRef = useRef(false);
-  const latestValueRef = useRef<string | null>(description);
-  const disabledRef = useRef(disabled);
-  const onDescriptionChangeRef = useRef(onDescriptionChange);
+  // Track the transient "Saved" helper state so it can be cleared on a timer.
+  const statusTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const dataCy = levelValue ? `${columnID}-${levelValue}` : columnID;
 
-  disabledRef.current = disabled;
-  onDescriptionChangeRef.current = onDescriptionChange;
+  // Debounce saves so we only persist after the user pauses typing.
+  const debouncedSave = useDebouncedCallback((value: string | null) => {
+    onDescriptionChange(columnID, value);
+    setSaveStatus('saved');
+    if (statusTimeoutRef.current) {
+      clearTimeout(statusTimeoutRef.current);
+    }
+    statusTimeoutRef.current = setTimeout(() => setSaveStatus('idle'), 1500);
+  }, 500);
 
   // Reset component state when the prop changes (e.g., missing toggle).
   useEffect(() => {
     setEditedDescription(description);
-    latestValueRef.current = description;
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
+    debouncedSave.cancel();
+    if (statusTimeoutRef.current) {
+      clearTimeout(statusTimeoutRef.current);
+      statusTimeoutRef.current = null;
     }
-    pendingSaveRef.current = false;
     setSaveStatus('idle');
-  }, [description, disabled]);
+  }, [description, disabled, debouncedSave]);
 
-  // Run any pending save on unmount so fast column switches don't drop edits.
+  // Flush any pending save on unmount so fast column switches don't drop edits.
   useEffect(
     () => () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-
-      if (pendingSaveRef.current && !disabledRef.current) {
-        onDescriptionChangeRef.current(columnID, latestValueRef.current);
-      }
-    },
-    [columnID]
-  );
-
-  /* 
-  This function ensures that we only update the description after the user stops typing
-  When a user types, start a timer before storing the current value. 
-  If they type again before the timer expires, create a new timer and begin waiting again.
-  */
-  const debouncedSave = useCallback(
-    (value: string | null) => {
       if (disabled) {
-        return;
+        debouncedSave.cancel();
+      } else {
+        debouncedSave.flush();
       }
-      pendingSaveRef.current = true;
-      latestValueRef.current = value;
-      setSaveStatus('saving');
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+      if (statusTimeoutRef.current) {
+        clearTimeout(statusTimeoutRef.current);
       }
-      timeoutRef.current = setTimeout(() => {
-        onDescriptionChange(columnID, value);
-        pendingSaveRef.current = false;
-        setSaveStatus('saved');
-        setTimeout(() => setSaveStatus('idle'), 1500);
-      }, 500);
     },
-    [columnID, disabled, onDescriptionChange]
+    [debouncedSave, disabled]
   );
 
   const handleDescriptionChange = (value: string) => {
     const newValue = value.trim() === '' ? null : value;
     setEditedDescription(newValue);
+    if (disabled) {
+      return;
+    }
+    setSaveStatus('saving');
     debouncedSave(newValue);
   };
 

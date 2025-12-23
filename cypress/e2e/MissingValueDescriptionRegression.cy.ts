@@ -30,6 +30,7 @@ describe('Missing Value Description Regression', () => {
     cy.get('[data-cy="side-column-nav-bar-sex-select-button"]').click();
     cy.get('[data-cy="2-categorical"]').should('be.visible');
 
+    // Freeze time and advance past the 500ms debounce so the save callback executes.
     cy.clock();
     cy.get('[data-cy="2-M-missing-value-no"]').click();
     cy.get('[data-cy="2-M-description"] textarea').first().should('not.be.disabled');
