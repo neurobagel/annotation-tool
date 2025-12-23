@@ -64,4 +64,17 @@ describe('DescriptionEditor', () => {
     cy.get('[data-cy="1-description"] textarea').first().clear();
     cy.get('@spy').should('have.been.calledWith', '1', null);
   });
+
+  it('should disable the input when disabled prop is true', () => {
+    cy.mount(
+      <DescriptionEditor
+        description={props.description}
+        onDescriptionChange={props.onDescriptionChange}
+        columnID={props.id}
+        disabled
+      />
+    );
+
+    cy.get('[data-cy="1-description"] textarea').should('be.disabled');
+  });
 });
