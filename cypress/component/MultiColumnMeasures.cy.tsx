@@ -45,19 +45,19 @@ describe('MultiColumnMeasures', () => {
         id: 'nb:SomeTerm',
         label: 'some term',
         standardizedVariableId: 'nb:Assessment',
-        isCollection: true,
+        collectionCreatedAt: '1',
       },
       'nb:AnotherTerm': {
         id: 'nb:AnotherTerm',
         label: 'another term',
         standardizedVariableId: 'nb:Assessment',
-        isCollection: false,
+        collectionCreatedAt: undefined,
       },
       'nb:OtherTerm': {
         id: 'nb:OtherTerm',
         label: 'some other term',
         standardizedVariableId: 'nb:Assessment',
-        isCollection: false,
+        collectionCreatedAt: undefined,
       },
     };
 

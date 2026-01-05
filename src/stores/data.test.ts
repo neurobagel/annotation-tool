@@ -1188,16 +1188,18 @@ describe('userCreatesCollection', () => {
     return result;
   };
 
-  it('should set isCollection to true for the provided term', async () => {
+  it('should set collectionCreatedAt when creating a collection', async () => {
     const result = await initializeTerms();
 
-    expect(result.current.standardizedTerms['snomed:1303696008'].isCollection).toBe(false);
+    expect(
+      result.current.standardizedTerms['snomed:1303696008'].collectionCreatedAt
+    ).toBeUndefined();
 
     act(() => {
       result.current.actions.userCreatesCollection('snomed:1303696008');
     });
 
-    expect(result.current.standardizedTerms['snomed:1303696008'].isCollection).toBe(true);
+    expect(result.current.standardizedTerms['snomed:1303696008'].collectionCreatedAt).toBeDefined();
   });
 });
 
@@ -1225,14 +1227,14 @@ describe('userDeletesCollection', () => {
     return result;
   };
 
-  it('should set isCollection to false when toggled off and remove column mappings', async () => {
+  it('should clear collectionCreatedAt when toggled off and remove column mappings', async () => {
     const result = await initializeTerms();
 
     act(() => {
       result.current.actions.userCreatesCollection('snomed:1303696008');
     });
 
-    expect(result.current.standardizedTerms['snomed:1303696008'].isCollection).toBe(true);
+    expect(result.current.standardizedTerms['snomed:1303696008'].collectionCreatedAt).toBeDefined();
 
     act(() => {
       result.current.actions.userUpdatesColumnToCollectionMapping('0', 'snomed:1303696008');
@@ -1242,7 +1244,9 @@ describe('userDeletesCollection', () => {
       result.current.actions.userDeletesCollection('snomed:1303696008');
     });
 
-    expect(result.current.standardizedTerms['snomed:1303696008'].isCollection).toBe(false);
+    expect(
+      result.current.standardizedTerms['snomed:1303696008'].collectionCreatedAt
+    ).toBeUndefined();
     expect(result.current.columns['0'].isPartOf).toBeUndefined();
   });
 });
@@ -1279,6 +1283,43 @@ describe('userUpdatesColumnLevelDescription', () => {
 
     expect(result.current.columns['0'].levels?.A.description).toBe('Group A');
     expect(result.current.columns['0'].levels?.B.description).toBe('');
+  });
+
+  it('should ignore updates for missing value levels', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['category'],
+      data: [['A'], ['B'], ['C']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('0', DataType.categorical);
+      result.current.actions.userUpdatesColumnMissingValues('0', 'A', true);
+    });
+
+    expect(result.current.columns['0'].missingValues).toEqual(['A']);
+    expect(result.current.columns['0'].levels?.A).toBeUndefined();
+
+    expect(() => {
+      act(() => {
+        result.current.actions.userUpdatesValueDescription('0', 'A', 'Group A');
+      });
+    }).not.toThrow();
+
+    expect(result.current.columns['0'].levels?.A).toBeUndefined();
   });
 
   it('should ignore updates when the level entry is absent', async () => {

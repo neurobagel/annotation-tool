@@ -71,7 +71,9 @@ export interface StandardizedTerm {
   description?: string;
   same_as?: string;
   status?: string;
-  isCollection?: boolean;
+  // When set, indicates the term has been used to create a collection card.
+  // Stored as a string so creation order can be tracked deterministically.
+  collectionCreatedAt?: string;
 }
 
 export interface StandardizedTerms {

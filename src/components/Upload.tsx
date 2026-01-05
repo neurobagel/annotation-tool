@@ -46,8 +46,12 @@ function Upload({ disableConfig }: UploadProps) {
       await appFetchesConfigOptions();
     };
     loadConfigs();
+  }, [appFetchesConfigOptions]);
+
+  useEffect(() => {
+    if (selectedConfig) return;
     userSelectsConfig('Neurobagel');
-  }, [appFetchesConfigOptions, userSelectsConfig]);
+  }, [selectedConfig, userSelectsConfig]);
 
   return (
     <div className="flex flex-col items-center gap-8" data-config-loading={isConfigLoading}>
