@@ -1,3 +1,24 @@
+# v0.4.8 (Tue Dec 23 2025)
+
+#### 🐛 Bug Fixes
+
+- [FIX] fix error when marking categorical values as missing during a debounced description save [#392](https://github.com/neurobagel/annotation-tool/pull/392) ([@rmanaem](https://github.com/rmanaem))
+- [FIX] Keep BIDS data type and descriptions from data dictionary for `Collection` columns [#391](https://github.com/neurobagel/annotation-tool/pull/391) ([@rmanaem](https://github.com/rmanaem))
+- [FIX] Preserve multi-column measure cards order [#385](https://github.com/neurobagel/annotation-tool/pull/385) ([@rmanaem](https://github.com/rmanaem))
+- [FIX] Persist selected configuration on upload view [#386](https://github.com/neurobagel/annotation-tool/pull/386) ([@rmanaem](https://github.com/rmanaem))
+- [FIX] dictionary levels no longer override data table [#384](https://github.com/neurobagel/annotation-tool/pull/384) ([@rmanaem](https://github.com/rmanaem))
+- [FIX] Disable the term dropdown for missing values in the  `Categorical` flow of Value Annotation view [#383](https://github.com/neurobagel/annotation-tool/pull/383) ([@rmanaem](https://github.com/rmanaem))
+
+####  🧪 Tests
+
+- [TST] Add regression test for config change [#382](https://github.com/neurobagel/annotation-tool/pull/382) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.4.7 (Tue Dec 09 2025)
 
 #### 🐛 Bug Fixes

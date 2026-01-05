@@ -12,6 +12,7 @@ import {
   convertStandardizedFormats,
   readFile,
   parseTsvContent,
+  buildCategoricalLevels,
   applyDataDictionaryToColumns,
   applyDataTypeToColumn,
 } from './data-utils';
@@ -330,6 +331,82 @@ describe('readFile + parseTsvContent integration', () => {
   });
 });
 
+describe('buildCategoricalLevels', () => {
+  it('should create levels from allValues', () => {
+    const result = buildCategoricalLevels({
+      column: { allValues: ['A', 'B', 'A'], missingValues: [] },
+      columnData: { Description: '' },
+      standardizedTerms: {},
+    });
+
+    expect(Object.keys(result)).toEqual(['A', 'B']);
+    expect(result.A).toEqual({ description: '', standardizedTerm: '' });
+    expect(result.B).toEqual({ description: '', standardizedTerm: '' });
+  });
+
+  it('should exclude missing values from levels', () => {
+    const result = buildCategoricalLevels({
+      column: { allValues: ['A', 'N/A', 'B'], missingValues: ['N/A'] },
+      columnData: { Description: '' },
+      standardizedTerms: {},
+    });
+
+    expect(result.A).toEqual({ description: '', standardizedTerm: '' });
+    expect(result.B).toEqual({ description: '', standardizedTerm: '' });
+    expect(result['N/A']).toBeUndefined();
+  });
+
+  it('should apply dictionary descriptions only for matching values', () => {
+    const result = buildCategoricalLevels({
+      column: { allValues: ['A', 'B'], missingValues: [] },
+      columnData: {
+        Description: '',
+        Levels: {
+          A: { Description: 'Alpha' },
+          C: { Description: 'Charlie' },
+        },
+      },
+      standardizedTerms: {},
+    });
+
+    expect(result.A.description).toBe('Alpha');
+    expect(result.B.description).toBe('');
+    expect(result.C).toBeUndefined();
+  });
+
+  it('should apply standardized terms only when recognized and matching', () => {
+    const result = buildCategoricalLevels({
+      column: { allValues: ['A', 'B'], missingValues: [] },
+      columnData: {
+        Description: '',
+        Annotations: {
+          Levels: {
+            A: { TermURL: 'term:1', Label: 'Alpha' },
+            B: { TermURL: 'term:missing', Label: 'Beta' },
+            C: { TermURL: 'term:2', Label: 'Charlie' },
+          },
+        },
+      },
+      standardizedTerms: {
+        'term:1': {
+          standardizedVariableId: 'nb:Test',
+          id: 'term:1',
+          label: 'Alpha',
+        },
+        'term:2': {
+          standardizedVariableId: 'nb:Test',
+          id: 'term:2',
+          label: 'Charlie',
+        },
+      },
+    });
+
+    expect(result.A.standardizedTerm).toBe('term:1');
+    expect(result.B.standardizedTerm).toBe('');
+    expect(result.C).toBeUndefined();
+  });
+});
+
 describe('applyDataDictionaryToColumns', () => {
   it('should apply data dictionary from mock.json to columns and return updated columns', () => {
     const mockDataDict = JSON.parse(mockDataDictionaryRaw);
@@ -602,6 +679,163 @@ describe('applyDataDictionaryToColumns', () => {
     expect(result['0'].format).toBe('nb:FromFloat');
     expect(result['0'].dataType).toBe('Continuous');
     expect(result['0'].units).toBe('years');
+  });
+
+  it('should infer categorical data type for collection variables with levels', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'assessment_score',
+        allValues: ['good', 'bad'],
+      },
+    };
+
+    const mockDataDict = {
+      assessment_score: {
+        Description: 'Assessment score',
+        Levels: {
+          good: {
+            Description: 'Good',
+          },
+          bad: {
+            Description: 'Bad',
+          },
+        },
+        Annotations: {
+          IsAbout: {
+            TermURL: 'nb:Assessment',
+            Label: 'Assessment Tool',
+          },
+          VariableType: 'Collection' as const,
+          Levels: {
+            good: {
+              TermURL: 'snomed:1304062007',
+              Label: 'Good',
+            },
+          },
+        },
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      mockStandardizedVariables as unknown as StandardizedVariables,
+      mockStandardizedTerms,
+      mockStandardizedFormats
+    );
+
+    expect(result['0'].dataType).toBe('Categorical');
+    expect(result['0'].levels?.good.description).toBe('Good');
+    expect(result['0'].levels?.good.standardizedTerm).toBe('snomed:1304062007');
+    expect(result['0'].levels?.bad.standardizedTerm).toEqual('');
+  });
+
+  it('should ignore dictionary-only levels and missing values for collection variables', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'assessment_score',
+        allValues: ['good', 'bad', 'N/A'],
+      },
+    };
+
+    const mockDataDict = {
+      assessment_score: {
+        Description: 'Assessment score',
+        Levels: {
+          good: {
+            Description: 'Good',
+          },
+          bad: {
+            Description: 'Bad',
+          },
+          extra: {
+            Description: 'Extra',
+          },
+        },
+        Annotations: {
+          IsAbout: {
+            TermURL: 'nb:Assessment',
+            Label: 'Assessment Tool',
+          },
+          VariableType: 'Collection' as const,
+          Levels: {
+            good: {
+              TermURL: 'snomed:1304062007',
+              Label: 'Good',
+            },
+            extra: {
+              TermURL: 'snomed:999999',
+              Label: 'Extra',
+            },
+          },
+          MissingValues: ['N/A'],
+        },
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      mockStandardizedVariables as unknown as StandardizedVariables,
+      {
+        ...mockStandardizedTerms,
+        'snomed:1304062007': {
+          id: 'snomed:1304062007',
+          standardizedVariableId: 'nb:Assessment',
+          label: 'Good',
+        },
+        'snomed:999999': {
+          id: 'snomed:999999',
+          standardizedVariableId: 'nb:Assessment',
+          label: 'Extra',
+        },
+      },
+      mockStandardizedFormats
+    );
+
+    expect(result['0'].levels?.good.description).toBe('Good');
+    expect(result['0'].levels?.good.standardizedTerm).toBe('snomed:1304062007');
+    expect(result['0'].levels?.bad.description).toBe('Bad');
+    expect(result['0'].levels?.extra).toBeUndefined();
+    expect(result['0'].levels?.['N/A']).toBeUndefined();
+    expect(result['0'].missingValues).toEqual(['N/A']);
+  });
+
+  it('should infer continuous data type for collection variables with units', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'assessment_score',
+        allValues: ['10', '20'],
+      },
+    };
+
+    const mockDataDict = {
+      assessment_score: {
+        Description: 'Assessment score',
+        Units: 'points',
+        Annotations: {
+          IsAbout: {
+            TermURL: 'nb:Assessment',
+            Label: 'Assessment Tool',
+          },
+          VariableType: 'Collection' as const,
+        },
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      mockStandardizedVariables as unknown as StandardizedVariables,
+      mockStandardizedTerms,
+      mockStandardizedFormats
+    );
+
+    expect(result['0'].dataType).toBe('Continuous');
+    expect(result['0'].units).toBe('points');
   });
 
   it('should not modify columns when column names do not match', () => {

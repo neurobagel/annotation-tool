@@ -260,9 +260,18 @@ const useDataStore = create<DataStore>()((set, get) => ({
     userUpdatesValueDescription(columnID, value, description) {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
-          if (draft[columnID].levels) {
-            draft[columnID].levels[value].description = description;
+          const column = draft[columnID];
+          // Guard against missing columns or removed levels (e.g., toggled to missing).
+          if (!column?.levels?.[value]) {
+            return;
           }
+
+          // Skip updates for values currently marked as missing.
+          if (column.missingValues?.includes(value)) {
+            return;
+          }
+
+          column.levels[value].description = description;
         }),
       }));
     },
