@@ -34,7 +34,7 @@
     "papaparse": "^5.5.3",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "react-window": "^2.2.3",
+    "react-window": "^2.2.4",
     "seedrandom": "^3.0.5",
     "use-debounce": "^10.0.0",
     "uuid": "^11.1.0",
