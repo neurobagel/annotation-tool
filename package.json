@@ -21,7 +21,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@fontsource/roboto": "^5.2.9",
-    "@microlink/react-json-view": "^1.27.0",
+    "@microlink/react-json-view": "^1.27.1",
     "@mui/icons-material": "^6.5.0",
     "@mui/material": "^6.4.8",
     "@mui/system": "^6.4.3",
@@ -34,11 +34,11 @@
     "papaparse": "^5.5.3",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "react-window": "^2.2.4",
+    "react-window": "^2.2.5",
     "seedrandom": "^3.0.5",
-    "use-debounce": "^10.0.0",
+    "use-debounce": "^10.1.0",
     "uuid": "^11.1.0",
-    "zustand": "^5.0.9"
+    "zustand": "^5.0.10"
   },
   "devDependencies": {
     "@cypress/code-coverage": "^3.14.7",
