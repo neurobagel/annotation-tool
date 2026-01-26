@@ -1,10 +1,7 @@
+/* eslint-disable react/require-default-props */
 import { TextField, Tooltip } from '@mui/material';
 import { useState, useEffect, useRef } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
-
-const defaultProps = {
-  disabled: false,
-};
 
 interface CompactDescriptionEditorProps {
   description: string | null;
@@ -18,7 +15,7 @@ function CompactDescriptionEditor({
   description,
   onDescriptionChange,
   columnID,
-  levelValue,
+  levelValue = '',
   disabled = false,
 }: CompactDescriptionEditorProps) {
   const [editedDescription, setEditedDescription] = useState<string | null>(description);
@@ -73,11 +70,6 @@ function CompactDescriptionEditor({
     debouncedSave(newValue);
   };
 
-  const getStatusColor = () => {
-    if (saveStatus === 'saved') return 'success.main';
-    return 'text.secondary';
-  };
-
   return (
     <div className="flex w-full items-center">
       <TextField
@@ -96,13 +88,11 @@ function CompactDescriptionEditor({
                 className={`w-2 h-2 rounded-full ${saveStatus === 'saved' ? 'bg-green-500' : 'bg-yellow-500'}`}
               />
             </Tooltip>
-          )
+          ),
         }}
       />
     </div>
   );
 }
-
-CompactDescriptionEditor.defaultProps = defaultProps;
 
 export default CompactDescriptionEditor;

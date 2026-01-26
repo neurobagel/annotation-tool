@@ -68,7 +68,6 @@ function CompactColumnAnnotationCard({
 
         {/* Controls Section - keeps Data Type and Variable together */}
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto items-center flex-shrink-0">
-
           {/* Data Type */}
           <div className="flex-shrink-0">
             {isDataTypeEditable ? (

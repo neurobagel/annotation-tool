@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { DataType } from '../utils/internal_types';
-import CompactColumnAnnotationCard from './prototypes/CompactColumnAnnotationCard';
 import { ColumnAnnotationInstructions } from '../utils/instructions';
+import { DataType } from '../utils/internal_types';
 import Instruction from './Instruction';
-import { useStandardizedVariableOptions } from '../hooks/useStandardizedVariableOptions';
+import CompactColumnAnnotationCard from './prototypes/CompactColumnAnnotationCard';
+import { MockColumn } from './prototypes/mock_types';
 
 const MOCK_OPTIONS = [
   { id: 'nb:ParticipantID', label: 'Participant ID', disabled: false },
@@ -21,7 +21,7 @@ const MOCK_COLUMNS = [
     dataType: null,
     standardizedVariableId: 'nb:ParticipantID',
     isDataTypeEditable: false, // Locked by var
-    inferredDataTypeLabel: 'Identifier'
+    inferredDataTypeLabel: 'Identifier',
   },
   {
     id: '2',
@@ -30,7 +30,7 @@ const MOCK_COLUMNS = [
     dataType: 'Continuous' as DataType,
     standardizedVariableId: 'nb:Age',
     isDataTypeEditable: true,
-    inferredDataTypeLabel: null
+    inferredDataTypeLabel: null,
   },
   {
     id: '3',
@@ -39,16 +39,17 @@ const MOCK_COLUMNS = [
     dataType: 'Categorical' as DataType,
     standardizedVariableId: 'nb:Sex',
     isDataTypeEditable: true,
-    inferredDataTypeLabel: null
+    inferredDataTypeLabel: null,
   },
   {
     id: '4',
     name: 'long_column_name_that_might_break_layout_or_cause_issues_if_not_handled_properly_test_test_test',
-    description: 'This is a very long description that checks how the input field handles text overflow and if it expands or scrolls correctly within the compact layout.',
+    description:
+      'This is a very long description that checks how the input field handles text overflow and if it expands or scrolls correctly within the compact layout.',
     dataType: null,
     standardizedVariableId: null,
     isDataTypeEditable: true,
-    inferredDataTypeLabel: null
+    inferredDataTypeLabel: null,
   },
   {
     id: '5',
@@ -57,7 +58,7 @@ const MOCK_COLUMNS = [
     dataType: 'Categorical' as DataType,
     standardizedVariableId: null, // Unassigned
     isDataTypeEditable: true,
-    inferredDataTypeLabel: null
+    inferredDataTypeLabel: null,
   },
   {
     id: '6',
@@ -66,7 +67,7 @@ const MOCK_COLUMNS = [
     dataType: 'Categorical' as DataType,
     standardizedVariableId: null,
     isDataTypeEditable: true,
-    inferredDataTypeLabel: null
+    inferredDataTypeLabel: null,
   },
   {
     id: '7',
@@ -75,7 +76,7 @@ const MOCK_COLUMNS = [
     dataType: 'Continuous' as DataType,
     standardizedVariableId: 'nb:Assessment',
     isDataTypeEditable: true,
-    inferredDataTypeLabel: null
+    inferredDataTypeLabel: null,
   },
   {
     id: '8',
@@ -84,7 +85,7 @@ const MOCK_COLUMNS = [
     dataType: 'Categorical' as DataType,
     standardizedVariableId: null,
     isDataTypeEditable: true,
-    inferredDataTypeLabel: null
+    inferredDataTypeLabel: null,
   },
   {
     id: '9',
@@ -93,43 +94,44 @@ const MOCK_COLUMNS = [
     dataType: 'Continuous' as DataType,
     standardizedVariableId: null,
     isDataTypeEditable: true,
-    inferredDataTypeLabel: null
-  }
+    inferredDataTypeLabel: null,
+  },
 ];
 
 function ColumnAnnotation() {
   // Mock State
-  const [columns, setColumns] = useState(MOCK_COLUMNS);
-  // We can still use the hook for options if we want, or just use MOCK_OPTIONS. 
+  const [columns, setColumns] = useState<MockColumn[]>(MOCK_COLUMNS);
+  // We can still use the hook for options if we want, or just use MOCK_OPTIONS.
   // Let's use MOCK_OPTIONS to be safe and isolated.
   const standardizedVariableOptions = MOCK_OPTIONS;
 
   const handleDescriptionChange = (id: string, newDesc: string | null) => {
-    setColumns(cols => cols.map(c => c.id === id ? { ...c, description: newDesc } : c));
+    setColumns((cols) => cols.map((c) => (c.id === id ? { ...c, description: newDesc } : c)));
   };
 
   const handleDataTypeChange = (id: string, newType: 'Categorical' | 'Continuous' | null) => {
     let dt: DataType | null = null;
     if (newType === 'Categorical') dt = DataType.categorical;
     if (newType === 'Continuous') dt = DataType.continuous;
-    setColumns(cols => cols.map(c => c.id === id ? { ...c, dataType: dt } : c));
+    setColumns((cols) => cols.map((c) => (c.id === id ? { ...c, dataType: dt } : c)));
   };
 
   const handleStandardizedVariableChange = (id: string, newVarId: string | null) => {
-    setColumns(cols => cols.map(c => {
-      if (c.id !== id) return c;
-      // Mock the store logic for locking types
-      const isLocked = newVarId === 'nb:ParticipantID';
-      return {
-        ...c,
-        standardizedVariableId: newVarId,
-        isDataTypeEditable: !isLocked,
-        dataType: isLocked ? null : c.dataType,
-        inferredDataTypeLabel: isLocked ? 'Identifier' : null
-      };
-    }));
+    setColumns((cols) =>
+      cols.map((c) => {
+        if (c.id !== id) return c;
+        // Mock the store logic for locking types
+        const isLocked = newVarId === 'nb:ParticipantID';
+        return {
+          ...c,
+          standardizedVariableId: newVarId,
+          isDataTypeEditable: !isLocked,
+          dataType: isLocked ? null : c.dataType,
+          inferredDataTypeLabel: isLocked ? 'Identifier' : null,
+        };
+      })
+    );
   };
-
 
   return (
     <div
