@@ -13,7 +13,6 @@ import { useHasMultiColumnMeasures } from './hooks/useHasMultiColumnMeasures';
 import { useUploadedDataTableFileName } from './stores/data';
 import useViewStore, { getNavigationProps } from './stores/view';
 import { View } from './utils/internal_types';
-
 function App() {
   const currentView = useViewStore((state) => state.currentView);
   const setCurrentView = useViewStore((state) => state.setCurrentView);

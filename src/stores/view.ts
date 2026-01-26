@@ -18,7 +18,7 @@ type ViewStore = {
 
 const useViewStore = create<ViewStore>()(
   devtools((set) => ({
-    currentView: View.Landing,
+    currentView: View.ColumnAnnotation,
     setCurrentView: (view: View) => set({ currentView: view }),
   }))
 );
