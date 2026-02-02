@@ -77,7 +77,7 @@ function CompactColumnAnnotationCard({
               exclusive
               color="primary"
               size="small"
-              className="h-8 shadow-sm w-full flex"
+              className="shadow-sm w-full flex h-10"
             >
               <Tooltip title="Categorical" arrow>
                 <ToggleButton
@@ -108,7 +108,7 @@ function CompactColumnAnnotationCard({
               arrow
             >
               <div
-                className="h-8 px-2 flex items-center justify-center border rounded border-gray-200 bg-gray-50/50 text-gray-500 cursor-not-allowed w-full shadow-sm"
+                className="h-10 px-2 flex items-center justify-center border rounded border-gray-200 bg-gray-50/50 text-gray-500 cursor-not-allowed w-full shadow-sm"
                 data-cy={`${id}-column-annotation-card-data-type`}
               >
                 <Typography variant="caption" className="font-medium truncate">
@@ -138,10 +138,6 @@ function CompactColumnAnnotationCard({
                 variant="outlined"
                 placeholder="Select variable"
                 className="w-full bg-white"
-                InputProps={{
-                  ...params.InputProps,
-                  style: { fontSize: '0.875rem', padding: '0px' }
-                }}
                 size="small"
               />
             )}
