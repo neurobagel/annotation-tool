@@ -98,31 +98,54 @@ export default function PrototypePage() {
 
   return (
     <div
-      className="flex flex-col items-center gap-6 h-[70vh] overflow-auto"
+      className="flex flex-col items-center gap-6 h-[70vh] overflow-hidden bg-gray-50/50"
       data-cy="column-annotation-container"
     >
-      <div className="w-full max-w-5xl">
-        <Instruction title="Column Annotation" className="mb-2">
-          <ColumnAnnotationInstructions />
-        </Instruction>
-      </div>
-      {columns.map((col) => (
-        <div key={col.id} className="w-full">
-          <CompactColumnAnnotationCard
-            id={col.id}
-            name={col.name}
-            description={col.description}
-            dataType={col.dataType}
-            standardizedVariableId={col.standardizedVariableId}
-            standardizedVariableOptions={MOCK_OPTIONS}
-            isDataTypeEditable={col.isDataTypeEditable}
-            inferredDataTypeLabel={col.inferredDataTypeLabel}
-            onDescriptionChange={handleDescriptionChange}
-            onDataTypeChange={handleDataTypeChange}
-            onStandardizedVariableChange={handleStandardizedVariableChange}
-          />
+      <div className="w-full max-w-7xl flex flex-col h-full">
+        <div className="p-4 flex-shrink-0">
+          <Instruction title="Column Annotation" className="mb-0">
+            <ColumnAnnotationInstructions />
+          </Instruction>
         </div>
-      ))}
+
+        {/* Global Header Row - Sticky */}
+        <div className="sticky top-0 z-10 mx-4 mt-2 bg-blue-50 border border-blue-200 border-b-0 shadow-sm rounded-t-lg backdrop-blur-sm bg-opacity-95">
+          {/* Row 1: Main Labels */}
+          <div className="grid grid-cols-[1fr_140px_250px] gap-4 px-4 pt-3 pb-1 items-end border-b border-blue-100">
+            <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">Description</span>
+            <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">Data Type</span>
+            <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">Mapped Variable</span>
+          </div>
+
+          {/* Row 2: Context/Sub-labels */}
+          <div className="grid grid-cols-[1fr_140px_250px] gap-4 px-4 py-2 items-start bg-blue-50/50">
+            <span className="text-[10px] text-gray-600 font-medium">Definition / Notes</span>
+            <span className="text-[10px] text-gray-600 font-medium">categorical or continuous</span>
+            <span className="text-[10px] text-gray-600 font-medium">Select what Standardized Variable your column measures</span>
+          </div>
+        </div>
+
+        {/* Scrollable Rows Container */}
+        <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-3">
+          {columns.map((col) => (
+            <div key={col.id} className="w-full">
+              <CompactColumnAnnotationCard
+                id={col.id}
+                name={col.name}
+                description={col.description}
+                dataType={col.dataType}
+                standardizedVariableId={col.standardizedVariableId}
+                standardizedVariableOptions={MOCK_OPTIONS}
+                isDataTypeEditable={col.isDataTypeEditable}
+                inferredDataTypeLabel={col.inferredDataTypeLabel}
+                onDescriptionChange={handleDescriptionChange}
+                onDataTypeChange={handleDataTypeChange}
+                onStandardizedVariableChange={handleStandardizedVariableChange}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

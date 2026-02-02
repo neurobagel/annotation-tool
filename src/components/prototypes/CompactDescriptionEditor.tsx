@@ -20,6 +20,8 @@ function CompactDescriptionEditor({
 }: CompactDescriptionEditorProps) {
   const [editedDescription, setEditedDescription] = useState<string | null>(description);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [isFocused, setIsFocused] = useState(false);
+
   // Track the transient "Saved" helper state so it can be cleared on a timer.
   const statusTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const dataCy = levelValue ? `${columnID}-${levelValue}` : columnID;
@@ -71,21 +73,33 @@ function CompactDescriptionEditor({
   };
 
   return (
-    <div className="flex w-full items-center">
+    <div className="flex w-full flex-col gap-1">
+      {/* Label removed - handled by Global Header in Floating Rows layout */}
       <TextField
         data-cy={`${dataCy}-description`}
         fullWidth
+        multiline
+        // Expand when focused or if there is substantial content (optional, but focus is safer for "compactness")
+        minRows={isFocused ? 3 : 1}
+        maxRows={isFocused ? 6 : 1}
         size="small"
         value={editedDescription || ''}
         disabled={disabled}
         onChange={(e) => handleDescriptionChange(e.target.value)}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
         variant="outlined"
-        placeholder="Add description..."
+        placeholder={isFocused ? "Enter column description..." : "Add description..."}
+        // Styling to make it look "flat" when inactive?
+        className={`transition-all duration-200 ${!isFocused && !editedDescription ? 'opacity-70' : 'opacity-100'}`}
         InputProps={{
+          classes: {
+            root: !isFocused ? 'bg-transparent' : 'bg-white',
+          },
           endAdornment: saveStatus !== 'idle' && (
             <Tooltip title={saveStatus === 'saving' ? 'Saving...' : 'Saved'}>
               <div
-                className={`w-2 h-2 rounded-full ${saveStatus === 'saved' ? 'bg-green-500' : 'bg-yellow-500'}`}
+                className={`w-2 h-2 rounded-full mb-auto mt-2 ${saveStatus === 'saved' ? 'bg-green-500' : 'bg-yellow-500'}`}
               />
             </Tooltip>
           ),
