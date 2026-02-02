@@ -80,8 +80,7 @@ function CompactDescriptionEditor({
         fullWidth
         multiline
         // Expand when focused or if there is substantial content (optional, but focus is safer for "compactness")
-        minRows={isFocused ? 3 : 1}
-        maxRows={isFocused ? 6 : 1}
+        minRows={1}
         size="small"
         value={editedDescription || ''}
         disabled={disabled}
@@ -94,7 +93,10 @@ function CompactDescriptionEditor({
         className={`transition-all duration-200 ${!isFocused && !editedDescription ? 'opacity-70' : 'opacity-100'}`}
         InputProps={{
           classes: {
-            root: !isFocused ? 'bg-transparent' : 'bg-white',
+            root: `transition-all duration-300 ease-in-out items-start ${!isFocused
+                ? 'min-h-[2.5rem] max-h-[2.5rem] overflow-hidden bg-transparent'
+                : 'min-h-[5rem] bg-white'
+              }`,
           },
           endAdornment: saveStatus !== 'idle' && (
             <Tooltip title={saveStatus === 'saving' ? 'Saving...' : 'Saved'}>
