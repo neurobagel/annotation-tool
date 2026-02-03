@@ -99,7 +99,7 @@ export default function PrototypePage() {
 
   return (
     <div
-      className="flex flex-col items-center gap-6 h-[70vh] overflow-hidden bg-gray-50/50"
+      className="flex flex-col items-center gap-6 h-[70vh] overflow-hidden"
       data-cy="column-annotation-container"
     >
       <div className="w-full max-w-7xl flex flex-col h-full">
@@ -121,12 +121,7 @@ export default function PrototypePage() {
             <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">Mapped Variable</span>
           </div>
 
-          {/* Row 2: Context/Sub-labels */}
-          <div className="grid grid-cols-[1fr_140px_250px] gap-4 px-4 py-2 items-start bg-gray-50/50">
-            <span className="text-[10px] text-gray-600 font-medium">Definition / Notes</span>
-            <span className="text-[10px] text-gray-600 font-medium">categorical or continuous</span>
-            <span className="text-[10px] text-gray-600 font-medium">Select what Standardized Variable your column measures</span>
-          </div>
+
         </Box>
 
         {/* Scrollable Rows Container */}

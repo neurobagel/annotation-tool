@@ -1,5 +1,6 @@
 /* eslint-disable react/require-default-props */
 import { TextField, Tooltip } from '@mui/material';
+import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
 import { useState, useEffect, useRef } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
@@ -92,18 +93,28 @@ function CompactDescriptionEditor({
         // Styling to make it look "flat" when inactive?
         className={`transition-all duration-200 ${!isFocused && !editedDescription ? 'opacity-70' : 'opacity-100'}`}
         InputProps={{
+          style: { willChange: 'min-height, max-height' },
           classes: {
-            root: `transition-all duration-300 ease-in-out items-start ${!isFocused
-                ? 'min-h-[2.5rem] max-h-[2.5rem] overflow-hidden bg-transparent'
-                : 'min-h-[5rem] bg-white'
+            root: `transition-[min-height,max-height,background-color] duration-300 ease-in-out items-start ${!isFocused
+              ? 'min-h-[2.5rem] max-h-[2.5rem] overflow-hidden bg-transparent'
+              : 'min-h-[5rem] max-h-[15rem] overflow-y-auto bg-white'
               }`,
           },
-          endAdornment: saveStatus !== 'idle' && (
-            <Tooltip title={saveStatus === 'saving' ? 'Saving...' : 'Saved'}>
-              <div
-                className={`w-2 h-2 rounded-full mb-auto mt-2 ${saveStatus === 'saved' ? 'bg-green-500' : 'bg-yellow-500'}`}
-              />
-            </Tooltip>
+          endAdornment: (
+            <>
+              {saveStatus !== 'idle' && (
+                <Tooltip title={saveStatus === 'saving' ? 'Saving...' : 'Saved'}>
+                  <div
+                    className={`w-2 h-2 rounded-full mb-auto mt-2 ${saveStatus === 'saved' ? 'bg-green-500' : 'bg-yellow-500'}`}
+                  />
+                </Tooltip>
+              )}
+              {saveStatus === 'idle' && !isFocused && !disabled && (
+                <Tooltip title="Click to expand">
+                  <UnfoldMoreIcon className="text-gray-400 mb-auto mt-1 transform rotate-45" fontSize="small" />
+                </Tooltip>
+              )}
+            </>
           ),
         }}
       />
