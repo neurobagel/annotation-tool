@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Box } from '@mui/material';
-import { ColumnAnnotationInstructions } from '../utils/instructions';
-import { DataType } from '../utils/internal_types';
-import Instruction from './Instruction';
-import CompactColumnAnnotationCard from './prototypes/CompactColumnAnnotationCard';
-import { MockColumn } from './prototypes/mock_types';
+import { ColumnAnnotationInstructions } from '../../utils/instructions';
+import { DataType } from '../../utils/internal_types';
+import Instruction from '../Instruction';
+import CompactColumnAnnotationCard from './CompactColumnAnnotationCard';
+import { MockColumn } from './mock_types';
 
 const MOCK_OPTIONS = [
   { id: 'nb:ParticipantID', label: 'Participant ID', disabled: false },
@@ -61,50 +61,13 @@ const MOCK_COLUMNS = [
     isDataTypeEditable: true,
     inferredDataTypeLabel: null,
   },
-  {
-    id: '6',
-    name: 'scan_site',
-    description: 'Location where the scan took place. Potentially multi-site data.',
-    dataType: 'Categorical' as DataType,
-    standardizedVariableId: null,
-    isDataTypeEditable: true,
-    inferredDataTypeLabel: null,
-  },
-  {
-    id: '7',
-    name: 'iq_score_verbal',
-    description: 'Verbal IQ Score from WAIS-IV',
-    dataType: 'Continuous' as DataType,
-    standardizedVariableId: 'nb:Assessment',
-    isDataTypeEditable: true,
-    inferredDataTypeLabel: null,
-  },
-  {
-    id: '8',
-    name: 'handedness',
-    description: 'R = Right, L = Left, A = Ambidextrous',
-    dataType: 'Categorical' as DataType,
-    standardizedVariableId: null,
-    isDataTypeEditable: true,
-    inferredDataTypeLabel: null,
-  },
-  {
-    id: '9',
-    name: 'cortical_thickness_mean',
-    description: 'Global mean cortical thickness (mm)',
-    dataType: 'Continuous' as DataType,
-    standardizedVariableId: null,
-    isDataTypeEditable: true,
-    inferredDataTypeLabel: null,
-  },
 ];
 
-function ColumnAnnotation() {
-  // Mock State
+// ... imports
+
+export default function PrototypePage() {
+  // Local state to simulate store actions
   const [columns, setColumns] = useState<MockColumn[]>(MOCK_COLUMNS);
-  // We can still use the hook for options if we want, or just use MOCK_OPTIONS.
-  // Let's use MOCK_OPTIONS to be safe and isolated.
-  const standardizedVariableOptions = MOCK_OPTIONS;
 
   const handleDescriptionChange = (id: string, newDesc: string | null) => {
     setColumns((cols) => cols.map((c) => (c.id === id ? { ...c, description: newDesc } : c)));
@@ -139,7 +102,7 @@ function ColumnAnnotation() {
       className="flex flex-col items-center gap-6 h-[70vh] overflow-hidden"
       data-cy="column-annotation-container"
     >
-      <div className="w-full max-w-6xl flex flex-col h-full">
+      <div className="w-full max-w-7xl flex flex-col h-full">
         <div className="p-4 flex-shrink-0">
           <Instruction title="Column Annotation" className="mb-0">
             <ColumnAnnotationInstructions />
@@ -161,18 +124,19 @@ function ColumnAnnotation() {
 
         </Box>
 
+        {/* Scrollable Rows Container */}
         <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-3">
-          {columns.map((columnData) => (
-            <div key={columnData.id} className="w-full">
+          {columns.map((col) => (
+            <div key={col.id} className="w-full">
               <CompactColumnAnnotationCard
-                id={columnData.id}
-                name={columnData.name}
-                description={columnData.description}
-                dataType={columnData.dataType}
-                standardizedVariableId={columnData.standardizedVariableId}
-                standardizedVariableOptions={standardizedVariableOptions}
-                isDataTypeEditable={columnData.isDataTypeEditable}
-                inferredDataTypeLabel={columnData.inferredDataTypeLabel}
+                id={col.id}
+                name={col.name}
+                description={col.description}
+                dataType={col.dataType}
+                standardizedVariableId={col.standardizedVariableId}
+                standardizedVariableOptions={MOCK_OPTIONS}
+                isDataTypeEditable={col.isDataTypeEditable}
+                inferredDataTypeLabel={col.inferredDataTypeLabel}
                 onDescriptionChange={handleDescriptionChange}
                 onDataTypeChange={handleDataTypeChange}
                 onStandardizedVariableChange={handleStandardizedVariableChange}
@@ -184,4 +148,3 @@ function ColumnAnnotation() {
     </div>
   );
 }
-export default ColumnAnnotation;
