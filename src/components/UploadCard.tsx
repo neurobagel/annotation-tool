@@ -1,5 +1,5 @@
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
-import { Button, Card, CardHeader, CardContent, Typography, Collapse } from '@mui/material';
+import { Button, Card, CardHeader, CardContent, Collapse } from '@mui/material';
 import { useRef, useState } from 'react';
 import FileUploader from './FileUploader';
 
@@ -86,13 +86,12 @@ function UploadCard({
             allowedFileType={allowedFileType}
             disabled={diableFileUploader}
             tooltipContent={FileUploaderToolTipContent}
+            uploadedFileName={uploadedFileName}
           />
 
           {isFileUploaded && (
             <div className="mt-4">
-              <Typography variant="body1" className="mb-2" data-cy={`${id}-uploaded-file-name`}>
-                <strong>{uploadedFileName}</strong>
-              </Typography>
+              {/* Filename display removed from here as it is now inside the FileUploader */}
               <Button
                 data-cy={`${id}-toggle-preview-button`}
                 variant="outlined"
