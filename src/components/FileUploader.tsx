@@ -69,17 +69,14 @@ function FileUploader({
         onDrop={handleDrag}
         onDragOver={handleDragOverEvent}
         sx={{
-          // Apply Primary color border when file is selected
           borderColor: isFileSelected && !disabled ? theme.palette.primary.main : undefined,
           '&:hover': {
             borderColor: disabled ? theme.palette.grey[400] : theme.palette.primary.main,
-            // Add a slight background tint on hover when selected for better feedback
             backgroundColor: isFileSelected && !disabled ? theme.palette.action.hover : undefined,
           },
         }}
       >
         {isFileSelected ? (
-          // View when file is selected
           <div className="flex flex-col items-center justify-center">
             <InsertDriveFile className="mb-2 text-4xl" sx={{ color: theme.palette.primary.main }} />
             <Typography
@@ -103,7 +100,6 @@ function FileUploader({
             </Typography>
           </div>
         ) : (
-          // View when no file is selected (Default)
           <>
             <CloudUpload
               className="mb-4 text-4xl"
