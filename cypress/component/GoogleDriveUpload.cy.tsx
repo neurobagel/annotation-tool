@@ -4,7 +4,7 @@ const props = {
   open: true,
   onClose: () => {},
   dataDictionary: {},
-  appsScriptUrl: 'https://somecoolurl.com',
+  appsScriptUrl: 'https://somecoolurl.com/exec',
 };
 
 describe('GoogleDriveUpload', () => {
