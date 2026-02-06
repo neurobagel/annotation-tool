@@ -138,7 +138,7 @@ ${notes}`;
         password,
       };
 
-      const scriptUrl = import.meta.env.NB_GOOGLE_APPS_SCRIPT_URL;
+      const scriptUrl = appsScriptUrl;
 
       const response = await fetch(scriptUrl, {
         method: 'POST',
