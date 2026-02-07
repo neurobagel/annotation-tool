@@ -256,9 +256,9 @@ function ColumnTypeCollapse({
         <List sx={{ pl: 4 }}>
           {columns.map((entry) => (
             <ListItem
+              data-cy={`side-column-nav-bar-${labelToDisplay}-${entry.column.name}`}
               key={entry.id}
               divider
-              data-cy={`side-column-nav-bar-${labelToDisplay}-${entry.column.name}`}
               sx={{
                 pl: 4,
                 py: 1,
