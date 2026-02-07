@@ -194,11 +194,10 @@ function ColumnTypeCollapse({
                         <ListItem
                           data-cy={`side-column-nav-bar-${labelToDisplay}-${groupName}-${entry.column.name}`}
                           key={entry.id}
+                          divider
                           sx={{
                             pl: 4,
                             py: 1,
-                            borderBottom: '1px solid',
-                            borderColor: 'divider',
                             color: 'text.secondary',
                             fontWeight: entry.id === selectedColumnId ? 'bold' : 'normal',
                           }}
@@ -257,13 +256,12 @@ function ColumnTypeCollapse({
         <List sx={{ pl: 4 }}>
           {columns.map((entry) => (
             <ListItem
-              data-cy={`side-column-nav-bar-${labelToDisplay}-${entry.column.name}`}
               key={entry.id}
+              divider
+              data-cy={`side-column-nav-bar-${labelToDisplay}-${entry.column.name}`}
               sx={{
                 pl: 4,
                 py: 1,
-                borderBottom: '1px solid',
-                borderColor: 'divider',
                 color: 'text.secondary',
                 fontWeight: entry.id === selectedColumnId ? 'bold' : 'normal',
               }}
