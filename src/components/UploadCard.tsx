@@ -91,7 +91,6 @@ function UploadCard({
 
           {isFileUploaded && (
             <div className="mt-4">
-              {/* Filename display removed from here as it is now inside the FileUploader */}
               <Button
                 data-cy={`${id}-toggle-preview-button`}
                 variant="outlined"

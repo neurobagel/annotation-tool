@@ -28,7 +28,9 @@ describe('FileUploader', () => {
     );
     cy.get('[data-cy="someid-upload-area"]').should('be.visible');
     cy.get('[data-cy="someid-upload-area"]').should('contain', 'Upload your file (.csv)');
+    cy.get('[data-cy="someid-upload-input"]').should('have.attr', 'accept', '.csv');
   });
+
   it('checks that input element and the upload area are disabled', () => {
     cy.mount(
       <FileUploader
@@ -47,25 +49,7 @@ describe('FileUploader', () => {
     cy.get('[data-cy="someid-upload-area"]').should('have.css', 'cursor', 'not-allowed');
   });
 
-  it('renders hidden file input with correct accept attribute', () => {
-    cy.mount(
-      <FileUploader
-        id={props.id}
-        displayText={props.displayText}
-        handleClickToUpload={props.handleClickToUpload}
-        handleDrop={props.handleDrop}
-        handleDragOver={props.handleDragOver}
-        handleFileUpload={props.handleFileUpload}
-        fileInputRef={props.fileInputRef}
-        allowedFileType={props.allowedFileType}
-      />
-    );
-
-    cy.get('[data-cy="someid-upload-input"]').should('exist');
-    cy.get('[data-cy="someid-upload-input"]').should('have.attr', 'accept', '.csv');
-  });
-
-  it('shows selected file name when uploadedFileName is provided', () => {
+  it('renders the file selected view correctly', () => {
     cy.mount(
       <FileUploader
         id={props.id}
@@ -79,26 +63,9 @@ describe('FileUploader', () => {
         uploadedFileName="test.csv"
       />
     );
-
+    cy.get('svg[data-testid="InsertDriveFileIcon"]').should('be.visible');
+    cy.get('svg[data-testid="CloudUploadIcon"]').should('not.exist');
     cy.get('[data-cy="someid-upload-area"]').should('contain', 'test.csv');
     cy.get('[data-cy="someid-upload-area"]').should('contain', 'Click to replace');
-  });
-
-  it('does not show default text when a file is already selected', () => {
-    cy.mount(
-      <FileUploader
-        id={props.id}
-        displayText={props.displayText}
-        handleClickToUpload={props.handleClickToUpload}
-        handleDrop={props.handleDrop}
-        handleDragOver={props.handleDragOver}
-        handleFileUpload={props.handleFileUpload}
-        fileInputRef={props.fileInputRef}
-        allowedFileType={props.allowedFileType}
-        uploadedFileName="test.csv"
-      />
-    );
-
-    cy.get('[data-cy="someid-upload-area"]').should('not.contain', 'Upload your file (.csv)');
   });
 });
