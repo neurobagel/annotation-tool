@@ -196,7 +196,9 @@ function ColumnTypeCollapse({
                           key={entry.id}
                           sx={{
                             pl: 4,
-                            py: 0,
+                            py: 1,
+                            borderBottom: '1px solid',
+                            borderColor: 'divider',
                             color: 'text.secondary',
                             fontWeight: entry.id === selectedColumnId ? 'bold' : 'normal',
                           }}
@@ -259,7 +261,9 @@ function ColumnTypeCollapse({
               key={entry.id}
               sx={{
                 pl: 4,
-                py: 0,
+                py: 1,
+                borderBottom: '1px solid',
+                borderColor: 'divider',
                 color: 'text.secondary',
                 fontWeight: entry.id === selectedColumnId ? 'bold' : 'normal',
               }}
