@@ -32,7 +32,7 @@ describe('Legacy Annotation Tool Compatibility', () => {
     );
     cy.get('[data-cy="1-description"]').should('contain', 'A session ID');
     cy.get('[data-cy="2-description"]').should('contain', 'Age of the participant');
-    cy.get('[data-cy="2-column-annotation-card-data-type"]').should('contain', 'Continuous');
+    cy.get('[data-cy="2-column-annotation-card-data-type"]').should('contain', 'Cont');
     cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"] input').should(
       'have.value',
       'Age'
@@ -52,7 +52,7 @@ describe('Legacy Annotation Tool Compatibility', () => {
       'Diagnosis'
     );
     cy.get('[data-cy="5-description"]').should('contain', 'item 1 scores for tool1');
-    cy.get('[data-cy="5-column-annotation-card-data-type"]').should('contain', 'Continuous');
+    cy.get('[data-cy="5-column-annotation-card-data-type"]').should('contain', 'Cont');
     cy.get('[data-cy="5-column-annotation-card-standardized-variable-dropdown"] input').should(
       'have.value',
       'Assessment Tool'
@@ -60,13 +60,13 @@ describe('Legacy Annotation Tool Compatibility', () => {
     // Scroll to access the 7th and 8th column annotation cards
     cy.get('[data-cy="6-column-annotation-card"]').scrollIntoView();
     cy.get('[data-cy="6-description"]').should('contain', 'item 2 scores for tool1');
-    cy.get('[data-cy="6-column-annotation-card-data-type"]').should('contain', 'Continuous');
+    cy.get('[data-cy="6-column-annotation-card-data-type"]').should('contain', 'Cont');
     cy.get('[data-cy="6-column-annotation-card-standardized-variable-dropdown"] input').should(
       'have.value',
       'Assessment Tool'
     );
     cy.get('[data-cy="7-description"]').should('contain', 'item 1 scores for tool2');
-    cy.get('[data-cy="7-column-annotation-card-data-type"]').should('contain', 'Continuous');
+    cy.get('[data-cy="7-column-annotation-card-data-type"]').should('contain', 'Cont');
     cy.get('[data-cy="7-column-annotation-card-standardized-variable-dropdown"] input').should(
       'have.value',
       'Assessment Tool'
