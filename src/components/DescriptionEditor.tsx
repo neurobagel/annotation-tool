@@ -1,4 +1,5 @@
-import { TextField, Typography } from '@mui/material';
+import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
+import { TextField, Tooltip, Typography } from '@mui/material';
 import { useState, useEffect, useRef } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
@@ -27,6 +28,8 @@ function DescriptionEditor({
 }: DescriptionEditorProps) {
   const [editedDescription, setEditedDescription] = useState<string | null>(description);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [isFocused, setIsFocused] = useState(false);
+
   // Track the transient "Saved" helper state so it can be cleared on a timer.
   const statusTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const dataCy = levelValue ? `${columnID}-${levelValue}` : columnID;
@@ -89,23 +92,46 @@ function DescriptionEditor({
         data-cy={`${dataCy}-description`}
         fullWidth
         multiline
-        rows={3}
+        minRows={1}
+        size="small"
         value={editedDescription || ''}
         disabled={disabled}
         onChange={(e) => handleDescriptionChange(e.target.value)}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
         variant="outlined"
-        placeholder="Click to add description..."
-        helperText={(() => {
-          if (saveStatus === 'saving') return 'Saving...';
-          if (saveStatus === 'saved') return 'Saved';
-          return '';
-        })()}
+        placeholder={isFocused ? 'Enter column description...' : 'Add description...'}
+        // Styling to make it look "flat" when inactive?
+        className={`transition-all duration-200 ${!isFocused && !editedDescription ? 'opacity-70' : 'opacity-100'}`}
         slotProps={{
-          formHelperText: {
-            sx: {
-              color: saveStatus === 'saved' ? 'success.main' : 'text.secondary',
-              fontSize: '0.75rem',
-            },
+          input: {
+            style: { willChange: 'min-height, max-height' },
+            className: `transition-[min-height,max-height,background-color] duration-300 ease-in-out items-start ${
+              !isFocused
+                ? 'min-h-[2.5rem] max-h-[2.5rem] overflow-hidden bg-transparent'
+                : 'min-h-[5rem] max-h-[15rem] overflow-y-auto bg-white'
+            }`,
+            endAdornment: (
+              <>
+                {saveStatus !== 'idle' && (
+                  <Tooltip title={saveStatus === 'saving' ? 'Saving...' : 'Saved'}>
+                    <div
+                      className={`w-2 h-2 rounded-full mb-auto mt-2 ${
+                        saveStatus === 'saved' ? 'bg-green-500' : 'bg-yellow-500'
+                      }`}
+                    />
+                  </Tooltip>
+                )}
+                {saveStatus === 'idle' && !isFocused && !disabled && (
+                  <Tooltip title="Click to expand">
+                    <UnfoldMoreIcon
+                      className="text-gray-400 mb-auto mt-1 transform rotate-45"
+                      fontSize="small"
+                    />
+                  </Tooltip>
+                )}
+              </>
+            ),
           },
         }}
       />
