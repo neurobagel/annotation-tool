@@ -94,7 +94,7 @@ describe('Collection Data Dictionary Regression', () => {
     cy.get('[data-cy="next-button"]').click();
 
     // Column Annotation view should reflect categorical type from the data dictionary
-    cy.get('[data-cy="5-column-annotation-card-data-type"]').should('contain', 'Categorical');
+    cy.get('[data-cy="5-column-annotation-card-data-type"]').should('contain', 'Cat');
     cy.get('[data-cy="next-button"]').click();
 
     // Multi-column measure view
