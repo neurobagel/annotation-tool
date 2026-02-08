@@ -1,3 +1,6 @@
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import DownloadIcon from '@mui/icons-material/Download';
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import {
   Button,
   Alert,
@@ -13,16 +16,19 @@ import { useState } from 'react';
 import emoji from '../assets/download-emoji.png';
 import { useGenerateDataDictionary } from '../hooks/useGenerateDataDictionary';
 import { useSchemaValidation } from '../hooks/useSchemaValidation';
-import { useDataActions, useUploadedDataTableFileName } from '../stores/data';
+import { useDataActions, useUploadedDataTableFileName, useConfig } from '../stores/data';
 import useViewStore from '../stores/view';
 import { View } from '../utils/internal_types';
 import DataDictionaryPreview from './DataDictionaryPreview';
+import GoogleDriveUpload from './GoogleDriveUpload';
 
 function Download() {
   const [dictionaryCollapsed, setDictionaryCollapsed] = useState(false);
   const [forceAllowDownload, setForceAllowDownload] = useState(false);
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
 
   const uploadedDataTableFileName = useUploadedDataTableFileName();
+  const config = useConfig();
   const { reset } = useDataActions();
   const setCurrentView = useViewStore((state) => state.setCurrentView);
 
@@ -185,15 +191,30 @@ function Download() {
           />
         ) : null}
 
-        <Button
-          data-cy="download-datadictionary-button"
-          variant="contained"
-          color={schemaValid ? 'success' : 'warning'}
-          disabled={!schemaValid && !forceAllowDownload}
-          onClick={handleDownload}
-        >
-          Download Data Dictionary
-        </Button>
+        <div className="flex gap-4">
+          <Button
+            data-cy="download-datadictionary-button"
+            variant="contained"
+            color={schemaValid ? 'success' : 'warning'}
+            disabled={!schemaValid && !forceAllowDownload}
+            onClick={handleDownload}
+            endIcon={<DownloadIcon />}
+          >
+            Download Data Dictionary
+          </Button>
+
+          {config === 'ENIGMA-PD' && (
+            <Button
+              variant="contained"
+              color="primary"
+              endIcon={<CloudUploadIcon />}
+              onClick={() => setUploadDialogOpen(true)}
+              disabled={!schemaValid && !forceAllowDownload}
+            >
+              Upload Data Dictionary to Drive
+            </Button>
+          )}
+        </div>
       </div>
 
       <Button
@@ -202,9 +223,16 @@ function Download() {
         color="info"
         onClick={handleAnnotatingNewDataset}
         className="mt-4"
+        endIcon={<NoteAddIcon />}
       >
         Annotate a new dataset
       </Button>
+
+      <GoogleDriveUpload
+        open={uploadDialogOpen}
+        onClose={() => setUploadDialogOpen(false)}
+        dataDictionary={dataDictionary}
+      />
     </div>
   );
 }
