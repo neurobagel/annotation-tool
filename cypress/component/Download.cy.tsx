@@ -96,4 +96,24 @@ describe('Download', () => {
       expect(fileContent).to.deep.equal(mockDataDictionaryWithNoDescription);
     });
   });
+
+  it('renders the ENIGMA-PD upload section when config is ENIGMA-PD', () => {
+    initializeStore({ columns: mockAnnotatedColumns });
+    useDataStore.setState((state) => ({ ...state, config: 'ENIGMA-PD' }));
+
+    cy.mount(<Download />);
+
+    cy.get('[data-cy="upload-section"]').should('be.visible');
+
+    cy.get('[data-cy="upload-section-header"]')
+      .should('be.visible')
+      .and('contain', 'Upload this data dictionary to drive');
+
+    cy.get('[data-cy="upload-info-alert"]')
+      .should('be.visible')
+      .and('contain', 'Only the data dictionary will be uploaded to the ENIGMA-PD community drive');
+    cy.get('[data-cy="upload-drive-button"]')
+      .should('be.visible')
+      .and('contain', 'Upload Data Dictionary to Drive');
+  });
 });

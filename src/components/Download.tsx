@@ -11,6 +11,7 @@ import {
   Switch,
   FormControlLabel,
   Link,
+  Divider,
 } from '@mui/material';
 import { useState } from 'react';
 import emoji from '../assets/download-emoji.png';
@@ -177,7 +178,61 @@ function Download() {
         </List>
       </div>
 
-      <div className="flex flex-col items-center">
+      <div className="flex w-full flex-col items-center">
+        {/* ENIGMA-PD Specific Upload Section */}
+        {config === 'ENIGMA-PD' && (
+          <>
+            <Divider className="my-6 w-full max-w-2xl" />
+            <div
+              className="my-2 flex w-full max-w-2xl flex-col items-center"
+              data-cy="upload-section"
+            >
+              <Typography
+                variant="h5"
+                className="mb-2 w-full font-bold"
+                data-cy="upload-section-header"
+              >
+                Upload this data dictionary to drive
+              </Typography>
+              <Alert
+                severity="info"
+                className="mb-2 w-full"
+                variant="filled"
+                data-cy="upload-info-alert"
+                sx={{
+                  bgcolor: '#e5f6fd', // light cyan background
+                  borderLeft: '4px solid #0288d1', // info blue border
+                  color: 'rgba(0, 0, 0, 0.87)', // dark test for readability
+                  '& .MuiAlert-icon': {
+                    color: '#0288d1',
+                  },
+                }}
+              >
+                <Typography variant="subtitle2">
+                  Only the data dictionary will be uploaded to the ENIGMA-PD community drive
+                </Typography>
+                <Typography variant="subtitle2">
+                  Refer to the &quot;Data Dictionary&quot; preview section above to see the exact
+                  content being uploaded.
+                </Typography>
+              </Alert>
+
+              <Button
+                variant="contained"
+                color="primary"
+                endIcon={<CloudUploadIcon />}
+                onClick={() => setUploadDialogOpen(true)}
+                disabled={!schemaValid && !forceAllowDownload}
+                className="mt-4"
+                data-cy="upload-drive-button"
+              >
+                Upload Data Dictionary to Drive
+              </Button>
+            </div>
+            <Divider className="my-6 w-full max-w-2xl" />
+          </>
+        )}
+
         {!schemaValid ? (
           <FormControlLabel
             control={
@@ -202,18 +257,6 @@ function Download() {
           >
             Download Data Dictionary
           </Button>
-
-          {config === 'ENIGMA-PD' && (
-            <Button
-              variant="contained"
-              color="primary"
-              endIcon={<CloudUploadIcon />}
-              onClick={() => setUploadDialogOpen(true)}
-              disabled={!schemaValid && !forceAllowDownload}
-            >
-              Upload Data Dictionary to Drive
-            </Button>
-          )}
         </div>
       </div>
 
