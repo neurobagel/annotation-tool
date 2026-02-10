@@ -121,7 +121,7 @@ describe('GoogleDriveUpload', () => {
         .and('contain', 'Incorrect Password');
     });
 
-    it('should handle file exists conflict and allow overwrite', () => {
+    it('should handle file exists conflict by creating a new version', () => {
       // Mock Conflict THEN Success (on retry)
       let conflictHit = false;
       cy.intercept('POST', '**/exec', (req) => {
@@ -145,17 +145,103 @@ describe('GoogleDriveUpload', () => {
 
       cy.wait('@createFile');
 
-      cy.get('[data-cy="overwrite-dialog"]').should('be.visible');
+      cy.get('[data-cy="overwrite-confirm-button"]').should('be.visible');
+      cy.get('[data-cy="new-filename-preview"]').should('be.visible').and('contain', 'conflict');
 
       cy.get('[data-cy="overwrite-confirm-button"]').click();
       cy.wait('@createFile').then((interception) => {
         const { body } = interception.request;
-        const parsed = typeof body === 'string' ? JSON.parse(body) : body;
-        expect(parsed.checkExists).to.equal(false);
+        const parsedBody = typeof body === 'string' ? JSON.parse(body) : body;
+        expect(parsedBody.checkExists).to.equal(false);
+        // Not end without prefix
+        expect(parsedBody.filename).to.not.equal('conflict.json');
       });
 
       cy.get('[data-cy="upload-success-alert"]').should('be.visible');
       cy.get('[data-cy="open-drive-file-button"]').should('be.visible');
+    });
+
+    it('should suggest a high-precision timestamp suffix on conflict', () => {
+      // Set a fixed date time: 2026-02-10 12:00:00 UTC
+      const now = new Date('2026-02-10T12:00:00.000Z').getTime();
+      cy.clock(now);
+
+      cy.intercept('POST', '**/exec', (req) => {
+        const body = JSON.parse(req.body);
+        if (body.action !== 'getSites') {
+          req.reply({
+            body: { status: 'conflict' },
+          });
+        }
+      }).as('createFileConflict');
+
+      cy.get('[data-cy="dataset-name-input"]').type('TimestampTest');
+      cy.get('[data-cy="password-input"]').type('pass');
+      cy.get('[data-cy="upload-button"]').click();
+
+      cy.wait('@createFileConflict');
+
+      cy.get('[data-cy="new-filename-preview"]').should('contain', '_20260210_120000');
+    });
+
+    it('should use custom suffix when provided', () => {
+      // Mock Conflict THEN Success (on retry)
+      let conflictHit = false;
+      cy.intercept('POST', '**/exec', (req) => {
+        const body = JSON.parse(req.body);
+        if (body.action !== 'getSites') {
+          if (!conflictHit) {
+            conflictHit = true;
+            req.reply({
+              body: { status: 'conflict' },
+            });
+          } else {
+            req.reply({
+              body: { status: 'success', fileId: '67890' },
+            });
+          }
+        }
+      }).as('createFileCustom');
+
+      cy.get('[data-cy="dataset-name-input"]').type('CustomSuffixTest');
+      cy.get('[data-cy="password-input"]').type('pass');
+      cy.get('[data-cy="upload-button"]').click();
+
+      cy.wait('@createFileCustom');
+
+      cy.get('[data-cy="custom-suffix-input"]').type('v2');
+      cy.get('[data-cy="new-filename-preview"]').should('contain', '_v2');
+      cy.get('[data-cy="overwrite-confirm-button"]').click();
+
+      cy.wait('@createFileCustom').then((interception) => {
+        const { body } = interception.request;
+        const parsedBody = typeof body === 'string' ? JSON.parse(body) : body;
+        expect(parsedBody.checkExists).to.equal(false);
+        expect(parsedBody.filename).to.contain('_v2.json');
+      });
+
+      cy.get('[data-cy="upload-success-alert"]').should('be.visible');
+    });
+
+    it('should only show info icon in initial state', () => {
+      // Initial state: Info icon should be visible
+      cy.get('[data-cy="upload-info-button"]').should('exist').and('be.visible');
+
+      cy.intercept('POST', '**/exec', (req) => {
+        const body = JSON.parse(req.body);
+        if (body.action !== 'getSites') {
+          req.reply({ body: { status: 'success', fileId: '123' } });
+        }
+      }).as('uploadSuccess');
+
+      cy.get('[data-cy="dataset-name-input"]').type('InfoIconTest');
+      cy.get('[data-cy="password-input"]').type('pass');
+      cy.get('[data-cy="upload-button"]').click();
+      cy.wait('@uploadSuccess');
+      cy.get('[data-cy="upload-success-alert"]').should('be.visible');
+
+      // Success state: Info icon should NOT be visible
+      cy.get('[data-cy="upload-info-button"]').should('not.exist');
     });
   });
 });
