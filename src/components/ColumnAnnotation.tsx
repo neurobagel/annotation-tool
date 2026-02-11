@@ -75,13 +75,9 @@ function ColumnAnnotation() {
           </Instruction>
         </div>
 
-        {/* Global Header Row - Sticky */}
-        <Box
-          className="sticky top-0 z-10 mx-4 mt-2 border border-blue-200 border-b-0 shadow-sm rounded-t-lg backdrop-blur-sm bg-opacity-95 bg-gray-50"
-          sx={{ borderColor: 'grey.200' }}
-        >
-          {/* Row 1: Main Labels */}
-          <div className="grid grid-cols-[1fr_140px_250px] gap-4 px-4 pt-3 pb-1 items-end border-b border-gray-200">
+        <div className="flex-1 overflow-y-auto px-4 pb-4" data-cy="scrollable-container">
+          {/* Global Header Row - Sticky */}
+          <Box className="sticky top-0 z-10 mb-4 border border-gray-200 shadow-sm rounded-t-lg backdrop-blur-sm bg-opacity-95 bg-gray-100 grid grid-cols-[6fr_1fr_3fr] gap-4 px-4 pt-3 pb-1 items-end min-w-[768px]">
             <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
               Description
             </span>
@@ -91,27 +87,27 @@ function ColumnAnnotation() {
             <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
               Mapped Variable
             </span>
-          </div>
-        </Box>
+          </Box>
 
-        <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-3" data-cy="scrollable-container">
-          {columnCardData.map((columnData) => (
-            <div key={columnData.columnId} className="w-full">
-              <ColumnAnnotationCard
-                id={columnData.columnId}
-                name={columnData.name}
-                description={columnData.description}
-                dataType={columnData.dataType}
-                standardizedVariableId={columnData.standardizedVariableId}
-                standardizedVariableOptions={standardizedVariableOptions}
-                isDataTypeEditable={columnData.isDataTypeEditable}
-                inferredDataTypeLabel={columnData.inferredDataTypeLabel}
-                onDescriptionChange={userUpdatesColumnDescription}
-                onDataTypeChange={handleDataTypeChange}
-                onStandardizedVariableChange={handleStandardizedVariableChange}
-              />
-            </div>
-          ))}
+          <div className="space-y-3">
+            {columnCardData.map((columnData) => (
+              <div key={columnData.columnId} className="w-full">
+                <ColumnAnnotationCard
+                  id={columnData.columnId}
+                  name={columnData.name}
+                  description={columnData.description}
+                  dataType={columnData.dataType}
+                  standardizedVariableId={columnData.standardizedVariableId}
+                  standardizedVariableOptions={standardizedVariableOptions}
+                  isDataTypeEditable={columnData.isDataTypeEditable}
+                  inferredDataTypeLabel={columnData.inferredDataTypeLabel}
+                  onDescriptionChange={userUpdatesColumnDescription}
+                  onDataTypeChange={handleDataTypeChange}
+                  onStandardizedVariableChange={handleStandardizedVariableChange}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

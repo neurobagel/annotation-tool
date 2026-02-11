@@ -43,10 +43,9 @@ describe('DescriptionEditor', () => {
     cy.get('[data-cy="1-description"] textarea').first().clear();
     cy.get('[data-cy="1-description"]').type('new description');
 
-    cy.get('.bg-yellow-500').should('exist');
+    cy.get('[data-cy="1-status-saving"]').should('exist');
 
-    // wait for the debounce + save timeout
-    cy.get('.bg-green-500', { timeout: 6000 }).should('exist');
+    cy.get('[data-cy="1-status-saved"]', { timeout: 6000 }).should('exist');
 
     cy.get('@spy').should('have.been.calledWith', '1', 'new description');
   });
@@ -76,5 +75,34 @@ describe('DescriptionEditor', () => {
     );
 
     cy.get('[data-cy="1-description"] textarea').should('be.disabled');
+  });
+
+  it('should expand on focus and collapse on blur', () => {
+    cy.mount(
+      <DescriptionEditor
+        description={props.description}
+        onDescriptionChange={props.onDescriptionChange}
+        columnID={props.id}
+      />
+    );
+    cy.get('[data-cy="1-description"] .MuiInputBase-root').should(
+      'have.attr',
+      'data-state',
+      'collapsed'
+    );
+
+    cy.get('[data-cy="1-description"] textarea:visible').focus();
+    cy.get('[data-cy="1-description"] .MuiInputBase-root').should(
+      'have.attr',
+      'data-state',
+      'expanded'
+    );
+
+    cy.get('[data-cy="1-description"] textarea:visible').blur();
+    cy.get('[data-cy="1-description"] .MuiInputBase-root').should(
+      'have.attr',
+      'data-state',
+      'collapsed'
+    );
   });
 });

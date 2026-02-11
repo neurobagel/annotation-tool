@@ -1,5 +1,5 @@
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
-import { TextField, Tooltip, Typography } from '@mui/material';
+import { InputProps, TextField, Tooltip, Typography } from '@mui/material';
 import { useState, useEffect, useRef } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
@@ -105,6 +105,7 @@ function DescriptionEditor({
         className={`transition-all duration-200 ${!isFocused && !editedDescription ? 'opacity-70' : 'opacity-100'}`}
         slotProps={{
           input: {
+            'data-state': isFocused ? 'expanded' : 'collapsed',
             style: { willChange: 'min-height, max-height' },
             className: `transition-[min-height,max-height,background-color] duration-300 ease-in-out items-start ${
               !isFocused
@@ -116,6 +117,10 @@ function DescriptionEditor({
                 {saveStatus !== 'idle' && (
                   <Tooltip title={saveStatus === 'saving' ? 'Saving...' : 'Saved'}>
                     <div
+                      role="button"
+                      aria-label={saveStatus === 'saving' ? 'Saving changes' : 'Changes saved'}
+                      tabIndex={0}
+                      data-cy={`${dataCy}-status-${saveStatus}`}
                       className={`w-2 h-2 rounded-full mb-auto mt-2 ${
                         saveStatus === 'saved' ? 'bg-green-500' : 'bg-yellow-500'
                       }`}
@@ -125,14 +130,17 @@ function DescriptionEditor({
                 {saveStatus === 'idle' && !isFocused && !disabled && (
                   <Tooltip title="Click to expand">
                     <UnfoldMoreIcon
-                      className="text-gray-400 mb-auto mt-1 transform rotate-45"
+                      role="button"
+                      aria-label="Click to expand description"
+                      tabIndex={0}
+                      className="text-gray-400 mb-auto mt-1 transform rotate-45 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 rounded"
                       fontSize="small"
                     />
                   </Tooltip>
                 )}
               </>
             ),
-          },
+          } as InputProps & { 'data-state'?: string },
         }}
       />
     </div>

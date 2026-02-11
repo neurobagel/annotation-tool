@@ -48,16 +48,13 @@ function ColumnAnnotationCard({
       data-cy={`${id}-column-annotation-card`}
       className="w-full bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200"
     >
-      {/* 1. Title Bar (Row 1) */}
       <div className="w-full bg-gray-50 px-4 py-2 border-b border-gray-200 flex items-center">
         <Typography variant="subtitle2" className="font-bold text-gray-900 truncate" title={name}>
           {name}
         </Typography>
       </div>
 
-      {/* 2. Action Grid (Row 2) */}
-      <div className="grid grid-cols-[1fr_140px_250px] gap-4 px-4 py-3 items-start items-center">
-        {/* Description (Flexible) */}
+      <div className="grid grid-cols-[6fr_1fr_3fr] gap-4 px-4 py-3 items-center">
         <div className="w-full min-w-0">
           <DescriptionEditor
             description={description}
@@ -66,7 +63,6 @@ function ColumnAnnotationCard({
           />
         </div>
 
-        {/* Data Type (Fixed 140px) */}
         <div className="flex-shrink-0">
           {isDataTypeEditable ? (
             <ToggleButtonGroup
@@ -109,6 +105,8 @@ function ColumnAnnotationCard({
               <div
                 className="h-10 px-2 flex items-center justify-center border rounded border-gray-200 bg-gray-50/50 text-gray-500 cursor-not-allowed w-full shadow-sm"
                 data-cy={`${id}-column-annotation-card-data-type`}
+                tabIndex={0}
+                role="button"
               >
                 <Typography variant="caption" className="font-medium truncate">
                   {inferredDataTypeLabel || dataType || 'Unknown'}
@@ -119,7 +117,6 @@ function ColumnAnnotationCard({
           )}
         </div>
 
-        {/* Mapped Variable (Fixed 250px) */}
         <div className="flex-shrink-0 w-full">
           <Autocomplete
             data-cy={`${id}-column-annotation-card-standardized-variable-dropdown`}
