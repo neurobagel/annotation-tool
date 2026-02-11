@@ -17,7 +17,7 @@ import {
   IconButton,
   Collapse,
 } from '@mui/material';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { DataDictionary } from '../utils/internal_types';
 
 interface GoogleDriveUploadProps {
@@ -83,15 +83,22 @@ function GoogleDriveUpload({
     }, 300);
   };
 
-  const fetchSites = async () => {
+  const fetchSites = useCallback(async () => {
     setLoadingSites(true);
     setShowSiteSuccess(false);
+    setError(null);
+
     try {
       const response = await fetch(appsScriptUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'getSites' }),
       });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch sites: ${response.status} ${response.statusText}`);
+      }
+
       const result = await response.json();
 
       if (result.status === 'success' && Array.isArray(result.sites)) {
@@ -101,20 +108,22 @@ function GoogleDriveUpload({
         }
         setShowSiteSuccess(true);
         setTimeout(() => setShowSiteSuccess(false), 2000);
+      } else {
+        throw new Error(result.message || 'Failed to load sites from Google Drive.');
       }
     } catch (fetchErr) {
-      // TODO: show a notif error
+      const message = fetchErr instanceof Error ? fetchErr.message : 'Unknown error loading sites';
+      setError(message);
     } finally {
       setLoadingSites(false);
     }
-  };
+  }, [appsScriptUrl]);
 
   useEffect(() => {
     if (open && hasAppsScriptUrl) {
       fetchSites();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, hasAppsScriptUrl]);
+  }, [open, hasAppsScriptUrl, fetchSites]);
 
   const generateFilename = () => {
     const siteSanitized = site.replace(/[^a-z0-9]/gi, '_');
@@ -229,6 +238,7 @@ ${notes}`;
             <Button
               variant="outlined"
               target="_blank"
+              rel="noopener noreferrer"
               href={uploadedUrl}
               startIcon={<OpenInNewIcon />}
               sx={{ mt: 1 }}

@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import GoogleDriveUpload from '../../src/components/GoogleDriveUpload';
 
-const props = {
+const testProps = {
   open: true,
   onClose: () => {},
   dataDictionary: {},
@@ -20,10 +21,10 @@ describe('GoogleDriveUpload', () => {
     }).as('getSites');
     cy.mount(
       <GoogleDriveUpload
-        open={props.open}
-        onClose={props.onClose}
-        dataDictionary={props.dataDictionary}
-        appsScriptUrl={props.appsScriptUrl}
+        open={testProps.open}
+        onClose={testProps.onClose}
+        dataDictionary={testProps.dataDictionary}
+        appsScriptUrl={testProps.appsScriptUrl}
       />
     );
 
@@ -44,9 +45,9 @@ describe('GoogleDriveUpload', () => {
   it('should handle missing configuration gracefully', () => {
     cy.mount(
       <GoogleDriveUpload
-        open={props.open}
-        onClose={props.onClose}
-        dataDictionary={props.dataDictionary}
+        open={testProps.open}
+        onClose={testProps.onClose}
+        dataDictionary={testProps.dataDictionary}
         appsScriptUrl=""
       />
     );
@@ -56,6 +57,29 @@ describe('GoogleDriveUpload', () => {
   });
 
   context('When Configured', () => {
+    it('should display error when site fetching fails', () => {
+      cy.intercept('POST', '**/exec', (req) => {
+        const body = JSON.parse(req.body);
+        if (body.action === 'getSites') {
+          req.reply({ statusCode: 500, body: 'Internal Server Error' });
+        }
+      }).as('getSitesFail');
+
+      cy.mount(
+        <GoogleDriveUpload
+          open={testProps.open}
+          onClose={testProps.onClose}
+          dataDictionary={testProps.dataDictionary}
+          appsScriptUrl={testProps.appsScriptUrl}
+        />
+      );
+
+      cy.wait('@getSitesFail');
+      cy.get('[data-cy="upload-error-alert"]')
+        .should('be.visible')
+        .and('contain', 'Failed to fetch sites: 500 Internal Server Error');
+    });
+
     it('should fetch sites and populate the select', () => {
       cy.get('[data-cy="site-select"]').click();
       cy.get('[role="listbox"]').should('contain', 'SiteA');
@@ -242,6 +266,47 @@ describe('GoogleDriveUpload', () => {
 
       // Success state: Info icon should NOT be visible
       cy.get('[data-cy="upload-info-button"]').should('not.exist');
+    });
+
+    it('should clear fields on close', () => {
+      cy.clock();
+      cy.get('[data-cy="dataset-name-input"]').type('SensitiveDataTest');
+      cy.get('[data-cy="password-input"]').type('supersecret');
+
+      cy.get('[data-cy="close-button"]').click();
+
+      // Use a wrapper component to toggle visibility to verify state logic
+      function Wrapper() {
+        const [open, setOpen] = useState(true);
+        return (
+          <>
+            <button data-cy="toggle-open" type="button" onClick={() => setOpen(true)}>
+              Open
+            </button>
+            <GoogleDriveUpload
+              dataDictionary={testProps.dataDictionary}
+              appsScriptUrl={testProps.appsScriptUrl}
+              open={open}
+              onClose={() => setOpen(false)}
+            />
+          </>
+        );
+      }
+
+      cy.mount(<Wrapper />);
+
+      cy.get('[data-cy="dataset-name-input"]').type('SensitiveDataTest');
+      cy.get('[data-cy="password-input"]').type('supersecret');
+
+      cy.get('[data-cy="close-button"]').click();
+
+      // Advance time to triggering the state clearing timeout (300ms)
+      cy.tick(500);
+
+      cy.get('[data-cy="toggle-open"]').click();
+
+      cy.get('[data-cy="dataset-name-input"]').should('have.value', '');
+      cy.get('[data-cy="password-input"]').should('have.value', '');
     });
   });
 });
