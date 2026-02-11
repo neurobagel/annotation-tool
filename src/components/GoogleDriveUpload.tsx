@@ -76,6 +76,10 @@ function GoogleDriveUpload({
       setCustomSuffix('');
       setFinalFilename('');
       setSuggestedSuffix('');
+      setError(null);
+      setPassword('');
+      setName('');
+      setEmail('');
     }, 300);
   };
 
