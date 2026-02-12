@@ -26,7 +26,7 @@
     "@mui/material": "^6.4.8",
     "@mui/system": "^6.4.3",
     "ajv": "^8.17.1",
-    "axios": "^1.13.3",
+    "axios": "^1.13.5",
     "immer": "^10.2.0",
     "lodash": "^4.17.23",
     "match-sorter": "^8.2.0",
@@ -34,11 +34,11 @@
     "papaparse": "^5.5.3",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "react-window": "^2.2.5",
+    "react-window": "^2.2.6",
     "seedrandom": "^3.0.5",
     "use-debounce": "^10.1.0",
     "uuid": "^11.1.0",
-    "zustand": "^5.0.10"
+    "zustand": "^5.0.11"
   },
   "devDependencies": {
     "@cypress/code-coverage": "^3.14.7",
