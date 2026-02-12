@@ -46,10 +46,10 @@ describe('ColumnAnnotationCard', () => {
     cy.get('[data-cy="1-column-annotation-card-data-type"]').should('be.visible');
     cy.get('[data-cy="1-column-annotation-card-data-type-categorical-button"]')
       .should('be.visible')
-      .and('contain', 'Categorical');
+      .and('contain', 'Cat');
     cy.get('[data-cy="1-column-annotation-card-data-type-continuous-button"]')
       .should('be.visible')
-      .and('contain', 'Continuous');
+      .and('contain', 'Cont');
     cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"] input')
       .should('be.visible')
       .and('have.value', 'Participant ID');
