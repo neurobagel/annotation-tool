@@ -25,6 +25,18 @@ interface GoogleDriveUploadProps {
   onClose: () => void;
   dataDictionary: DataDictionary;
   appsScriptUrl?: string;
+  config: string;
+}
+
+interface FormState {
+  site: string;
+  name: string;
+  email: string;
+  datasetName: string;
+  notes: string;
+  password: string;
+  reuploadReason: string;
+  customSuffix: string;
 }
 
 const defaultProps = {
@@ -34,11 +46,85 @@ const defaultProps = {
 const getTimestampSuffix = () =>
   new Date().toISOString().replace(/[-:]/g, '').replace('T', '_').split('.')[0];
 
+const createUploadPayload = ({
+  filename,
+  dataDictionary,
+  notes,
+  reuploadReason,
+  name,
+  email,
+  site,
+  password,
+  forceOverwrite,
+}: {
+  filename: string;
+  dataDictionary: DataDictionary;
+  notes: string;
+  reuploadReason: string;
+  name: string;
+  email: string;
+  site: string;
+  password?: string;
+  forceOverwrite: boolean;
+}) => {
+  const fileContent = JSON.stringify(dataDictionary, null, 2);
+
+  let commentsContent;
+  const hasNotes = notes && notes.trim().length > 0;
+  const hasReason = reuploadReason && reuploadReason.trim().length > 0;
+
+  if (hasNotes || hasReason) {
+    commentsContent = `Uploader Metadata
+=================
+Name:  ${name || 'Anonymous'}
+Email: ${email || 'N/A'}
+Date:  ${new Date().toLocaleString()}
+
+`;
+
+    if (hasReason) {
+      commentsContent += `Re-upload Reason:
+-----------------
+${reuploadReason}
+
+`;
+    }
+
+    if (hasNotes) {
+      commentsContent += `User Notes/Comments:
+--------------------
+${notes}`;
+    }
+  }
+
+  return {
+    filename,
+    content: fileContent,
+    description: `Uploaded by ${name} (${email}). Notes: ${notes}`,
+    folderName: site,
+    commentsContent,
+    checkExists: !forceOverwrite,
+    password,
+  };
+};
+
+const initialFormState: FormState = {
+  site: '',
+  name: '',
+  email: '',
+  datasetName: '',
+  notes: '',
+  password: '',
+  reuploadReason: '',
+  customSuffix: '',
+};
+
 function GoogleDriveUpload({
   open,
   onClose,
   dataDictionary,
   appsScriptUrl = import.meta.env.NB_GOOGLE_APPS_SCRIPT_URL,
+  config,
 }: GoogleDriveUploadProps) {
   const [error, setError] = useState<string | null>(null);
   const [sites, setSites] = useState<string[]>([]);
@@ -46,18 +132,11 @@ function GoogleDriveUpload({
   const [showSiteSuccess, setShowSiteSuccess] = useState(false);
   const [showUploadInfo, setShowUploadInfo] = useState(false);
 
-  const [site, setSite] = useState('');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [datasetName, setDatasetName] = useState('');
-  const [notes, setNotes] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState<FormState>(initialFormState);
   const [uploading, setUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
   const [showConfirmOverwrite, setShowConfirmOverwrite] = useState(false);
-  const [reuploadReason, setReuploadReason] = useState('');
-  const [customSuffix, setCustomSuffix] = useState('');
   const [finalFilename, setFinalFilename] = useState('');
   const [suggestedSuffix, setSuggestedSuffix] = useState('');
 
@@ -70,16 +149,10 @@ function GoogleDriveUpload({
       setUploadSuccess(false);
       setUploadedUrl(null);
       setShowConfirmOverwrite(false);
-      setDatasetName('');
-      setNotes('');
-      setReuploadReason('');
-      setCustomSuffix('');
       setFinalFilename('');
       setSuggestedSuffix('');
       setError(null);
-      setPassword('');
-      setName('');
-      setEmail('');
+      setFormData(initialFormState);
     }, 300);
   };
 
@@ -96,7 +169,7 @@ function GoogleDriveUpload({
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch sites: ${response.status} ${response.statusText}`);
+        throw new Error(`Failed to fetch site names: ${response.status} ${response.statusText}`);
       }
 
       const result = await response.json();
@@ -104,7 +177,7 @@ function GoogleDriveUpload({
       if (result.status === 'success' && Array.isArray(result.sites)) {
         setSites(result.sites);
         if (result.sites.length > 0) {
-          setSite(result.sites[0]);
+          setFormData((prev) => ({ ...prev, site: result.sites[0] }));
         }
         setShowSiteSuccess(true);
         setTimeout(() => setShowSiteSuccess(false), 2000);
@@ -126,8 +199,10 @@ function GoogleDriveUpload({
   }, [open, hasAppsScriptUrl, fetchSites]);
 
   const generateFilename = () => {
-    const siteSanitized = site.replace(/[^a-z0-9]/gi, '_');
-    const datasetSanitized = datasetName ? datasetName.replace(/[^a-z0-9]/gi, '_') : 'dataset';
+    const siteSanitized = formData.site.replace(/[^a-z0-9]/gi, '_');
+    const datasetSanitized = formData.datasetName
+      ? formData.datasetName.replace(/[^a-z0-9]/gi, '_')
+      : 'dataset';
     return `${siteSanitized}_${datasetSanitized}.json`;
   };
 
@@ -142,45 +217,17 @@ function GoogleDriveUpload({
 
     try {
       const filename = overrideFilename || generateFilename();
-      const fileContent = JSON.stringify(dataDictionary, null, 2);
-
-      let commentsContent;
-      const hasNotes = notes && notes.trim().length > 0;
-      const hasReason = reuploadReason && reuploadReason.trim().length > 0;
-
-      if (hasNotes || hasReason) {
-        commentsContent = `Uploader Metadata
-=================
-Name:  ${name || 'Anonymous'}
-Email: ${email || 'N/A'}
-Date:  ${new Date().toLocaleString()}
-
-`;
-
-        if (hasReason) {
-          commentsContent += `Re-upload Reason:
------------------
-${reuploadReason}
-
-`;
-        }
-
-        if (hasNotes) {
-          commentsContent += `User Notes/Comments:
---------------------
-${notes}`;
-        }
-      }
-
-      const payload = {
+      const payload = createUploadPayload({
         filename,
-        content: fileContent,
-        description: `Uploaded by ${name} (${email}). Notes: ${notes}`,
-        folderName: site,
-        commentsContent,
-        checkExists: !forceOverwrite,
-        password,
-      };
+        dataDictionary,
+        notes: formData.notes,
+        reuploadReason: formData.reuploadReason,
+        name: formData.name,
+        email: formData.email,
+        site: formData.site,
+        password: formData.password,
+        forceOverwrite,
+      });
 
       const scriptUrl = appsScriptUrl;
 
@@ -255,9 +302,9 @@ ${notes}`;
       return (
         <div className="flex flex-col items-center gap-4 py-8">
           <Alert severity="error" data-cy="config-error-alert">
-            Google Apps Script URL is not configured.
+            The data dictionary upload for <strong>{config}</strong> is not available.
             <br />
-            Please add <strong>NB_GOOGLE_APPS_SCRIPT_URL</strong>.
+            Please contact your community admin to enable it.
           </Alert>
         </div>
       );
@@ -268,7 +315,7 @@ ${notes}`;
         <div className="flex flex-col gap-4 pt-2">
           <Alert severity="warning">
             A file named <strong>{generateFilename()}</strong> already exists in{' '}
-            <strong>{site}</strong>.
+            <strong>{formData.site}</strong>.
             <br />
             <br />
             We will save this as a new version to avoid overwriting the existing file.
@@ -278,14 +325,22 @@ ${notes}`;
             The new file will be named:
             <br />
             <strong>
-              {generateFilename().replace('.json', `_${customSuffix || suggestedSuffix}.json`)}
+              {generateFilename().replace(
+                '.json',
+                `_${formData.customSuffix || suggestedSuffix}.json`
+              )}
             </strong>
           </Typography>
 
           <TextField
             label="Custom Suffix (Optional)"
-            value={customSuffix}
-            onChange={(e) => setCustomSuffix(e.target.value.replace(/[^a-z0-9_-]/gi, ''))}
+            value={formData.customSuffix}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                customSuffix: e.target.value.replace(/[^a-z0-9_-]/gi, ''),
+              })
+            }
             placeholder={`e.g. v2 (default: ${suggestedSuffix})`}
             fullWidth
             helperText="Only letters, numbers, hyphens, and underscores allowed."
@@ -294,8 +349,8 @@ ${notes}`;
 
           <TextField
             label="Reason for re-upload / changes"
-            value={reuploadReason}
-            onChange={(e) => setReuploadReason(e.target.value)}
+            value={formData.reuploadReason}
+            onChange={(e) => setFormData({ ...formData, reuploadReason: e.target.value })}
             fullWidth
             multiline
             rows={2}
@@ -364,8 +419,8 @@ ${notes}`;
         <TextField
           select
           label="Site"
-          value={site}
-          onChange={(e) => setSite(e.target.value)}
+          value={formData.site}
+          onChange={(e) => setFormData({ ...formData, site: e.target.value })}
           fullWidth
           disabled={loadingSites}
           data-cy="site-select"
@@ -392,8 +447,8 @@ ${notes}`;
 
         <TextField
           label="Dataset Name"
-          value={datasetName}
-          onChange={(e) => setDatasetName(e.target.value)}
+          value={formData.datasetName}
+          onChange={(e) => setFormData({ ...formData, datasetName: e.target.value })}
           fullWidth
           required
           placeholder="e.g. My Study 2026"
@@ -403,8 +458,8 @@ ${notes}`;
         <TextField
           label="Password"
           type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={formData.password}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
           fullWidth
           required
           data-cy="password-input"
@@ -431,23 +486,23 @@ ${notes}`;
         <div className="grid grid-cols-2 gap-4">
           <TextField
             label="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             fullWidth
             data-cy="user-name-input"
           />
           <TextField
             label="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             fullWidth
             data-cy="user-email-input"
           />
         </div>
         <TextField
           label="Questions / Comments / Problems"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
+          value={formData.notes}
+          onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
           multiline
           rows={3}
           fullWidth
@@ -497,7 +552,7 @@ ${notes}`;
             onClick={() => handleUpload(false)}
             variant="contained"
             color="primary"
-            disabled={uploading || !datasetName || !password}
+            disabled={uploading || !formData.datasetName || !formData.password}
             data-cy="upload-button"
           >
             {uploading ? 'Uploading...' : 'Upload'}
@@ -507,7 +562,7 @@ ${notes}`;
           <Button
             onClick={() => {
               const baseName = generateFilename().replace('.json', '');
-              const suffix = customSuffix || suggestedSuffix;
+              const suffix = formData.customSuffix || suggestedSuffix;
               const newFilename = `${baseName}_${suffix}.json`;
               // Do NOT close dialog or reset state here, just call upload
               // setShowConfirmOverwrite(false); // REMOVED

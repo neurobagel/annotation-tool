@@ -192,7 +192,7 @@ function Download() {
                 className="mb-2 w-full font-bold"
                 data-cy="upload-section-header"
               >
-                Upload this data dictionary to drive
+                Upload this data dictionary to the {config} drive
               </Typography>
               <Alert
                 severity="info"
@@ -202,7 +202,7 @@ function Download() {
                 sx={{
                   bgcolor: '#e5f6fd', // light cyan background
                   borderLeft: '4px solid #0288d1', // info blue border
-                  color: 'rgba(0, 0, 0, 0.87)', // dark test for readability
+                  color: 'rgba(0, 0, 0, 0.87)', // dark text for readability
                   '& .MuiAlert-icon': {
                     color: '#0288d1',
                   },
@@ -226,7 +226,7 @@ function Download() {
                 className="mt-4"
                 data-cy="upload-drive-button"
               >
-                Upload Data Dictionary to Drive
+                Upload Data Dictionary to {config}
               </Button>
             </div>
             <Divider className="my-6 w-full max-w-2xl" />
@@ -275,6 +275,7 @@ function Download() {
         open={uploadDialogOpen}
         onClose={() => setUploadDialogOpen(false)}
         dataDictionary={dataDictionary}
+        config={config}
       />
     </div>
   );

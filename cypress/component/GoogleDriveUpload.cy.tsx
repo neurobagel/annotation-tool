@@ -6,6 +6,7 @@ const testProps = {
   onClose: () => {},
   dataDictionary: {},
   appsScriptUrl: 'https://somecoolurl.com/exec',
+  config: 'some-config',
 };
 
 describe('GoogleDriveUpload', () => {
@@ -25,6 +26,7 @@ describe('GoogleDriveUpload', () => {
         onClose={testProps.onClose}
         dataDictionary={testProps.dataDictionary}
         appsScriptUrl={testProps.appsScriptUrl}
+        config={testProps.config}
       />
     );
 
@@ -42,13 +44,14 @@ describe('GoogleDriveUpload', () => {
     cy.get('[data-cy="user-notes-input"]').should('be.visible');
   });
 
-  it('should handle missing configuration gracefully', () => {
+  it('should handle unconfigured backend script gracefully', () => {
     cy.mount(
       <GoogleDriveUpload
         open={testProps.open}
         onClose={testProps.onClose}
         dataDictionary={testProps.dataDictionary}
         appsScriptUrl=""
+        config={testProps.config}
       />
     );
 
@@ -56,8 +59,8 @@ describe('GoogleDriveUpload', () => {
     cy.get('[data-cy="upload-button"]').should('not.exist');
   });
 
-  context('When Configured', () => {
-    it('should display error when site fetching fails', () => {
+  context('When the backend script is correctly configured', () => {
+    it('should display error when site names cannot be fetched', () => {
       cy.intercept('POST', '**/exec', (req) => {
         const body = JSON.parse(req.body);
         if (body.action === 'getSites') {
@@ -71,20 +74,25 @@ describe('GoogleDriveUpload', () => {
           onClose={testProps.onClose}
           dataDictionary={testProps.dataDictionary}
           appsScriptUrl={testProps.appsScriptUrl}
+          config={testProps.config}
         />
       );
 
       cy.wait('@getSitesFail');
       cy.get('[data-cy="upload-error-alert"]')
         .should('be.visible')
-        .and('contain', 'Failed to fetch sites: 500 Internal Server Error');
+        .and('contain', 'Failed to fetch site names')
+        .and('contain', '500');
     });
 
-    it('should fetch sites and populate the select', () => {
+    it('should populate the site dropdown with fetched site names', () => {
       cy.get('[data-cy="site-select"]').click();
-      cy.get('[role="listbox"]').should('contain', 'SiteA');
-      cy.get('[role="listbox"]').should('contain', 'SiteB');
+      cy.get('[role="listbox"]').within(() => {
+        cy.contains('SiteA').should('be.visible');
+        cy.contains('SiteB').should('be.visible');
+      });
       cy.get('[role="option"]').contains('SiteA').click();
+      cy.get('[data-cy="site-select"] input').should('have.value', 'SiteA');
     });
 
     it('should enable upload button only when required fields are filled', () => {
@@ -288,6 +296,7 @@ describe('GoogleDriveUpload', () => {
               appsScriptUrl={testProps.appsScriptUrl}
               open={open}
               onClose={() => setOpen(false)}
+              config={testProps.config}
             />
           </>
         );
