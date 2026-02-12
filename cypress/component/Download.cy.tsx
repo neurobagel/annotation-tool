@@ -107,13 +107,13 @@ describe('Download', () => {
 
     cy.get('[data-cy="upload-section-header"]')
       .should('be.visible')
-      .and('contain', 'Upload this data dictionary to drive');
+      .and('contain', 'Upload this data dictionary to the ENIGMA-PD drive');
 
     cy.get('[data-cy="upload-info-alert"]')
       .should('be.visible')
       .and('contain', 'Only the data dictionary will be uploaded to the ENIGMA-PD community drive');
     cy.get('[data-cy="upload-drive-button"]')
       .should('be.visible')
-      .and('contain', 'Upload Data Dictionary to Drive');
+      .and('contain', 'Upload Data Dictionary to ENIGMA-PD');
   });
 });
