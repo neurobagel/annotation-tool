@@ -1,14 +1,7 @@
-import HelpIcon from '@mui/icons-material/Help';
-import {
-  Typography,
-  ToggleButtonGroup,
-  ToggleButton,
-  Autocomplete,
-  Tooltip,
-  TextField,
-} from '@mui/material';
+import { Typography, Autocomplete, TextField } from '@mui/material';
 import { DataType } from '~/utils/internal_types';
 import { StandardizedVariableOption } from '../hooks/useStandardizedVariableOptions';
+import DataTypeToggle from './DataTypeToggle';
 import DescriptionEditor from './DescriptionEditor';
 
 interface ColumnAnnotationCardProps {
@@ -64,57 +57,13 @@ function ColumnAnnotationCard({
         </div>
 
         <div className="flex-shrink-0">
-          {isDataTypeEditable ? (
-            <ToggleButtonGroup
-              data-cy={`${id}-column-annotation-card-data-type`}
-              value={dataType}
-              onChange={(_, newDataType) => onDataTypeChange(id, newDataType)}
-              exclusive
-              color="primary"
-              size="small"
-              className="shadow-sm w-full flex h-10"
-            >
-              <Tooltip title="Categorical" arrow>
-                <ToggleButton
-                  data-cy={`${id}-column-annotation-card-data-type-categorical-button`}
-                  value="Categorical"
-                  className="px-2 flex-1 w-1/2"
-                >
-                  <span className="text-xs font-semibold">Cat.</span>
-                </ToggleButton>
-              </Tooltip>
-
-              <Tooltip title="Continuous" arrow>
-                <ToggleButton
-                  data-cy={`${id}-column-annotation-card-data-type-continuous-button`}
-                  value="Continuous"
-                  className="px-2 flex-1 w-1/2"
-                >
-                  <span className="text-xs font-semibold">Cont.</span>
-                </ToggleButton>
-              </Tooltip>
-            </ToggleButtonGroup>
-          ) : (
-            <Tooltip
-              title={
-                'Data type is automatically determined by standardized variable selection. \n' +
-                ' To change the data type manually, remove the standardized variable'
-              }
-              arrow
-            >
-              <div
-                className="h-10 px-2 flex items-center justify-center border rounded border-gray-200 bg-gray-50/50 text-gray-500 cursor-not-allowed w-full shadow-sm"
-                data-cy={`${id}-column-annotation-card-data-type`}
-                tabIndex={0}
-                role="button"
-              >
-                <Typography variant="caption" className="font-medium truncate">
-                  {inferredDataTypeLabel || dataType || 'Unknown'}
-                </Typography>
-                <HelpIcon sx={{ fontSize: 14 }} className="text-gray-400 ml-1" />
-              </div>
-            </Tooltip>
-          )}
+          <DataTypeToggle
+            columnId={id}
+            value={dataType}
+            isEditable={isDataTypeEditable}
+            inferredLabel={inferredDataTypeLabel}
+            onChange={onDataTypeChange}
+          />
         </div>
 
         <div className="flex-shrink-0 w-full">
