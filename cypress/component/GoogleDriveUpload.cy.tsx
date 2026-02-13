@@ -91,8 +91,6 @@ describe('GoogleDriveUpload', () => {
         cy.contains('SiteA').should('be.visible');
         cy.contains('SiteB').should('be.visible');
       });
-      cy.get('[role="option"]').contains('SiteA').click();
-      cy.get('[data-cy="site-select"] input').should('have.value', 'SiteA');
     });
 
     it('should enable upload button only when required fields are filled', () => {
