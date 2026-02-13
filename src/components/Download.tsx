@@ -1,3 +1,6 @@
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import DownloadIcon from '@mui/icons-material/Download';
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import {
   Button,
   Alert,
@@ -8,21 +11,25 @@ import {
   Switch,
   FormControlLabel,
   Link,
+  Divider,
 } from '@mui/material';
 import { useState } from 'react';
 import emoji from '../assets/download-emoji.png';
 import { useGenerateDataDictionary } from '../hooks/useGenerateDataDictionary';
 import { useSchemaValidation } from '../hooks/useSchemaValidation';
-import { useDataActions, useUploadedDataTableFileName } from '../stores/data';
+import { useDataActions, useUploadedDataTableFileName, useConfig } from '../stores/data';
 import useViewStore from '../stores/view';
 import { View } from '../utils/internal_types';
 import DataDictionaryPreview from './DataDictionaryPreview';
+import GoogleDriveUpload from './GoogleDriveUpload';
 
 function Download() {
   const [dictionaryCollapsed, setDictionaryCollapsed] = useState(false);
   const [forceAllowDownload, setForceAllowDownload] = useState(false);
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
 
   const uploadedDataTableFileName = useUploadedDataTableFileName();
+  const config = useConfig();
   const { reset } = useDataActions();
   const setCurrentView = useViewStore((state) => state.setCurrentView);
 
@@ -171,7 +178,61 @@ function Download() {
         </List>
       </div>
 
-      <div className="flex flex-col items-center">
+      <div className="flex w-full flex-col items-center">
+        {/* ENIGMA-PD Specific Upload Section */}
+        {config === 'ENIGMA-PD' && (
+          <>
+            <Divider className="my-6 w-full max-w-2xl" />
+            <div
+              className="my-2 flex w-full max-w-2xl flex-col items-center"
+              data-cy="upload-section"
+            >
+              <Typography
+                variant="h5"
+                className="mb-2 w-full font-bold"
+                data-cy="upload-section-header"
+              >
+                Upload this data dictionary to the {config} drive
+              </Typography>
+              <Alert
+                severity="info"
+                className="mb-2 w-full"
+                variant="filled"
+                data-cy="upload-info-alert"
+                sx={{
+                  bgcolor: '#e5f6fd', // light cyan background
+                  borderLeft: '4px solid #0288d1', // info blue border
+                  color: 'rgba(0, 0, 0, 0.87)', // dark text for readability
+                  '& .MuiAlert-icon': {
+                    color: '#0288d1',
+                  },
+                }}
+              >
+                <Typography variant="subtitle2">
+                  Only the data dictionary will be uploaded to the ENIGMA-PD community drive
+                </Typography>
+                <Typography variant="subtitle2">
+                  Refer to the &quot;Data Dictionary&quot; preview section above to see the exact
+                  content being uploaded.
+                </Typography>
+              </Alert>
+
+              <Button
+                variant="contained"
+                color="primary"
+                endIcon={<CloudUploadIcon />}
+                onClick={() => setUploadDialogOpen(true)}
+                disabled={!schemaValid && !forceAllowDownload}
+                className="mt-4"
+                data-cy="upload-drive-button"
+              >
+                Upload Data Dictionary to {config}
+              </Button>
+            </div>
+            <Divider className="my-6 w-full max-w-2xl" />
+          </>
+        )}
+
         {!schemaValid ? (
           <FormControlLabel
             control={
@@ -185,15 +246,18 @@ function Download() {
           />
         ) : null}
 
-        <Button
-          data-cy="download-datadictionary-button"
-          variant="contained"
-          color={schemaValid ? 'success' : 'warning'}
-          disabled={!schemaValid && !forceAllowDownload}
-          onClick={handleDownload}
-        >
-          Download Data Dictionary
-        </Button>
+        <div className="flex gap-4">
+          <Button
+            data-cy="download-datadictionary-button"
+            variant="contained"
+            color={schemaValid ? 'success' : 'warning'}
+            disabled={!schemaValid && !forceAllowDownload}
+            onClick={handleDownload}
+            endIcon={<DownloadIcon />}
+          >
+            Download Data Dictionary
+          </Button>
+        </div>
       </div>
 
       <Button
@@ -202,9 +266,17 @@ function Download() {
         color="info"
         onClick={handleAnnotatingNewDataset}
         className="mt-4"
+        endIcon={<NoteAddIcon />}
       >
         Annotate a new dataset
       </Button>
+
+      <GoogleDriveUpload
+        open={uploadDialogOpen}
+        onClose={() => setUploadDialogOpen(false)}
+        dataDictionary={dataDictionary}
+        config={config}
+      />
     </div>
   );
 }
