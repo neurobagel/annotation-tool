@@ -1,14 +1,14 @@
 import { useTheme } from '@mui/material/styles';
 import { useEffect } from 'react';
 import AppTitle from './components/AppTitle';
-import ColumnAnnotation from './components/ColumnAnnotation';
-import Download from './components/Download';
-import Landing from './components/Landing';
-import MultiColumnMeasures from './components/MultiColumnMeasures';
+// import ColumnAnnotation from './components/ColumnAnnotation';
+// import Download from './components/Download';
+// import Landing from './components/Landing';
+import MultiColumnMeasures from './components/MockMultiColumnMeasures';
 import NavStepper from './components/NavStepper';
 import NavigationButton from './components/NavigationButton';
-import Upload from './components/Upload';
-import ValueAnnotation from './components/ValueAnnotation';
+// import Upload from './components/Upload';
+// import ValueAnnotation from './components/ValueAnnotation';
 import { useHasMultiColumnMeasures } from './hooks/useHasMultiColumnMeasures';
 import { useUploadedDataTableFileName } from './stores/data';
 import useViewStore, { getNavigationProps } from './stores/view';
@@ -24,7 +24,7 @@ function App() {
   const theme = useTheme();
   const appBarHeight = theme.mixins.toolbar.minHeight || 64;
 
-  const disableConfig = (import.meta.env.NB_DISABLE_CONFIG ?? 'true').toLowerCase() === 'true';
+  // const disableConfig = (import.meta.env.NB_DISABLE_CONFIG ?? 'true').toLowerCase() === 'true';
 
   const { backView, nextView, backLabel, nextLabel, className } = getNavigationProps(
     currentView,
@@ -37,6 +37,7 @@ function App() {
     }
   }, [currentView, hasMultiColumnMeasures, setCurrentView]);
 
+  /*
   const determineView = () => {
     switch (currentView) {
       case View.Landing:
@@ -55,9 +56,11 @@ function App() {
         return <Landing />;
     }
   };
+  */
 
   // Alias for the better readability
-  const content = determineView();
+  // Force Mock for Proposal 1 Review
+  const content = <MultiColumnMeasures />;
 
   return (
     <div
