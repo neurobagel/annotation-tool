@@ -67,20 +67,20 @@ function ValueAnnotation() {
         <Paper
           data-cy="other"
           elevation={3}
-          className="flex h-full items-center justify-center shadow-lg"
+          className="flex h-full flex-col shadow-lg overflow-hidden p-6"
         >
-          <Typography variant="h6" component="div">
+          <Typography variant="h6" component="div" sx={{ mb: 2 }}>
             {`The following column${
               unknownDataTypeColumns.length > 1 ? 's' : ''
             } do not have an assigned data type:`}
-            <List dense sx={{ listStyleType: 'disc', pl: 4 }}>
-              {unknownDataTypeColumns.map((columnId) => (
-                <ListItem key={columnId} sx={{ display: 'list-item' }}>
-                  <ListItemText primary={columnMetadata[columnId]?.name || columnId} />
-                </ListItem>
-              ))}
-            </List>
           </Typography>
+          <List dense sx={{ listStyleType: 'disc', pl: 4, overflowY: 'auto', flexGrow: 1 }}>
+            {unknownDataTypeColumns.map((columnId) => (
+              <ListItem key={columnId} sx={{ display: 'list-item' }}>
+                <ListItemText primary={columnMetadata[columnId]?.name || columnId} />
+              </ListItem>
+            ))}
+          </List>
         </Paper>
       );
     }
