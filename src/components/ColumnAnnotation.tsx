@@ -1,10 +1,13 @@
 import { Box } from '@mui/material';
+import { useCallback, useMemo } from 'react';
 import { useColumns, useDataActions, useStandardizedVariables } from '~/stores/data';
+import { useSearchFilter } from '../hooks/useSearchFilter';
 import { useStandardizedVariableOptions } from '../hooks/useStandardizedVariableOptions';
 import { ColumnAnnotationInstructions } from '../utils/instructions';
 import { DataType } from '../utils/internal_types';
 import ColumnAnnotationCard from './ColumnAnnotationCard';
 import Instruction from './Instruction';
+import SearchFilter from './SearchFilter';
 
 function ColumnAnnotation() {
   const columns = useColumns();
@@ -15,53 +18,71 @@ function ColumnAnnotation() {
     userUpdatesColumnDataType,
   } = useDataActions();
   const standardizedVariableOptions = useStandardizedVariableOptions();
+  const { searchTerm, debouncedSearchTerm, setSearchTerm, clearSearch } = useSearchFilter(300);
 
-  const columnsArray = Object.entries(columns);
+  const handleStandardizedVariableChange = useCallback(
+    (columnId: string, newId: string | null) => {
+      userUpdatesColumnStandardizedVariable(columnId, newId);
+    },
+    [userUpdatesColumnStandardizedVariable]
+  );
 
-  const handleStandardizedVariableChange = (columnId: string, newId: string | null) => {
-    userUpdatesColumnStandardizedVariable(columnId, newId);
-  };
+  const handleDataTypeChange = useCallback(
+    (columnId: string, newDataType: 'Categorical' | 'Continuous' | null) => {
+      let dataType: DataType | null;
+      if (newDataType === 'Categorical') {
+        dataType = DataType.categorical;
+      } else if (newDataType === 'Continuous') {
+        dataType = DataType.continuous;
+      } else {
+        dataType = null;
+      }
+      userUpdatesColumnDataType(columnId, dataType);
+    },
+    [userUpdatesColumnDataType]
+  );
 
-  const handleDataTypeChange = (
-    columnId: string,
-    newDataType: 'Categorical' | 'Continuous' | null
-  ) => {
-    let dataType: DataType | null;
-    if (newDataType === 'Categorical') {
-      dataType = DataType.categorical;
-    } else if (newDataType === 'Continuous') {
-      dataType = DataType.continuous;
-    } else {
-      dataType = null;
-    }
-    userUpdatesColumnDataType(columnId, dataType);
-  };
+  // Memoize the heavy mapping to prevent re-calculating the entire list of columns
+  // on every keystroke in the search filter which causes a re-render.
+  const columnCardData = useMemo(
+    () =>
+      Object.entries(columns).map(([columnId, column]) => {
+        // Data type is editable when:
+        // 1. No standardized variable is selected, OR
+        // 2. The selected standardized variable is a multi-column measure
+        const selectedStandardizedVariable = column.standardizedVariable
+          ? standardizedVariables[column.standardizedVariable]
+          : undefined;
+        const isDataTypeEditable =
+          !column.standardizedVariable ||
+          selectedStandardizedVariable?.is_multi_column_measure === true;
 
-  const columnCardData = columnsArray.map(([columnId, column]) => {
-    // Data type is editable when:
-    // 1. No standardized variable is selected, OR
-    // 2. The selected standardized variable is a multi-column measure
-    const selectedStandardizedVariable = column.standardizedVariable
-      ? standardizedVariables[column.standardizedVariable]
-      : undefined;
-    const isDataTypeEditable =
-      !column.standardizedVariable ||
-      selectedStandardizedVariable?.is_multi_column_measure === true;
+        const inferredDataTypeLabel = isDataTypeEditable
+          ? null
+          : selectedStandardizedVariable?.variable_type || column.dataType || null;
 
-    const inferredDataTypeLabel = isDataTypeEditable
-      ? null
-      : selectedStandardizedVariable?.variable_type || column.dataType || null;
+        return {
+          columnId,
+          name: column.name,
+          description: column.description || null,
+          dataType: column.dataType || null,
+          standardizedVariableId: column.standardizedVariable || null,
+          isDataTypeEditable,
+          inferredDataTypeLabel,
+        };
+      }),
+    [columns, standardizedVariables]
+  );
 
-    return {
-      columnId,
-      name: column.name,
-      description: column.description || null,
-      dataType: column.dataType || null,
-      standardizedVariableId: column.standardizedVariable || null,
-      isDataTypeEditable,
-      inferredDataTypeLabel,
-    };
-  });
+  // Memoize the filtering logic to ensure that we only apply the .filter() operation
+  // when the actual data changes OR when the 300ms debounce timer finishes, preventing
+  // sluggish filtering on every keystroke
+  const filteredColumnCardData = useMemo(() => {
+    const lowerSearchTerm = debouncedSearchTerm.toLowerCase();
+    if (!lowerSearchTerm) return columnCardData;
+
+    return columnCardData.filter((col) => col.name.toLowerCase().includes(lowerSearchTerm));
+  }, [columnCardData, debouncedSearchTerm]);
 
   return (
     <div
@@ -69,10 +90,18 @@ function ColumnAnnotation() {
       data-cy="column-annotation-container"
     >
       <div className="w-full max-w-6xl flex flex-col h-full">
-        <div className="p-4 flex-shrink-0">
+        <div className="p-4 flex-shrink-0 flex flex-col items-start gap-4">
           <Instruction title="Column Annotation" className="mb-0">
             <ColumnAnnotationInstructions />
           </Instruction>
+          <SearchFilter
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            onClear={clearSearch}
+            placeholder="Filter columns by name..."
+            totalCount={columnCardData.length}
+            filteredCount={filteredColumnCardData.length}
+          />
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 pb-4" data-cy="scrollable-container">
@@ -90,23 +119,29 @@ function ColumnAnnotation() {
           </Box>
 
           <div className="space-y-3">
-            {columnCardData.map((columnData) => (
-              <div key={columnData.columnId} className="w-full">
-                <ColumnAnnotationCard
-                  id={columnData.columnId}
-                  name={columnData.name}
-                  description={columnData.description}
-                  dataType={columnData.dataType}
-                  standardizedVariableId={columnData.standardizedVariableId}
-                  standardizedVariableOptions={standardizedVariableOptions}
-                  isDataTypeEditable={columnData.isDataTypeEditable}
-                  inferredDataTypeLabel={columnData.inferredDataTypeLabel}
-                  onDescriptionChange={userUpdatesColumnDescription}
-                  onDataTypeChange={handleDataTypeChange}
-                  onStandardizedVariableChange={handleStandardizedVariableChange}
-                />
+            {filteredColumnCardData.length > 0 ? (
+              filteredColumnCardData.map((columnData) => (
+                <div key={columnData.columnId} className="w-full">
+                  <ColumnAnnotationCard
+                    id={columnData.columnId}
+                    name={columnData.name}
+                    description={columnData.description}
+                    dataType={columnData.dataType}
+                    standardizedVariableId={columnData.standardizedVariableId}
+                    standardizedVariableOptions={standardizedVariableOptions}
+                    isDataTypeEditable={columnData.isDataTypeEditable}
+                    inferredDataTypeLabel={columnData.inferredDataTypeLabel}
+                    onDescriptionChange={userUpdatesColumnDescription}
+                    onDataTypeChange={handleDataTypeChange}
+                    onStandardizedVariableChange={handleStandardizedVariableChange}
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500" data-cy="no-columns-found-message">
+                No columns found matching &quot;{debouncedSearchTerm}&quot;
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>
