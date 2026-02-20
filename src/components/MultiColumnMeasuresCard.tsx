@@ -77,28 +77,28 @@ function MultiColumnMeasuresCard({
               renderOption={(optionProps, option) => {
                 const { key, ...otherProps } = optionProps;
                 return (
-                  // eslint-disable-next-line react/jsx-props-no-spreading
-                  <li key={option.id} {...otherProps}>
-                    <Tooltip
-                      title={option.description || ''}
-                      placement="right"
-                      enterDelay={400}
-                      arrow
-                      slotProps={{
-                        tooltip: {
-                          sx: {
-                            fontSize: '16px',
-                          },
+                  <Tooltip
+                    title={option.description || ''}
+                    placement="right"
+                    enterDelay={400}
+                    arrow
+                    slotProps={{
+                      tooltip: {
+                        sx: {
+                          fontSize: '16px',
                         },
-                      }}
-                    >
+                      },
+                    }}
+                  >
+                    {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+                    <li key={option.id} {...otherProps}>
                       <div className="w-full">
                         {option.abbreviation
                           ? `${option.abbreviation} - ${option.label}`
                           : option.label}
                       </div>
-                    </Tooltip>
-                  </li>
+                    </li>
+                  </Tooltip>
                 );
               }}
               filterOptions={filterOptions}
