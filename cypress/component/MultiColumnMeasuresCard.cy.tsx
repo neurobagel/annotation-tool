@@ -31,10 +31,10 @@ const props = {
     { id: '2', label: 'age', isPartOfCollection: false },
     { id: '3', label: 'sex', isPartOfCollection: false },
   ],
-  onCreateCollection: () => { },
-  onColumnSelect: () => { },
-  onRemoveColumn: () => { },
-  onRemoveCard: () => { },
+  onCreateCollection: () => {},
+  onColumnSelect: () => {},
+  onRemoveColumn: () => {},
+  onRemoveCard: () => {},
 };
 
 const cardWithoutTerm = {
