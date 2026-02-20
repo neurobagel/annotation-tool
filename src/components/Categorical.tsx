@@ -156,13 +156,15 @@ function Categorical({
                       const { key, ...otherProps } = optionProps;
                       return (
                         <Tooltip
-                          data-cy={`${columnID}-${value}-term-tooltip`}
                           title={option.label}
                           placement="right"
                           enterDelay={400}
                           arrow
                           slotProps={{
                             tooltip: {
+                              ...({
+                                'data-cy': `${columnID}-${value}-term-tooltip`,
+                              } as React.HTMLAttributes<HTMLDivElement>),
                               sx: {
                                 fontSize: '16px',
                               },
