@@ -1,3 +1,24 @@
+# v0.5.0 (Fri Feb 13 2026)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Tushar Jamdade ([@Tusharjamdade](https://github.com/Tusharjamdade)), for all your work!
+
+#### 🚀 Enhancements
+
+- [ENH] Implement google drive upload for Enigma-PD [#410](https://github.com/neurobagel/annotation-tool/pull/410) ([@rmanaem](https://github.com/rmanaem) [@surchs](https://github.com/surchs))
+- [ENH] Redesign the column annotation card to reduce the existing whitespace and improve ux [#413](https://github.com/neurobagel/annotation-tool/pull/413) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Improve upload UI to better indicate selected file [#408](https://github.com/neurobagel/annotation-tool/pull/408) ([@Tusharjamdade](https://github.com/Tusharjamdade))
+- [ENH] Improve visual separation between columns in value annotation [#412](https://github.com/neurobagel/annotation-tool/pull/412) ([@Tusharjamdade](https://github.com/Tusharjamdade) [@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 3
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+- Sebastian Urchs ([@surchs](https://github.com/surchs))
+- Tushar Jamdade ([@Tusharjamdade](https://github.com/Tusharjamdade))
+
+---
+
 # v0.4.8 (Tue Dec 23 2025)
 
 #### 🐛 Bug Fixes

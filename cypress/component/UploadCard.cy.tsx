@@ -1,10 +1,9 @@
 import UploadCard from '../../src/components/UploadCard';
 
 const exampleFileName = 'ds003653_participant.tsv';
-const exampleFilePath = `cypress/fixtures/examples/${exampleFileName}`;
 
 function MockPreviewComponent() {
-  return <div data-cy="some title-datatable">Preview Component</div>;
+  return <div data-cy="some-title-datatable">Preview Component</div>;
 }
 
 const props = {
@@ -30,21 +29,17 @@ describe('UploadCard', () => {
         previewComponent={props.previewComponent}
       />
     );
-
-    cy.get('[data-cy="someid-upload-input"]').selectFile(exampleFilePath, { force: true });
   });
 
   it('should render the component correctly', () => {
     cy.get('[data-cy="someid-upload-card"]').should('be.visible');
     cy.get('[data-cy="someid-upload-card"]').should('contain', 'some title');
-    cy.get('[data-cy="someid-upload-card"]').should('contain', 'some display text');
+    cy.get('[data-cy="someid-toggle-preview-button"]').should('be.visible');
   });
 
   it('should open the preview, and verify the data table preview component is rendered', () => {
-    cy.get('[data-cy="someid-uploaded-file-name"]').should('contain', exampleFileName);
-
     cy.get('[data-cy="someid-toggle-preview-button"]').click();
 
-    cy.get('[data-cy="someid-toggle-preview-button"]').should('be.visible');
+    cy.get('[data-cy="some-title-datatable"]').should('be.visible');
   });
 });
