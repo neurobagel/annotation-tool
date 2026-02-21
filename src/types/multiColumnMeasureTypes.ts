@@ -2,6 +2,7 @@ export interface TermDisplay {
   id: string;
   label: string;
   abbreviation?: string;
+  description?: string;
 }
 
 export interface AvailableTerm extends TermDisplay {

@@ -152,27 +152,36 @@ function Categorical({
                       // eslint-disable-next-line react/jsx-props-no-spreading
                       <TextField {...params} variant="standard" size="small" fullWidth />
                     )}
-                    renderOption={(props, option) => (
-                      // eslint-disable-next-line react/jsx-props-no-spreading
-                      <li {...props} data-cy={`${columnID}-${value}-term-dropdown-option`}>
+                    renderOption={(optionProps, option) => {
+                      const { key, ...otherProps } = optionProps;
+                      return (
                         <Tooltip
-                          data-cy={`${columnID}-${value}-term-tooltip`}
                           title={option.label}
                           placement="right"
                           enterDelay={400}
                           arrow
                           slotProps={{
                             tooltip: {
+                              ...({
+                                'data-cy': `${columnID}-${value}-term-tooltip`,
+                              } as React.HTMLAttributes<HTMLDivElement>),
                               sx: {
                                 fontSize: '16px',
                               },
                             },
                           }}
                         >
-                          <div className="w-full truncate">{option.label}</div>
+                          <li
+                            key={option.id}
+                            // eslint-disable-next-line react/jsx-props-no-spreading
+                            {...otherProps}
+                            data-cy={`${columnID}-${value}-term-dropdown-option`}
+                          >
+                            <div className="w-full truncate">{option.label}</div>
+                          </li>
                         </Tooltip>
-                      </li>
-                    )}
+                      );
+                    }}
                     slotProps={{
                       listbox: {
                         component: VirtualListbox,

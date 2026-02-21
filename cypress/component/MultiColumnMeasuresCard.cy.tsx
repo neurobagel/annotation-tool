@@ -205,4 +205,45 @@ describe('Card mapping dropdown', () => {
     cy.get('[role="option"]').should('have.length', 1);
     cy.get('[role="option"]').first().should('contain', 'Stroop Color-Word Test');
   });
+
+  it('should display a tooltip with the term description when hovering over a dropdown option', () => {
+    const availableTermsWithDescription = [
+      {
+        id: 'nb:one',
+        label: 'Term with description',
+        description: 'Description for term one',
+        disabled: false,
+      },
+      {
+        id: 'nb:two',
+        label: 'Term without description',
+        disabled: false,
+      },
+    ];
+
+    cy.mount(
+      <MultiColumnMeasuresCard
+        card={cardWithoutTerm}
+        cardIndex={1}
+        mappedColumnHeaders={props.mappedColumnHeaders}
+        availableTerms={availableTermsWithDescription}
+        columnOptions={props.columnOptions}
+        onCreateCollection={props.onCreateCollection}
+        onColumnSelect={props.onColumnSelect}
+        onRemoveColumn={props.onRemoveColumn}
+        onRemoveCard={props.onRemoveCard}
+      />
+    );
+
+    cy.get('[data-cy="multi-column-measures-card-1-title-dropdown"]').click();
+
+    cy.get('li[role="option"]').contains('Term with description').trigger('mouseover');
+    cy.get('.MuiTooltip-tooltip').should('be.visible').and('contain', 'Description for term one');
+
+    cy.get('li[role="option"]').contains('Term with description').trigger('mouseout');
+    cy.get('.MuiTooltip-tooltip').should('not.exist');
+
+    cy.get('li[role="option"]').contains('Term without description').trigger('mouseover');
+    cy.get('.MuiTooltip-tooltip').should('not.exist');
+  });
 });
