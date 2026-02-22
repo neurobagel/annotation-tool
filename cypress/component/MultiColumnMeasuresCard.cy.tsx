@@ -60,6 +60,7 @@ describe('MultiColumnMeasuresCard', () => {
     );
     cy.get('[data-cy=multi-column-measures-card-1]').should('be.visible');
     cy.get('[data-cy=multi-column-measures-card-1]').should('be.visible').and('contain', 'cool');
+    cy.get('[data-cy=collapse-card-1-button]').click();
     cy.get('[data-cy=multi-column-measures-card-1-columns-dropdown]').should('be.visible');
     cy.get('[data-cy=mapped-column-1]').should('be.visible').and('contain', 'participant_id');
   });
@@ -79,6 +80,7 @@ describe('MultiColumnMeasuresCard', () => {
         onRemoveCard={props.onRemoveCard}
       />
     );
+    cy.get('[data-cy=collapse-card-1-button]').click();
     cy.get('[data-cy=multi-column-measures-card-1-columns-dropdown]').type('age{downArrow}{enter}');
     cy.get('@onColumnSelect').should('have.been.calledWith', 'nb:coolTerm', '2');
   });
@@ -98,6 +100,7 @@ describe('MultiColumnMeasuresCard', () => {
         onRemoveCard={props.onRemoveCard}
       />
     );
+    cy.get('[data-cy=collapse-card-1-button]').click();
 
     cy.get('[data-cy=mapped-column-1] svg').click();
     cy.get('@onRemoveColumn').should('have.been.calledWith', '1');
@@ -141,6 +144,8 @@ describe('MultiColumnMeasuresCard', () => {
         onRemoveCard={props.onRemoveCard}
       />
     );
+    cy.get('[data-cy=collapse-card-1-button]').click();
+
     cy.get('[data-cy=multi-column-measures-card-1-columns-dropdown]').type(
       'my happy{downArrow}{enter}'
     );
