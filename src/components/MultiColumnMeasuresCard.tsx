@@ -169,6 +169,8 @@ function MultiColumnMeasuresCard({
                 options={columnOptions}
                 inputValue={inputQueryString}
                 onInputChange={(_, newInputValue, reason) => {
+                  // We want to make sure we only update the text in the dropdown
+                  // when the user types, not when the user makes a selection
                   if (reason === 'input' || reason === 'clear') {
                     setInputQueryString(newInputValue);
                   }
