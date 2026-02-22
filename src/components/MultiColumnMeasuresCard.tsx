@@ -1,15 +1,16 @@
 import CancelIcon from '@mui/icons-material/Cancel';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   Card,
-  CardContent,
-  CardHeader,
-  Divider,
   Chip,
   IconButton,
   Typography,
   Autocomplete,
   TextField,
   Tooltip,
+  Collapse,
+  Box,
 } from '@mui/material';
 import { matchSorter, rankings } from 'match-sorter';
 import { useState } from 'react';
@@ -39,6 +40,7 @@ function MultiColumnMeasuresCard({
   onRemoveCard,
 }: TermCardProps) {
   const [inputQueryString, setInputQueryString] = useState('');
+  const [expanded, setExpanded] = useState(card.mappedColumns.length === 0);
 
   const filterOptions = (items: AvailableTerm[], { inputValue }: { inputValue: string }) =>
     matchSorter(items, inputValue, {
@@ -51,15 +53,29 @@ function MultiColumnMeasuresCard({
 
   return (
     <Card
-      elevation={3}
-      className="w-full shadow-lg"
+      elevation={0}
+      sx={{
+        mb: 1.5,
+        border: '1px solid',
+        borderColor: 'grey.300',
+        borderRadius: 1.5,
+      }}
       data-cy={`multi-column-measures-card-${cardIndex}`}
     >
-      <CardHeader
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          px: 1.5,
+          py: 1,
+          bgcolor: 'grey.50',
+        }}
         data-cy={`multi-column-measures-card-${cardIndex}-header`}
-        title={
-          card.term ? (
-            <Typography variant="h6" className="font-bold">
+      >
+        <Box sx={{ flexGrow: 1, mr: 2 }}>
+          {card.term ? (
+            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.primary' }}>
               {card.term.abbreviation
                 ? `${card.term.abbreviation} - ${card.term.label}`
                 : card.term.label}
@@ -91,11 +107,13 @@ function MultiColumnMeasuresCard({
                     }}
                   >
                     {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-                    <li key={option.id} {...otherProps}>
+                    <li key={option.id} {...otherProps} style={{ padding: '4px 8px' }}>
                       <div className="w-full">
-                        {option.abbreviation
-                          ? `${option.abbreviation} - ${option.label}`
-                          : option.label}
+                        <Typography variant="body2">
+                          {option.abbreviation
+                            ? `${option.abbreviation} - ${option.label}`
+                            : option.label}
+                        </Typography>
                       </div>
                     </li>
                   </Tooltip>
@@ -110,25 +128,43 @@ function MultiColumnMeasuresCard({
                   variant="outlined"
                   size="small"
                   fullWidth
+                  sx={{
+                    bgcolor: 'background.paper',
+                    '& .MuiInputBase-root': { py: 0 },
+                  }}
                 />
               )}
             />
-          )
-        }
-        action={
-          <IconButton onClick={onRemoveCard} data-cy={`remove-card-${cardIndex}-button`}>
-            <CancelIcon color="error" />
+          )}
+        </Box>
+
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          {card.term && (
+            <IconButton
+              size="small"
+              onClick={() => setExpanded(!expanded)}
+              data-cy={`collapse-card-${cardIndex}-button`}
+            >
+              {expanded ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
+            </IconButton>
+          )}
+          <IconButton
+            size="small"
+            onClick={onRemoveCard}
+            data-cy={`remove-card-${cardIndex}-button`}
+          >
+            <CancelIcon color="error" fontSize="small" />
           </IconButton>
-        }
-        className="bg-gray-50"
-      />
+        </Box>
+      </Box>
+
       {card.term && (
-        <>
-          <Divider />
-          <CardContent>
-            <div className="mt-4">
+        <Collapse in={expanded} timeout="auto" unmountOnExit>
+          <Box sx={{ p: 1.5, borderTop: '1px solid', borderColor: 'grey.200' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
               <Autocomplete
                 disableCloseOnSelect
+                size="small"
                 data-cy={`multi-column-measures-card-${cardIndex}-columns-dropdown`}
                 options={columnOptions}
                 inputValue={inputQueryString}
@@ -152,38 +188,43 @@ function MultiColumnMeasuresCard({
                     {...params}
                     label="Select column(s) to map"
                     variant="outlined"
-                    size="small"
                     fullWidth
                   />
                 )}
               />
-            </div>
-            <div className="flex flex-wrap gap-2 mt-4">
-              <Typography variant="subtitle1" className="mb-2 font-bold text-gray-700">
-                Mapped Columns:
-              </Typography>
-              {card.mappedColumns.map((columnId) => (
-                <Chip
-                  data-cy={`mapped-column-${columnId}`}
-                  key={columnId}
-                  label={mappedColumnHeaders[columnId] || `Column ${columnId}`}
-                  onDelete={() => onRemoveColumn(columnId)}
-                  color="primary"
-                  variant="outlined"
-                  sx={{
-                    width: 'fit-content',
-                    maxWidth: '100%',
-                    '& .MuiChip-label': {
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    },
-                  }}
-                />
-              ))}
-            </div>
-          </CardContent>
-        </>
+
+              <Box
+                sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center', mt: 0.5 }}
+              >
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                  Mapped Columns:
+                </Typography>
+                {card.mappedColumns.map((columnId) => (
+                  <Chip
+                    size="small"
+                    data-cy={`mapped-column-${columnId}`}
+                    key={columnId}
+                    label={mappedColumnHeaders[columnId] || `Column ${columnId}`}
+                    onDelete={() => onRemoveColumn(columnId)}
+                    color="primary"
+                    variant="outlined"
+                    sx={{
+                      height: '24px',
+                      maxWidth: '100%',
+                      '& .MuiChip-label': {
+                        px: 1,
+                        fontSize: '0.75rem',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      },
+                    }}
+                  />
+                ))}
+              </Box>
+            </Box>
+          </Box>
+        </Collapse>
       )}
     </Card>
   );

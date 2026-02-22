@@ -115,6 +115,7 @@ describe('Multi-Column Measure Column Annotation Regression', () => {
 
     // Return to Multi-Column Measures and verify the new column appears as an option
     cy.get('[data-cy="next-button"]').click();
+    cy.get('[data-cy="collapse-card-0-button"]').click();
 
     cy.get('[data-cy="multi-column-measures-card-0-columns-dropdown"]').click();
     cy.get('[role="option"]').contains('group').should('be.visible');
