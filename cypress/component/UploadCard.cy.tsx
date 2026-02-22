@@ -42,4 +42,18 @@ describe('UploadCard', () => {
 
     cy.get('[data-cy="some-title-datatable"]').should('be.visible');
   });
+  it('should show an error alert when an invalid JSON file is uploaded', () => {
+    cy.get('input[type="file"]').selectFile(
+      {
+        contents: Cypress.Buffer.from('{"invalidJson": '),
+        fileName: 'bad.json',
+        mimeType: 'application/json',
+      },
+      { force: true }
+    );
+
+    cy.contains('Invalid JSON file uploaded. Please check the file for syntax errors.').should(
+      'be.visible'
+    );
+  });
 });
