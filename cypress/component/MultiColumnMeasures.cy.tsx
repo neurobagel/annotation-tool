@@ -84,6 +84,7 @@ describe('MultiColumnMeasures', () => {
     cy.get('[data-cy="multi-column-measures-card-0"]').should('be.visible');
     cy.get('[data-cy="remove-card-0-button"]').should('be.visible');
     cy.get('[data-cy="multi-column-measures-card-0-header"]').should('contain', 'some term');
+    cy.get('[data-cy="collapse-card-0-button"]').click();
     cy.get('[data-cy="mapped-column-1"]').should('be.visible').and('contain', 'some column');
     cy.get('[data-cy="multi-column-measures-columns-side-bar"]')
       .should('be.visible')
@@ -112,6 +113,7 @@ describe('MultiColumnMeasures', () => {
   });
 
   it('should unmap a column when its chip is removed', () => {
+    cy.get('[data-cy="collapse-card-0-button"]').click();
     cy.get('[data-cy="mapped-column-1"]').should('be.visible').and('contain', 'some column');
     cy.get('[data-cy="mapped-column-1"] svg').click();
     cy.get('@userUpdatesColumnToCollectionMappingSpy').should('have.been.calledWith', '1', null);

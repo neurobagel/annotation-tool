@@ -365,6 +365,7 @@ describe('Main user flow', () => {
       'contain.text',
       'Previous IQ assessment by pronunciation'
     );
+    cy.get('[data-cy="collapse-card-0-button"]').click();
     cy.get('[data-cy="mapped-column-5"]').should('be.visible').and('contain', 'iq');
     cy.get('[data-cy="multi-column-measures"]').should('contain.text', '1 column assigned');
     cy.get('[data-cy="next-button"]').click();

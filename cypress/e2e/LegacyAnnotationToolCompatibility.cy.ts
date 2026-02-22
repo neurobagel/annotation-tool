@@ -79,6 +79,7 @@ describe('Legacy Annotation Tool Compatibility', () => {
     cy.get('[data-cy="multi-column-measures"]').should('contain.text', '3 columns assigned');
 
     cy.get('[data-cy="multi-column-measures-card-0"]').should('be.visible');
+    cy.get('[data-cy="collapse-card-0-button"]').click();
     cy.get('[data-cy="mapped-column-5"]').should('be.visible').and('contain', 'tool1_item1');
     cy.get('[data-cy="mapped-column-6"]').should('be.visible').and('contain', 'tool1_item2');
     cy.get('[data-cy="multi-column-measures-card-0-header"]').should(
@@ -91,6 +92,7 @@ describe('Legacy Annotation Tool Compatibility', () => {
       .and('contain.text', 'tool1_item2');
 
     cy.get('[data-cy="multi-column-measures-card-1"]').should('be.visible');
+    cy.get('[data-cy="collapse-card-1-button"]').click();
     cy.get('[data-cy="mapped-column-7"]').should('be.visible').and('contain', 'tool2_item1');
     cy.get('[data-cy="multi-column-measures-card-1-header"]').should(
       'contain.text',
