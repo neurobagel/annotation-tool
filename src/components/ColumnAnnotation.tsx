@@ -1,4 +1,5 @@
-import { Box, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { Box, ToggleButton, ToggleButtonGroup, Typography, Chip } from '@mui/material';
 import { useState } from 'react';
 import { useColumns, useDataActions, useStandardizedVariables } from '~/stores/data';
 import { useStandardizedVariableOptions } from '../hooks/useStandardizedVariableOptions';
@@ -158,7 +159,21 @@ function ColumnAnnotation() {
           <div className="space-y-3">
             {filteredColumnCardData.length > 0 ? (
               filteredColumnCardData.map((columnData) => (
-                <div key={columnData.columnId} className="w-full">
+                <div key={columnData.columnId} className="w-full relative">
+                  {/* --- START: VISUAL MARKER (Issue #429) --- */}
+                  {columnData.standardizedVariableId !== null && (
+                    <Box className="absolute -top-3 left-4 z-20">
+                      <Chip
+                        icon={<CheckCircleIcon fontSize="small" />}
+                        label="Annotated"
+                        color="success"
+                        size="small"
+                        variant="filled"
+                        className="shadow-sm"
+                      />
+                    </Box>
+                  )}
+                  {/* --- END: VISUAL MARKER --- */}
                   <ColumnAnnotationCard
                     id={columnData.columnId}
                     name={columnData.name}
