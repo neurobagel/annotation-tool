@@ -10,14 +10,24 @@ import {
     Button,
     Autocomplete,
     TextField,
-    Tooltip
+    Tooltip,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    ToggleButton,
+    ToggleButtonGroup
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CancelIcon from '@mui/icons-material/Cancel';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+import TableRowsIcon from '@mui/icons-material/TableRows';
+import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import { matchSorter, rankings } from 'match-sorter';
 import MockMultiColumnMeasuresColumnsSidebar from './MockMultiColumnMeasuresColumnsSidebar';
 import MockToolLibrary from './MockToolLibrary';
+import DescriptionEditor from './DescriptionEditor';
 import assessmentData from '../assets/default_config/assessment.json';
 
 // -- Mock Data --
@@ -52,13 +62,25 @@ const ALL_TERMS = assessmentData.flatMap(vocab =>
     }))
 );
 
+type ColumnMetadata = {
+    description: string;
+    dataType: 'Continuous' | 'Categorical' | null;
+};
+
 export default function MockMultiColumnMeasures() {
     // State
-    const [cards, setCards] = useState<{ id: string, termId: string | null, termLabel?: string, mappedColumns: string[] }[]>([
-        // Start empty to show the "Proposal 1" flow
-        // Or maybe one pre-filled example?
-        // { id: 'card_1', termId: 'snomed:123', termLabel: 'Wechsler Intelligence Scale for Children', mappedColumns: ['wisc_vocab'] }
+    const [cards, setCards] = useState<{
+        id: string,
+        termId: string | null,
+        termLabel?: string,
+        mappedColumns: string[],
+        viewMode: 'list' | 'table'
+    }[]>([
+        // Start empty
     ]);
+
+    // Metadata state: Keyed by column ID for simplicity in mock
+    const [columnMetadata, setColumnMetadata] = useState<Record<string, ColumnMetadata>>({});
 
     const [isLibraryOpen, setIsLibraryOpen] = useState(false);
     const [activeCardIdForSelection, setActiveCardIdForSelection] = useState<string | null>(null);
@@ -66,14 +88,11 @@ export default function MockMultiColumnMeasures() {
     // Derived
     const allMappedColumns = new Set(cards.flatMap(c => c.mappedColumns));
 
-
     // -- Handlers --
 
     const handleAssignColumnsToCard = (cardId: string, colIds: string[]) => {
         setCards(cards.map(c => {
             if (c.id === cardId) {
-                // Filter out columns effectively "stolen" from other cards? 
-                // For this mock, let's assume valid unassigned columns are passed
                 const newCols = [...new Set([...c.mappedColumns, ...colIds])];
                 return { ...c, mappedColumns: newCols };
             }
@@ -110,11 +129,25 @@ export default function MockMultiColumnMeasures() {
 
     const handleAddNewCard = () => {
         const newId = `card_${Date.now()}`;
-        setCards([...cards, { id: newId, termId: null, mappedColumns: [] }]);
+        setCards([...cards, { id: newId, termId: null, mappedColumns: [], viewMode: 'list' }]);
     };
 
     const handleRemoveCard = (id: string) => {
         setCards(cards.filter(c => c.id !== id));
+    };
+
+    const toggleCardViewMode = (cardId: string) => {
+        setCards(cards.map(c => c.id === cardId ? { ...c, viewMode: c.viewMode === 'list' ? 'table' : 'list' } : c));
+    };
+
+    const updateColumnMetadata = (colId: string, field: keyof ColumnMetadata, value: any) => {
+        setColumnMetadata(prev => ({
+            ...prev,
+            [colId]: {
+                ...prev[colId] || { description: '', dataType: 'Continuous' },
+                [field]: value
+            }
+        }));
     };
 
     return (
@@ -214,40 +247,122 @@ export default function MockMultiColumnMeasures() {
                                                 )
                                             }
                                             action={
-                                                <IconButton onClick={() => handleRemoveCard(card.id)}>
-                                                    <CancelIcon color="error" />
-                                                </IconButton>
+                                                <div className="flex gap-1">
+                                                    <Tooltip title={card.viewMode === 'list' ? "Switch to Table View (Edit Details)" : "Switch to Chip View"}>
+                                                        <IconButton onClick={() => toggleCardViewMode(card.id)} color={card.viewMode === 'table' ? 'primary' : 'default'}>
+                                                            {card.viewMode === 'list' ? <TableRowsIcon /> : <ViewModuleIcon />}
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                    <IconButton onClick={() => handleRemoveCard(card.id)}>
+                                                        <CancelIcon color="error" />
+                                                    </IconButton>
+                                                </div>
                                             }
                                             className="bg-gray-50 border-b"
                                         />
                                         <CardContent>
-                                            <Typography variant="subtitle2" className="mb-2 text-gray-600 font-bold uppercase text-xs tracking-wider">
-                                                Mapped Columns ({card.mappedColumns.length})
-                                            </Typography>
-
-                                            <div className="flex flex-wrap gap-2 min-h-[60px] p-4 bg-gray-50 rounded border-2 border-dashed border-gray-300 transition-all">
-                                                {card.mappedColumns.length === 0 && (
-                                                    <div className="w-full text-center py-2 flex flex-col items-center justify-center text-gray-400">
-                                                        <Typography variant="caption">
-                                                            Drag Unassigned Columns Here
-                                                        </Typography>
-                                                    </div>
-                                                )}
-                                                {card.mappedColumns.map(colId => {
-                                                    const col = INITIAL_COLUMNS.find(c => c.id === colId);
-                                                    return (
-                                                        <Chip
-                                                            key={colId}
-                                                            label={col?.header || colId}
-                                                            size="medium"
-                                                            onDelete={() => handleUnassignColumn(card.id, colId)}
-                                                            color="secondary"
-                                                            variant="filled"
-                                                            className="shadow-sm"
-                                                        />
-                                                    )
-                                                })}
+                                            <div className="flex justify-between items-center mb-2">
+                                                <Typography variant="subtitle2" className="text-gray-600 font-bold uppercase text-xs tracking-wider">
+                                                    Mapped Columns ({card.mappedColumns.length})
+                                                </Typography>
                                             </div>
+
+                                            {card.viewMode === 'list' ? (
+                                                <div className="flex flex-wrap gap-2 min-h-[60px] p-4 bg-gray-50 rounded border-2 border-dashed border-gray-300 transition-all">
+                                                    {card.mappedColumns.length === 0 && (
+                                                        <div className="w-full text-center py-2 flex flex-col items-center justify-center text-gray-400">
+                                                            <Typography variant="caption">
+                                                                Drag Unassigned Columns Here
+                                                            </Typography>
+                                                        </div>
+                                                    )}
+                                                    {card.mappedColumns.map(colId => {
+                                                        const col = INITIAL_COLUMNS.find(c => c.id === colId);
+                                                        return (
+                                                            <Chip
+                                                                key={colId}
+                                                                label={col?.header || colId}
+                                                                size="medium"
+                                                                onDelete={() => handleUnassignColumn(card.id, colId)}
+                                                                color="secondary"
+                                                                variant="filled"
+                                                                className="shadow-sm"
+                                                            />
+                                                        )
+                                                    })}
+                                                </div>
+                                            ) : (
+                                                <div className="overflow-x-auto border border-gray-200 rounded">
+                                                    <Table size="small">
+                                                        <TableHead className="bg-gray-100">
+                                                            <TableRow>
+                                                                <TableCell width="25%">Column</TableCell>
+                                                                <TableCell width="45%">Description</TableCell>
+                                                                <TableCell width="25%">Data Type</TableCell>
+                                                                <TableCell width="5%" align="right">Actions</TableCell>
+                                                            </TableRow>
+                                                        </TableHead>
+                                                        <TableBody>
+                                                            {card.mappedColumns.map(colId => {
+                                                                const col = INITIAL_COLUMNS.find(c => c.id === colId);
+                                                                const meta = columnMetadata[colId] || { description: '', dataType: 'Continuous' };
+
+                                                                return (
+                                                                    <TableRow key={colId}>
+                                                                        <TableCell className="font-medium text-gray-700 align-top pt-4">
+                                                                            {col?.header || colId}
+                                                                        </TableCell>
+                                                                        <TableCell className="align-top">
+                                                                            <div className="w-full mt-1">
+                                                                                <DescriptionEditor
+                                                                                    description={meta.description}
+                                                                                    onDescriptionChange={(_, val) => updateColumnMetadata(colId, 'description', val)}
+                                                                                    columnID={colId}
+                                                                                />
+                                                                            </div>
+                                                                        </TableCell>
+                                                                        <TableCell className="align-top pt-3">
+                                                                            <ToggleButtonGroup
+                                                                                value={meta.dataType}
+                                                                                exclusive
+                                                                                onChange={(_, val) => {
+                                                                                    if (val) updateColumnMetadata(colId, 'dataType', val)
+                                                                                }}
+                                                                                size="small"
+                                                                                color="primary"
+                                                                                className="shadow-sm w-full flex"
+                                                                            >
+                                                                                <Tooltip title="Categorical" arrow>
+                                                                                    <ToggleButton value="Categorical" className="flex-1 w-1/2 px-2 py-1">
+                                                                                        <span className="text-xs font-semibold">Cat.</span>
+                                                                                    </ToggleButton>
+                                                                                </Tooltip>
+                                                                                <Tooltip title="Continuous" arrow>
+                                                                                    <ToggleButton value="Continuous" className="flex-1 w-1/2 px-2 py-1">
+                                                                                        <span className="text-xs font-semibold">Cont.</span>
+                                                                                    </ToggleButton>
+                                                                                </Tooltip>
+                                                                            </ToggleButtonGroup>
+                                                                        </TableCell>
+                                                                        <TableCell align="right" className="align-top pt-3">
+                                                                            <IconButton size="small" onClick={() => handleUnassignColumn(card.id, colId)}>
+                                                                                <CancelIcon fontSize="small" color="action" />
+                                                                            </IconButton>
+                                                                        </TableCell>
+                                                                    </TableRow>
+                                                                );
+                                                            })}
+                                                            {card.mappedColumns.length === 0 && (
+                                                                <TableRow>
+                                                                    <TableCell colSpan={4} align="center" className="text-gray-400 italic py-4">
+                                                                        No columns mapped. Drag items here to populate.
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            )}
+                                                        </TableBody>
+                                                    </Table>
+                                                </div>
+                                            )}
                                         </CardContent>
                                     </Card>
                                 )

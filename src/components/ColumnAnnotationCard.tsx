@@ -6,6 +6,7 @@ import {
   Autocomplete,
   Tooltip,
   TextField,
+  Chip,
 } from '@mui/material';
 import { DataType } from '~/utils/internal_types';
 import { StandardizedVariableOption } from '../hooks/useStandardizedVariableOptions';
@@ -20,6 +21,10 @@ interface ColumnAnnotationCardProps {
   standardizedVariableOptions: StandardizedVariableOption[];
   isDataTypeEditable: boolean;
   inferredDataTypeLabel: string | null;
+  term?: string | null;
+  termLabel?: string | null;
+  selected?: boolean;
+  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
   onDescriptionChange: (columnId: string, newDescription: string | null) => void;
   onDataTypeChange: (columnId: string, newDataType: 'Categorical' | 'Continuous' | null) => void;
   onStandardizedVariableChange: (columnId: string, newId: string | null) => void;
@@ -34,6 +39,9 @@ function ColumnAnnotationCard({
   standardizedVariableOptions,
   isDataTypeEditable,
   inferredDataTypeLabel,
+  termLabel,
+  selected = false,
+  onClick,
   onDescriptionChange,
   onDataTypeChange,
   onStandardizedVariableChange,
@@ -46,16 +54,22 @@ function ColumnAnnotationCard({
   return (
     <div
       data-cy={`${id}-column-annotation-card`}
-      className="w-full bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200"
+      onClick={onClick}
+      className={`select-none w-full rounded-lg border shadow-sm transition-all duration-200 ${selected ? 'bg-blue-50 border-blue-400 shadow-md ring-1 ring-blue-300' : 'bg-white border-gray-200 hover:border-blue-300 hover:shadow'
+        }`}
+      style={{ cursor: onClick ? 'pointer' : 'default' }}
     >
-      <div className="w-full bg-gray-50 px-4 py-2 border-b border-gray-200 flex items-center">
+      <div className={`w-full px-4 py-2 border-b flex items-center justify-between ${selected ? 'bg-blue-50/50 border-blue-200' : 'bg-gray-50 border-gray-200'}`}>
         <Typography variant="subtitle2" className="font-bold text-gray-900 truncate" title={name}>
           {name}
         </Typography>
+        {termLabel && (
+          <Chip label={termLabel} size="small" color="primary" variant="outlined" />
+        )}
       </div>
 
       <div className="grid grid-cols-[6fr_1fr_3fr] gap-4 px-4 py-3 items-center">
-        <div className="w-full min-w-0">
+        <div className="w-full min-w-0" onClick={(e) => e.stopPropagation()}>
           <DescriptionEditor
             description={description}
             onDescriptionChange={onDescriptionChange}
@@ -63,7 +77,7 @@ function ColumnAnnotationCard({
           />
         </div>
 
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
           {isDataTypeEditable ? (
             <ToggleButtonGroup
               data-cy={`${id}-column-annotation-card-data-type`}
@@ -117,7 +131,7 @@ function ColumnAnnotationCard({
           )}
         </div>
 
-        <div className="flex-shrink-0 w-full">
+        <div className="flex-shrink-0 w-full" onClick={(e) => e.stopPropagation()}>
           <Autocomplete
             data-cy={`${id}-column-annotation-card-standardized-variable-dropdown`}
             value={selectedOption}

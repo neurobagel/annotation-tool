@@ -4,7 +4,8 @@ import AppTitle from './components/AppTitle';
 // import ColumnAnnotation from './components/ColumnAnnotation';
 // import Download from './components/Download';
 // import Landing from './components/Landing';
-import MultiColumnMeasures from './components/MockMultiColumnMeasures';
+// import MultiColumnMeasures from './components/MockMultiColumnMeasures';
+import MockColumnAnnotation from './components/MockColumnAnnotation';
 import NavStepper from './components/NavStepper';
 import NavigationButton from './components/NavigationButton';
 // import Upload from './components/Upload';
@@ -60,7 +61,10 @@ function App() {
 
   // Alias for the better readability
   // Force Mock for Proposal 1 Review
-  const content = <MultiColumnMeasures />;
+  // const content = <MultiColumnMeasures />;
+
+  // Force Mock for Proposal 2 Review
+  const content = <MockColumnAnnotation />;
 
   return (
     <div
