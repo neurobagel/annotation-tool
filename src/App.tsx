@@ -4,6 +4,7 @@ import AppTitle from './components/AppTitle';
 import ColumnAnnotation from './components/ColumnAnnotation';
 import Download from './components/Download';
 import Landing from './components/Landing';
+import MappingSuggestionsDock from './components/MappingSuggestionsDock';
 import MultiColumnMeasures from './components/MultiColumnMeasures';
 import NavStepper from './components/NavStepper';
 import NavigationButton from './components/NavigationButton';
@@ -13,6 +14,7 @@ import { useHasMultiColumnMeasures } from './hooks/useHasMultiColumnMeasures';
 import { useUploadedDataTableFileName } from './stores/data';
 import useViewStore, { getNavigationProps } from './stores/view';
 import { View } from './utils/internal_types';
+import { isLlmSuggestionsEnabled } from './utils/llm-utils';
 
 function App() {
   const currentView = useViewStore((state) => state.currentView);
@@ -79,6 +81,9 @@ function App() {
       )}
 
       {content}
+      {currentView === View.ColumnAnnotation && isLlmSuggestionsEnabled() && (
+        <MappingSuggestionsDock />
+      )}
 
       {currentView !== View.Landing && (
         <div className="mt-auto">
