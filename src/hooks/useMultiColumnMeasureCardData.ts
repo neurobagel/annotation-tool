@@ -33,6 +33,7 @@ export function useMultiColumnMeasureCardData(
                 id: card.term.id,
                 label: card.term.label,
                 abbreviation: card.term.abbreviation,
+                description: card.term.description,
               }
             : null,
           mappedColumns: card.mappedColumns,

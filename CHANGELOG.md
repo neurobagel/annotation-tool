@@ -1,3 +1,15 @@
+# v0.5.1 (Sat Feb 21 2026)
+
+#### 🚀 Enhancements
+
+- [ENH] Display assessment term descriptions during multi-measure column annotation [#433](https://github.com/neurobagel/annotation-tool/pull/433) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.5.0 (Fri Feb 13 2026)
 
 :tada: This release contains work from a new contributor! :tada:
