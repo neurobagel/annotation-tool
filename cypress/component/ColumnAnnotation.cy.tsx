@@ -90,6 +90,9 @@ describe('ColumnAnnotation', () => {
     cy.get('[data-cy="1-column-annotation-card"]').should('be.visible');
   });
   it('edits the description', () => {
+    cy.spy(useDataStore.getState().actions, 'userUpdatesColumnDescription').as(
+      'userUpdatesColumnDescription'
+    );
     cy.mount(<ColumnAnnotation />);
     cy.get('[data-cy="1-description"] textarea')
       .first()
@@ -97,7 +100,7 @@ describe('ColumnAnnotation', () => {
       .should('be.visible');
     cy.get('@descriptionTextarea').clear();
     cy.get('@descriptionTextarea').type('new description');
-    cy.get('@descriptionTextarea').should('have.value', 'new description');
+    cy.get('@userUpdatesColumnDescription').should('have.been.calledWith', '1', 'new description');
   });
   it('toggles the data type between categorical and continuous', () => {
     cy.mount(<ColumnAnnotation />);
@@ -151,6 +154,9 @@ describe('ColumnAnnotation', () => {
   });
 
   it('allows editing a column while filtered', () => {
+    cy.spy(useDataStore.getState().actions, 'userUpdatesColumnDescription').as(
+      'userUpdatesColumnDescription'
+    );
     cy.mount(<ColumnAnnotation />);
 
     cy.get('[data-cy="search-filter-input"]').type('another');
@@ -160,11 +166,13 @@ describe('ColumnAnnotation', () => {
       '{selectall}{backspace}Edited description while filtered'
     );
 
-    cy.get('[data-cy="search-filter-clear"]').click();
-    cy.get('[data-cy="search-filter-counter"]').should('contain', '4 of 4');
-    cy.get('[data-cy="2-description"] textarea').should(
-      'have.value',
+    cy.get('@userUpdatesColumnDescription').should(
+      'have.been.calledWith',
+      '2',
       'Edited description while filtered'
     );
+
+    cy.get('[data-cy="search-filter-clear"]').click();
+    cy.get('[data-cy="search-filter-counter"]').should('contain', '4 of 4');
   });
 });
