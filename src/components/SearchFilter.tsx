@@ -6,9 +6,11 @@ interface SearchFilterProps {
   value: string;
   onChange: (value: string) => void;
   onClear: () => void;
+  // eslint-disable-next-line react/require-default-props
   placeholder?: string;
   showingCount: number;
   totalCount: number;
+  // eslint-disable-next-line react/require-default-props
   className?: string;
 }
 
@@ -19,7 +21,7 @@ export default function SearchFilter({
   placeholder = 'Filter items...',
   showingCount,
   totalCount,
-  className,
+  className = '',
 }: SearchFilterProps) {
   return (
     <div className={`w-full max-w-md ${className || ''}`}>

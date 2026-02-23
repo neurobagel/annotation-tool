@@ -67,7 +67,8 @@ type ColumnMetadata = {
     dataType: 'Continuous' | 'Categorical' | null;
 };
 
-export default function MockMultiColumnMeasures() {
+// eslint-disable-next-line react/require-default-props
+export default function MockMultiColumnMeasures({ onToggleMock }: { onToggleMock?: () => void }) {
     // State
     const [cards, setCards] = useState<{
         id: string,
@@ -103,11 +104,11 @@ export default function MockMultiColumnMeasures() {
     const handleUnassignColumn = (cardId: string, columnId: string) => {
         setCards(cards.map(c => {
             if (c.id === cardId) {
-                return { ...c, mappedColumns: c.mappedColumns.filter(id => id !== columnId) }
+                return { ...c, mappedColumns: c.mappedColumns.filter(id => id !== columnId) };
             }
             return c;
-        }))
-    }
+        }));
+    };
 
     const handleOpenLibraryForCard = (cardId: string) => {
         setActiveCardIdForSelection(cardId);
@@ -140,6 +141,7 @@ export default function MockMultiColumnMeasures() {
         setCards(cards.map(c => c.id === cardId ? { ...c, viewMode: c.viewMode === 'list' ? 'table' : 'list' } : c));
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updateColumnMetadata = (colId: string, field: keyof ColumnMetadata, value: any) => {
         setColumnMetadata(prev => ({
             ...prev,
@@ -152,6 +154,13 @@ export default function MockMultiColumnMeasures() {
 
     return (
         <div className="flex justify-center p-4 bg-gray-100 h-full overflow-hidden absolute inset-0 mt-[64px]">
+            {onToggleMock && (
+                <div className="absolute top-4 right-4 z-50">
+                    <Button variant="outlined" color="primary" onClick={onToggleMock}>
+                        Switch to column annotation
+                    </Button>
+                </div>
+            )}
             <div className="flex flex-col max-w-[1400px] w-full gap-4 h-full">
 
 
@@ -175,24 +184,19 @@ export default function MockMultiColumnMeasures() {
                                         className="w-full shadow-md overflow-visible transition-colors duration-200 border-l-4 border-l-transparent hover:border-l-blue-500"
                                         onDragOver={(e) => {
                                             e.preventDefault();
-                                            e.currentTarget.style.backgroundColor = '#f0f9ff';
-                                            e.currentTarget.style.borderColor = '#2196f3'; // Visual cue
-                                            e.dataTransfer.dropEffect = 'copy';
                                         }}
                                         onDragLeave={(e) => {
-                                            e.currentTarget.style.backgroundColor = '';
-                                            e.currentTarget.style.borderColor = '';
+                                            e.preventDefault();
                                         }}
                                         onDrop={(e) => {
                                             e.preventDefault();
-                                            e.currentTarget.style.backgroundColor = '';
-                                            e.currentTarget.style.borderColor = '';
                                             try {
                                                 const data = JSON.parse(e.dataTransfer.getData('application/json'));
                                                 if (data && Array.isArray(data.ids)) {
                                                     handleAssignColumnsToCard(card.id, data.ids);
                                                 }
                                             } catch (err) {
+                                                // eslint-disable-next-line no-console
                                                 console.error('Failed to parse drag data', err);
                                             }
                                         }}
@@ -225,6 +229,7 @@ export default function MockMultiColumnMeasures() {
                                                             style={{ flex: 1 }}
                                                             renderInput={(params) => (
                                                                 <TextField
+                                                                    // eslint-disable-next-line react/jsx-props-no-spreading
                                                                     {...params}
                                                                     label="Select assessment term"
                                                                     variant="outlined"
@@ -248,7 +253,7 @@ export default function MockMultiColumnMeasures() {
                                             }
                                             action={
                                                 <div className="flex gap-1">
-                                                    <Tooltip title={card.viewMode === 'list' ? "Switch to Table View (Edit Details)" : "Switch to Chip View"}>
+                                                    <Tooltip title={card.viewMode === 'list' ? 'Switch to Table View (Edit Details)' : 'Switch to Chip View'}>
                                                         <IconButton onClick={() => toggleCardViewMode(card.id)} color={card.viewMode === 'table' ? 'primary' : 'default'}>
                                                             {card.viewMode === 'list' ? <TableRowsIcon /> : <ViewModuleIcon />}
                                                         </IconButton>
@@ -288,7 +293,7 @@ export default function MockMultiColumnMeasures() {
                                                                 variant="filled"
                                                                 className="shadow-sm"
                                                             />
-                                                        )
+                                                        );
                                                     })}
                                                 </div>
                                             ) : (
@@ -326,7 +331,7 @@ export default function MockMultiColumnMeasures() {
                                                                                 value={meta.dataType}
                                                                                 exclusive
                                                                                 onChange={(_, val) => {
-                                                                                    if (val) updateColumnMetadata(colId, 'dataType', val)
+                                                                                    if (val) updateColumnMetadata(colId, 'dataType', val);
                                                                                 }}
                                                                                 size="small"
                                                                                 color="primary"
@@ -365,7 +370,7 @@ export default function MockMultiColumnMeasures() {
                                             )}
                                         </CardContent>
                                     </Card>
-                                )
+                                );
                             })}
 
                             <div className="flex justify-center mt-4">

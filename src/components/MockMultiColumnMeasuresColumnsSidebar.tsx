@@ -37,6 +37,14 @@ export default function MockMultiColumnMeasuresColumnsSidebar({ allColumns, mapp
         });
     }, [allColumns, searchTerm, showAssigned, mappedColumnIds]);
 
+    const toggleSelection = (colId: string) => {
+        if (selectedColumnIds.includes(colId)) {
+            setSelectedColumnIds(prev => prev.filter(id => id !== colId));
+        } else {
+            setSelectedColumnIds(prev => [...prev, colId]);
+        }
+    };
+
     const handleColumnClick = (e: React.MouseEvent, colId: string) => {
         // Prevent interaction if assigned
         if (mappedColumnIds.includes(colId)) return;
@@ -70,14 +78,6 @@ export default function MockMultiColumnMeasuresColumnsSidebar({ allColumns, mapp
         }
     };
 
-    const toggleSelection = (colId: string) => {
-        if (selectedColumnIds.includes(colId)) {
-            setSelectedColumnIds(prev => prev.filter(id => id !== colId));
-        } else {
-            setSelectedColumnIds(prev => [...prev, colId]);
-        }
-    };
-
     const handleDragStart = (e: React.DragEvent, colId: string) => {
         // Prevent drag if assigned
         if (mappedColumnIds.includes(colId)) {
@@ -96,7 +96,6 @@ export default function MockMultiColumnMeasuresColumnsSidebar({ allColumns, mapp
         }
 
         e.dataTransfer.setData('application/json', JSON.stringify({ ids: idsToDrag }));
-        e.dataTransfer.effectAllowed = 'copy';
     };
 
     const handleSelectAll = () => {
@@ -109,6 +108,99 @@ export default function MockMultiColumnMeasuresColumnsSidebar({ allColumns, mapp
         setSelectedColumnIds([]);
         setLastSelectedId(null);
     };
+
+    let content;
+    if (allColumns.length === 0) {
+        content = (
+            <div className="text-center p-4 text-gray-400 italic">
+                No columns available.
+            </div>
+        );
+    } else if (filteredColumns.length === 0) {
+        content = (
+            <div className="text-center p-4 text-gray-400 italic">
+                {searchTerm ? `No columns match "${searchTerm}"` : 'All columns assigned!'}
+            </div>
+        );
+    } else {
+        content = filteredColumns.map((col) => {
+            const isAssigned = mappedColumnIds.includes(col.id);
+            const isSelected = selectedColumnIds.includes(col.id);
+
+            let rowBgClass = 'bg-white border-gray-200 hover:border-blue-300 hover:shadow cursor-grab active:cursor-grabbing';
+            let spanClass = 'text-gray-700';
+
+            if (isAssigned) {
+                rowBgClass = 'bg-gray-100 border-gray-200 opacity-60 cursor-default';
+                spanClass = 'text-gray-500 line-through';
+            } else if (isSelected) {
+                rowBgClass = 'bg-blue-50 border-blue-400 shadow-md ring-1 ring-blue-300 cursor-grab active:cursor-grabbing';
+                spanClass = 'text-blue-900';
+            }
+
+            return (
+                <div
+                    key={col.id}
+                    draggable={!isAssigned}
+                    onClick={(e) => handleColumnClick(e, col.id)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            // Synthesize realistic click event
+                            const clickEvent = {
+                                shiftKey: e.shiftKey,
+                                ctrlKey: e.ctrlKey,
+                                metaKey: e.metaKey
+                            } as React.MouseEvent;
+                            handleColumnClick(clickEvent, col.id);
+                        }
+                    }}
+                    onDragStart={(e) => handleDragStart(e, col.id)}
+                    role="button"
+                    tabIndex={0}
+                    className={`
+                        group p-2 rounded border shadow-sm flex items-center justify-between transition-all
+                        ${rowBgClass}
+                    `}
+                >
+                    <div className="flex items-center gap-2 overflow-hidden w-full">
+                        {!isAssigned && (
+                            <Checkbox
+                                size="small"
+                                checked={isSelected}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleSelection(col.id);
+                                    setLastSelectedId(col.id);
+                                }}
+                                className="p-1"
+                            />
+                        )}
+                        {isAssigned && (
+                            <div className="p-2">
+                                <CheckCircleIcon fontSize="small" className="text-green-500" />
+                            </div>
+                        )}
+
+                        <div className="flex items-center gap-1 overflow-hidden">
+                            {!isAssigned && (
+                                <DragIndicatorIcon
+                                    className={`${isSelected ? 'text-blue-500' : 'text-gray-300 group-hover:text-gray-400'}`}
+                                    fontSize="small"
+                                />
+                            )}
+                            <span
+                                className={`font-medium truncate ${spanClass}`}
+                                title={col.header}
+                            >
+                                {col.header}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            );
+        });
+    }
 
     return (
         <Card className="w-full shadow-lg h-full flex flex-col" elevation={3}>
@@ -153,7 +245,7 @@ export default function MockMultiColumnMeasuresColumnsSidebar({ allColumns, mapp
                                             <SearchIcon fontSize="small" color="action" />
                                         </InputAdornment>
                                     ),
-                                    className: "bg-white"
+                                    className: 'bg-white'
                                 }}
                             />
                         </div>
@@ -178,70 +270,7 @@ export default function MockMultiColumnMeasuresColumnsSidebar({ allColumns, mapp
             />
             <CardContent className="flex-1 overflow-y-auto p-2 bg-gray-50/50">
                 <div className="flex flex-col gap-2 select-none">
-                    {allColumns.length === 0 ? (
-                        <div className="text-center p-4 text-gray-400 italic">
-                            No columns available.
-                        </div>
-                    ) : filteredColumns.length === 0 ? (
-                        <div className="text-center p-4 text-gray-400 italic">
-                            {searchTerm ? `No columns match "${searchTerm}"` : 'All columns assigned!'}
-                        </div>
-                    ) : (
-                        filteredColumns.map((col) => {
-                            const isAssigned = mappedColumnIds.includes(col.id);
-                            const isSelected = selectedColumnIds.includes(col.id);
-
-                            return (
-                                <div
-                                    key={col.id}
-                                    draggable={!isAssigned}
-                                    onClick={(e) => handleColumnClick(e, col.id)}
-                                    onDragStart={(e) => handleDragStart(e, col.id)}
-                                    className={`
-                                        group p-2 rounded border shadow-sm flex items-center justify-between transition-all
-                                        ${isAssigned
-                                            ? 'bg-gray-100 border-gray-200 opacity-60 cursor-default'
-                                            : isSelected
-                                                ? 'bg-blue-50 border-blue-400 shadow-md ring-1 ring-blue-300 cursor-grab active:cursor-grabbing'
-                                                : 'bg-white border-gray-200 hover:border-blue-300 hover:shadow cursor-grab active:cursor-grabbing'
-                                        }
-                                    `}
-                                >
-                                    <div className="flex items-center gap-2 overflow-hidden w-full">
-                                        {!isAssigned && (
-                                            <Checkbox
-                                                size="small"
-                                                checked={isSelected}
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    toggleSelection(col.id);
-                                                    setLastSelectedId(col.id);
-                                                }}
-                                                className="p-1"
-                                            />
-                                        )}
-                                        {isAssigned && (
-                                            <div className="p-2">
-                                                <CheckCircleIcon fontSize="small" className="text-green-500" />
-                                            </div>
-                                        )}
-
-                                        <div className="flex items-center gap-1 overflow-hidden">
-                                            {!isAssigned && (
-                                                <DragIndicatorIcon
-                                                    className={`${isSelected ? 'text-blue-500' : 'text-gray-300 group-hover:text-gray-400'}`}
-                                                    fontSize="small"
-                                                />
-                                            )}
-                                            <span className={`font-medium truncate ${isAssigned ? 'text-gray-500 line-through' : isSelected ? 'text-blue-900' : 'text-gray-700'}`} title={col.header}>
-                                                {col.header}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })
-                    )}
+                    {content}
                 </div>
             </CardContent>
         </Card>

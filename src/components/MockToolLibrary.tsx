@@ -109,7 +109,7 @@ export default function MockToolLibrary({ open, onClose, onSelect }: MockToolLib
                         ))}
                         {filteredTerms.length === 0 && (
                             <div className="p-8 text-center text-gray-500">
-                                No tools found matching "{search}"
+                                No tools found matching &quot;{search}&quot;
                             </div>
                         )}
                     </List>

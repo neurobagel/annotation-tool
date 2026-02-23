@@ -3,10 +3,8 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import CloseIcon from '@mui/icons-material/Close';
 import { useState, useMemo } from 'react';
 import { useDebounce } from 'use-debounce';
-import { ColumnAnnotationInstructions } from '../utils/instructions';
 import { DataType } from '../utils/internal_types';
 import ColumnAnnotationCard from './ColumnAnnotationCard';
-import Instruction from './Instruction';
 import MockTaxonomySidebar, { TaxonomyNode } from './MockTaxonomySidebar';
 import MockActionBar from './MockActionBar';
 import SearchFilter from './SearchFilter';
@@ -132,7 +130,7 @@ const MOCK_OPTIONS = [
   { label: 'Assessment Tool', id: 'std_assessment', variable_type: 'Categorical', disabled: false },
 ];
 
-function MockColumnAnnotation() {
+function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
   // -- Local State instead of Store --
   const [columns, setColumns] = useState(MOCK_COLUMNS);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
@@ -246,12 +244,10 @@ function MockColumnAnnotation() {
 
     if (debouncedSearchQuery) {
       const lowerQuery = debouncedSearchQuery.toLowerCase();
-      result = result.filter(([_, column]: [string, any]) => {
-        return (
-          column.name.toLowerCase().includes(lowerQuery) ||
-          (column.description || '').toLowerCase().includes(lowerQuery)
-        );
-      });
+      result = result.filter(([_, column]: [string, any]) => (
+        column.name.toLowerCase().includes(lowerQuery) ||
+        (column.description || '').toLowerCase().includes(lowerQuery)
+      ));
     }
 
     return result;
@@ -415,11 +411,13 @@ function MockColumnAnnotation() {
       className="flex flex-col gap-6 h-[70vh] overflow-hidden relative"
       data-cy="column-annotation-container"
     >
-      <div className="p-4 flex-shrink-0">
-        <Instruction title="Column Annotation (Mock)" className="mb-0">
-          <ColumnAnnotationInstructions />
-        </Instruction>
-      </div>
+      {onToggleMock && (
+        <div className="absolute top-0 right-4 z-50">
+          <Button variant="outlined" color="primary" onClick={onToggleMock}>
+            Switch to multi-column measure
+          </Button>
+        </div>
+      )}
 
       <div className="flex flex-1 overflow-hidden">
         {/* -- TAXONOMY SIDEBAR -- */}
@@ -449,10 +447,7 @@ function MockColumnAnnotation() {
           </div>
           <div className="flex-1 overflow-y-auto px-4 pb-20 pt-4" data-cy="scrollable-container">
             {/* Global Header Row - Sticky */}
-            <Box className="sticky top-0 z-10 mb-4 border border-gray-200 shadow-sm rounded-t-lg backdrop-blur-sm bg-opacity-95 bg-gray-100 grid grid-cols-[6fr_1fr_3fr] gap-4 px-4 pt-3 pb-1 items-end min-w-[768px]">
-              <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
-                Description
-              </span>
+            <Box className="sticky top-0 z-10 mb-4 border border-gray-200 shadow-sm rounded-t-lg backdrop-blur-sm bg-opacity-95 bg-gray-100 grid grid-cols-[1fr_3fr] md:grid-cols-[1fr_4fr] gap-4 px-4 pt-3 pb-1 items-end min-w-[768px]">
               <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
                 Data Type
               </span>
@@ -527,7 +522,8 @@ function MockColumnAnnotation() {
                                 inferredDataTypeLabel={columnData.inferredDataTypeLabel}
                                 term={columnData.term}
                                 termLabel={columnData.termLabel}
-                                selected={true}
+                                selected={selectedColumnIds.has(columnData.columnId)}
+                                hideDescription
                                 onClick={(e) => handleCardClick(e, columnData.columnId)}
                                 onDescriptionChange={handleDescriptionChange}
                                 onDataTypeChange={handleDataTypeChange}
@@ -623,6 +619,7 @@ function MockColumnAnnotation() {
                                     term={columnData.term}
                                     termLabel={columnData.termLabel}
                                     selected={selectedColumnIds.has(columnData.columnId)}
+                                    hideDescription={true}
                                     onClick={(e) => handleCardClick(e, columnData.columnId)}
                                     onDescriptionChange={handleDescriptionChange}
                                     onDataTypeChange={handleDataTypeChange}

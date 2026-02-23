@@ -24,6 +24,7 @@ interface ColumnAnnotationCardProps {
   term?: string | null;
   termLabel?: string | null;
   selected?: boolean;
+  hideDescription?: boolean;
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
   onDescriptionChange: (columnId: string, newDescription: string | null) => void;
   onDataTypeChange: (columnId: string, newDataType: 'Categorical' | 'Continuous' | null) => void;
@@ -41,6 +42,7 @@ function ColumnAnnotationCard({
   inferredDataTypeLabel,
   termLabel,
   selected = false,
+  hideDescription = false,
   onClick,
   onDescriptionChange,
   onDataTypeChange,
@@ -68,14 +70,16 @@ function ColumnAnnotationCard({
         )}
       </div>
 
-      <div className="grid grid-cols-[6fr_1fr_3fr] gap-4 px-4 py-3 items-center">
-        <div className="w-full min-w-0" onClick={(e) => e.stopPropagation()}>
-          <DescriptionEditor
-            description={description}
-            onDescriptionChange={onDescriptionChange}
-            columnID={id}
-          />
-        </div>
+      <div className={`grid ${hideDescription ? 'grid-cols-[1fr_3fr] md:grid-cols-[1fr_4fr]' : 'grid-cols-[6fr_1fr_3fr]'} gap-4 px-4 py-3 items-center`}>
+        {!hideDescription && (
+          <div className="w-full min-w-0" onClick={(e) => e.stopPropagation()}>
+            <DescriptionEditor
+              description={description}
+              onDescriptionChange={onDescriptionChange}
+              columnID={id}
+            />
+          </div>
+        )}
 
         <div className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
           {isDataTypeEditable ? (

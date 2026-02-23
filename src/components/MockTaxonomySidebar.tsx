@@ -25,15 +25,11 @@ export default function MockTaxonomySidebar({
         // If selecting the currently selected node again, unselect it
         if (nodeId === selectedNodeId) {
             onNodeSelect(null);
+        } else if (nodeId === 'demographics' || nodeId === 'assessments') {
+            // Optionally allow selecting the group folder itself
+            onNodeSelect(nodeId);
         } else {
-            // "root" is a dummy ID if we used one for a top level group, 
-            // but let's just make it unselectable or clear selection
-            if (nodeId === 'demographics' || nodeId === 'assessments') {
-                // Optionally allow selecting the group folder itself
-                onNodeSelect(nodeId);
-            } else {
-                onNodeSelect(nodeId);
-            }
+            onNodeSelect(nodeId);
         }
     };
 
