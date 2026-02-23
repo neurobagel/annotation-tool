@@ -1,6 +1,7 @@
 import { Box } from '@mui/material';
 import { useCallback, useMemo } from 'react';
 import { useColumns, useDataActions, useStandardizedVariables } from '~/stores/data';
+import { useColumnCardData } from '../hooks/useColumnCardData';
 import { useSearchFilter } from '../hooks/useSearchFilter';
 import { useStandardizedVariableOptions } from '../hooks/useStandardizedVariableOptions';
 import { ColumnAnnotationInstructions } from '../utils/instructions';
@@ -42,37 +43,7 @@ function ColumnAnnotation() {
     [userUpdatesColumnDataType]
   );
 
-  // Memoize the heavy mapping to prevent re-calculating the entire list of columns
-  // on every keystroke in the search filter which causes a re-render.
-  const columnCardData = useMemo(
-    () =>
-      Object.entries(columns).map(([columnId, column]) => {
-        // Data type is editable when:
-        // 1. No standardized variable is selected, OR
-        // 2. The selected standardized variable is a multi-column measure
-        const selectedStandardizedVariable = column.standardizedVariable
-          ? standardizedVariables[column.standardizedVariable]
-          : undefined;
-        const isDataTypeEditable =
-          !column.standardizedVariable ||
-          selectedStandardizedVariable?.is_multi_column_measure === true;
-
-        const inferredDataTypeLabel = isDataTypeEditable
-          ? null
-          : selectedStandardizedVariable?.variable_type || column.dataType || null;
-
-        return {
-          columnId,
-          name: column.name,
-          description: column.description || null,
-          dataType: column.dataType || null,
-          standardizedVariableId: column.standardizedVariable || null,
-          isDataTypeEditable,
-          inferredDataTypeLabel,
-        };
-      }),
-    [columns, standardizedVariables]
-  );
+  const columnCardData = useColumnCardData(columns, standardizedVariables);
 
   // Memoize the filtering logic to ensure that we only apply the .filter() operation
   // when the actual data changes OR when the 300ms debounce timer finishes, preventing
