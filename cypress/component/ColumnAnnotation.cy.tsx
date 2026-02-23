@@ -46,8 +46,37 @@ describe('ColumnAnnotation', () => {
     });
   });
 
+  // --- NEW TEST FOR ISSUE #429 ---
+  it('filters columns based on visibility toggle (annotated/unannotated/all)', () => {
+    cy.mount(<ColumnAnnotation />);
+
+    // 1. Verify Default State ('unannotated')
+    // Col 2 is unannotated. Cols 1, 3, 4 are annotated.
+    cy.get('p').contains('1 columns remaining | 3 columns annotated').should('be.visible');
+    cy.get('[data-cy="2-column-annotation-card"]').should('be.visible');
+    cy.get('[data-cy="1-column-annotation-card"]').should('not.exist');
+    cy.get('[data-cy="3-column-annotation-card"]').should('not.exist');
+    cy.get('[data-cy="4-column-annotation-card"]').should('not.exist');
+
+    // 2. Switch to 'annotated'
+    cy.get('[aria-label="show annotated only"]').click();
+    cy.get('[data-cy="1-column-annotation-card"]').should('be.visible');
+    cy.get('[data-cy="3-column-annotation-card"]').should('exist');
+    cy.get('[data-cy="4-column-annotation-card"]').should('exist');
+    cy.get('[data-cy="2-column-annotation-card"]').should('not.exist');
+
+    // 3. Switch to 'all'
+    cy.get('[aria-label="show all columns"]').click();
+    cy.get('[data-cy="1-column-annotation-card"]').should('be.visible');
+    cy.get('[data-cy="2-column-annotation-card"]').should('exist');
+    cy.get('[data-cy="3-column-annotation-card"]').should('exist');
+    cy.get('[data-cy="4-column-annotation-card"]').should('exist');
+  });
+
   it('renders the component correctly', () => {
     cy.mount(<ColumnAnnotation />);
+    cy.get('[aria-label="show all columns"]').click(); // Show all for legacy test compatibility
+
     cy.get('[data-cy="column-annotation-container"]').should('be.visible');
     cy.get('[data-cy="1-column-annotation-card"]').should('be.visible');
     cy.get('[data-cy="1-description"] textarea')
@@ -74,6 +103,8 @@ describe('ColumnAnnotation', () => {
 
   it('allows scrolling to access all column cards', () => {
     cy.mount(<ColumnAnnotation />);
+    cy.get('[aria-label="show all columns"]').click(); // Show all for legacy test compatibility
+
     cy.get('[data-cy="scrollable-container"]').should('be.visible');
 
     // Initially visible cards
@@ -89,11 +120,14 @@ describe('ColumnAnnotation', () => {
     cy.get('[data-cy="scrollable-container"]').scrollTo('top');
     cy.get('[data-cy="1-column-annotation-card"]').should('be.visible');
   });
+
   it('edits the description', () => {
     cy.spy(useDataStore.getState().actions, 'userUpdatesColumnDescription').as(
       'userUpdatesColumnDescription'
     );
     cy.mount(<ColumnAnnotation />);
+    cy.get('[aria-label="show all columns"]').click(); // Show all for legacy test compatibility
+
     cy.get('[data-cy="1-description"] textarea')
       .first()
       .as('descriptionTextarea')
@@ -102,8 +136,10 @@ describe('ColumnAnnotation', () => {
     cy.get('@descriptionTextarea').type('new description');
     cy.get('@userUpdatesColumnDescription').should('have.been.calledWith', '1', 'new description');
   });
+
   it('toggles the data type between categorical and continuous', () => {
     cy.mount(<ColumnAnnotation />);
+    cy.get('[aria-label="show all columns"]').click(); // Show all for legacy test compatibility
 
     cy.get('[data-cy="1-column-annotation-card-data-type-categorical-button"]').should(
       'have.class',
@@ -128,6 +164,7 @@ describe('ColumnAnnotation', () => {
 
   it('filters columns based on search input', () => {
     cy.mount(<ColumnAnnotation />);
+    cy.get('[aria-label="show all columns"]').click(); // Show all for legacy test compatibility
 
     cy.get('[data-cy="search-filter-input"]').should('be.visible');
     cy.get('[data-cy="search-filter-counter"]').should('contain', 'Showing 4 of 4 columns');
@@ -158,6 +195,7 @@ describe('ColumnAnnotation', () => {
       'userUpdatesColumnDescription'
     );
     cy.mount(<ColumnAnnotation />);
+    cy.get('[aria-label="show all columns"]').click(); // Show all for legacy test compatibility
 
     cy.get('[data-cy="search-filter-input"]').type('another');
     cy.get('[data-cy="search-filter-counter"]').should('contain', '1 of 4');
