@@ -22,7 +22,7 @@ The annotation tool is a React application, developed in [TypeScript](https://ww
 
 ## Quickstart
 
-The staging version of the annotation tool is hosted at [https://staging-annotation.netlify.app/](https://staging-annotation.netlify.app/).
+The annotation tool is available at [https://annotate.neurobagel.org/.](https://annotate.neurobagel.org/.).
 
 ## Local Installation
 
