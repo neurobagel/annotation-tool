@@ -9,6 +9,7 @@ import {
   Typography,
   Autocomplete,
   TextField,
+  Tooltip,
 } from '@mui/material';
 import { matchSorter, rankings } from 'match-sorter';
 import { useState } from 'react';
@@ -73,12 +74,33 @@ function MultiColumnMeasuresCard({
               getOptionDisabled={(option) => option.disabled || false}
               onChange={(_, newValue) => onCreateCollection(newValue?.id || null)}
               isOptionEqualToValue={(option, value) => option.id === value.id}
-              renderOption={(props, option) => (
-                // eslint-disable-next-line react/jsx-props-no-spreading
-                <li {...props} key={option.id}>
-                  {option.abbreviation ? `${option.abbreviation} - ${option.label}` : option.label}
-                </li>
-              )}
+              renderOption={(optionProps, option) => {
+                const { key, ...otherProps } = optionProps;
+                return (
+                  <Tooltip
+                    title={option.description || ''}
+                    placement="right"
+                    enterDelay={400}
+                    arrow
+                    slotProps={{
+                      tooltip: {
+                        sx: {
+                          fontSize: '16px',
+                        },
+                      },
+                    }}
+                  >
+                    {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+                    <li key={option.id} {...otherProps}>
+                      <div className="w-full">
+                        {option.abbreviation
+                          ? `${option.abbreviation} - ${option.label}`
+                          : option.label}
+                      </div>
+                    </li>
+                  </Tooltip>
+                );
+              }}
               filterOptions={filterOptions}
               renderInput={(params) => (
                 <TextField

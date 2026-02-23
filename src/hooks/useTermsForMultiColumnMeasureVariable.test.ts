@@ -27,6 +27,7 @@ describe('useTermsForMultiColumnMeasureVariable', () => {
         id: 'term-2',
         label: 'Term 2',
         standardizedVariableId: 'var-1',
+        description: 'desc 2',
         collectionCreatedAt: undefined,
       },
       'term-3': {
@@ -43,6 +44,7 @@ describe('useTermsForMultiColumnMeasureVariable', () => {
     expect(result.current).toHaveLength(2);
     expect(result.current.find((term) => term.id === 'term-1')?.disabled).toBe(true);
     expect(result.current.find((term) => term.id === 'term-2')?.disabled).toBe(false);
+    expect(result.current.find((term) => term.id === 'term-2')?.description).toBe('desc 2');
   });
 
   it('should return empty array when variableId is empty', () => {

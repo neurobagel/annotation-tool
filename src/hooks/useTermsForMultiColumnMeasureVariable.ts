@@ -16,6 +16,7 @@ export function useTermsForMultiColumnMeasureVariable(variableId: string): Avail
       id: term.id,
       label: term.label,
       abbreviation: term.abbreviation,
+      description: term.description,
       disabled: Boolean(term.collectionCreatedAt),
     }));
 }
