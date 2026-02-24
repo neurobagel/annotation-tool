@@ -32,9 +32,6 @@ import assessmentData from '../assets/default_config/assessment.json';
 
 // -- Mock Data --
 const INITIAL_COLUMNS = [
-    { id: 'sub_ID', header: 'Subject ID' },
-    { id: 'age', header: 'Age' },
-    { id: 'sex', header: 'Sex' },
     // Unassigned columns suitable for grouping
     { id: 'wisc_vocab', header: 'WISC_Vocab_Score' },
     { id: 'wisc_matrix', header: 'WISC_Matrix_Reasoning' },
