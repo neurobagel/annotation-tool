@@ -32,11 +32,12 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
     this.state = { hasError: false, error: null, errorInfo: null, showDetails: false };
   }
 
-  static getDerivedStateFromError(): ErrorBoundaryState {
-    return { hasError: true, showDetails: false };
+  static getDerivedStateFromError(): Partial<ErrorBoundaryState> {
+  return { hasError: true, showDetails: false };
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo): void {
+  // TODO: integrate error logging service (e.g. Sentry) 
     this.setState({ error, errorInfo: info });
   }
 
@@ -51,8 +52,8 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
     if (hasError) {
       // Fallback UI
       return (
-        <div className="flex h-screen w-screen flex-col items-center justify-center space-y-5">
-          <img src={emoji} alt="Emoji" className="max-h-20 animate-pulse" />
+        <div className="flex min-h-screen w-full flex-col items-center justify-center space-y-5">
+          <img src={emoji} alt="Application error illustration" className="max-h-20 animate-pulse" />
           <Typography variant="h5" className="text-center">
             This is not supposed to happen. Please try again,{' '}
             <a
@@ -74,6 +75,13 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
           </Typography>
           <Button variant="outlined" color="primary" onClick={this.toggleDetails}>
             {showDetails ? 'Hide Details' : 'Show Details'}
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => window.location.reload()}
+          >
+           Reload page
           </Button>
           <Collapse in={showDetails}>
             <div className="mt-4 w-11/12 max-w-lg overflow-auto rounded bg-gray-100 p-4 text-left shadow">
