@@ -23,7 +23,14 @@ interface ColumnAnnotationCardProps {
   onDescriptionChange: (columnId: string, newDescription: string | null) => void;
   onDataTypeChange: (columnId: string, newDataType: 'Categorical' | 'Continuous' | null) => void;
   onStandardizedVariableChange: (columnId: string, newId: string | null) => void;
+  selected?: boolean;
+  onSelect?: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
+
+const defaultProps = {
+  selected: false,
+  onSelect: undefined,
+};
 
 function ColumnAnnotationCard({
   id,
@@ -37,6 +44,8 @@ function ColumnAnnotationCard({
   onDescriptionChange,
   onDataTypeChange,
   onStandardizedVariableChange,
+  selected = false,
+  onSelect,
 }: ColumnAnnotationCardProps) {
   const selectedOption =
     standardizedVariableId !== null
@@ -45,10 +54,42 @@ function ColumnAnnotationCard({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       data-cy={`${id}-column-annotation-card`}
-      className="w-full bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200"
+      className={`w-full rounded-lg transition-all duration-200 cursor-pointer ${
+        selected
+          ? 'bg-blue-50/50 border-blue-500 ring-1 ring-blue-500 shadow-md'
+          : 'bg-white border-gray-200 border shadow-sm hover:shadow-md'
+      }`}
+      onClick={(e) => {
+        const target = e.target as HTMLElement;
+        const currentTarget = e.currentTarget as HTMLElement;
+
+        // Find the closest interactive element
+        const interactiveElement = target.closest(
+          'input, button, a, textarea, [role="button"], [role="option"], [role="tooltip"], [role="combobox"], [role="listbox"], .MuiAutocomplete-root, .MuiInputBase-root, .MuiToggleButtonGroup-root'
+        );
+
+        // If we found an interactive element, AND it's not the card itself, ignore the click
+        if (interactiveElement && interactiveElement !== currentTarget) {
+          return;
+        }
+
+        onSelect?.(e);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSelect?.(e as unknown as React.MouseEvent<HTMLDivElement>);
+        }
+      }}
     >
-      <div className="w-full bg-gray-50 px-4 py-2 border-b border-gray-200 flex items-center">
+      <div
+        className={`w-full px-4 py-2 border-b flex items-center select-none ${
+          selected ? 'bg-blue-100/50 border-blue-200' : 'bg-gray-50 border-gray-200'
+        }`}
+      >
         <Typography variant="subtitle2" className="font-bold text-gray-900 truncate" title={name}>
           {name}
         </Typography>
@@ -144,5 +185,7 @@ function ColumnAnnotationCard({
     </div>
   );
 }
+
+ColumnAnnotationCard.defaultProps = defaultProps;
 
 export default ColumnAnnotationCard;
