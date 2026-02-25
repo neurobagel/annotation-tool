@@ -7,7 +7,9 @@ import {
   Tooltip,
   TextField,
 } from '@mui/material';
+import { useState } from 'react';
 import { DataType } from '~/utils/internal_types';
+import { useColumnKeyboardShortcuts } from '../hooks/useColumnKeyboardShortcuts';
 import { StandardizedVariableOption } from '../hooks/useStandardizedVariableOptions';
 import DescriptionEditor from './DescriptionEditor';
 
@@ -42,11 +44,23 @@ function ColumnAnnotationCard({
     standardizedVariableId !== null
       ? standardizedVariableOptions.find((option) => option.id === standardizedVariableId) || null
       : null;
+  const [isFocused, setIsFocused] = useState(false);
+
+  useColumnKeyboardShortcuts({
+    columnId: id,
+    isFocused,
+    isDataTypeEditable,
+    onDataTypeChange,
+  });
 
   return (
     <div
       data-cy={`${id}-column-annotation-card`}
       className="w-full bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200"
+      role="button"
+      tabIndex={0}
+      onFocus={() => setIsFocused(true)}
+      onBlur={() => setIsFocused(false)}
     >
       <div className="w-full bg-gray-50 px-4 py-2 border-b border-gray-200 flex items-center">
         <Typography variant="subtitle2" className="font-bold text-gray-900 truncate" title={name}>

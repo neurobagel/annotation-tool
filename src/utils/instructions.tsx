@@ -138,6 +138,63 @@ export function ColumnAnnotationInstructions() {
         />
       </ListItem>
       <ListItem sx={{ display: 'list-item' }}>
+        <ListItemText
+          primary={
+            <>
+              <strong>Keyboard shortcuts</strong> for faster annotation:
+              <List dense sx={{ listStyleType: 'circle', pl: 4 }}>
+                <ListItem sx={{ display: 'list-item' }}>
+                  <ListItemText
+                    primary={
+                      <>
+                        <code>C</code> — Select Categorical data type
+                      </>
+                    }
+                  />
+                </ListItem>
+                <ListItem sx={{ display: 'list-item' }}>
+                  <ListItemText
+                    primary={
+                      <>
+                        <code>N</code> — Select Continuous data type
+                      </>
+                    }
+                  />
+                </ListItem>
+                <ListItem sx={{ display: 'list-item' }}>
+                  <ListItemText
+                    primary={
+                      <>
+                        <code>Tab</code> — Move focus to the next field within a column card
+                      </>
+                    }
+                  />
+                </ListItem>
+                <ListItem sx={{ display: 'list-item' }}>
+                  <ListItemText
+                    primary={
+                      <>
+                        <code>Enter</code> — Jump to the next column card
+                      </>
+                    }
+                  />
+                </ListItem>
+                <ListItem sx={{ display: 'list-item' }}>
+                  <ListItemText
+                    primary={
+                      <>
+                        Shortcuts are active only when a column card is focused — click on a card
+                        first to activate them.
+                      </>
+                    }
+                  />
+                </ListItem>
+              </List>
+            </>
+          }
+        />
+      </ListItem>
+      <ListItem sx={{ display: 'list-item' }}>
         <ListItemText primary="When you have reviewed all columns, you can move on to the next step." />
       </ListItem>
     </List>
