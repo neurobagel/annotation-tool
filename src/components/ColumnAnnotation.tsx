@@ -12,6 +12,13 @@ import ColumnAnnotationCard from './ColumnAnnotationCard';
 import Instruction from './Instruction';
 import SearchFilter from './SearchFilter';
 
+const isEventFromInteractiveChild = (target: HTMLElement, currentTarget: HTMLElement) => {
+  const interactiveElement = target.closest(
+    'input, button, a, textarea, [role="button"], [role="option"], [role="tooltip"], [role="combobox"], [role="listbox"], .MuiAutocomplete-root, .MuiInputBase-root, .MuiToggleButtonGroup-root'
+  );
+  return interactiveElement !== null && interactiveElement !== currentTarget;
+};
+
 function ColumnAnnotation() {
   const columns = useColumns();
   const standardizedVariables = useStandardizedVariables();
@@ -71,18 +78,9 @@ function ColumnAnnotation() {
       className="flex flex-col items-center gap-6 h-[70vh] overflow-hidden"
       data-cy="column-annotation-container"
       onClick={(e) => {
-        const target = e.target as HTMLElement;
-        const currentTarget = e.currentTarget as HTMLElement;
-
-        // Ignore clicks on anything that is interactive or inside a card
-        const isInteractive = target.closest(
-          'input, button, a, textarea, [role="button"], [role="option"], [role="tooltip"], [role="combobox"], [role="listbox"], .MuiAutocomplete-root, .MuiInputBase-root, .MuiToggleButtonGroup-root'
-        );
-
-        if (isInteractive && isInteractive !== currentTarget) {
+        if (isEventFromInteractiveChild(e.target as HTMLElement, e.currentTarget as HTMLElement)) {
           return;
         }
-
         clearSelection();
       }}
       onKeyDown={(e) => {

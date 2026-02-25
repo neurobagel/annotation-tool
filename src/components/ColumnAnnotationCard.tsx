@@ -32,6 +32,13 @@ const defaultProps = {
   onSelect: undefined,
 };
 
+const isEventFromInteractiveChild = (target: HTMLElement, currentTarget: HTMLElement) => {
+  const interactiveElement = target.closest(
+    'input, button, a, textarea, [role="button"], [role="option"], [role="tooltip"], [role="combobox"], [role="listbox"], .MuiAutocomplete-root, .MuiInputBase-root, .MuiToggleButtonGroup-root'
+  );
+  return interactiveElement !== null && interactiveElement !== currentTarget;
+};
+
 function ColumnAnnotationCard({
   id,
   name,
@@ -63,22 +70,15 @@ function ColumnAnnotationCard({
           : 'bg-white border-gray-200 border shadow-sm hover:shadow-md'
       }`}
       onClick={(e) => {
-        const target = e.target as HTMLElement;
-        const currentTarget = e.currentTarget as HTMLElement;
-
-        // Find the closest interactive element
-        const interactiveElement = target.closest(
-          'input, button, a, textarea, [role="button"], [role="option"], [role="tooltip"], [role="combobox"], [role="listbox"], .MuiAutocomplete-root, .MuiInputBase-root, .MuiToggleButtonGroup-root'
-        );
-
-        // If we found an interactive element, AND it's not the card itself, ignore the click
-        if (interactiveElement && interactiveElement !== currentTarget) {
+        if (isEventFromInteractiveChild(e.target as HTMLElement, e.currentTarget as HTMLElement)) {
           return;
         }
-
         onSelect?.(e);
       }}
       onKeyDown={(e) => {
+        if (isEventFromInteractiveChild(e.target as HTMLElement, e.currentTarget as HTMLElement)) {
+          return;
+        }
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           onSelect?.(e as unknown as React.MouseEvent<HTMLDivElement>);
