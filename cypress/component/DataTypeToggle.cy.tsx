@@ -60,4 +60,35 @@ describe('DataTypeToggle', () => {
 
     cy.get('[data-cy="2-column-annotation-card-data-type"]').should('contain', 'Identifier');
   });
+
+  it('displays the value prop in locked state when inferredLabel is null', () => {
+    cy.mount(
+      <DataTypeToggle
+        columnId="3"
+        value={DataType.categorical}
+        isEditable={false}
+        inferredLabel={null}
+        onChange={props.onChange}
+      />
+    );
+
+    cy.get('[data-cy="3-column-annotation-card-data-type"]').should(
+      'contain',
+      DataType.categorical
+    );
+  });
+
+  it("displays 'Unknown' in locked state when both inferredLabel and value are null", () => {
+    cy.mount(
+      <DataTypeToggle
+        columnId="4"
+        value={null}
+        isEditable={false}
+        inferredLabel={null}
+        onChange={props.onChange}
+      />
+    );
+
+    cy.get('[data-cy="4-column-annotation-card-data-type"]').should('contain', 'Unknown');
+  });
 });
