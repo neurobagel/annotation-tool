@@ -12,13 +12,6 @@ import ColumnAnnotationCard from './ColumnAnnotationCard';
 import Instruction from './Instruction';
 import SearchFilter from './SearchFilter';
 
-const isEventFromInteractiveChild = (target: HTMLElement, currentTarget: HTMLElement) => {
-  const interactiveElement = target.closest(
-    'input, button, a, textarea, [role="button"], [role="option"], [role="tooltip"], [role="combobox"], [role="listbox"], .MuiAutocomplete-root, .MuiInputBase-root, .MuiToggleButtonGroup-root'
-  );
-  return interactiveElement !== null && interactiveElement !== currentTarget;
-};
-
 function ColumnAnnotation() {
   const columns = useColumns();
   const standardizedVariables = useStandardizedVariables();
@@ -77,35 +70,24 @@ function ColumnAnnotation() {
       role="presentation"
       className="flex flex-col items-center gap-6 h-[70vh] overflow-hidden"
       data-cy="column-annotation-container"
-      onClick={(e) => {
-        if (isEventFromInteractiveChild(e.target as HTMLElement, e.currentTarget as HTMLElement)) {
-          return;
-        }
-        clearSelection();
-      }}
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') {
-          clearSelection();
-        }
-      }}
     >
       <div className="w-full max-w-6xl flex flex-col h-full">
         <div className="p-4 flex-shrink-0 flex flex-col items-start gap-4">
           <Instruction title="Column Annotation" className="mb-0">
             <ColumnAnnotationInstructions />
           </Instruction>
-          <SearchFilter
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            onClear={clearSearch}
-            placeholder="Filter columns by name..."
-            totalCount={columnCardData.length}
-            filteredCount={filteredColumnCardData.length}
-          />
-          {selectedIds.size > 0 && (
-            <div className="w-full">
+          <div className="w-full flex items-start gap-4">
+            <SearchFilter
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              onClear={clearSearch}
+              placeholder="Filter columns by name..."
+              totalCount={columnCardData.length}
+              filteredCount={filteredColumnCardData.length}
+            />
+            {selectedIds.size > 0 && (
               <Box
-                className="bg-primary-50 border border-primary-200 rounded-lg px-4 py-3 shadow-sm w-full transition-all mt-2"
+                className="bg-primary-50 border border-primary-200 rounded-lg px-4 py-2 shadow-sm flex-1 transition-all"
                 data-cy="action-bar"
               >
                 <div className="w-full flex items-center justify-between gap-4">
@@ -126,8 +108,8 @@ function ColumnAnnotation() {
                   </div>
                 </div>
               </Box>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         <div
