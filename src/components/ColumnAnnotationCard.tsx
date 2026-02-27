@@ -16,7 +16,14 @@ interface ColumnAnnotationCardProps {
   onDescriptionChange: (columnId: string, newDescription: string | null) => void;
   onDataTypeChange: (columnId: string, newDataType: 'Categorical' | 'Continuous' | null) => void;
   onStandardizedVariableChange: (columnId: string, newId: string | null) => void;
+  selected?: boolean;
+  onSelect?: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
+
+const defaultProps = {
+  selected: false,
+  onSelect: undefined,
+};
 
 function ColumnAnnotationCard({
   id,
@@ -30,6 +37,8 @@ function ColumnAnnotationCard({
   onDescriptionChange,
   onDataTypeChange,
   onStandardizedVariableChange,
+  selected = false,
+  onSelect,
 }: ColumnAnnotationCardProps) {
   const selectedOption =
     standardizedVariableId !== null
@@ -37,11 +46,28 @@ function ColumnAnnotationCard({
       : null;
 
   return (
+    // The jsx-a11y linter expects any element with role="button" and an onClick handler
+    // to be fully accessible via keyboard (requiring a tabIndex and an onKeyDown handler).
+    // We intentionally omit these keyboard/focus handlers so the card itself doesn't
+    // become a tab stop, allowing users to naturally tab through the interactive elements
+    // *inside* the card instead.
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus, jsx-a11y/role-supports-aria-props
     <div
+      role="button"
+      aria-selected={selected}
       data-cy={`${id}-column-annotation-card`}
-      className="w-full bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200"
+      className={`w-full rounded-lg transition-all duration-200 cursor-pointer ${
+        selected
+          ? 'bg-blue-50/50 border-blue-500 ring-1 ring-blue-500 shadow-md'
+          : 'bg-white border-gray-200 border shadow-sm hover:shadow-md'
+      }`}
+      onClick={onSelect}
     >
-      <div className="w-full bg-gray-50 px-4 py-2 border-b border-gray-200 flex items-center">
+      <div
+        className={`w-full px-4 py-2 border-b flex items-center select-none ${
+          selected ? 'bg-blue-100/50 border-blue-200' : 'bg-gray-50 border-gray-200'
+        }`}
+      >
         <Typography variant="subtitle2" className="font-bold text-gray-900 truncate" title={name}>
           {name}
         </Typography>
@@ -93,5 +119,7 @@ function ColumnAnnotationCard({
     </div>
   );
 }
+
+ColumnAnnotationCard.defaultProps = defaultProps;
 
 export default ColumnAnnotationCard;
