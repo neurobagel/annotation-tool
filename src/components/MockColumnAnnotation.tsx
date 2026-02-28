@@ -9,30 +9,35 @@ import {
   pointerWithin,
 } from '@dnd-kit/core';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useState, useMemo } from 'react';
 import { useDebounce } from 'use-debounce';
 import assessmentData from '../assets/default_config/assessment.json';
-import { DataType } from '../utils/internal_types';
-import ColumnAnnotationCard from './ColumnAnnotationCard';
-import MockActionBar from './MockActionBar';
-import MockTaxonomySidebar, { TaxonomyNode } from './MockTaxonomySidebar';
-import SearchFilter from './SearchFilter';
 
-const ALL_TERMS = assessmentData.flatMap((vocab) =>
-  vocab.terms.map((term) => ({
+interface MockAssessmentTerm {
+  id: string;
+  label: string;
+  abbreviation: string;
+}
+import { DataType } from '../utils/internal_types';
+import MockColumnAnnotationCard from './MockColumnAnnotationCard';
+import MockTaxonomySidebar, { TaxonomyNode } from './MockTaxonomySidebar';
+import MockSearchFilter from './MockSearchFilter';
+
+const ALL_TERMS = assessmentData.flatMap((vocab: any) =>
+  vocab.terms.map((term: any) => ({
     id: term.id,
     label: term.name,
     abbreviation: term.name
       .split(' ')
-      .map((w) => w[0])
+      .map((w: any) => w[0])
       .join('')
       .toUpperCase()
       .substring(0, 4),
   }))
 );
 
-const TERM_BY_ID = new Map(ALL_TERMS.map((t) => [t.id, t]));
+const TERM_BY_ID = new Map(ALL_TERMS.map((t: MockAssessmentTerm) => [t.id, t]));
 
 // -- Mock Data Definitions --
 
@@ -131,12 +136,6 @@ const MOCK_STANDARDIZED_VARIABLES: any = {
   },
 };
 
-const MOCK_OPTIONS = [
-  { label: 'Age', id: 'std_age', variable_type: 'Continuous', disabled: false },
-  { label: 'Sex', id: 'std_sex', variable_type: 'Categorical', disabled: false },
-  { label: 'Diagnosis', id: 'std_diagnosis', variable_type: 'Categorical', disabled: false },
-  { label: 'Assessment Tool', id: 'std_assessment', variable_type: 'Categorical', disabled: false },
-];
 
 function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
   // -- Local State instead of Store --
@@ -211,7 +210,7 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
     });
 
     // Populate with ALL terms from the assessment vocabulary
-    ALL_TERMS.forEach((term) => {
+    ALL_TERMS.forEach((term: MockAssessmentTerm) => {
       assessmentsNode.children!.push({
         id: term.id,
         label: term.label,
@@ -227,12 +226,55 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
       });
     }
 
-    return [demographicsNode, assessmentsNode];
+    // 3. Group 3: Data Types
+    const dataTypesNode: TaxonomyNode = {
+      id: 'data_types',
+      label: 'Data Types',
+      count: 0,
+      children: [],
+    };
+
+    const categoricalCount = columnsArray.filter(
+      ([_, col]: any) => col.dataType === DataType.categorical
+    ).length;
+    const continuousCount = columnsArray.filter(
+      ([_, col]: any) => col.dataType === DataType.continuous
+    ).length;
+
+    dataTypesNode.children!.push({
+      id: 'dt_categorical',
+      label: 'Categorical',
+      count: categoricalCount,
+    });
+    dataTypesNode.children!.push({
+      id: 'dt_continuous',
+      label: 'Continuous',
+      count: continuousCount,
+    });
+    dataTypesNode.count = categoricalCount + continuousCount;
+
+    return [dataTypesNode, demographicsNode, assessmentsNode];
   }, [columnsArray]);
 
   // -- Filtered Data & Selection State --
+  const [showAnnotated, setShowAnnotated] = useState(false);
+  const [sortOption, setSortOption] = useState<string>('default');
+
   const filteredColumnsArray = useMemo(() => {
     let result = columnsArray;
+
+    // 1. Filter out annotated columns if showAnnotated is false
+    if (!showAnnotated) {
+      result = result.filter(([_, col]: [string, any]) => {
+        const isDemographicsAnnotated = col.standardizedVariable && MOCK_STANDARDIZED_VARIABLES[col.standardizedVariable] && !MOCK_STANDARDIZED_VARIABLES[col.standardizedVariable].is_multi_column_measure;
+        const isAssessmentAnnotated = col.term !== null;
+
+        if (isDemographicsAnnotated || isAssessmentAnnotated) {
+          return false;
+        }
+        return true;
+      });
+    }
 
     if (selectedNodeId) {
       result = result.filter(([_, column]: [string, any]) => {
@@ -262,8 +304,34 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
       );
     }
 
+    // 3. Sort the filtered array
+    result = [...result].sort((a: any, b: any) => {
+      const [, colA] = a;
+      const [, colB] = b;
+
+      switch (sortOption) {
+        case 'name_asc':
+          return colA.name.localeCompare(colB.name);
+        case 'name_desc':
+          return colB.name.localeCompare(colA.name);
+        case 'datatype':
+          const typeA = colA.dataType || '';
+          const typeB = colB.dataType || '';
+          return typeA.localeCompare(typeB);
+        case 'status':
+          const isAnnotatedA = Boolean((colA.standardizedVariable && !colA.assessmentTool) || (colA.assessmentTool && colA.term));
+          const isAnnotatedB = Boolean((colB.standardizedVariable && !colB.assessmentTool) || (colB.assessmentTool && colB.term));
+          // false (unannotated) comes before true (annotated)
+          return (isAnnotatedA === isAnnotatedB) ? 0 : (isAnnotatedA ? 1 : -1);
+        case 'default':
+        default:
+          // In 'default' mode, we trust the original Object.entries order
+          return 0;
+      }
+    });
+
     return result;
-  }, [columnsArray, selectedNodeId, debouncedSearchQuery]);
+  }, [columnsArray, selectedNodeId, debouncedSearchQuery, showAnnotated, sortOption]);
 
   const [selectedColumnIds, setSelectedColumnIds] = useState<Set<string>>(new Set());
   const [lastSelectedId, setLastSelectedId] = useState<string | null>(null);
@@ -327,13 +395,6 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
     }));
   };
 
-  const handleStandardizedVariableChange = (columnId: string, newId: string | null) => {
-    setColumns((prev: any) => ({
-      ...prev,
-      [columnId]: { ...prev[columnId], standardizedVariable: newId, term: null },
-    }));
-  };
-
   const handleDataTypeChange = (
     columnId: string,
     newDataType: 'Categorical' | 'Continuous' | null
@@ -348,21 +409,25 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
     }));
   };
 
+  const handleRemoveVariable = (columnId: string) => {
+    setColumns((prev: any) => ({
+      ...prev,
+      [columnId]: { ...prev[columnId], standardizedVariable: null, term: null },
+    }));
+  };
+
+  const handleRemoveTerm = (columnId: string) => {
+    setColumns((prev: any) => ({
+      ...prev,
+      [columnId]: { ...prev[columnId], term: null },
+    }));
+  };
+
   // -- Bulk Actions --
 
   const handleClearSelection = () => {
     setSelectedColumnIds(new Set());
     setLastSelectedId(null);
-  };
-
-  const handleBulkAssignVariable = (variableId: string | null) => {
-    setColumns((prev: any) => {
-      const updated = { ...prev };
-      selectedColumnIds.forEach((id) => {
-        updated[id] = { ...updated[id], standardizedVariable: variableId, term: null };
-      });
-      return updated;
-    });
   };
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -383,7 +448,6 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
 
     if (!activeData || !overData) return;
 
-    // SCENARIO 1: Left to Right (Sidebar item to Card)
     if (activeData.type === 'sidebar' && overData.type === 'card') {
       const sidebarId = activeData.id;
       const targetCardId = overData.id;
@@ -392,19 +456,10 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
       if (
         sidebarId === 'demographics' ||
         sidebarId === 'all_columns' ||
-        sidebarId === 'unassigned_std_assessment'
+        sidebarId === 'unassigned_std_assessment' ||
+        sidebarId === 'data_types'
       )
         return;
-
-      let applyVarId: string | null = null;
-      let applyTermId: string | null = null;
-
-      if (MOCK_STANDARDIZED_VARIABLES[sidebarId]) {
-        applyVarId = sidebarId;
-      } else if (TERM_BY_ID.has(sidebarId)) {
-        applyVarId = 'std_assessment';
-        applyTermId = sidebarId;
-      }
 
       // If targeted card is part of multi-selection, apply to ALL selected
       const isCardSelected = selectedColumnIds.has(targetCardId);
@@ -413,13 +468,30 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
           ? Array.from(selectedColumnIds)
           : [targetCardId];
 
-      setColumns((prev: any) => {
-        const updated = { ...prev };
-        targetsToUpdate.forEach((id) => {
-          updated[id] = { ...updated[id], standardizedVariable: applyVarId, term: applyTermId };
+      if (sidebarId === 'dt_categorical' || sidebarId === 'dt_continuous') {
+        // Data Type assignment
+        const newDataType = sidebarId === 'dt_categorical' ? 'Categorical' : 'Continuous';
+        targetsToUpdate.forEach((id) => handleDataTypeChange(id, newDataType));
+      } else {
+        // Variable assignment
+        let applyVarId: string | null = null;
+        let applyTermId: string | null = null;
+
+        if (MOCK_STANDARDIZED_VARIABLES[sidebarId]) {
+          applyVarId = sidebarId;
+        } else if (TERM_BY_ID.has(sidebarId)) {
+          applyVarId = 'std_assessment';
+          applyTermId = sidebarId;
+        }
+
+        setColumns((prev: any) => {
+          const updated = { ...prev };
+          targetsToUpdate.forEach((id) => {
+            updated[id] = { ...updated[id], standardizedVariable: applyVarId, term: applyTermId };
+          });
+          return updated;
         });
-        return updated;
-      });
+      }
     }
 
     // SCENARIO 2: Right to Left (Card to Sidebar item)
@@ -431,19 +503,10 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
       if (
         targetSidebarId === 'demographics' ||
         targetSidebarId === 'all_columns' ||
-        targetSidebarId === 'unassigned_std_assessment'
+        targetSidebarId === 'unassigned_std_assessment' ||
+        targetSidebarId === 'data_types'
       )
         return;
-
-      let applyVarId: string | null = null;
-      let applyTermId: string | null = null;
-
-      if (MOCK_STANDARDIZED_VARIABLES[targetSidebarId]) {
-        applyVarId = targetSidebarId;
-      } else if (TERM_BY_ID.has(targetSidebarId)) {
-        applyVarId = 'std_assessment';
-        applyTermId = targetSidebarId;
-      }
 
       // Apply to all dragged cards
       const isCardSelected = selectedColumnIds.has(draggedCardId);
@@ -452,13 +515,30 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
           ? Array.from(selectedColumnIds)
           : [draggedCardId];
 
-      setColumns((prev: any) => {
-        const updated = { ...prev };
-        targetsToUpdate.forEach((id) => {
-          updated[id] = { ...updated[id], standardizedVariable: applyVarId, term: applyTermId };
+      if (targetSidebarId === 'dt_categorical' || targetSidebarId === 'dt_continuous') {
+        // Data Type assignment
+        const newDataType = targetSidebarId === 'dt_categorical' ? 'Categorical' : 'Continuous';
+        targetsToUpdate.forEach((id) => handleDataTypeChange(id, newDataType));
+      } else {
+        // Variable assignment
+        let applyVarId: string | null = null;
+        let applyTermId: string | null = null;
+
+        if (MOCK_STANDARDIZED_VARIABLES[targetSidebarId]) {
+          applyVarId = targetSidebarId;
+        } else if (TERM_BY_ID.has(targetSidebarId)) {
+          applyVarId = 'std_assessment';
+          applyTermId = targetSidebarId;
+        }
+
+        setColumns((prev: any) => {
+          const updated = { ...prev };
+          targetsToUpdate.forEach((id) => {
+            updated[id] = { ...updated[id], standardizedVariable: applyVarId, term: applyTermId };
+          });
+          return updated;
         });
-        return updated;
-      });
+      }
     }
   };
 
@@ -502,14 +582,16 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
     if (data.type === 'sidebar') {
       const actualSidebarId = data.id as string;
       const labelText =
-        MOCK_STANDARDIZED_VARIABLES[actualSidebarId]?.name ||
-        TERM_BY_ID.get(actualSidebarId)?.label ||
-        'Item';
+        actualSidebarId === 'dt_categorical' ? 'Categorical' :
+          actualSidebarId === 'dt_continuous' ? 'Continuous' :
+            MOCK_STANDARDIZED_VARIABLES[actualSidebarId]?.name ||
+            TERM_BY_ID.get(actualSidebarId)?.label ||
+            'Item';
       return (
         <Box
           sx={{
-            p: 1,
-            px: 2,
+            py: 0.5,
+            px: 1.5,
             bgcolor: 'primary.main',
             color: 'white',
             borderRadius: 8,
@@ -520,6 +602,8 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
             gap: 1,
             transform: 'rotate(2deg)',
             cursor: 'grabbing',
+            width: 'max-content',
+            maxWidth: 400,
           }}
         >
           <DragIndicatorIcon fontSize="small" sx={{ opacity: 0.7 }} />
@@ -539,27 +623,26 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
       return (
         <Box
           sx={{
-            p: 1,
-            px: 2,
+            py: 0.5,
+            px: 1.5,
             bgcolor: 'background.paper',
-            borderRadius: 8,
+            borderRadius: 2,
             boxShadow: 8,
             display: 'flex',
             alignItems: 'center',
-            gap: 1.5,
+            gap: 1,
             border: '1px solid #e0e0e0',
             opacity: 0.95,
             transform: 'rotate(-2deg)',
             cursor: 'grabbing',
-            maxWidth: 300,
+            width: 'max-content',
+            maxWidth: 400,
           }}
         >
           <DragIndicatorIcon fontSize="small" color="disabled" />
           <Typography
             variant="body2"
             fontWeight="bold"
-            noWrap
-            sx={{ textOverflow: 'ellipsis', overflow: 'hidden' }}
           >
             {cardData?.name || 'Column'}
           </Typography>
@@ -599,9 +682,7 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
       >
         {onToggleMock && (
           <div className="absolute top-0 right-4 z-50">
-            <Button variant="outlined" color="primary" onClick={onToggleMock}>
-              Switch to multi-column measure
-            </Button>
+
           </div>
         )}
 
@@ -615,7 +696,7 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
 
           <div className="flex-1 flex flex-col overflow-hidden max-w-6xl mx-auto w-full">
             <div className="px-4 pt-4 shrink-0 flex flex-col gap-3">
-              <SearchFilter
+              <MockSearchFilter
                 value={searchQuery}
                 onChange={setSearchQuery}
                 onClear={() => setSearchQuery('')}
@@ -626,38 +707,44 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
                   setSearchQuery('');
                   setSelectedNodeId(null);
                 }}
-              />
-              {/* ACTION BAR INLINE */}
-              <MockActionBar
                 selectedCount={selectedColumnIds.size}
-                options={MOCK_OPTIONS}
                 onClearSelection={handleClearSelection}
-                onAssignVariable={handleBulkAssignVariable}
-                onIsCreatingGroupChange={() => {}} // No longer used in paperpile design
+                showAnnotated={showAnnotated}
+                onShowAnnotatedChange={setShowAnnotated}
+                sortOption={sortOption}
+                onSortChange={setSortOption}
               />
             </div>
             <div className="flex-1 overflow-y-auto px-4 pb-20 pt-4" data-cy="scrollable-container">
               {/* Global Header Row - Sticky */}
-              <Box className="sticky top-0 z-10 mb-4 border border-gray-200 shadow-sm rounded-t-lg backdrop-blur-sm bg-opacity-95 bg-gray-100 grid grid-cols-[1fr_3fr] md:grid-cols-[1fr_4fr] gap-4 px-4 pt-3 pb-1 items-end min-w-[768px]">
-                <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
-                  Data Type
-                </span>
-                <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
-                  Mapped Variable
-                </span>
-              </Box>
+              <div className="sticky top-0 z-10 mb-4 border border-gray-200 shadow-sm rounded-t-lg backdrop-blur-sm bg-opacity-95 bg-gray-100 flex items-center gap-4 justify-between px-4 pt-3 pb-2 min-w-[768px]">
+                <div className="min-w-[200px] w-1/4 px-2">
+                  <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    Column
+                  </span>
+                </div>
+                <div className="flex-1 min-w-[200px] px-2">
+                  <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    Description
+                  </span>
+                </div>
+                <div className="min-w-[200px] w-1/3 text-right pr-2">
+                  <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    Mapped Variable & Data Type
+                  </span>
+                </div>
+              </div>
 
               <div className="space-y-3">
                 {/* Flat rendering flow with paperpile-style chips */}
                 {columnCardData.map((columnData) => (
                   <div key={columnData.columnId} className="w-full">
-                    <ColumnAnnotationCard
+                    <MockColumnAnnotationCard
                       id={columnData.columnId}
                       name={columnData.name}
                       description={columnData.description}
                       dataType={columnData.dataType}
                       standardizedVariableId={columnData.standardizedVariableId}
-                      standardizedVariableOptions={MOCK_OPTIONS}
                       isDataTypeEditable={columnData.isDataTypeEditable}
                       inferredDataTypeLabel={columnData.inferredDataTypeLabel}
                       term={columnData.term}
@@ -666,10 +753,11 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
                       standardizedVariableLabel={columnData.standardizedVariableLabel}
                       selected={selectedColumnIds.has(columnData.columnId)}
                       onChipClick={setSelectedNodeId}
-                      onClick={(e) => handleCardClick(e, columnData.columnId)}
+                      onClick={(e: React.MouseEvent<HTMLDivElement>) => handleCardClick(e as any, columnData.columnId)}
                       onDescriptionChange={handleDescriptionChange}
                       onDataTypeChange={handleDataTypeChange}
-                      onStandardizedVariableChange={handleStandardizedVariableChange}
+                      onRemoveVariable={handleRemoveVariable}
+                      onRemoveTerm={handleRemoveTerm}
                     />
                   </div>
                 ))}

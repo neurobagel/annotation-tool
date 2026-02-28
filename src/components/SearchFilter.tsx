@@ -1,78 +1,63 @@
 import ClearIcon from '@mui/icons-material/Clear';
-import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
-import { TextField, InputAdornment, IconButton, Typography, Button } from '@mui/material';
+import { IconButton, InputAdornment, TextField, Typography } from '@mui/material';
 
 interface SearchFilterProps {
-  value: string;
-  onChange: (value: string) => void;
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
   onClear: () => void;
-  // eslint-disable-next-line react/require-default-props
   placeholder?: string;
-  showingCount: number;
   totalCount: number;
-  // eslint-disable-next-line react/require-default-props
-  className?: string;
-  hasActiveFilters?: boolean;
-  onClearAll?: () => void;
+  filteredCount: number;
 }
 
+const defaultProps = { placeholder: 'Filter...' };
+
 export default function SearchFilter({
-  value,
-  onChange,
+  searchTerm,
+  onSearchChange,
   onClear,
-  placeholder = 'Filter items...',
-  showingCount,
+  placeholder = 'Filter...',
   totalCount,
-  className = '',
-  hasActiveFilters = false,
-  onClearAll,
+  filteredCount,
 }: SearchFilterProps) {
   return (
-    <div className={`w-full max-w-md ${className || ''}`}>
+    <div className="flex flex-col gap-1 w-full max-w-md" data-cy="search-filter-container">
       <TextField
-        fullWidth
-        placeholder={'Filter columns...'}
-        variant="outlined"
         size="small"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon color="action" />
-            </InputAdornment>
-          ),
-          endAdornment: value && (
-            <InputAdornment position="end">
-              <IconButton size="small" onClick={onClear}>
-                <ClearIcon fontSize="small" />
-              </IconButton>
-            </InputAdornment>
-          ),
+        placeholder={placeholder}
+        value={searchTerm}
+        onChange={(e) => onSearchChange(e.target.value)}
+        fullWidth
+        data-cy="search-filter-input"
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon fontSize="small" className="text-gray-400" />
+              </InputAdornment>
+            ),
+            endAdornment: searchTerm ? (
+              <InputAdornment position="end">
+                <IconButton
+                  size="small"
+                  onClick={onClear}
+                  edge="end"
+                  data-cy="search-filter-clear"
+                  aria-label="clear search"
+                >
+                  <ClearIcon fontSize="small" />
+                </IconButton>
+              </InputAdornment>
+            ) : null,
+          },
         }}
       />
-      <div className="flex items-center gap-2 mt-1 ml-1 h-6">
-        <Typography
-          variant="button"
-          className="text-gray-500 normal-case"
-          sx={{ fontSize: '0.8125rem' }}
-        >
-          Showing {showingCount} of {totalCount} items
-        </Typography>
-        {hasActiveFilters && onClearAll && (
-          <Button
-            size="small"
-            variant="text"
-            color="inherit"
-            onClick={onClearAll}
-            startIcon={<CloseIcon fontSize="small" />}
-            className="text-gray-500 hover:text-gray-700 whitespace-nowrap"
-          >
-            Clear filters
-          </Button>
-        )}
-      </div>
+      <Typography variant="caption" className="text-gray-500 ml-1" data-cy="search-filter-counter">
+        Showing {filteredCount} of {totalCount} columns
+      </Typography>
     </div>
   );
 }
+
+SearchFilter.defaultProps = defaultProps;
