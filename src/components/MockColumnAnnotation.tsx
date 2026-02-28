@@ -1,29 +1,38 @@
-import { Box, Typography, Autocomplete, TextField, Button, IconButton, Tooltip } from '@mui/material';
-import CancelIcon from '@mui/icons-material/Cancel';
-import CloseIcon from '@mui/icons-material/Close';
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+  DragStartEvent,
+  DragOverlay,
+  pointerWithin,
+} from '@dnd-kit/core';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import { Box, Typography, Button } from '@mui/material';
 import { useState, useMemo } from 'react';
 import { useDebounce } from 'use-debounce';
+import assessmentData from '../assets/default_config/assessment.json';
 import { DataType } from '../utils/internal_types';
 import ColumnAnnotationCard from './ColumnAnnotationCard';
-import MockTaxonomySidebar, { TaxonomyNode } from './MockTaxonomySidebar';
 import MockActionBar from './MockActionBar';
+import MockTaxonomySidebar, { TaxonomyNode } from './MockTaxonomySidebar';
 import SearchFilter from './SearchFilter';
-import assessmentData from '../assets/default_config/assessment.json';
 
 const ALL_TERMS = assessmentData.flatMap((vocab) =>
   vocab.terms.map((term) => ({
     id: term.id,
     label: term.name,
-    abbreviation: term.name.split(' ').map((w) => w[0]).join('').toUpperCase().substring(0, 4),
+    abbreviation: term.name
+      .split(' ')
+      .map((w) => w[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 4),
   }))
 );
 
-const FORMATTED_TERMS = ALL_TERMS.map((t) => ({
-  label: `${t.abbreviation} - ${t.label}`,
-  id: t.id,
-}));
-
-const TERM_BY_ID = new Map(ALL_TERMS.map(t => [t.id, t]));
+const TERM_BY_ID = new Map(ALL_TERMS.map((t) => [t.id, t]));
 
 // -- Mock Data Definitions --
 
@@ -122,7 +131,6 @@ const MOCK_STANDARDIZED_VARIABLES: any = {
   },
 };
 
-
 const MOCK_OPTIONS = [
   { label: 'Age', id: 'std_age', variable_type: 'Continuous', disabled: false },
   { label: 'Sex', id: 'std_sex', variable_type: 'Categorical', disabled: false },
@@ -137,8 +145,18 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
+  const [activeDragEvent, setActiveDragEvent] = useState<DragStartEvent | null>(null);
 
   const columnsArray = Object.entries(columns);
+
+  // -- DndKit Sensors --
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5, // Require a 5px drag intent to trigger (prevent accidental drags on click)
+      },
+    })
+  );
 
   // -- Compute Taxonomy Nodes --
   const taxonomyNodes = useMemo(() => {
@@ -153,7 +171,9 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
     ['std_age', 'std_sex', 'std_diagnosis'].forEach((varId) => {
       const varDef = MOCK_STANDARDIZED_VARIABLES[varId];
       if (varDef) {
-        const count = columnsArray.filter(([_, col]: any) => col.standardizedVariable === varId).length;
+        const count = columnsArray.filter(
+          ([_, col]: any) => col.standardizedVariable === varId
+        ).length;
         demographicsNode.children!.push({
           id: varId,
           label: varDef.name,
@@ -190,40 +210,31 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
       }
     });
 
-    Object.entries(groupedByTerm).forEach(([termId, count]) => {
-      const termDef = TERM_BY_ID.get(termId);
-      if (termDef) {
-        assessmentsNode.children!.push({
-          id: termId,
-          label: termDef.abbreviation || termDef.label,
-          count,
-        });
-      }
+    // Populate with ALL terms from the assessment vocabulary
+    ALL_TERMS.forEach((term) => {
+      assessmentsNode.children!.push({
+        id: term.id,
+        label: term.label,
+        count: groupedByTerm[term.id] || 0,
+      });
     });
 
     if (unassignedCount > 0) {
-      assessmentsNode.children!.push({
+      assessmentsNode.children!.unshift({
         id: 'unassigned_std_assessment',
         label: 'Unassigned',
         count: unassignedCount,
       });
     }
 
-    // Include an "All Columns" node
-    const allColumnsNode: TaxonomyNode = {
-      id: 'all_columns',
-      label: 'All Columns',
-      count: columnsArray.length,
-    };
-
-    return [allColumnsNode, demographicsNode, assessmentsNode];
+    return [demographicsNode, assessmentsNode];
   }, [columnsArray]);
 
   // -- Filtered Data & Selection State --
   const filteredColumnsArray = useMemo(() => {
     let result = columnsArray;
 
-    if (selectedNodeId && selectedNodeId !== 'all_columns') {
+    if (selectedNodeId) {
       result = result.filter(([_, column]: [string, any]) => {
         if (selectedNodeId === 'demographics') {
           const demoIds = ['std_age', 'std_sex', 'std_diagnosis'];
@@ -244,17 +255,17 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
 
     if (debouncedSearchQuery) {
       const lowerQuery = debouncedSearchQuery.toLowerCase();
-      result = result.filter(([_, column]: [string, any]) => (
-        column.name.toLowerCase().includes(lowerQuery) ||
-        (column.description || '').toLowerCase().includes(lowerQuery)
-      ));
+      result = result.filter(
+        ([_, column]: [string, any]) =>
+          column.name.toLowerCase().includes(lowerQuery) ||
+          (column.description || '').toLowerCase().includes(lowerQuery)
+      );
     }
 
     return result;
   }, [columnsArray, selectedNodeId, debouncedSearchQuery]);
 
   const [selectedColumnIds, setSelectedColumnIds] = useState<Set<string>>(new Set());
-  const [isCreatingGroup, setIsCreatingGroup] = useState(false);
   const [lastSelectedId, setLastSelectedId] = useState<string | null>(null);
 
   // Clear selection when filter changes to avoid weird state
@@ -352,32 +363,103 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
       });
       return updated;
     });
-    // Optional: handleClearSelection();
   };
 
-  const handleBulkAssignTerm = (termId: string | null) => {
-    setColumns((prev: any) => {
-      const updated = { ...prev };
-      selectedColumnIds.forEach((id) => {
-        // Only assign term if it's already an assessment, or maybe auto-assign assessment?
-        // Let's assume they have to map to assessment first, but we can do it automatically for convenience
-        updated[id] = { ...updated[id], term: termId, standardizedVariable: 'std_assessment' };
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveDragEvent(event);
+  };
+
+  const handleDragCancel = () => {
+    setActiveDragEvent(null);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    setActiveDragEvent(null);
+    const { active, over } = event;
+    if (!over) return;
+
+    const activeData = active.data.current;
+    const overData = over.data.current;
+
+    if (!activeData || !overData) return;
+
+    // SCENARIO 1: Left to Right (Sidebar item to Card)
+    if (activeData.type === 'sidebar' && overData.type === 'card') {
+      const sidebarId = activeData.id;
+      const targetCardId = overData.id;
+
+      // Ignore structural folders
+      if (
+        sidebarId === 'demographics' ||
+        sidebarId === 'all_columns' ||
+        sidebarId === 'unassigned_std_assessment'
+      )
+        return;
+
+      let applyVarId: string | null = null;
+      let applyTermId: string | null = null;
+
+      if (MOCK_STANDARDIZED_VARIABLES[sidebarId]) {
+        applyVarId = sidebarId;
+      } else if (TERM_BY_ID.has(sidebarId)) {
+        applyVarId = 'std_assessment';
+        applyTermId = sidebarId;
+      }
+
+      // If targeted card is part of multi-selection, apply to ALL selected
+      const isCardSelected = selectedColumnIds.has(targetCardId);
+      const targetsToUpdate =
+        isCardSelected && selectedColumnIds.size > 0
+          ? Array.from(selectedColumnIds)
+          : [targetCardId];
+
+      setColumns((prev: any) => {
+        const updated = { ...prev };
+        targetsToUpdate.forEach((id) => {
+          updated[id] = { ...updated[id], standardizedVariable: applyVarId, term: applyTermId };
+        });
+        return updated;
       });
-      return updated;
-    });
-    handleClearSelection();
-  };
+    }
 
-  const handleRemoveFromGroup = (columnId: string) => {
-    setColumns((prev: any) => ({
-      ...prev,
-      [columnId]: { ...prev[columnId], term: null },
-    }));
-    setSelectedColumnIds((prev) => {
-      const updated = new Set(prev);
-      updated.delete(columnId);
-      return updated;
-    });
+    // SCENARIO 2: Right to Left (Card to Sidebar item)
+    if (activeData.type === 'card' && overData.type === 'sidebar') {
+      const draggedCardId = activeData.id;
+      const targetSidebarId = overData.id;
+
+      // Ignore structural folders
+      if (
+        targetSidebarId === 'demographics' ||
+        targetSidebarId === 'all_columns' ||
+        targetSidebarId === 'unassigned_std_assessment'
+      )
+        return;
+
+      let applyVarId: string | null = null;
+      let applyTermId: string | null = null;
+
+      if (MOCK_STANDARDIZED_VARIABLES[targetSidebarId]) {
+        applyVarId = targetSidebarId;
+      } else if (TERM_BY_ID.has(targetSidebarId)) {
+        applyVarId = 'std_assessment';
+        applyTermId = targetSidebarId;
+      }
+
+      // Apply to all dragged cards
+      const isCardSelected = selectedColumnIds.has(draggedCardId);
+      const targetsToUpdate =
+        isCardSelected && selectedColumnIds.size > 0
+          ? Array.from(selectedColumnIds)
+          : [draggedCardId];
+
+      setColumns((prev: any) => {
+        const updated = { ...prev };
+        targetsToUpdate.forEach((id) => {
+          updated[id] = { ...updated[id], standardizedVariable: applyVarId, term: applyTermId };
+        });
+        return updated;
+      });
+    }
   };
 
   const columnCardData = filteredColumnsArray.map(([columnId, column]: [string, any]) => {
@@ -402,282 +484,208 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
       isDataTypeEditable,
       inferredDataTypeLabel,
       term: column.term,
-      termLabel: column.term ? TERM_BY_ID.get(column.term)?.abbreviation || TERM_BY_ID.get(column.term)?.label : null,
+      termLabel: column.term
+        ? TERM_BY_ID.get(column.term)?.abbreviation || TERM_BY_ID.get(column.term)?.label
+        : null,
+      termTooltip: column.term ? TERM_BY_ID.get(column.term)?.label : null,
+      standardizedVariableLabel: column.standardizedVariable
+        ? MOCK_STANDARDIZED_VARIABLES[column.standardizedVariable]?.name
+        : null,
     };
   });
 
-  return (
-    <div
-      className="flex flex-col gap-6 h-[70vh] overflow-hidden relative"
-      data-cy="column-annotation-container"
-    >
-      {onToggleMock && (
-        <div className="absolute top-0 right-4 z-50">
-          <Button variant="outlined" color="primary" onClick={onToggleMock}>
-            Switch to multi-column measure
-          </Button>
-        </div>
-      )}
+  const renderDragOverlay = () => {
+    if (!activeDragEvent || !activeDragEvent.active.data.current) return null;
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* -- TAXONOMY SIDEBAR -- */}
-        <MockTaxonomySidebar
-          nodes={taxonomyNodes}
-          selectedNodeId={selectedNodeId}
-          onNodeSelect={setSelectedNodeId}
-        />
+    const data = activeDragEvent.active.data.current;
 
-        <div className="flex-1 flex flex-col overflow-hidden max-w-6xl mx-auto w-full">
-          <div className="px-4 pt-4 shrink-0 flex flex-col gap-3">
-            <SearchFilter
-              value={searchQuery}
-              onChange={setSearchQuery}
-              onClear={() => setSearchQuery('')}
-              showingCount={filteredColumnsArray.length}
-              totalCount={columnsArray.length}
-            />
-            {/* ACTION BAR INLINE */}
-            <MockActionBar
-              selectedCount={selectedColumnIds.size}
-              options={MOCK_OPTIONS}
-              onClearSelection={handleClearSelection}
-              onAssignVariable={handleBulkAssignVariable}
-              onIsCreatingGroupChange={setIsCreatingGroup}
-            />
-          </div>
-          <div className="flex-1 overflow-y-auto px-4 pb-20 pt-4" data-cy="scrollable-container">
-            {/* Global Header Row - Sticky */}
-            <Box className="sticky top-0 z-10 mb-4 border border-gray-200 shadow-sm rounded-t-lg backdrop-blur-sm bg-opacity-95 bg-gray-100 grid grid-cols-[1fr_3fr] md:grid-cols-[1fr_4fr] gap-4 px-4 pt-3 pb-1 items-end min-w-[768px]">
-              <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
-                Data Type
-              </span>
-              <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
-                Mapped Variable
-              </span>
+    if (data.type === 'sidebar') {
+      const actualSidebarId = data.id as string;
+      const labelText =
+        MOCK_STANDARDIZED_VARIABLES[actualSidebarId]?.name ||
+        TERM_BY_ID.get(actualSidebarId)?.label ||
+        'Item';
+      return (
+        <Box
+          sx={{
+            p: 1,
+            px: 2,
+            bgcolor: 'primary.main',
+            color: 'white',
+            borderRadius: 8,
+            boxShadow: 8,
+            opacity: 0.95,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            transform: 'rotate(2deg)',
+            cursor: 'grabbing',
+          }}
+        >
+          <DragIndicatorIcon fontSize="small" sx={{ opacity: 0.7 }} />
+          <Typography variant="body2" fontWeight="bold">
+            {labelText}
+          </Typography>
+        </Box>
+      );
+    }
+
+    if (data.type === 'card') {
+      const actualCardId = data.id as string;
+      const isMulti = selectedColumnIds.has(actualCardId) && selectedColumnIds.size > 1;
+      const count = isMulti ? selectedColumnIds.size : 1;
+      const cardData = columns[actualCardId];
+
+      return (
+        <Box
+          sx={{
+            p: 1,
+            px: 2,
+            bgcolor: 'background.paper',
+            borderRadius: 8,
+            boxShadow: 8,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            border: '1px solid #e0e0e0',
+            opacity: 0.95,
+            transform: 'rotate(-2deg)',
+            cursor: 'grabbing',
+            maxWidth: 300,
+          }}
+        >
+          <DragIndicatorIcon fontSize="small" color="disabled" />
+          <Typography
+            variant="body2"
+            fontWeight="bold"
+            noWrap
+            sx={{ textOverflow: 'ellipsis', overflow: 'hidden' }}
+          >
+            {cardData?.name || 'Column'}
+          </Typography>
+          {isMulti && (
+            <Box
+              sx={{
+                ml: 0.5,
+                px: 1,
+                py: 0.25,
+                bgcolor: 'primary.main',
+                color: 'white',
+                borderRadius: 4,
+                fontSize: '0.75rem',
+                fontWeight: 'bold',
+              }}
+            >
+              +{count - 1} more
             </Box>
+          )}
+        </Box>
+      );
+    }
+    return null;
+  };
 
-            <div className="space-y-3">
-              {isCreatingGroup && selectedColumnIds.size > 0 ? (
-                <>
-                  {/* Selected cards wrapped in a group container */}
-                  <div className="border-[3px] border-gray-900 rounded-lg p-4 bg-white shadow-sm relative mb-6">
-                    {/* Header of the container with Label and Dropdown */}
-                    <div className="flex items-center gap-4 mb-4 pb-4 border-b border-gray-100">
-                      <Typography variant="h6" className="font-bold text-gray-900">
-                        New Group
-                      </Typography>
-                      <div className="flex items-center gap-2">
-                        <Typography variant="body2" className="text-gray-600 font-medium">
-                          Map to Tool:
-                        </Typography>
-                        <Autocomplete
-                          options={FORMATTED_TERMS}
-                          getOptionLabel={(option) => option.label}
-                          isOptionEqualToValue={(option, value) => option.id === value.id}
-                          onChange={(_, value) => {
-                            if (value) {
-                              handleBulkAssignTerm(value.id);
-                              setIsCreatingGroup(false);
-                            }
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder="Search for tool..."
-                              size="small"
-                              className="w-64 bg-gray-50"
-                              variant="outlined"
-                              autoFocus
-                            />
-                          )}
-                          size="small"
-                        />
-                      </div>
-                      <div className="flex-1" />
-                      <Button
-                        size="small"
-                        color="inherit"
-                        onClick={() => setIsCreatingGroup(false)}
-                        className="text-gray-500"
-                        startIcon={<CancelIcon fontSize="small" />}
-                      >
-                        Cancel
-                      </Button>
-                    </div>
+  return (
+    <DndContext
+      sensors={sensors}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDragCancel={handleDragCancel}
+      collisionDetection={pointerWithin}
+    >
+      <div
+        className="flex flex-col gap-6 h-[70vh] overflow-hidden relative"
+        data-cy="column-annotation-container"
+      >
+        {onToggleMock && (
+          <div className="absolute top-0 right-4 z-50">
+            <Button variant="outlined" color="primary" onClick={onToggleMock}>
+              Switch to multi-column measure
+            </Button>
+          </div>
+        )}
 
-                    <div className="space-y-3">
-                      {columnCardData
-                        .filter((c) => selectedColumnIds.has(c.columnId))
-                        .map((columnData) => (
-                          <div key={columnData.columnId} className="w-full flex items-center gap-3">
-                            <div className="flex-1 min-w-0">
-                              <ColumnAnnotationCard
-                                id={columnData.columnId}
-                                name={columnData.name}
-                                description={columnData.description}
-                                dataType={columnData.dataType}
-                                standardizedVariableId={columnData.standardizedVariableId}
-                                standardizedVariableOptions={MOCK_OPTIONS}
-                                isDataTypeEditable={columnData.isDataTypeEditable}
-                                inferredDataTypeLabel={columnData.inferredDataTypeLabel}
-                                term={columnData.term}
-                                termLabel={columnData.termLabel}
-                                selected={selectedColumnIds.has(columnData.columnId)}
-                                hideDescription
-                                onClick={(e) => handleCardClick(e, columnData.columnId)}
-                                onDescriptionChange={handleDescriptionChange}
-                                onDataTypeChange={handleDataTypeChange}
-                                onStandardizedVariableChange={handleStandardizedVariableChange}
-                              />
-                            </div>
-                            <Tooltip title="Remove from selection">
-                              <IconButton
-                                onClick={() => {
-                                  setSelectedColumnIds((prev) => {
-                                    const updated = new Set(prev);
-                                    updated.delete(columnData.columnId);
-                                    return updated;
-                                  });
-                                }}
-                                color="error"
-                                className="flex-shrink-0"
-                              >
-                                <CloseIcon />
-                              </IconButton>
-                            </Tooltip>
-                          </div>
-                        ))}
-                    </div>
+        <div className="flex flex-1 overflow-hidden">
+          {/* -- TAXONOMY SIDEBAR -- */}
+          <MockTaxonomySidebar
+            nodes={taxonomyNodes}
+            selectedNodeId={selectedNodeId}
+            onNodeSelect={setSelectedNodeId}
+          />
+
+          <div className="flex-1 flex flex-col overflow-hidden max-w-6xl mx-auto w-full">
+            <div className="px-4 pt-4 shrink-0 flex flex-col gap-3">
+              <SearchFilter
+                value={searchQuery}
+                onChange={setSearchQuery}
+                onClear={() => setSearchQuery('')}
+                showingCount={filteredColumnsArray.length}
+                totalCount={columnsArray.length}
+                hasActiveFilters={searchQuery.length > 0 || selectedNodeId !== null}
+                onClearAll={() => {
+                  setSearchQuery('');
+                  setSelectedNodeId(null);
+                }}
+              />
+              {/* ACTION BAR INLINE */}
+              <MockActionBar
+                selectedCount={selectedColumnIds.size}
+                options={MOCK_OPTIONS}
+                onClearSelection={handleClearSelection}
+                onAssignVariable={handleBulkAssignVariable}
+                onIsCreatingGroupChange={() => {}} // No longer used in paperpile design
+              />
+            </div>
+            <div className="flex-1 overflow-y-auto px-4 pb-20 pt-4" data-cy="scrollable-container">
+              {/* Global Header Row - Sticky */}
+              <Box className="sticky top-0 z-10 mb-4 border border-gray-200 shadow-sm rounded-t-lg backdrop-blur-sm bg-opacity-95 bg-gray-100 grid grid-cols-[1fr_3fr] md:grid-cols-[1fr_4fr] gap-4 px-4 pt-3 pb-1 items-end min-w-[768px]">
+                <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  Data Type
+                </span>
+                <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  Mapped Variable
+                </span>
+              </Box>
+
+              <div className="space-y-3">
+                {/* Flat rendering flow with paperpile-style chips */}
+                {columnCardData.map((columnData) => (
+                  <div key={columnData.columnId} className="w-full">
+                    <ColumnAnnotationCard
+                      id={columnData.columnId}
+                      name={columnData.name}
+                      description={columnData.description}
+                      dataType={columnData.dataType}
+                      standardizedVariableId={columnData.standardizedVariableId}
+                      standardizedVariableOptions={MOCK_OPTIONS}
+                      isDataTypeEditable={columnData.isDataTypeEditable}
+                      inferredDataTypeLabel={columnData.inferredDataTypeLabel}
+                      term={columnData.term}
+                      termLabel={columnData.termLabel}
+                      termTooltip={columnData.termTooltip}
+                      standardizedVariableLabel={columnData.standardizedVariableLabel}
+                      selected={selectedColumnIds.has(columnData.columnId)}
+                      onChipClick={setSelectedNodeId}
+                      onClick={(e) => handleCardClick(e, columnData.columnId)}
+                      onDescriptionChange={handleDescriptionChange}
+                      onDataTypeChange={handleDataTypeChange}
+                      onStandardizedVariableChange={handleStandardizedVariableChange}
+                    />
                   </div>
+                ))}
 
-                  {/* Unselected cards outside the container */}
-                  {columnCardData
-                    .filter((c) => !selectedColumnIds.has(c.columnId))
-                    .map((columnData) => (
-                      <div key={columnData.columnId} className="w-full opacity-50 pointer-events-none transition-opacity">
-                        <ColumnAnnotationCard
-                          id={columnData.columnId}
-                          name={columnData.name}
-                          description={columnData.description}
-                          dataType={columnData.dataType}
-                          standardizedVariableId={columnData.standardizedVariableId}
-                          standardizedVariableOptions={MOCK_OPTIONS}
-                          isDataTypeEditable={columnData.isDataTypeEditable}
-                          inferredDataTypeLabel={columnData.inferredDataTypeLabel}
-                          term={columnData.term}
-                          termLabel={columnData.termLabel}
-                          selected={false}
-                          onClick={(e) => handleCardClick(e, columnData.columnId)}
-                          onDescriptionChange={handleDescriptionChange}
-                          onDataTypeChange={handleDataTypeChange}
-                          onStandardizedVariableChange={handleStandardizedVariableChange}
-                        />
-                      </div>
-                    ))}
-                </>
-              ) : (
-                /* Normal rendering flow with persistent groups for assigned terms */
-                (() => {
-                  const groupedByTerm = new Map<string, typeof columnCardData>();
-                  const ungrouped: typeof columnCardData = [];
-
-                  columnCardData.forEach(c => {
-                    if (c.term) {
-                      if (!groupedByTerm.has(c.term)) groupedByTerm.set(c.term, []);
-                      groupedByTerm.get(c.term)!.push(c);
-                    } else {
-                      ungrouped.push(c);
-                    }
-                  });
-
-                  return (
-                    <>
-                      {/* Render grouped columns in containers */}
-                      {Array.from(groupedByTerm.entries()).map(([termId, cols]) => (
-                        <div key={termId} className="border-2 border-gray-300 rounded-lg p-4 bg-gray-50/50 shadow-sm relative mb-6">
-                          <div className="flex items-center gap-4 mb-4 pb-3 border-b border-gray-200">
-                            <Typography variant="h6" className="font-bold text-gray-800">
-                              {cols[0].termLabel || termId}
-                            </Typography>
-                            <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
-                              {cols.length} column{cols.length !== 1 ? 's' : ''}
-                            </span>
-                          </div>
-                          <div className="space-y-3">
-                            {cols.map((columnData) => (
-                              <div key={columnData.columnId} className="w-full flex items-center gap-3">
-                                <div className="flex-1 min-w-0">
-                                  <ColumnAnnotationCard
-                                    id={columnData.columnId}
-                                    name={columnData.name}
-                                    description={columnData.description}
-                                    dataType={columnData.dataType}
-                                    standardizedVariableId={columnData.standardizedVariableId}
-                                    standardizedVariableOptions={MOCK_OPTIONS}
-                                    isDataTypeEditable={columnData.isDataTypeEditable}
-                                    inferredDataTypeLabel={columnData.inferredDataTypeLabel}
-                                    term={columnData.term}
-                                    termLabel={columnData.termLabel}
-                                    selected={selectedColumnIds.has(columnData.columnId)}
-                                    hideDescription={true}
-                                    onClick={(e) => handleCardClick(e, columnData.columnId)}
-                                    onDescriptionChange={handleDescriptionChange}
-                                    onDataTypeChange={handleDataTypeChange}
-                                    onStandardizedVariableChange={handleStandardizedVariableChange}
-                                  />
-                                </div>
-                                <Tooltip title="Remove from group">
-                                  <IconButton
-                                    onClick={() => handleRemoveFromGroup(columnData.columnId)}
-                                    color="error"
-                                    className="flex-shrink-0"
-                                  >
-                                    <CloseIcon />
-                                  </IconButton>
-                                </Tooltip>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-
-                      {/* Render ungrouped columns normally */}
-                      {ungrouped.map((columnData) => (
-                        <div key={columnData.columnId} className="w-full">
-                          <ColumnAnnotationCard
-                            id={columnData.columnId}
-                            name={columnData.name}
-                            description={columnData.description}
-                            dataType={columnData.dataType}
-                            standardizedVariableId={columnData.standardizedVariableId}
-                            standardizedVariableOptions={MOCK_OPTIONS}
-                            isDataTypeEditable={columnData.isDataTypeEditable}
-                            inferredDataTypeLabel={columnData.inferredDataTypeLabel}
-                            term={columnData.term}
-                            termLabel={columnData.termLabel}
-                            selected={selectedColumnIds.has(columnData.columnId)}
-                            onClick={(e) => handleCardClick(e, columnData.columnId)}
-                            onDescriptionChange={handleDescriptionChange}
-                            onDataTypeChange={handleDataTypeChange}
-                            onStandardizedVariableChange={handleStandardizedVariableChange}
-                          />
-                        </div>
-                      ))}
-                    </>
-                  );
-                })()
-              )}
-
-              {filteredColumnsArray.length === 0 && (
-                <div className="text-center py-8 text-gray-500">
-                  <Typography>No columns match the selected filter.</Typography>
-                </div>
-              )}
+                {filteredColumnsArray.length === 0 && (
+                  <div className="text-center py-8 text-gray-500">
+                    <Typography>No columns match the selected filter.</Typography>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+      <DragOverlay dropAnimation={null}>{renderDragOverlay()}</DragOverlay>
+    </DndContext>
   );
 }
 

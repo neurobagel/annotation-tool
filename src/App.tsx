@@ -1,11 +1,11 @@
 import { useTheme } from '@mui/material/styles';
 import { useState, useEffect } from 'react';
 import AppTitle from './components/AppTitle';
+import MockColumnAnnotation from './components/MockColumnAnnotation';
 // import ColumnAnnotation from './components/ColumnAnnotation';
 // import Download from './components/Download';
 // import Landing from './components/Landing';
 import MockMultiColumnMeasures from './components/MockMultiColumnMeasures';
-import MockColumnAnnotation from './components/MockColumnAnnotation';
 import NavStepper from './components/NavStepper';
 import NavigationButton from './components/NavigationButton';
 // import Upload from './components/Upload';
