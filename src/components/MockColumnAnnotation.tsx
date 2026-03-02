@@ -9,10 +9,11 @@ import {
   pointerWithin,
 } from '@dnd-kit/core';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import { useState, useMemo } from 'react';
 import { useDebounce } from 'use-debounce';
-import assessmentData from '../../enigma.json';
+import Joyride, { CallBackProps, STATUS, Step, EVENTS } from 'react-joyride';
+import assessmentData from '../assets/default_config/assessment.json';
 
 interface MockAssessmentTerm {
   id: string;
@@ -943,6 +944,64 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
   const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
   const [activeDragEvent, setActiveDragEvent] = useState<DragStartEvent | null>(null);
 
+  // -- Tour State --
+  const [runTour, setRunTour] = useState(false);
+
+  const tourSteps: Step[] = [
+    {
+      target: 'body',
+      placement: 'center',
+      title: 'Welcome to Column Annotation',
+      content: 'Column Annotation allows you to map your dataset columns to standardized variables and terms using an intuitive drag-and-drop interface.',
+      disableBeacon: true,
+    },
+    {
+      target: '[data-tour="tour-demographics"]',
+      title: 'Demographics',
+      content: 'Quickly map common demographic variables like Age, Sex, or Diagnosis by dragging them directly onto your column cards.',
+    },
+    {
+      target: '[data-tour="tour-assessment"]',
+      title: 'Assessment Tools',
+      content: 'Here you can browse available neurocognitive assessment tools. You can drag a specific tool directly onto a column card to map it.',
+    },
+    {
+      target: '[data-tour="tour-datatypes"]',
+      title: 'Data Types',
+      content: 'Assign columns as Categorical or Continuous by dragging these data types onto a card, or dragging a card here.',
+    },
+    {
+      target: '[data-tour="tour-action-bar"]',
+      title: 'Filtering & Sorting',
+      content: 'Use this bar to search for columns, hide those you\'ve already mapped, and sort Column Annotation by name, status, or data type.',
+    },
+    {
+      target: '[data-tour="tour-column-card-0"]',
+      title: 'Column Cards',
+      content: 'These represent the columns in your dataset. You can click to select multiple cards, and drag them to the sidebar to map them in bulk!',
+    }
+  ];
+
+  const handleJoyrideCallback = (data: CallBackProps) => {
+    const { status, type, step } = data;
+    const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
+
+    if (finishedStatuses.includes(status)) {
+      setRunTour(false);
+    }
+
+    // Force element into the vertical center of its scrolling container 
+    // to prevent it from being hidden behind sticky headers or clipped.
+    if (type === EVENTS.STEP_BEFORE) {
+      if (step && step.target && typeof step.target === 'string') {
+        const targetEl = document.querySelector(step.target);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'auto', block: 'center' });
+        }
+      }
+    }
+  };
+
   const columnsArray = Object.entries(columns);
 
   // -- DndKit Sensors --
@@ -1473,6 +1532,21 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
       onDragCancel={handleDragCancel}
       collisionDetection={pointerWithin}
     >
+      <Joyride
+        steps={tourSteps}
+        run={runTour}
+        continuous
+        showProgress
+        showSkipButton
+        disableScrolling={true}
+        callback={handleJoyrideCallback}
+        styles={{
+          options: {
+            primaryColor: '#1976d2', // MUI primary color
+            zIndex: 10000,
+          },
+        }}
+      />
       <div
         className="flex flex-col gap-6 h-[70vh] overflow-hidden relative"
         data-cy="column-annotation-container"
@@ -1492,7 +1566,10 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
           />
 
           <div className="flex-1 flex flex-col overflow-hidden max-w-6xl mx-auto w-full">
-            <div className="px-4 pt-4 shrink-0 flex flex-col gap-3">
+            <div className="flex justify-end pt-2 px-4 shrink-0">
+              <Button variant="outlined" size="small" onClick={() => setRunTour(true)}>Take UI Tour</Button>
+            </div>
+            <div className="px-4 pt-2 shrink-0 flex flex-col gap-3" data-tour="tour-action-bar">
               <MockSearchFilter
                 value={searchQuery}
                 onChange={setSearchQuery}
@@ -1534,8 +1611,8 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
 
               <div className="space-y-3">
                 {/* Flat rendering flow with paperpile-style chips */}
-                {columnCardData.map((columnData) => (
-                  <div key={columnData.columnId} className="w-full">
+                {columnCardData.map((columnData, index) => (
+                  <div key={columnData.columnId} className="w-full" data-tour={index === 0 ? "tour-column-card-0" : undefined}>
                     <MockColumnAnnotationCard
                       id={columnData.columnId}
                       name={columnData.name}

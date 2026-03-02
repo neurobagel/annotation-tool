@@ -33,9 +33,10 @@ interface DraggableTreeItemProps {
     label: React.ReactNode;
     children?: React.ReactNode;
     isSelected?: boolean;
+    dataTour?: string;
 }
 
-function DraggableTreeItem({ nodeId, label, children, isSelected }: DraggableTreeItemProps) {
+function DraggableTreeItem({ nodeId, label, children, isSelected, dataTour }: DraggableTreeItemProps) {
     const { setNodeRef: setDroppableRef, isOver } = useDroppable({
         id: `sidebar - ${nodeId} `,
         data: { type: 'sidebar', id: nodeId },
@@ -62,6 +63,7 @@ function DraggableTreeItem({ nodeId, label, children, isSelected }: DraggableTre
                     }}
                     {...listeners}
                     {...attributes}
+                    data-tour={dataTour}
                     sx={{
                         display: 'flex',
                         alignItems: 'center',
@@ -191,6 +193,11 @@ export default function MockTaxonomySidebar({
                     nodeId={node.id}
                     label={labelContent}
                     isSelected={selectedNodeId === node.id}
+                    dataTour={
+                        node.id === 'std_assessment' ? 'tour-assessment' :
+                            node.id === 'data_types' ? 'tour-datatypes' :
+                                node.id === 'demographics' ? 'tour-demographics' : undefined
+                    }
                 >
                     {node.id === 'std_assessment' && (
                         <Box
