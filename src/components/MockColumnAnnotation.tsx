@@ -965,11 +965,13 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
       title: 'Assessment Tools',
       content: 'Here you can browse available neurocognitive assessment tools. You can drag a specific tool directly onto a column card to map it.',
     },
+    /*
     {
       target: '[data-tour="tour-datatypes"]',
       title: 'Data Types',
       content: 'Assign columns as Categorical or Continuous by dragging these data types onto a card, or dragging a card here.',
     },
+    */
     {
       target: '[data-tour="tour-action-bar"]',
       title: 'Filtering & Sorting',
@@ -1082,7 +1084,8 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
       });
     }
 
-    // 3. Group 3: Data Types
+    // 3. Group 3: Data Types (Commented out per request)
+    /*
     const dataTypesNode: TaxonomyNode = {
       id: 'data_types',
       label: 'Data Types',
@@ -1108,8 +1111,9 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
       count: continuousCount,
     });
     dataTypesNode.count = categoricalCount + continuousCount;
+    */
 
-    return [dataTypesNode, demographicsNode, assessmentsNode];
+    return [demographicsNode, assessmentsNode];
   }, [columnsArray]);
 
   // -- Filtered Data & Selection State --

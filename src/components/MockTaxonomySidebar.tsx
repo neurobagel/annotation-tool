@@ -284,7 +284,7 @@ export default function MockTaxonomySidebar({
             }}
         >
             <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
-                Terminology & Data Types
+                ENIGMA-PD Community
             </Typography>
             <SimpleTreeView
                 aria-label="taxonomy sidebar"
