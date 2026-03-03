@@ -90,6 +90,9 @@ describe('ColumnAnnotation', () => {
     cy.get('[data-cy="1-column-annotation-card"]').should('be.visible');
   });
   it('edits the description', () => {
+    cy.spy(useDataStore.getState().actions, 'userUpdatesColumnDescription').as(
+      'userUpdatesColumnDescription'
+    );
     cy.mount(<ColumnAnnotation />);
     cy.get('[data-cy="1-description"] textarea')
       .first()
@@ -97,7 +100,7 @@ describe('ColumnAnnotation', () => {
       .should('be.visible');
     cy.get('@descriptionTextarea').clear();
     cy.get('@descriptionTextarea').type('new description');
-    cy.get('@descriptionTextarea').should('have.value', 'new description');
+    cy.get('@userUpdatesColumnDescription').should('have.been.calledWith', '1', 'new description');
   });
   it('toggles the data type between categorical and continuous', () => {
     cy.mount(<ColumnAnnotation />);
@@ -121,5 +124,55 @@ describe('ColumnAnnotation', () => {
       'not.have.class',
       'Mui-selected'
     );
+  });
+
+  it('filters columns based on search input', () => {
+    cy.mount(<ColumnAnnotation />);
+
+    cy.get('[data-cy="search-filter-input"]').should('be.visible');
+    cy.get('[data-cy="search-filter-counter"]').should('contain', 'Showing 4 of 4 columns');
+
+    cy.get('[data-cy="search-filter-input"]').type('another');
+
+    cy.get('[data-cy="search-filter-counter"]').should('contain', '1 of 4');
+    cy.get('[data-cy="2-column-annotation-card"]').should('be.visible');
+    cy.get('[data-cy="1-column-annotation-card"]').should('not.exist');
+    cy.get('[data-cy="3-column-annotation-card"]').should('not.exist');
+    cy.get('[data-cy="4-column-annotation-card"]').should('not.exist');
+
+    cy.get('[data-cy="search-filter-clear"]').click();
+    cy.get('[data-cy="search-filter-input"] input').should('have.value', '');
+    cy.get('[data-cy="search-filter-counter"]').should('contain', '4 of 4');
+
+    cy.get('[data-cy="search-filter-input"]').type('COLUMN');
+    cy.get('[data-cy="search-filter-counter"]').should('contain', '4 of 4');
+
+    cy.get('[data-cy="search-filter-input"]').type('{selectall}{backspace}NONEXISTENT');
+    cy.get('[data-cy="no-columns-found-message"]')
+      .should('be.visible')
+      .and('contain', 'NONEXISTENT');
+  });
+
+  it('allows editing a column while filtered', () => {
+    cy.spy(useDataStore.getState().actions, 'userUpdatesColumnDescription').as(
+      'userUpdatesColumnDescription'
+    );
+    cy.mount(<ColumnAnnotation />);
+
+    cy.get('[data-cy="search-filter-input"]').type('another');
+    cy.get('[data-cy="search-filter-counter"]').should('contain', '1 of 4');
+
+    cy.get('[data-cy="2-description"]').type(
+      '{selectall}{backspace}Edited description while filtered'
+    );
+
+    cy.get('@userUpdatesColumnDescription').should(
+      'have.been.calledWith',
+      '2',
+      'Edited description while filtered'
+    );
+
+    cy.get('[data-cy="search-filter-clear"]').click();
+    cy.get('[data-cy="search-filter-counter"]').should('contain', '4 of 4');
   });
 });
