@@ -23,7 +23,8 @@ function App() {
   const disableUploadNextButton = useUploadedDataTableFileName() == null;
 
   const theme = useTheme();
-  const appBarHeight = theme.mixins.toolbar.minHeight || 64;
+  const appBarHeight =
+    typeof theme.mixins.toolbar.minHeight === 'number' ? theme.mixins.toolbar.minHeight : 64;
 
   // const disableConfig = (import.meta.env.NB_DISABLE_CONFIG ?? 'true').toLowerCase() === 'true';
 
@@ -72,19 +73,15 @@ function App() {
       className="flex flex-col overflow-x-hidden"
       style={{
         minHeight: `calc(100vh - ${appBarHeight}px)`,
-        marginTop: appBarHeight,
+        marginTop: appBarHeight + 20,
       }}
     >
-      {currentView !== View.Landing && (
-        <>
-          <AppTitle
-            title="Neurobagel Annotation Tool"
-            githubUrl="https://github.com/neurobagel/annotation-tool"
-            docsUrl="https://neurobagel.org/user_guide/annotation_tool/"
-          />
-          <NavStepper currentView={currentView} />
-        </>
-      )}
+      <AppTitle
+        title="Neurobagel Annotation Tool"
+        githubUrl="https://github.com/neurobagel/annotation-tool"
+        docsUrl="https://neurobagel.org/user_guide/annotation_tool/"
+      />
+      {currentView !== View.Landing && <NavStepper currentView={currentView} />}
 
       {content}
 

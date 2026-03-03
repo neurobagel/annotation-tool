@@ -11,30 +11,32 @@ import {
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { Box, Typography, Button } from '@mui/material';
 import { useState, useMemo } from 'react';
-import { useDebounce } from 'use-debounce';
 import Joyride, { CallBackProps, STATUS, Step, EVENTS } from 'react-joyride';
+import { useDebounce } from 'use-debounce';
 import assessmentData from '../assets/default_config/assessment.json';
+import { DataType } from '../utils/internal_types';
+import MockColumnAnnotationCard from './MockColumnAnnotationCard';
+import MockSearchFilter from './MockSearchFilter';
+import MockTaxonomySidebar, { TaxonomyNode } from './MockTaxonomySidebar';
 
 interface MockAssessmentTerm {
   id: string;
   label: string;
   abbreviation: string;
 }
-import { DataType } from '../utils/internal_types';
-import MockColumnAnnotationCard from './MockColumnAnnotationCard';
-import MockTaxonomySidebar, { TaxonomyNode } from './MockTaxonomySidebar';
-import MockSearchFilter from './MockSearchFilter';
 
 const ALL_TERMS = assessmentData.flatMap((vocab: any) =>
   vocab.terms.map((term: any) => ({
     id: term.id,
     label: term.name,
-    abbreviation: term.abbreviation || term.name
-      .split(' ')
-      .map((w: any) => w[0])
-      .join('')
-      .toUpperCase()
-      .substring(0, 4),
+    abbreviation:
+      term.abbreviation ||
+      term.name
+        .split(' ')
+        .map((w: any) => w[0])
+        .join('')
+        .toUpperCase()
+        .substring(0, 4),
   }))
 );
 
@@ -43,884 +45,880 @@ const TERM_BY_ID = new Map(ALL_TERMS.map((t: MockAssessmentTerm) => [t.id, t]));
 // -- Mock Data Definitions --
 
 const MOCK_COLUMNS: any = {
-  "participant_id": {
-    "id": "participant_id",
-    "name": "participant_id",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "redcap_event_name": {
-    "id": "redcap_event_name",
-    "name": "redcap_event_name",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "sex": {
-    "id": "sex",
-    "name": "sex",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "diagnosis_group_for_analysis": {
-    "id": "diagnosis_group_for_analysis",
-    "name": "diagnosis_group_for_analysis",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Semantic Fluency Actions (Raw score)": {
-    "id": "Semantic Fluency Actions (Raw score)",
-    "name": "Semantic Fluency Actions (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Copy raw": {
-    "id": "Copy raw",
-    "name": "Copy raw",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Letter Fluency Total (Automatic Calculation)": {
-    "id": "Letter Fluency Total (Automatic Calculation)",
-    "name": "Letter Fluency Total (Automatic Calculation)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Was the Stroop Colour and Word test (Golden) administered?": {
-    "id": "Was the Stroop Colour and Word test (Golden) administered?",
-    "name": "Was the Stroop Colour and Word test (Golden) administered?",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Was the Letter Fluency test administered?": {
-    "id": "Was the Letter Fluency test administered?",
-    "name": "Was the Letter Fluency test administered?",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Delayed recall raw": {
-    "id": "Delayed recall raw",
-    "name": "Delayed recall raw",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Trail A Errors raw score": {
-    "id": "Trail A Errors raw score",
-    "name": "Trail A Errors raw score",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Trial total 1,2,3 (Raw score)": {
-    "id": "Trial total 1,2,3 (Raw score)",
-    "name": "Trial total 1,2,3 (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Letter Fluency A (Raw score)": {
-    "id": "Letter Fluency A (Raw score)",
-    "name": "Letter Fluency A (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Stroop - D-Kefs - Cond.1: Total errors (Automatic Calculation)": {
-    "id": "Stroop - D-Kefs - Cond.1: Total errors (Automatic Calculation)",
-    "name": "Stroop - D-Kefs - Cond.1: Total errors (Automatic Calculation)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Stroop - D-Kefs, Cond. 1 - COLORS : Time (sec) (Raw score)": {
-    "id": "Stroop - D-Kefs, Cond. 1 - COLORS : Time (sec) (Raw score)",
-    "name": "Stroop - D-Kefs, Cond. 1 - COLORS : Time (sec) (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Was the Rey Complex Figure Test administered?": {
-    "id": "Was the Rey Complex Figure Test administered?",
-    "name": "Was the Rey Complex Figure Test administered?",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Stroop - D-Kefs - Cond. 3 - 1 (time) (Automatic Calculation)": {
-    "id": "Stroop - D-Kefs - Cond. 3 - 1 (time) (Automatic Calculation)",
-    "name": "Stroop - D-Kefs - Cond. 3 - 1 (time) (Automatic Calculation)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Semantic Fluency Total (Automatic Calculation)": {
-    "id": "Semantic Fluency Total (Automatic Calculation)",
-    "name": "Semantic Fluency Total (Automatic Calculation)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Stroop - D-Kefs - cond. 1: self-corrected errors (Raw score)": {
-    "id": "Stroop - D-Kefs - cond. 1: self-corrected errors (Raw score)",
-    "name": "Stroop - D-Kefs - cond. 1: self-corrected errors (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Trail B Errors raw score": {
-    "id": "Trail B Errors raw score",
-    "name": "Trail B Errors raw score",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Stroop - D-Kefs - Cond. 3 - 1 (time)": {
-    "id": "Stroop - D-Kefs - Cond. 3 - 1 (time)",
-    "name": "Stroop - D-Kefs - Cond. 3 - 1 (time)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Trail A raw score (time in sec.)": {
-    "id": "Trail A raw score (time in sec.)",
-    "name": "Trail A raw score (time in sec.)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Immediate recall time (sec)": {
-    "id": "Immediate recall time (sec)",
-    "name": "Immediate recall time (sec)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Main dominante (30 sec)": {
-    "id": "Main dominante (30 sec)",
-    "name": "Main dominante (30 sec)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "STROOP GOLDEN: colors, uncorrected errors": {
-    "id": "STROOP GOLDEN: colors, uncorrected errors",
-    "name": "STROOP GOLDEN: colors, uncorrected errors",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Was the WAIS IV Digit Span test administered?": {
-    "id": "Was the WAIS IV Digit Span test administered?",
-    "name": "Was the WAIS IV Digit Span test administered?",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Copy Clock raw (max 10)": {
-    "id": "Copy Clock raw (max 10)",
-    "name": "Copy Clock raw (max 10)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Stroop GOLDEN : ink, self-corrected errors (raw score)": {
-    "id": "Stroop GOLDEN : ink, self-corrected errors (raw score)",
-    "name": "Stroop GOLDEN : ink, self-corrected errors (raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Stroop - D-Kefs - Cond.3: self-corrected errors (Raw score)": {
-    "id": "Stroop - D-Kefs - Cond.3: self-corrected errors (Raw score)",
-    "name": "Stroop - D-Kefs - Cond.3: self-corrected errors (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Main non dominante (30 sec)": {
-    "id": "Main non dominante (30 sec)",
-    "name": "Main non dominante (30 sec)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Trial 1 raw": {
-    "id": "Trial 1 raw",
-    "name": "Trial 1 raw",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Repetitions total 1,2,3 (Raw score)": {
-    "id": "Repetitions total 1,2,3 (Raw score)",
-    "name": "Repetitions total 1,2,3 (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "STROOP GOLDEN, words, uncorrected errors (raw score)": {
-    "id": "STROOP GOLDEN, words, uncorrected errors (raw score)",
-    "name": "STROOP GOLDEN, words, uncorrected errors (raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "BNT sans indice + IS": {
-    "id": "BNT sans indice + IS",
-    "name": "BNT sans indice + IS",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Command Clock raw (max 10)": {
-    "id": "Command Clock raw (max 10)",
-    "name": "Command Clock raw (max 10)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Total Set-Loss errors": {
-    "id": "Total Set-Loss errors",
-    "name": "Total Set-Loss errors",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Stroop - D-Kefs - Cond.3: Total errors (Raw score)": {
-    "id": "Stroop - D-Kefs - Cond.3: Total errors (Raw score)",
-    "name": "Stroop - D-Kefs - Cond.3: Total errors (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Trial 4 delayed (Raw score)": {
-    "id": "Trial 4 delayed (Raw score)",
-    "name": "Trial 4 delayed (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "BNT sans indice + IS + IP": {
-    "id": "BNT sans indice + IS + IP",
-    "name": "BNT sans indice + IS + IP",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Trial 2 raw": {
-    "id": "Trial 2 raw",
-    "name": "Trial 2 raw",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Digit span forward - longest correct serie (Raw score)": {
-    "id": "Digit span forward - longest correct serie (Raw score)",
-    "name": "Digit span forward - longest correct serie (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Stroop - D-Kefs - Cond.3: Total errors (Automatic calculation)": {
-    "id": "Stroop - D-Kefs - Cond.3: Total errors (Automatic calculation)",
-    "name": "Stroop - D-Kefs - Cond.3: Total errors (Automatic calculation)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Trial 3 raw": {
-    "id": "Trial 3 raw",
-    "name": "Trial 3 raw",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "STROOP GOLDEN : COLORS Number of responses": {
-    "id": "STROOP GOLDEN : COLORS Number of responses",
-    "name": "STROOP GOLDEN : COLORS Number of responses",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Was the CDT test administered?": {
-    "id": "Was the CDT test administered?",
-    "name": "Was the CDT test administered?",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Letter Fluency Total (Raw score)": {
-    "id": "Letter Fluency Total (Raw score)",
-    "name": "Letter Fluency Total (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Stroop - D-Kefs - Cond.3: Uncorrected errors (Raw score)": {
-    "id": "Stroop - D-Kefs - Cond.3: Uncorrected errors (Raw score)",
-    "name": "Stroop - D-Kefs - Cond.3: Uncorrected errors (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Stroop - D-Kefs - Cond.2 WORDS: Time (sec) (Raw score)": {
-    "id": "Stroop - D-Kefs - Cond.2 WORDS: Time (sec) (Raw score)",
-    "name": "Stroop - D-Kefs - Cond.2 WORDS: Time (sec) (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Stroop GOLDEN, ink, uncorrected errors (raw score)": {
-    "id": "Stroop GOLDEN, ink, uncorrected errors (raw score)",
-    "name": "Stroop GOLDEN, ink, uncorrected errors (raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Main non dominante (1 min)": {
-    "id": "Main non dominante (1 min)",
-    "name": "Main non dominante (1 min)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Stroop - D-Kefs - Cond.1: Total errors (Raw score)": {
-    "id": "Stroop - D-Kefs - Cond.1: Total errors (Raw score)",
-    "name": "Stroop - D-Kefs - Cond.1: Total errors (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Was the Boston Naming test administered?": {
-    "id": "Was the Boston Naming test administered?",
-    "name": "Was the Boston Naming test administered?",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Stroop - D-Kefs - Cond.2: total errors (Raw score)": {
-    "id": "Stroop - D-Kefs - Cond.2: total errors (Raw score)",
-    "name": "Stroop - D-Kefs - Cond.2: total errors (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Was the Brixton test administered?": {
-    "id": "Was the Brixton test administered?",
-    "name": "Was the Brixton test administered?",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Digit Span Forward - total correct (Raw score)": {
-    "id": "Digit Span Forward - total correct (Raw score)",
-    "name": "Digit Span Forward - total correct (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Letter Fluency S (Raw score)": {
-    "id": "Letter Fluency S (Raw score)",
-    "name": "Letter Fluency S (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Brixton raw score": {
-    "id": "Brixton raw score",
-    "name": "Brixton raw score",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "STROOP GOLDEN : colors, self-corrected errors (raw scores)": {
-    "id": "STROOP GOLDEN : colors, self-corrected errors (raw scores)",
-    "name": "STROOP GOLDEN : colors, self-corrected errors (raw scores)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Main dominante (1 min)": {
-    "id": "Main dominante (1 min)",
-    "name": "Main dominante (1 min)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Digit span backward - longest correct serie (Raw score)": {
-    "id": "Digit span backward - longest correct serie (Raw score)",
-    "name": "Digit span backward - longest correct serie (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Was the Semantic Fluency test administered?": {
-    "id": "Was the Semantic Fluency test administered?",
-    "name": "Was the Semantic Fluency test administered?",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Stroop - D-Kefs - Cond.2: total errors (Automatic Calculation)": {
-    "id": "Stroop - D-Kefs - Cond.2: total errors (Automatic Calculation)",
-    "name": "Stroop - D-Kefs - Cond.2: total errors (Automatic Calculation)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Deux mains (30 sec)": {
-    "id": "Deux mains (30 sec)",
-    "name": "Deux mains (30 sec)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "STROOP GOLDEN : WORDS, number of responses": {
-    "id": "STROOP GOLDEN : WORDS, number of responses",
-    "name": "STROOP GOLDEN : WORDS, number of responses",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Was the Stroop Colour and Word (D-KEFS) test administered?": {
-    "id": "Was the Stroop Colour and Word (D-KEFS) test administered?",
-    "name": "Was the Stroop Colour and Word (D-KEFS) test administered?",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Semantic Fluency Animals (Raw score)": {
-    "id": "Semantic Fluency Animals (Raw score)",
-    "name": "Semantic Fluency Animals (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Was the Purdue pegboard administered?": {
-    "id": "Was the Purdue pegboard administered?",
-    "name": "Was the Purdue pegboard administered?",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Trail B raw score (time in sec.)": {
-    "id": "Trail B raw score (time in sec.)",
-    "name": "Trail B raw score (time in sec.)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Letter Fluency F (Raw score)": {
-    "id": "Letter Fluency F (Raw score)",
-    "name": "Letter Fluency F (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Total repetition errors": {
-    "id": "Total repetition errors",
-    "name": "Total repetition errors",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Digit Span Backward - total correct (Raw score)": {
-    "id": "Digit Span Backward - total correct (Raw score)",
-    "name": "Digit Span Backward - total correct (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Stroop - D-Kefs -  Cond.2: Self-corrected errors (Raw score)": {
-    "id": "Stroop - D-Kefs -  Cond.2: Self-corrected errors (Raw score)",
-    "name": "Stroop - D-Kefs -  Cond.2: Self-corrected errors (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Delayed recall time (sec)": {
-    "id": "Delayed recall time (sec)",
-    "name": "Delayed recall time (sec)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Stroop - D-Kefs - Cond.2: uncorrected errors (Raw score)": {
-    "id": "Stroop - D-Kefs - Cond.2: uncorrected errors (Raw score)",
-    "name": "Stroop - D-Kefs - Cond.2: uncorrected errors (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Stroop GOLDEN: INK Number of Responses": {
-    "id": "Stroop GOLDEN: INK Number of Responses",
-    "name": "Stroop GOLDEN: INK Number of Responses",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Stroop - D-Kefs - Cond.3 - INK: Time (sec) (Raw score)": {
-    "id": "Stroop - D-Kefs - Cond.3 - INK: Time (sec) (Raw score)",
-    "name": "Stroop - D-Kefs - Cond.3 - INK: Time (sec) (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "STROOP GOLDEN : words, self-corrected errors (raw score)": {
-    "id": "STROOP GOLDEN : words, self-corrected errors (raw score)",
-    "name": "STROOP GOLDEN : words, self-corrected errors (raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Intrusions total 1,2,3 (Raw score)": {
-    "id": "Intrusions total 1,2,3 (Raw score)",
-    "name": "Intrusions total 1,2,3 (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Copy time (sec)": {
-    "id": "Copy time (sec)",
-    "name": "Copy time (sec)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Semantic Fluency Total (Raw score)": {
-    "id": "Semantic Fluency Total (Raw score)",
-    "name": "Semantic Fluency Total (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Was the Trails A B test administered?": {
-    "id": "Was the Trails A B test administered?",
-    "name": "Was the Trails A B test administered?",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Stroop - D-Kefs - Cond.1: Uncorrected errors (Raw score)": {
-    "id": "Stroop - D-Kefs - Cond.1: Uncorrected errors (Raw score)",
-    "name": "Stroop - D-Kefs - Cond.1: Uncorrected errors (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Was the Hopkins Verbal Learning Test Revised administered?": {
-    "id": "Was the Hopkins Verbal Learning Test Revised administered?",
-    "name": "Was the Hopkins Verbal Learning Test Revised administered?",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Immediate recall raw": {
-    "id": "Immediate recall raw",
-    "name": "Immediate recall raw",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Total Repetition errors": {
-    "id": "Total Repetition errors",
-    "name": "Total Repetition errors",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "BNT sans indice (Raw score)": {
-    "id": "BNT sans indice (Raw score)",
-    "name": "BNT sans indice (Raw score)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "neuropsy_age": {
-    "id": "neuropsy_age",
-    "name": "neuropsy_age",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "neuropsy_age_diff": {
-    "id": "neuropsy_age_diff",
-    "name": "neuropsy_age_diff",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "MoCA Total Score": {
-    "id": "MoCA Total Score",
-    "name": "MoCA Total Score",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "moca_age": {
-    "id": "moca_age",
-    "name": "moca_age",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "moca_age_diff": {
-    "id": "moca_age_diff",
-    "name": "moca_age_diff",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Part I: Non-Motor Aspects of Experiences of Daily Living (nM-EDL)": {
-    "id": "Part I: Non-Motor Aspects of Experiences of Daily Living (nM-EDL)",
-    "name": "Part I: Non-Motor Aspects of Experiences of Daily Living (nM-EDL)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Part II: Motor Aspects of Experiences of Daily Living (M-EDL)": {
-    "id": "Part II: Motor Aspects of Experiences of Daily Living (M-EDL)",
-    "name": "Part II: Motor Aspects of Experiences of Daily Living (M-EDL)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Part III: Motor Examination (harmonized)": {
-    "id": "Part III: Motor Examination (harmonized)",
-    "name": "Part III: Motor Examination (harmonized)",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "Part IV: Motor Complications": {
-    "id": "Part IV: Motor Complications",
-    "name": "Part IV: Motor Complications",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "updrs_age": {
-    "id": "updrs_age",
-    "name": "updrs_age",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  },
-  "updrs_age_diff": {
-    "id": "updrs_age_diff",
-    "name": "updrs_age_diff",
-    "description": null,
-    "dataType": null,
-    "isMapped": false,
-    "standardizedVariable": null,
-    "term": null
-  }
+  participant_id: {
+    id: 'participant_id',
+    name: 'participant_id',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  age_at_baseline_visit: {
+    id: 'age_at_baseline_visit',
+    name: 'age_at_baseline_visit',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  sex: {
+    id: 'sex',
+    name: 'sex',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  diagnosis_group_for_analysis: {
+    id: 'diagnosis_group_for_analysis',
+    name: 'diagnosis_group_for_analysis',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Semantic Fluency Actions (Raw score)': {
+    id: 'Semantic Fluency Actions (Raw score)',
+    name: 'Semantic Fluency Actions (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Copy raw': {
+    id: 'Copy raw',
+    name: 'Copy raw',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Letter Fluency Total (Automatic Calculation)': {
+    id: 'Letter Fluency Total (Automatic Calculation)',
+    name: 'Letter Fluency Total (Automatic Calculation)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Was the Stroop Colour and Word test (Golden) administered?': {
+    id: 'Was the Stroop Colour and Word test (Golden) administered?',
+    name: 'Was the Stroop Colour and Word test (Golden) administered?',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Was the Letter Fluency test administered?': {
+    id: 'Was the Letter Fluency test administered?',
+    name: 'Was the Letter Fluency test administered?',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Delayed recall raw': {
+    id: 'Delayed recall raw',
+    name: 'Delayed recall raw',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Trail A Errors raw score': {
+    id: 'Trail A Errors raw score',
+    name: 'Trail A Errors raw score',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Trial total 1,2,3 (Raw score)': {
+    id: 'Trial total 1,2,3 (Raw score)',
+    name: 'Trial total 1,2,3 (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Letter Fluency A (Raw score)': {
+    id: 'Letter Fluency A (Raw score)',
+    name: 'Letter Fluency A (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Stroop - D-Kefs - Cond.1: Total errors (Automatic Calculation)': {
+    id: 'Stroop - D-Kefs - Cond.1: Total errors (Automatic Calculation)',
+    name: 'Stroop - D-Kefs - Cond.1: Total errors (Automatic Calculation)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Stroop - D-Kefs, Cond. 1 - COLORS : Time (sec) (Raw score)': {
+    id: 'Stroop - D-Kefs, Cond. 1 - COLORS : Time (sec) (Raw score)',
+    name: 'Stroop - D-Kefs, Cond. 1 - COLORS : Time (sec) (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Was the Rey Complex Figure Test administered?': {
+    id: 'Was the Rey Complex Figure Test administered?',
+    name: 'Was the Rey Complex Figure Test administered?',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Stroop - D-Kefs - Cond. 3 - 1 (time) (Automatic Calculation)': {
+    id: 'Stroop - D-Kefs - Cond. 3 - 1 (time) (Automatic Calculation)',
+    name: 'Stroop - D-Kefs - Cond. 3 - 1 (time) (Automatic Calculation)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Semantic Fluency Total (Automatic Calculation)': {
+    id: 'Semantic Fluency Total (Automatic Calculation)',
+    name: 'Semantic Fluency Total (Automatic Calculation)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Stroop - D-Kefs - cond. 1: self-corrected errors (Raw score)': {
+    id: 'Stroop - D-Kefs - cond. 1: self-corrected errors (Raw score)',
+    name: 'Stroop - D-Kefs - cond. 1: self-corrected errors (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Trail B Errors raw score': {
+    id: 'Trail B Errors raw score',
+    name: 'Trail B Errors raw score',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Stroop - D-Kefs - Cond. 3 - 1 (time)': {
+    id: 'Stroop - D-Kefs - Cond. 3 - 1 (time)',
+    name: 'Stroop - D-Kefs - Cond. 3 - 1 (time)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Trail A raw score (time in sec.)': {
+    id: 'Trail A raw score (time in sec.)',
+    name: 'Trail A raw score (time in sec.)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Immediate recall time (sec)': {
+    id: 'Immediate recall time (sec)',
+    name: 'Immediate recall time (sec)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Main dominante (30 sec)': {
+    id: 'Main dominante (30 sec)',
+    name: 'Main dominante (30 sec)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'STROOP GOLDEN: colors, uncorrected errors': {
+    id: 'STROOP GOLDEN: colors, uncorrected errors',
+    name: 'STROOP GOLDEN: colors, uncorrected errors',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Was the WAIS IV Digit Span test administered?': {
+    id: 'Was the WAIS IV Digit Span test administered?',
+    name: 'Was the WAIS IV Digit Span test administered?',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Copy Clock raw (max 10)': {
+    id: 'Copy Clock raw (max 10)',
+    name: 'Copy Clock raw (max 10)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Stroop GOLDEN : ink, self-corrected errors (raw score)': {
+    id: 'Stroop GOLDEN : ink, self-corrected errors (raw score)',
+    name: 'Stroop GOLDEN : ink, self-corrected errors (raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Stroop - D-Kefs - Cond.3: self-corrected errors (Raw score)': {
+    id: 'Stroop - D-Kefs - Cond.3: self-corrected errors (Raw score)',
+    name: 'Stroop - D-Kefs - Cond.3: self-corrected errors (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Main non dominante (30 sec)': {
+    id: 'Main non dominante (30 sec)',
+    name: 'Main non dominante (30 sec)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Trial 1 raw': {
+    id: 'Trial 1 raw',
+    name: 'Trial 1 raw',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Repetitions total 1,2,3 (Raw score)': {
+    id: 'Repetitions total 1,2,3 (Raw score)',
+    name: 'Repetitions total 1,2,3 (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'STROOP GOLDEN, words, uncorrected errors (raw score)': {
+    id: 'STROOP GOLDEN, words, uncorrected errors (raw score)',
+    name: 'STROOP GOLDEN, words, uncorrected errors (raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'BNT sans indice + IS': {
+    id: 'BNT sans indice + IS',
+    name: 'BNT sans indice + IS',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Command Clock raw (max 10)': {
+    id: 'Command Clock raw (max 10)',
+    name: 'Command Clock raw (max 10)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Total Set-Loss errors': {
+    id: 'Total Set-Loss errors',
+    name: 'Total Set-Loss errors',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Stroop - D-Kefs - Cond.3: Total errors (Raw score)': {
+    id: 'Stroop - D-Kefs - Cond.3: Total errors (Raw score)',
+    name: 'Stroop - D-Kefs - Cond.3: Total errors (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Trial 4 delayed (Raw score)': {
+    id: 'Trial 4 delayed (Raw score)',
+    name: 'Trial 4 delayed (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'BNT sans indice + IS + IP': {
+    id: 'BNT sans indice + IS + IP',
+    name: 'BNT sans indice + IS + IP',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Trial 2 raw': {
+    id: 'Trial 2 raw',
+    name: 'Trial 2 raw',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Digit span forward - longest correct serie (Raw score)': {
+    id: 'Digit span forward - longest correct serie (Raw score)',
+    name: 'Digit span forward - longest correct serie (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Stroop - D-Kefs - Cond.3: Total errors (Automatic calculation)': {
+    id: 'Stroop - D-Kefs - Cond.3: Total errors (Automatic calculation)',
+    name: 'Stroop - D-Kefs - Cond.3: Total errors (Automatic calculation)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Trial 3 raw': {
+    id: 'Trial 3 raw',
+    name: 'Trial 3 raw',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'STROOP GOLDEN : COLORS Number of responses': {
+    id: 'STROOP GOLDEN : COLORS Number of responses',
+    name: 'STROOP GOLDEN : COLORS Number of responses',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Was the CDT test administered?': {
+    id: 'Was the CDT test administered?',
+    name: 'Was the CDT test administered?',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Letter Fluency Total (Raw score)': {
+    id: 'Letter Fluency Total (Raw score)',
+    name: 'Letter Fluency Total (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Stroop - D-Kefs - Cond.3: Uncorrected errors (Raw score)': {
+    id: 'Stroop - D-Kefs - Cond.3: Uncorrected errors (Raw score)',
+    name: 'Stroop - D-Kefs - Cond.3: Uncorrected errors (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Stroop - D-Kefs - Cond.2 WORDS: Time (sec) (Raw score)': {
+    id: 'Stroop - D-Kefs - Cond.2 WORDS: Time (sec) (Raw score)',
+    name: 'Stroop - D-Kefs - Cond.2 WORDS: Time (sec) (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Stroop GOLDEN, ink, uncorrected errors (raw score)': {
+    id: 'Stroop GOLDEN, ink, uncorrected errors (raw score)',
+    name: 'Stroop GOLDEN, ink, uncorrected errors (raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Main non dominante (1 min)': {
+    id: 'Main non dominante (1 min)',
+    name: 'Main non dominante (1 min)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Stroop - D-Kefs - Cond.1: Total errors (Raw score)': {
+    id: 'Stroop - D-Kefs - Cond.1: Total errors (Raw score)',
+    name: 'Stroop - D-Kefs - Cond.1: Total errors (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Was the Boston Naming test administered?': {
+    id: 'Was the Boston Naming test administered?',
+    name: 'Was the Boston Naming test administered?',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Stroop - D-Kefs - Cond.2: total errors (Raw score)': {
+    id: 'Stroop - D-Kefs - Cond.2: total errors (Raw score)',
+    name: 'Stroop - D-Kefs - Cond.2: total errors (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Was the Brixton test administered?': {
+    id: 'Was the Brixton test administered?',
+    name: 'Was the Brixton test administered?',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Digit Span Forward - total correct (Raw score)': {
+    id: 'Digit Span Forward - total correct (Raw score)',
+    name: 'Digit Span Forward - total correct (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Letter Fluency S (Raw score)': {
+    id: 'Letter Fluency S (Raw score)',
+    name: 'Letter Fluency S (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Brixton raw score': {
+    id: 'Brixton raw score',
+    name: 'Brixton raw score',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'STROOP GOLDEN : colors, self-corrected errors (raw scores)': {
+    id: 'STROOP GOLDEN : colors, self-corrected errors (raw scores)',
+    name: 'STROOP GOLDEN : colors, self-corrected errors (raw scores)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Main dominante (1 min)': {
+    id: 'Main dominante (1 min)',
+    name: 'Main dominante (1 min)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Digit span backward - longest correct serie (Raw score)': {
+    id: 'Digit span backward - longest correct serie (Raw score)',
+    name: 'Digit span backward - longest correct serie (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Was the Semantic Fluency test administered?': {
+    id: 'Was the Semantic Fluency test administered?',
+    name: 'Was the Semantic Fluency test administered?',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Stroop - D-Kefs - Cond.2: total errors (Automatic Calculation)': {
+    id: 'Stroop - D-Kefs - Cond.2: total errors (Automatic Calculation)',
+    name: 'Stroop - D-Kefs - Cond.2: total errors (Automatic Calculation)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Deux mains (30 sec)': {
+    id: 'Deux mains (30 sec)',
+    name: 'Deux mains (30 sec)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'STROOP GOLDEN : WORDS, number of responses': {
+    id: 'STROOP GOLDEN : WORDS, number of responses',
+    name: 'STROOP GOLDEN : WORDS, number of responses',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Was the Stroop Colour and Word (D-KEFS) test administered?': {
+    id: 'Was the Stroop Colour and Word (D-KEFS) test administered?',
+    name: 'Was the Stroop Colour and Word (D-KEFS) test administered?',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Semantic Fluency Animals (Raw score)': {
+    id: 'Semantic Fluency Animals (Raw score)',
+    name: 'Semantic Fluency Animals (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Was the Purdue pegboard administered?': {
+    id: 'Was the Purdue pegboard administered?',
+    name: 'Was the Purdue pegboard administered?',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Trail B raw score (time in sec.)': {
+    id: 'Trail B raw score (time in sec.)',
+    name: 'Trail B raw score (time in sec.)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Letter Fluency F (Raw score)': {
+    id: 'Letter Fluency F (Raw score)',
+    name: 'Letter Fluency F (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Total repetition errors': {
+    id: 'Total repetition errors',
+    name: 'Total repetition errors',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Digit Span Backward - total correct (Raw score)': {
+    id: 'Digit Span Backward - total correct (Raw score)',
+    name: 'Digit Span Backward - total correct (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Stroop - D-Kefs -  Cond.2: Self-corrected errors (Raw score)': {
+    id: 'Stroop - D-Kefs -  Cond.2: Self-corrected errors (Raw score)',
+    name: 'Stroop - D-Kefs -  Cond.2: Self-corrected errors (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Delayed recall time (sec)': {
+    id: 'Delayed recall time (sec)',
+    name: 'Delayed recall time (sec)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Stroop - D-Kefs - Cond.2: uncorrected errors (Raw score)': {
+    id: 'Stroop - D-Kefs - Cond.2: uncorrected errors (Raw score)',
+    name: 'Stroop - D-Kefs - Cond.2: uncorrected errors (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Stroop GOLDEN: INK Number of Responses': {
+    id: 'Stroop GOLDEN: INK Number of Responses',
+    name: 'Stroop GOLDEN: INK Number of Responses',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Stroop - D-Kefs - Cond.3 - INK: Time (sec) (Raw score)': {
+    id: 'Stroop - D-Kefs - Cond.3 - INK: Time (sec) (Raw score)',
+    name: 'Stroop - D-Kefs - Cond.3 - INK: Time (sec) (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'STROOP GOLDEN : words, self-corrected errors (raw score)': {
+    id: 'STROOP GOLDEN : words, self-corrected errors (raw score)',
+    name: 'STROOP GOLDEN : words, self-corrected errors (raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Intrusions total 1,2,3 (Raw score)': {
+    id: 'Intrusions total 1,2,3 (Raw score)',
+    name: 'Intrusions total 1,2,3 (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Copy time (sec)': {
+    id: 'Copy time (sec)',
+    name: 'Copy time (sec)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Semantic Fluency Total (Raw score)': {
+    id: 'Semantic Fluency Total (Raw score)',
+    name: 'Semantic Fluency Total (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Was the Trails A B test administered?': {
+    id: 'Was the Trails A B test administered?',
+    name: 'Was the Trails A B test administered?',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Stroop - D-Kefs - Cond.1: Uncorrected errors (Raw score)': {
+    id: 'Stroop - D-Kefs - Cond.1: Uncorrected errors (Raw score)',
+    name: 'Stroop - D-Kefs - Cond.1: Uncorrected errors (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Was the Hopkins Verbal Learning Test Revised administered?': {
+    id: 'Was the Hopkins Verbal Learning Test Revised administered?',
+    name: 'Was the Hopkins Verbal Learning Test Revised administered?',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Immediate recall raw': {
+    id: 'Immediate recall raw',
+    name: 'Immediate recall raw',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Total Repetition errors': {
+    id: 'Total Repetition errors',
+    name: 'Total Repetition errors',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'BNT sans indice (Raw score)': {
+    id: 'BNT sans indice (Raw score)',
+    name: 'BNT sans indice (Raw score)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  neuropsy_age: {
+    id: 'neuropsy_age',
+    name: 'neuropsy_age',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  neuropsy_age_diff: {
+    id: 'neuropsy_age_diff',
+    name: 'neuropsy_age_diff',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'MoCA Total Score': {
+    id: 'MoCA Total Score',
+    name: 'MoCA Total Score',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  moca_age: {
+    id: 'moca_age',
+    name: 'moca_age',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  moca_age_diff: {
+    id: 'moca_age_diff',
+    name: 'moca_age_diff',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Part I: Non-Motor Aspects of Experiences of Daily Living (nM-EDL)': {
+    id: 'Part I: Non-Motor Aspects of Experiences of Daily Living (nM-EDL)',
+    name: 'Part I: Non-Motor Aspects of Experiences of Daily Living (nM-EDL)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Part II: Motor Aspects of Experiences of Daily Living (M-EDL)': {
+    id: 'Part II: Motor Aspects of Experiences of Daily Living (M-EDL)',
+    name: 'Part II: Motor Aspects of Experiences of Daily Living (M-EDL)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Part III: Motor Examination (harmonized)': {
+    id: 'Part III: Motor Examination (harmonized)',
+    name: 'Part III: Motor Examination (harmonized)',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  'Part IV: Motor Complications': {
+    id: 'Part IV: Motor Complications',
+    name: 'Part IV: Motor Complications',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  updrs_age: {
+    id: 'updrs_age',
+    name: 'updrs_age',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
+  updrs_age_diff: {
+    id: 'updrs_age_diff',
+    name: 'updrs_age_diff',
+    description: null,
+    dataType: null,
+    isMapped: false,
+    standardizedVariable: null,
+    term: null,
+  },
 };
-
-
-
-
 
 const MOCK_STANDARDIZED_VARIABLES: any = {
   std_age: { id: 'std_age', name: 'Age', variable_type: 'Continuous' },
@@ -933,7 +931,6 @@ const MOCK_STANDARDIZED_VARIABLES: any = {
     is_multi_column_measure: true,
   },
 };
-
 
 function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
   // -- Local State instead of Store --
@@ -952,18 +949,21 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
       target: 'body',
       placement: 'center',
       title: 'Welcome to Column Annotation',
-      content: 'Column Annotation allows you to map your dataset columns to standardized variables and terms using an intuitive drag-and-drop interface.',
+      content:
+        'Column Annotation allows you to map your dataset columns to standardized variables and terms using an intuitive drag-and-drop interface.',
       disableBeacon: true,
     },
     {
       target: '[data-tour="tour-demographics"]',
       title: 'Demographics',
-      content: 'Quickly map common demographic variables like Age, Sex, or Diagnosis by dragging them directly onto your column cards.',
+      content:
+        'Quickly map common demographic variables like Age, Sex, or Diagnosis by dragging them directly onto your column cards.',
     },
     {
       target: '[data-tour="tour-assessment"]',
       title: 'Assessment Tools',
-      content: 'Here you can browse available neurocognitive assessment tools. You can drag a specific tool directly onto a column card to map it.',
+      content:
+        'Here you can browse available neurocognitive assessment tools. You can drag a specific tool directly onto a column card to map it.',
     },
     /*
     {
@@ -975,13 +975,15 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
     {
       target: '[data-tour="tour-action-bar"]',
       title: 'Filtering & Sorting',
-      content: 'Use this bar to search for columns, hide those you\'ve already mapped, and sort Column Annotation by name, status, or data type.',
+      content:
+        "Use this bar to search for columns, hide those you've already mapped, and sort Column Annotation by name, status, or data type.",
     },
     {
       target: '[data-tour="tour-column-card-0"]',
       title: 'Column Cards',
-      content: 'These represent the columns in your dataset. You can click to select multiple cards, and drag them to the sidebar to map them in bulk!',
-    }
+      content:
+        'These represent the columns in your dataset. You can click to select multiple cards, and drag them to the sidebar to map them in bulk!',
+    },
   ];
 
   const handleJoyrideCallback = (data: CallBackProps) => {
@@ -992,7 +994,7 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
       setRunTour(false);
     }
 
-    // Force element into the vertical center of its scrolling container 
+    // Force element into the vertical center of its scrolling container
     // to prevent it from being hidden behind sticky headers or clipped.
     if (type === EVENTS.STEP_BEFORE) {
       if (step && step.target && typeof step.target === 'string') {
@@ -1126,7 +1128,10 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
     // 1. Filter out annotated columns if showAnnotated is false
     if (!showAnnotated) {
       result = result.filter(([_, col]: [string, any]) => {
-        const isDemographicsAnnotated = col.standardizedVariable && MOCK_STANDARDIZED_VARIABLES[col.standardizedVariable] && !MOCK_STANDARDIZED_VARIABLES[col.standardizedVariable].is_multi_column_measure;
+        const isDemographicsAnnotated =
+          col.standardizedVariable &&
+          MOCK_STANDARDIZED_VARIABLES[col.standardizedVariable] &&
+          !MOCK_STANDARDIZED_VARIABLES[col.standardizedVariable].is_multi_column_measure;
         const isAssessmentAnnotated = col.term !== null;
 
         if (isDemographicsAnnotated || isAssessmentAnnotated) {
@@ -1179,10 +1184,16 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
           const typeB = colB.dataType || '';
           return typeA.localeCompare(typeB);
         case 'status':
-          const isAnnotatedA = Boolean((colA.standardizedVariable && !colA.assessmentTool) || (colA.assessmentTool && colA.term));
-          const isAnnotatedB = Boolean((colB.standardizedVariable && !colB.assessmentTool) || (colB.assessmentTool && colB.term));
+          const isAnnotatedA = Boolean(
+            (colA.standardizedVariable && !colA.assessmentTool) ||
+            (colA.assessmentTool && colA.term)
+          );
+          const isAnnotatedB = Boolean(
+            (colB.standardizedVariable && !colB.assessmentTool) ||
+            (colB.assessmentTool && colB.term)
+          );
           // false (unannotated) comes before true (annotated)
-          return (isAnnotatedA === isAnnotatedB) ? 0 : (isAnnotatedA ? 1 : -1);
+          return isAnnotatedA === isAnnotatedB ? 0 : isAnnotatedA ? 1 : -1;
         case 'default':
         default:
           // In 'default' mode, we trust the original Object.entries order
@@ -1442,11 +1453,13 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
     if (data.type === 'sidebar') {
       const actualSidebarId = data.id as string;
       const labelText =
-        actualSidebarId === 'dt_categorical' ? 'Categorical' :
-          actualSidebarId === 'dt_continuous' ? 'Continuous' :
-            MOCK_STANDARDIZED_VARIABLES[actualSidebarId]?.name ||
-            TERM_BY_ID.get(actualSidebarId)?.label ||
-            'Item';
+        actualSidebarId === 'dt_categorical'
+          ? 'Categorical'
+          : actualSidebarId === 'dt_continuous'
+            ? 'Continuous'
+            : MOCK_STANDARDIZED_VARIABLES[actualSidebarId]?.name ||
+              TERM_BY_ID.get(actualSidebarId)?.label ||
+              'Item';
       return (
         <Box
           sx={{
@@ -1500,10 +1513,7 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
           }}
         >
           <DragIndicatorIcon fontSize="small" color="disabled" />
-          <Typography
-            variant="body2"
-            fontWeight="bold"
-          >
+          <Typography variant="body2" fontWeight="bold">
             {cardData?.name || 'Column'}
           </Typography>
           {isMulti && (
@@ -1555,11 +1565,7 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
         className="flex flex-col gap-6 h-[70vh] overflow-hidden relative"
         data-cy="column-annotation-container"
       >
-        {onToggleMock && (
-          <div className="absolute top-0 right-4 z-50">
-
-          </div>
-        )}
+        {onToggleMock && <div className="absolute top-0 right-4 z-50"></div>}
 
         <div className="flex flex-1 overflow-hidden">
           {/* -- TAXONOMY SIDEBAR -- */}
@@ -1571,7 +1577,9 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
 
           <div className="flex-1 flex flex-col overflow-hidden max-w-6xl mx-auto w-full">
             <div className="flex justify-end pt-2 px-4 shrink-0">
-              <Button variant="outlined" size="small" onClick={() => setRunTour(true)}>Take UI Tour</Button>
+              <Button variant="outlined" size="small" onClick={() => setRunTour(true)}>
+                Take UI Tour
+              </Button>
             </div>
             <div className="px-4 pt-2 shrink-0 flex flex-col gap-3" data-tour="tour-action-bar">
               <MockSearchFilter
@@ -1616,7 +1624,11 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
               <div className="space-y-3">
                 {/* Flat rendering flow with paperpile-style chips */}
                 {columnCardData.map((columnData, index) => (
-                  <div key={columnData.columnId} className="w-full" data-tour={index === 0 ? "tour-column-card-0" : undefined}>
+                  <div
+                    key={columnData.columnId}
+                    className="w-full"
+                    data-tour={index === 0 ? 'tour-column-card-0' : undefined}
+                  >
                     <MockColumnAnnotationCard
                       id={columnData.columnId}
                       name={columnData.name}
@@ -1631,7 +1643,9 @@ function MockColumnAnnotation({ onToggleMock }: { onToggleMock?: () => void }) {
                       standardizedVariableLabel={columnData.standardizedVariableLabel}
                       selected={selectedColumnIds.has(columnData.columnId)}
                       onChipClick={setSelectedNodeId}
-                      onClick={(e: React.MouseEvent<HTMLDivElement>) => handleCardClick(e as any, columnData.columnId)}
+                      onClick={(e: React.MouseEvent<HTMLDivElement>) =>
+                        handleCardClick(e as any, columnData.columnId)
+                      }
                       onDescriptionChange={handleDescriptionChange}
                       onDataTypeChange={handleDataTypeChange}
                       onRemoveVariable={handleRemoveVariable}

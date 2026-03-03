@@ -58,7 +58,7 @@ export default function MockSearchFilter({
   onSortChange,
 }: MockSearchFilterProps) {
   const currentSearchTerm = value ?? searchTerm ?? '';
-  const currentOnSearchChange = onChange ?? onSearchChange ?? (() => { });
+  const currentOnSearchChange = onChange ?? onSearchChange ?? (() => {});
   const currentShowingCount = showingCount ?? filteredCount ?? 0;
 
   return (
@@ -145,7 +145,8 @@ export default function MockSearchFilter({
                 className="text-gray-500 whitespace-nowrap"
                 data-cy="search-filter-counter"
               >
-                Showing <span className="font-medium text-gray-700">{currentShowingCount}</span> of <span className="font-medium text-gray-700">{totalCount}</span>
+                Showing <span className="font-medium text-gray-700">{currentShowingCount}</span> of{' '}
+                <span className="font-medium text-gray-700">{totalCount}</span>
               </Typography>
 
               {hasActiveFilters && onClearAll && (
@@ -185,15 +186,16 @@ export default function MockSearchFilter({
                   '& .MuiSvgIcon-root': { color: 'text.secondary' },
                 }}
                 renderValue={(val) =>
-                  `Sort by: ${val === 'name_asc'
-                    ? 'Name (A-Z)'
-                    : val === 'name_desc'
-                      ? 'Name (Z-A)'
-                      : val === 'datatype'
-                        ? 'Data Type'
-                        : val === 'status'
-                          ? 'Annotation Status'
-                          : 'Original Order'
+                  `Sort by: ${
+                    val === 'name_asc'
+                      ? 'Name (A-Z)'
+                      : val === 'name_desc'
+                        ? 'Name (Z-A)'
+                        : val === 'datatype'
+                          ? 'Data Type'
+                          : val === 'status'
+                            ? 'Annotation Status'
+                            : 'Original Order'
                   }`
                 }
               >

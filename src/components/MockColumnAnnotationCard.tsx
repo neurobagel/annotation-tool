@@ -1,11 +1,7 @@
 import { useDraggable, useDroppable } from '@dnd-kit/core';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import HelpIcon from '@mui/icons-material/Help';
-import {
-  Typography,
-  Tooltip,
-  Chip,
-} from '@mui/material';
+import { Typography, Tooltip, Chip } from '@mui/material';
 import { DataType } from '~/utils/internal_types';
 import DescriptionEditor from './DescriptionEditor';
 
@@ -76,16 +72,19 @@ function MockColumnAnnotationCard({
       onClick={onClick}
       {...attributes}
       {...listeners}
-      className={`group select-none w-full rounded-lg border shadow-sm transition-all duration-200 ${selected
-        ? 'bg-blue-50 border-blue-400 shadow-md ring-1 ring-blue-300'
-        : 'bg-white border-gray-200 hover:border-blue-300 hover:shadow'
-        } ${isOver ? 'ring-2 ring-blue-500 ring-offset-1 bg-blue-50/50' : ''} ${isDragging ? 'opacity-50 ring-2 ring-blue-400 z-50 shadow-lg' : ''
-        }`}
+      className={`group select-none w-full rounded-lg border shadow-sm transition-all duration-200 ${
+        selected
+          ? 'bg-blue-50 border-blue-400 shadow-md ring-1 ring-blue-300'
+          : 'bg-white border-gray-200 hover:border-blue-300 hover:shadow'
+      } ${isOver ? 'ring-2 ring-blue-500 ring-offset-1 bg-blue-50/50' : ''} ${
+        isDragging ? 'opacity-50 ring-2 ring-blue-400 z-50 shadow-lg' : ''
+      }`}
       style={{ cursor: isDragging ? 'grabbing' : onClick ? 'pointer' : 'grab' }}
     >
       <div
-        className={`w-full px-4 py-2 flex items-center gap-4 justify-between transition-colors ${selected ? 'bg-blue-50/50' : 'bg-transparent'
-          }`}
+        className={`w-full px-4 py-2 flex items-center gap-4 justify-between transition-colors ${
+          selected ? 'bg-blue-50/50' : 'bg-transparent'
+        }`}
       >
         {/* LEFT: Drag Handle & Title */}
         <div className="flex items-center gap-2 min-w-[200px] w-1/4">
@@ -123,17 +122,17 @@ function MockColumnAnnotationCard({
               onClick={
                 onChipClick && standardizedVariableId
                   ? (e) => {
-                    e.stopPropagation();
-                    onChipClick(standardizedVariableId);
-                  }
+                      e.stopPropagation();
+                      onChipClick(standardizedVariableId);
+                    }
                   : undefined
               }
               onDelete={
                 onRemoveVariable
                   ? (e) => {
-                    e.stopPropagation();
-                    onRemoveVariable(id);
-                  }
+                      e.stopPropagation();
+                      onRemoveVariable(id);
+                    }
                   : undefined
               }
             />
@@ -154,17 +153,17 @@ function MockColumnAnnotationCard({
                 onClick={
                   onChipClick && term
                     ? (e) => {
-                      e.stopPropagation();
-                      onChipClick(term);
-                    }
+                        e.stopPropagation();
+                        onChipClick(term);
+                      }
                     : undefined
                 }
                 onDelete={
                   onRemoveTerm
                     ? (e) => {
-                      e.stopPropagation();
-                      onRemoveTerm(id);
-                    }
+                        e.stopPropagation();
+                        onRemoveTerm(id);
+                      }
                     : undefined
                 }
               />
@@ -194,9 +193,9 @@ function MockColumnAnnotationCard({
                 onDelete={
                   isDataTypeEditable && dataType !== null
                     ? (e) => {
-                      e.stopPropagation();
-                      onDataTypeChange(id, null);
-                    }
+                        e.stopPropagation();
+                        onDataTypeChange(id, null);
+                      }
                     : undefined
                 }
                 deleteIcon={

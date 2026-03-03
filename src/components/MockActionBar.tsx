@@ -6,10 +6,7 @@ interface MockActionBarProps {
   onClearSelection: () => void;
 }
 
-function MockActionBar({
-  selectedCount,
-  onClearSelection,
-}: MockActionBarProps) {
+function MockActionBar({ selectedCount, onClearSelection }: MockActionBarProps) {
   if (selectedCount === 0) return null;
 
   return (
