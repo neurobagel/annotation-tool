@@ -119,7 +119,7 @@ describe('useStandardizedVariableItems', () => {
     ]);
   });
 
-  it('should return collection variables without terms property if they have no terms attached', () => {
+  it('should return collection variables with an empty terms array if they have no terms attached', () => {
     mockedUseStandardizedVariables.mockReturnValue({
       'var:empty_collection': {
         id: 'var:empty_collection',
@@ -134,8 +134,7 @@ describe('useStandardizedVariableItems', () => {
     const { result } = renderHook(() => useStandardizedVariableItems());
 
     expect(result.current.collectionVariables).toEqual([
-      { id: 'var:empty_collection', label: 'Empty Collection' },
+      { id: 'var:empty_collection', label: 'Empty Collection', terms: [] },
     ]);
-    expect(result.current.collectionVariables[0]).not.toHaveProperty('terms');
   });
 });

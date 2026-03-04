@@ -38,11 +38,9 @@ export function useStandardizedVariableItems() {
         const stdVarItem: StandardizedVariableItem = {
           id: stdVar.id,
           label: stdVar.name,
+          terms: termsForVar,
         };
 
-        if (termsForVar.length > 0) {
-          stdVarItem.terms = termsForVar;
-        }
         collections.push(stdVarItem);
       }
     });
