@@ -165,8 +165,8 @@ function ColumnAnnotation() {
         {/* Standardized Variables List */}
         <div className="py-4 h-full">
           <StandardizedVariablesList
-            selectedNodeId={selectedSidebarNode}
-            onNodeSelect={setSelectedSidebarNode}
+            selectedItemId={selectedSidebarNode}
+            onItemSelect={setSelectedSidebarNode}
           />
         </div>
       </div>

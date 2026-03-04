@@ -51,30 +51,30 @@ describe('StandardizedVariablesList', () => {
     cy.get('[data-cy="standardized-variables-list"]').should('not.contain', 'UPDRS');
   });
 
-  it('should fire the onNodeSelect event handler with the appropriate payload when a term is selected', () => {
-    const onSelectSpy = cy.spy().as('onSelectSpy');
-    cy.mount(<StandardizedVariablesList onNodeSelect={onSelectSpy} selectedNodeId={null} />);
+  it('should fire the onItemSelect event handler with the appropriate payload when a term is selected', () => {
+    const onItemSelectSpy = cy.spy().as('onItemSelectSpy');
+    cy.mount(<StandardizedVariablesList onItemSelect={onItemSelectSpy} selectedItemId={null} />);
 
     cy.get('[data-cy="standardized-variables-list"]').contains('MOCA').click();
 
-    cy.get('@onSelectSpy').should('have.been.calledWith', 'term-2');
+    cy.get('@onItemSelectSpy').should('have.been.calledWith', 'term-2');
   });
 
-  it('should fire the onNodeSelect event handler with the appropriate payload if the same node is selected again', () => {
-    const onSelectSpy = cy.spy().as('onSelectSpy');
-    cy.mount(<StandardizedVariablesList onNodeSelect={onSelectSpy} selectedNodeId="term-2" />);
+  it('should fire the onItemSelect event handler with the appropriate payload if the same item is selected again', () => {
+    const onItemSelectSpy = cy.spy().as('onItemSelectSpy');
+    cy.mount(<StandardizedVariablesList onItemSelect={onItemSelectSpy} selectedItemId="term-2" />);
 
     cy.get('[data-cy="standardized-variables-list"]').contains('MOCA').click();
 
-    cy.get('@onSelectSpy').should('have.been.calledWith', null);
+    cy.get('@onItemSelectSpy').should('have.been.calledWith', null);
   });
 
-  it('should fire the onNodeSelect event handler with the appropriate payload when a non-collection variable is selected', () => {
-    const onSelectSpy = cy.spy().as('onSelectSpy');
-    cy.mount(<StandardizedVariablesList onNodeSelect={onSelectSpy} selectedNodeId={null} />);
+  it('should fire the onItemSelect event handler with the appropriate payload when a non-collection variable is selected', () => {
+    const onItemSelectSpy = cy.spy().as('onItemSelectSpy');
+    cy.mount(<StandardizedVariablesList onItemSelect={onItemSelectSpy} selectedItemId={null} />);
 
     cy.get('[data-cy="standardized-variables-list"]').contains('Age').click();
 
-    cy.get('@onSelectSpy').should('have.been.calledWith', 'var-1');
+    cy.get('@onItemSelectSpy').should('have.been.calledWith', 'var-1');
   });
 });

@@ -169,8 +169,8 @@ export type DataStore = DataStoreState & {
   actions: DataStoreActions;
 };
 
-export interface StandardizedVariableListNode {
+export interface StandardizedVariableItem {
   id: string;
   label: string;
-  terms?: StandardizedVariableListNode[];
+  terms?: StandardizedVariableItem[];
 }

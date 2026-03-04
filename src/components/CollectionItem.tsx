@@ -2,29 +2,29 @@ import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import { Typography, TextField, IconButton, InputAdornment, Collapse } from '@mui/material';
 import { useState, useMemo } from 'react';
-import { StandardizedVariableListNode } from '~/utils/internal_types';
+import { StandardizedVariableItem } from '~/utils/internal_types';
 import VirtualListbox from './VirtualListBox';
 
 interface CollectionItemProps {
-  node: StandardizedVariableListNode;
-  onNodeSelect: (nodeId: string) => void;
-  selectedNodeId?: string | null;
+  variable: StandardizedVariableItem;
+  onTermSelect: (termId: string) => void;
+  selectedTermId?: string | null;
 }
 
-function CollectionItem({ node, onNodeSelect, selectedNodeId }: CollectionItemProps) {
+function CollectionItem({ variable, onTermSelect, selectedTermId }: CollectionItemProps) {
   const [query, setQuery] = useState('');
   const [isSearchVisible, setIsSearchVisible] = useState(false);
 
   const filteredTerms = useMemo(() => {
-    if (!node.terms || query.trim() === '') return node.terms || [];
+    if (!variable.terms || query.trim() === '') return variable.terms || [];
     const q = query.toLowerCase();
-    return node.terms.filter((t) => t.label.toLowerCase().includes(q));
-  }, [node.terms, query]);
+    return variable.terms.filter((t) => t.label.toLowerCase().includes(q));
+  }, [variable.terms, query]);
 
   return (
     <div className="flex flex-col space-y-2">
       <Typography variant="subtitle2" className="font-semibold px-2 text-gray-700">
-        {node.label}
+        {variable.label}
       </Typography>
       {!isSearchVisible ? (
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events
@@ -102,11 +102,11 @@ function CollectionItem({ node, onNodeSelect, selectedNodeId }: CollectionItemPr
                   role="button"
                   tabIndex={0}
                   className={`flex items-center w-full px-3 h-full cursor-pointer transition-colors ${
-                    selectedNodeId === term.id
+                    selectedTermId === term.id
                       ? 'bg-blue-100 text-blue-900 font-medium'
                       : 'hover:bg-gray-100 text-gray-800'
                   }`}
-                  onClick={() => onNodeSelect(term.id)}
+                  onClick={() => onTermSelect(term.id)}
                   title={term.label}
                 >
                   <Typography variant="body2" noWrap>
@@ -128,7 +128,7 @@ function CollectionItem({ node, onNodeSelect, selectedNodeId }: CollectionItemPr
 }
 
 CollectionItem.defaultProps = {
-  selectedNodeId: null,
+  selectedTermId: null,
 };
 
 export default CollectionItem;

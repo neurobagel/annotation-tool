@@ -1,61 +1,69 @@
 import { Typography } from '@mui/material';
 import { useMemo } from 'react';
 import { useStandardizedVariables, useStandardizedTerms } from '~/stores/data';
-import { VariableType, StandardizedVariableListNode } from '~/utils/internal_types';
+import { VariableType, StandardizedVariableItem } from '~/utils/internal_types';
 import CollectionItem from './CollectionItem';
 
 interface StandardizedVariablesListProps {
-  onNodeSelect?: (nodeId: string | null) => void;
-  selectedNodeId?: string | null;
+  onItemSelect?: (itemId: string | null) => void;
+  selectedItemId?: string | null;
 }
 
 function StandardizedVariablesList({
-  onNodeSelect,
-  selectedNodeId,
+  onItemSelect,
+  selectedItemId,
 }: StandardizedVariablesListProps) {
   const standardizedVariables = useStandardizedVariables();
   const standardizedTerms = useStandardizedTerms();
 
-  const allNodes = useMemo(() => {
-    const nodes: StandardizedVariableListNode[] = [];
-    Object.values(standardizedVariables).forEach((stdVar) => {
-      const stdVarNode: StandardizedVariableListNode = {
+  const listItems = useMemo(() => {
+    const termsByVariableId = Object.values(standardizedTerms).reduce(
+      (acc, term) => {
+        const currentTerms = acc[term.standardizedVariableId] || [];
+        return {
+          ...acc,
+          [term.standardizedVariableId]: [...currentTerms, { id: term.id, label: term.label }],
+        };
+      },
+      {} as Record<string, { id: string; label: string }[]>
+    );
+
+    const items = Object.values(standardizedVariables).map((stdVar) => {
+      if (stdVar.variable_type !== VariableType.collection) {
+        return {
+          id: stdVar.id,
+          label: stdVar.name,
+        } as StandardizedVariableItem;
+      }
+
+      const termsForVar = termsByVariableId[stdVar.id] || [];
+      termsForVar.sort((a, b) => a.label.localeCompare(b.label));
+
+      const stdVarItem: StandardizedVariableItem = {
         id: stdVar.id,
         label: stdVar.name,
-        terms: [],
       };
-      if (stdVar.variable_type === VariableType.collection) {
-        const termsForVar = Object.values(standardizedTerms).filter(
-          (term) => term.standardizedVariableId === stdVar.id
-        );
-        termsForVar.sort((a, b) => a.label.localeCompare(b.label));
-        if (termsForVar.length > 0) {
-          stdVarNode.terms = termsForVar.map((term) => ({
-            id: term.id,
-            label: term.label,
-          }));
-        } else {
-          delete stdVarNode.terms;
-        }
-      } else {
-        delete stdVarNode.terms;
+
+      if (termsForVar.length > 0) {
+        stdVarItem.terms = termsForVar;
       }
-      nodes.push(stdVarNode);
+
+      return stdVarItem;
     });
-    nodes.sort((a, b) => {
-      const aIsCollection = a.terms ? 1 : 0;
-      const bIsCollection = b.terms ? 1 : 0;
+
+    return items.sort((a, b) => {
+      const aIsCollection = 'terms' in a ? 1 : 0;
+      const bIsCollection = 'terms' in b ? 1 : 0;
       if (aIsCollection !== bIsCollection) {
         return aIsCollection - bIsCollection;
       }
       return a.label.localeCompare(b.label);
     });
-    return nodes;
   }, [standardizedVariables, standardizedTerms]);
 
-  const handleSelect = (nodeId: string) => {
-    if (onNodeSelect) {
-      onNodeSelect(nodeId === selectedNodeId ? null : nodeId);
+  const handleSelect = (itemId: string) => {
+    if (onItemSelect) {
+      onItemSelect(itemId === selectedItemId ? null : itemId);
     }
   };
 
@@ -69,30 +77,30 @@ function StandardizedVariablesList({
       </Typography>
       <div className="flex-1 overflow-y-auto pr-2">
         <div className="space-y-2">
-          {allNodes.map((node) =>
-            node.terms ? (
+          {listItems.map((item) =>
+            item.terms ? (
               <CollectionItem
-                key={node.id}
-                node={node}
-                onNodeSelect={handleSelect}
-                selectedNodeId={selectedNodeId}
+                key={item.id}
+                variable={item}
+                onTermSelect={handleSelect}
+                selectedTermId={selectedItemId}
               />
             ) : (
-              <div key={node.id}>
+              <div key={item.id}>
                 <div
                   role="button"
                   tabIndex={0}
-                  className={`px-3 py-2 cursor-pointer rounded-md transition-colors ${selectedNodeId === node.id ? 'bg-blue-100 text-blue-900 font-medium' : 'hover:bg-gray-100'}`}
-                  onClick={() => handleSelect(node.id)}
+                  className={`px-3 py-2 cursor-pointer rounded-md transition-colors ${selectedItemId === item.id ? 'bg-blue-100 text-blue-900 font-medium' : 'hover:bg-gray-100'}`}
+                  onClick={() => handleSelect(item.id)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      handleSelect(node.id);
+                      handleSelect(item.id);
                     }
                   }}
                 >
                   <Typography variant="body2" className="font-semibold text-gray-700">
-                    {node.label}
+                    {item.label}
                   </Typography>
                 </div>
               </div>
@@ -105,8 +113,8 @@ function StandardizedVariablesList({
 }
 
 StandardizedVariablesList.defaultProps = {
-  onNodeSelect: undefined,
-  selectedNodeId: null,
+  onItemSelect: undefined,
+  selectedItemId: null,
 };
 
 export default StandardizedVariablesList;
