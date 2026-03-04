@@ -16,7 +16,7 @@ function StandardizedVariablesList({
   const standardizedVariables = useStandardizedVariables();
   const standardizedTerms = useStandardizedTerms();
 
-  const listItems = useMemo(() => {
+  const { demographicVariables, collectionVariables } = useMemo(() => {
     const termsByVariableId = Object.values(standardizedTerms).reduce(
       (acc, term) => {
         const currentTerms = acc[term.standardizedVariableId] || [];
@@ -28,37 +28,35 @@ function StandardizedVariablesList({
       {} as Record<string, { id: string; label: string }[]>
     );
 
-    const items = Object.values(standardizedVariables).map((stdVar) => {
+    const demographics: StandardizedVariableItem[] = [];
+    const collections: StandardizedVariableItem[] = [];
+
+    Object.values(standardizedVariables).forEach((stdVar) => {
       if (stdVar.variable_type !== VariableType.collection) {
-        return {
+        demographics.push({
           id: stdVar.id,
           label: stdVar.name,
-        } as StandardizedVariableItem;
+        } as StandardizedVariableItem);
+      } else {
+        const termsForVar = termsByVariableId[stdVar.id] || [];
+        termsForVar.sort((a, b) => a.label.localeCompare(b.label));
+
+        const stdVarItem: StandardizedVariableItem = {
+          id: stdVar.id,
+          label: stdVar.name,
+        };
+
+        if (termsForVar.length > 0) {
+          stdVarItem.terms = termsForVar;
+        }
+        collections.push(stdVarItem);
       }
-
-      const termsForVar = termsByVariableId[stdVar.id] || [];
-      termsForVar.sort((a, b) => a.label.localeCompare(b.label));
-
-      const stdVarItem: StandardizedVariableItem = {
-        id: stdVar.id,
-        label: stdVar.name,
-      };
-
-      if (termsForVar.length > 0) {
-        stdVarItem.terms = termsForVar;
-      }
-
-      return stdVarItem;
     });
 
-    return items.sort((a, b) => {
-      const aIsCollection = 'terms' in a ? 1 : 0;
-      const bIsCollection = 'terms' in b ? 1 : 0;
-      if (aIsCollection !== bIsCollection) {
-        return aIsCollection - bIsCollection;
-      }
-      return a.label.localeCompare(b.label);
-    });
+    demographics.sort((a, b) => a.label.localeCompare(b.label));
+    collections.sort((a, b) => a.label.localeCompare(b.label));
+
+    return { demographicVariables: demographics, collectionVariables: collections };
   }, [standardizedVariables, standardizedTerms]);
 
   const handleSelect = (itemId: string) => {
@@ -77,35 +75,35 @@ function StandardizedVariablesList({
       </Typography>
       <div className="flex-1 overflow-y-auto pr-2">
         <div className="space-y-2">
-          {listItems.map((item) =>
-            item.terms ? (
-              <CollectionItem
-                key={item.id}
-                variable={item}
-                onTermSelect={handleSelect}
-                selectedTermId={selectedItemId}
-              />
-            ) : (
-              <div key={item.id}>
-                <div
-                  role="button"
-                  tabIndex={0}
-                  className={`px-3 py-2 cursor-pointer rounded-md transition-colors ${selectedItemId === item.id ? 'bg-blue-100 text-blue-900 font-medium' : 'hover:bg-gray-100'}`}
-                  onClick={() => handleSelect(item.id)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleSelect(item.id);
-                    }
-                  }}
-                >
-                  <Typography variant="body2" className="font-semibold text-gray-700">
-                    {item.label}
-                  </Typography>
-                </div>
+          {demographicVariables.map((item) => (
+            <div key={item.id}>
+              <div
+                role="button"
+                tabIndex={0}
+                className={`px-3 py-2 cursor-pointer rounded-md transition-colors ${selectedItemId === item.id ? 'bg-blue-100 text-blue-900 font-medium' : 'hover:bg-gray-100'}`}
+                onClick={() => handleSelect(item.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleSelect(item.id);
+                  }
+                }}
+              >
+                <Typography variant="body2" className="font-semibold text-gray-700">
+                  {item.label}
+                </Typography>
               </div>
-            )
-          )}
+            </div>
+          ))}
+
+          {collectionVariables.map((item) => (
+            <CollectionItem
+              key={item.id}
+              variable={item}
+              onTermSelect={handleSelect}
+              selectedTermId={selectedItemId}
+            />
+          ))}
         </div>
       </div>
     </div>
