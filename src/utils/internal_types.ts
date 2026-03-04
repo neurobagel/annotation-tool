@@ -168,3 +168,14 @@ export type DataStoreActions = {
 export type DataStore = DataStoreState & {
   actions: DataStoreActions;
 };
+
+export interface StandardizedTermItem {
+  id: string;
+  label: string;
+}
+
+export interface StandardizedVariableItem {
+  id: string;
+  label: string;
+  terms?: StandardizedTermItem[];
+}
