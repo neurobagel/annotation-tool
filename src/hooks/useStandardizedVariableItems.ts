@@ -1,6 +1,10 @@
 import { useMemo } from 'react';
 import { useStandardizedVariables, useStandardizedTerms } from '~/stores/data';
-import { VariableType, StandardizedVariableItem } from '~/utils/internal_types';
+import {
+  VariableType,
+  StandardizedVariableItem,
+  StandardizedTermItem,
+} from '~/utils/internal_types';
 
 export function useStandardizedVariableItems() {
   const standardizedVariables = useStandardizedVariables();
@@ -15,7 +19,7 @@ export function useStandardizedVariableItems() {
           [term.standardizedVariableId]: [...currentTerms, { id: term.id, label: term.label }],
         };
       },
-      {} as Record<string, { id: string; label: string }[]>
+      {} as Record<string, StandardizedTermItem[]>
     );
 
     const demographics: StandardizedVariableItem[] = [];
