@@ -33,16 +33,14 @@ function DataTypeDisplay({ columnId, value, inferredLabel }: DataTypeDisplayProp
   }
 
   return (
-    <Tooltip title="Data type is determined when you assign a standardized variable" arrow>
-      <div
-        className="h-10 px-3 flex items-center justify-start text-gray-400 w-full"
-        data-cy={`${columnId}-column-annotation-card-data-type-unassigned`}
-      >
-        <Typography variant="body2" className="italic truncate">
-          Assign data type
-        </Typography>
-      </div>
-    </Tooltip>
+    <div
+      className="h-10 px-3 flex items-center justify-start text-gray-400 w-full"
+      data-cy={`${columnId}-column-annotation-card-data-type-unassigned`}
+    >
+      <Typography variant="body2" className="italic truncate">
+        Assign data type
+      </Typography>
+    </div>
   );
 }
 
