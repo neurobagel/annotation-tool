@@ -85,9 +85,11 @@ function ColumnAnnotationCard({
             <div
               className="h-10 px-3 flex items-center justify-start border rounded border-gray-200 bg-white text-gray-900 w-full shadow-sm"
               data-cy={`${id}-column-annotation-card-mapped-variable`}
+              // TODO: Update title to use `selectedOption.abbreviation` instead of `label`
               title={selectedOption.label}
             >
               <Typography variant="body2" className="font-medium truncate">
+                {/* TODO: Display `selectedOption.abbreviation` here instead of `label` */}
                 {selectedOption.label}
               </Typography>
             </div>
