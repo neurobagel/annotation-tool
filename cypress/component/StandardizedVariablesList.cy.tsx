@@ -44,7 +44,6 @@ describe('StandardizedVariablesList', () => {
     cy.get('[data-cy="standardized-variables-list"]').should('contain', 'UPDRS');
     cy.get('[data-cy="standardized-variables-list"]').should('contain', 'MOCA');
 
-    cy.contains('Search terms...').click();
     cy.get('[data-cy="search-terms-input"] input').type('MOC');
 
     cy.get('[data-cy="standardized-variables-list"]').should('contain', 'MOCA');

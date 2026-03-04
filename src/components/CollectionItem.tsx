@@ -1,6 +1,6 @@
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
-import { Typography, TextField, IconButton, InputAdornment, Collapse } from '@mui/material';
+import { Typography, TextField, IconButton, InputAdornment } from '@mui/material';
 import { useState, useMemo } from 'react';
 import { StandardizedVariableItem } from '~/utils/internal_types';
 import VirtualListbox from './VirtualListBox';
@@ -13,8 +13,6 @@ interface CollectionItemProps {
 
 function CollectionItem({ variable, onTermSelect, selectedTermId }: CollectionItemProps) {
   const [query, setQuery] = useState('');
-  const [isSearchVisible, setIsSearchVisible] = useState(false);
-
   const filteredTerms = useMemo(() => {
     if (!variable.terms || query.trim() === '') return variable.terms || [];
     const q = query.toLowerCase();
@@ -26,71 +24,41 @@ function CollectionItem({ variable, onTermSelect, selectedTermId }: CollectionIt
       <Typography variant="subtitle2" className="font-semibold px-2 text-gray-700">
         {variable.label}
       </Typography>
-      {!isSearchVisible ? (
-        // eslint-disable-next-line jsx-a11y/click-events-have-key-events
-        <div
-          role="button"
-          tabIndex={0}
-          onClick={() => setIsSearchVisible(true)}
-          className="flex items-center px-2 text-gray-500 cursor-pointer hover:text-blue-600 transition-colors duration-200 py-1"
-        >
-          <SearchIcon fontSize="small" className="mr-2" />
-          <Typography variant="body2" className="font-medium">
-            Search terms...
-          </Typography>
-        </div>
-      ) : (
-        <Collapse in={isSearchVisible}>
-          <div className="px-2">
-            <TextField
-              data-cy="search-terms-input"
-              fullWidth
-              size="small"
-              placeholder="Search terms..."
-              variant="outlined"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              autoFocus
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon fontSize="small" color="disabled" />
-                    </InputAdornment>
-                  ),
-                  endAdornment: query ? (
-                    <InputAdornment position="end">
-                      <IconButton size="small" onClick={() => setQuery('')}>
-                        <CloseIcon fontSize="small" />
-                      </IconButton>
-                    </InputAdornment>
-                  ) : (
-                    <InputAdornment position="end">
-                      <IconButton
-                        size="small"
-                        onClick={() => {
-                          setIsSearchVisible(false);
-                          setQuery('');
-                        }}
-                      >
-                        <CloseIcon fontSize="small" />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                  sx: { borderRadius: 4, backgroundColor: 'grey.50' },
-                },
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': { borderColor: 'transparent' },
-                  '&:hover fieldset': { borderColor: 'grey.300' },
-                  '&.Mui-focused fieldset': { borderColor: 'primary.main' },
-                },
-              }}
-            />
-          </div>
-        </Collapse>
-      )}
+      <div className="px-2">
+        <TextField
+          data-cy="search-terms-input"
+          fullWidth
+          size="small"
+          placeholder="Search terms..."
+          variant="outlined"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" color="disabled" />
+                </InputAdornment>
+              ),
+              endAdornment: query ? (
+                <InputAdornment position="end">
+                  <IconButton size="small" onClick={() => setQuery('')}>
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
+                </InputAdornment>
+              ) : null,
+              sx: { borderRadius: 4, backgroundColor: 'grey.50' },
+            },
+          }}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': { borderColor: 'transparent' },
+              '&:hover fieldset': { borderColor: 'grey.300' },
+              '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+            },
+          }}
+        />
+      </div>
       {filteredTerms.length > 0 && (
         <div className="px-2 w-full">
           <div className="border rounded-md border-gray-200 overflow-hidden bg-white">
