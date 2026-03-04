@@ -53,23 +53,23 @@ describe('ColumnAnnotation', () => {
     cy.get('[data-cy="1-description"] textarea')
       .should('be.visible')
       .and('have.value', 'This is some column');
-    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"] input')
+    cy.get('[data-cy="1-column-annotation-card-mapped-variable"]')
       .should('be.visible')
-      .and('have.value', 'Assessment Tool');
-    cy.get('[data-cy="1-column-annotation-card-data-type-categorical-button"]')
+      .and('contain', 'Assessment Tool');
+    cy.get('[data-cy="1-column-annotation-card-data-type"]')
       .should('be.visible')
-      .and('have.class', 'Mui-selected');
+      .and('contain', 'Categorical');
     cy.get('[data-cy="2-column-annotation-card"]').scrollIntoView();
     cy.get('[data-cy="2-column-annotation-card"]').should('be.visible');
     cy.get('[data-cy="2-description"] textarea')
       .should('be.visible')
       .and('have.value', 'This is another column');
-    cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"] input')
+    cy.get('[data-cy="2-column-annotation-card-mapped-variable-unassigned"]')
       .should('be.visible')
-      .and('have.value', '');
-    cy.get('[data-cy="2-column-annotation-card-data-type-continuous-button"]')
+      .and('contain', 'Assign standardized variable');
+    cy.get('[data-cy="2-column-annotation-card-data-type"]')
       .should('be.visible')
-      .and('have.class', 'Mui-selected');
+      .and('contain', 'Continuous');
   });
 
   it('allows scrolling to access all column cards', () => {
@@ -101,29 +101,6 @@ describe('ColumnAnnotation', () => {
     cy.get('@descriptionTextarea').clear();
     cy.get('@descriptionTextarea').type('new description');
     cy.get('@userUpdatesColumnDescription').should('have.been.calledWith', '1', 'new description');
-  });
-  it('toggles the data type between categorical and continuous', () => {
-    cy.mount(<ColumnAnnotation />);
-
-    cy.get('[data-cy="1-column-annotation-card-data-type-categorical-button"]').should(
-      'have.class',
-      'Mui-selected'
-    );
-    cy.get('[data-cy="1-column-annotation-card-data-type-continuous-button"]').should(
-      'not.have.class',
-      'Mui-selected'
-    );
-
-    cy.get('[data-cy="1-column-annotation-card-data-type-continuous-button"]').click();
-
-    cy.get('[data-cy="1-column-annotation-card-data-type-continuous-button"]').should(
-      'have.class',
-      'Mui-selected'
-    );
-    cy.get('[data-cy="1-column-annotation-card-data-type-categorical-button"]').should(
-      'not.have.class',
-      'Mui-selected'
-    );
   });
 
   it('filters columns based on search input', () => {
