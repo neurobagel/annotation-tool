@@ -13,15 +13,12 @@ const props = {
     { id: 'nb:Age', label: 'Age', disabled: false },
     { id: 'nb:Assessment', label: 'Assessment Tool', disabled: false },
   ],
-  isDataTypeEditable: true,
   inferredDataTypeLabel: null,
   onDescriptionChange: () => {},
-  onDataTypeChange: () => {},
-  onStandardizedVariableChange: () => {},
 };
 
 describe('ColumnAnnotationCard', () => {
-  beforeEach(() => {
+  it('should render the component with mapped values', () => {
     cy.mount(
       <ColumnAnnotationCard
         id={props.id}
@@ -30,31 +27,47 @@ describe('ColumnAnnotationCard', () => {
         dataType={props.dataType}
         standardizedVariableId={props.standardizedVariableId}
         standardizedVariableOptions={props.standardizedVariableOptions}
-        isDataTypeEditable={props.isDataTypeEditable}
         inferredDataTypeLabel={props.inferredDataTypeLabel}
         onDescriptionChange={props.onDescriptionChange}
-        onDataTypeChange={props.onDataTypeChange}
-        onStandardizedVariableChange={props.onStandardizedVariableChange}
       />
     );
-  });
-  it('renders the component', () => {
     cy.get('[data-cy="1-column-annotation-card"]')
       .should('be.visible')
       .and('contain', 'some header');
     cy.get('[data-cy="1-description"]').should('be.visible').and('contain', 'some description');
-    cy.get('[data-cy="1-column-annotation-card-data-type"]').should('be.visible');
-    cy.get('[data-cy="1-column-annotation-card-data-type-categorical-button"]')
+
+    cy.get('[data-cy="1-column-annotation-card-data-type"]')
       .should('be.visible')
-      .and('contain', 'Cat');
-    cy.get('[data-cy="1-column-annotation-card-data-type-continuous-button"]')
+      .and('contain', 'Categorical');
+
+    cy.get('[data-cy="1-column-annotation-card-mapped-variable"]')
       .should('be.visible')
-      .and('contain', 'Cont');
-    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"] input')
-      .should('be.visible')
-      .and('have.value', 'Participant ID');
+      .and('contain', 'Participant ID');
   });
-  it('Fires the onDescriptionChange event handler with the appropriate payload when description is auto-saved', () => {
+
+  it('should render placeholders for unmapped columns', () => {
+    cy.mount(
+      <ColumnAnnotationCard
+        id={props.id}
+        name={props.name}
+        description={props.description}
+        dataType={null}
+        standardizedVariableId={null}
+        standardizedVariableOptions={props.standardizedVariableOptions}
+        inferredDataTypeLabel={null}
+        onDescriptionChange={props.onDescriptionChange}
+      />
+    );
+    cy.get('[data-cy="1-column-annotation-card-data-type-unassigned"]')
+      .should('be.visible')
+      .and('contain', 'Assign data type');
+
+    cy.get('[data-cy="1-column-annotation-card-mapped-variable-unassigned"]')
+      .should('be.visible')
+      .and('contain', 'Assign standardized variable');
+  });
+
+  it('should fire the onDescriptionChange event handler with the appropriate payload when description is auto-saved', () => {
     const spy = cy.spy().as('spy');
     cy.mount(
       <ColumnAnnotationCard
@@ -64,11 +77,8 @@ describe('ColumnAnnotationCard', () => {
         dataType={props.dataType}
         standardizedVariableId={props.standardizedVariableId}
         standardizedVariableOptions={props.standardizedVariableOptions}
-        isDataTypeEditable={props.isDataTypeEditable}
         inferredDataTypeLabel={props.inferredDataTypeLabel}
         onDescriptionChange={spy}
-        onDataTypeChange={props.onDataTypeChange}
-        onStandardizedVariableChange={props.onStandardizedVariableChange}
       />
     );
     cy.get('[data-cy="1-description"]').should('be.visible');
@@ -76,64 +86,8 @@ describe('ColumnAnnotationCard', () => {
     cy.get('[data-cy="1-description"]').type('new description');
     cy.get('@spy').should('have.been.calledWith', '1', 'new description');
   });
-  it('Fires the onDataTypeChange event handler with the appropriate payload when the data type is toggled', () => {
-    const spy = cy.spy().as('spy');
-    cy.mount(
-      <ColumnAnnotationCard
-        id={props.id}
-        name={props.name}
-        description={props.description}
-        dataType={props.dataType}
-        standardizedVariableId={props.standardizedVariableId}
-        standardizedVariableOptions={props.standardizedVariableOptions}
-        isDataTypeEditable={props.isDataTypeEditable}
-        onDescriptionChange={props.onDescriptionChange}
-        onDataTypeChange={spy}
-        onStandardizedVariableChange={props.onStandardizedVariableChange}
-        inferredDataTypeLabel={props.inferredDataTypeLabel}
-      />
-    );
-    cy.get('[data-cy="1-column-annotation-card-data-type-continuous-button"]').click();
-    cy.get('@spy').should('have.been.calledWith', '1', 'Continuous');
-  });
-  it('Fires the onStandardizedVariableChange event handler with the appropriate payload when the standardized variable is changed', () => {
-    const spy = cy.spy().as('spy');
-    cy.mount(
-      <ColumnAnnotationCard
-        id={props.id}
-        name={props.name}
-        description={props.description}
-        dataType={props.dataType}
-        standardizedVariableId={props.standardizedVariableId}
-        standardizedVariableOptions={props.standardizedVariableOptions}
-        isDataTypeEditable={props.isDataTypeEditable}
-        onDescriptionChange={props.onDescriptionChange}
-        onDataTypeChange={props.onDataTypeChange}
-        onStandardizedVariableChange={spy}
-        inferredDataTypeLabel={props.inferredDataTypeLabel}
-      />
-    );
-    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
-      'age{downarrow}{enter}'
-    );
-    cy.get('@spy').should('have.been.calledWith', '1', 'nb:Age');
-  });
 
-  it('Cannot assign single-column standardized variables twice', () => {
-    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').click();
-
-    // Verify that "Participant ID" and "Sex" option are disabled (should have aria-disabled="true")
-    cy.get('[role="listbox"]').should('be.visible');
-    cy.get('[role="option"]')
-      .contains('Participant ID')
-      .should('have.attr', 'aria-disabled', 'true');
-    cy.get('[role="option"]').contains('Sex').should('have.attr', 'aria-disabled', 'true');
-
-    // Verify that other options like "Age" are still enabled
-    cy.get('[role="option"]').contains('Age').should('not.have.attr', 'aria-disabled', 'true');
-  });
-
-  it('shows identifier label when data type is locked by standardized variable', () => {
+  it('should show identifier label when data type is locked/inferred by standardized variable', () => {
     cy.mount(
       <ColumnAnnotationCard
         id="2"
@@ -142,11 +96,8 @@ describe('ColumnAnnotationCard', () => {
         dataType={null}
         standardizedVariableId="nb:ParticipantID"
         standardizedVariableOptions={props.standardizedVariableOptions}
-        isDataTypeEditable={false}
         inferredDataTypeLabel="Identifier"
         onDescriptionChange={props.onDescriptionChange}
-        onDataTypeChange={props.onDataTypeChange}
-        onStandardizedVariableChange={props.onStandardizedVariableChange}
       />
     );
 

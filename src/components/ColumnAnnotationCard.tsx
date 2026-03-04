@@ -1,7 +1,7 @@
-import { Typography, Autocomplete, TextField } from '@mui/material';
+import { Typography } from '@mui/material';
 import { DataType } from '~/utils/internal_types';
 import { StandardizedVariableOption } from '../hooks/useStandardizedVariableOptions';
-import DataTypeToggle from './DataTypeToggle';
+import DataTypeDisplay from './DataTypeDisplay';
 import DescriptionEditor from './DescriptionEditor';
 
 interface ColumnAnnotationCardProps {
@@ -11,11 +11,8 @@ interface ColumnAnnotationCardProps {
   dataType: DataType | null;
   standardizedVariableId: string | null;
   standardizedVariableOptions: StandardizedVariableOption[];
-  isDataTypeEditable: boolean;
   inferredDataTypeLabel: string | null;
   onDescriptionChange: (columnId: string, newDescription: string | null) => void;
-  onDataTypeChange: (columnId: string, newDataType: 'Categorical' | 'Continuous' | null) => void;
-  onStandardizedVariableChange: (columnId: string, newId: string | null) => void;
   selected?: boolean;
   onSelect?: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
@@ -32,11 +29,8 @@ function ColumnAnnotationCard({
   dataType,
   standardizedVariableId,
   standardizedVariableOptions,
-  isDataTypeEditable,
   inferredDataTypeLabel,
   onDescriptionChange,
-  onDataTypeChange,
-  onStandardizedVariableChange,
   selected = false,
   onSelect,
 }: ColumnAnnotationCardProps) {
@@ -83,37 +77,31 @@ function ColumnAnnotationCard({
         </div>
 
         <div className="flex-shrink-0">
-          <DataTypeToggle
-            columnId={id}
-            value={dataType}
-            isEditable={isDataTypeEditable}
-            inferredLabel={inferredDataTypeLabel}
-            onChange={onDataTypeChange}
-          />
+          <DataTypeDisplay columnId={id} value={dataType} inferredLabel={inferredDataTypeLabel} />
         </div>
 
         <div className="flex-shrink-0 w-full">
-          <Autocomplete
-            data-cy={`${id}-column-annotation-card-standardized-variable-dropdown`}
-            value={selectedOption}
-            onChange={(_, newValue) => onStandardizedVariableChange(id, newValue?.id ?? null)}
-            options={standardizedVariableOptions}
-            getOptionDisabled={(option) => option.disabled}
-            getOptionLabel={(option) => option.label}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-            size="small"
-            renderInput={(params) => (
-              <TextField
-                // eslint-disable-next-line react/jsx-props-no-spreading
-                {...params}
-                variant="outlined"
-                placeholder="Select variable"
-                className="w-full bg-white"
-                size="small"
-              />
-            )}
-            fullWidth
-          />
+          {selectedOption ? (
+            <div
+              className="h-10 px-3 flex items-center justify-start border rounded border-gray-200 bg-white text-gray-900 w-full shadow-sm"
+              data-cy={`${id}-column-annotation-card-mapped-variable`}
+              title={selectedOption.label}
+            >
+              <Typography variant="body2" className="font-medium truncate">
+                {selectedOption.label}
+              </Typography>
+            </div>
+          ) : (
+            <div
+              className="h-10 px-3 flex items-center justify-start text-gray-400 w-full"
+              data-cy={`${id}-column-annotation-card-mapped-variable-unassigned`}
+              title="Assign standardized variable"
+            >
+              <Typography variant="body2" className="italic truncate">
+                Assign standardized variable
+              </Typography>
+            </div>
+          )}
         </div>
       </div>
     </div>
