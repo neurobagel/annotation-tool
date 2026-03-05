@@ -1,34 +1,35 @@
+import HelpIcon from '@mui/icons-material/Help';
 import { Tooltip, Typography } from '@mui/material';
-import { DataType } from '~/utils/internal_types';
 
 interface DataTypeDisplayProps {
   columnId: string;
-  value: DataType | null;
-  inferredLabel: string | null;
+  label: string | null;
+  isInferred?: boolean;
 }
 
-function DataTypeDisplay({ columnId, value, inferredLabel }: DataTypeDisplayProps) {
-  const displayValue = inferredLabel || value;
+function DataTypeDisplay({ columnId, label, isInferred = false }: DataTypeDisplayProps) {
+  if (label) {
+    const tooltipText =
+      'Data type is automatically determined by standardized variable selection. \n To change the data type manually, remove the standardized variable';
 
-  let label = displayValue;
-  if (displayValue === DataType.categorical) {
-    label = 'Categorical';
-  } else if (displayValue === DataType.continuous) {
-    label = 'Continuous';
-  }
+    const content = (
+      <div
+        className="h-10 px-3 flex items-center justify-start border rounded border-gray-200 bg-white text-gray-900 w-full shadow-sm"
+        data-cy={`${columnId}-column-annotation-card-data-type`}
+      >
+        <Typography variant="body2" className="font-medium truncate">
+          {label}
+        </Typography>
+        {isInferred && <HelpIcon sx={{ fontSize: 14 }} className="text-gray-400 ml-1" />}
+      </div>
+    );
 
-  if (displayValue) {
-    return (
-      <Tooltip title="Data type" arrow>
-        <div
-          className="h-10 px-3 flex items-center justify-start border rounded border-gray-200 bg-white text-gray-900 w-full shadow-sm"
-          data-cy={`${columnId}-column-annotation-card-data-type`}
-        >
-          <Typography variant="body2" className="font-medium truncate">
-            {label}
-          </Typography>
-        </div>
+    return isInferred ? (
+      <Tooltip title={tooltipText} arrow>
+        {content}
       </Tooltip>
+    ) : (
+      content
     );
   }
 
@@ -43,5 +44,9 @@ function DataTypeDisplay({ columnId, value, inferredLabel }: DataTypeDisplayProp
     </div>
   );
 }
+
+DataTypeDisplay.defaultProps = {
+  isInferred: false,
+};
 
 export default DataTypeDisplay;

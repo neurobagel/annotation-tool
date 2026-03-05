@@ -39,6 +39,13 @@ function ColumnAnnotationCard({
       ? standardizedVariableOptions.find((option) => option.id === standardizedVariableId) || null
       : null;
 
+  let dataTypeLabel = inferredDataTypeLabel || dataType;
+  if (dataTypeLabel === DataType.categorical) {
+    dataTypeLabel = 'Categorical';
+  } else if (dataTypeLabel === DataType.continuous) {
+    dataTypeLabel = 'Continuous';
+  }
+
   return (
     // The jsx-a11y linter expects any element with role="button" and an onClick handler
     // to be fully accessible via keyboard (requiring a tabIndex and an onKeyDown handler).
@@ -77,7 +84,11 @@ function ColumnAnnotationCard({
         </div>
 
         <div className="flex-shrink-0">
-          <DataTypeDisplay columnId={id} value={dataType} inferredLabel={inferredDataTypeLabel} />
+          <DataTypeDisplay
+            columnId={id}
+            label={dataTypeLabel}
+            isInferred={!!inferredDataTypeLabel}
+          />
         </div>
 
         <div className="flex-shrink-0 w-full">
