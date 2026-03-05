@@ -1,5 +1,4 @@
-import CloseIcon from '@mui/icons-material/Close';
-import { Box, Typography, Button } from '@mui/material';
+import { Box } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { useColumns, useDataActions, useStandardizedVariables } from '~/stores/data';
 import { useColumnCardData } from '../hooks/useColumnCardData';
@@ -7,6 +6,7 @@ import { useMultiSelect } from '../hooks/useMultiSelect';
 import { useSearchFilter } from '../hooks/useSearchFilter';
 import { useStandardizedVariableOptions } from '../hooks/useStandardizedVariableOptions';
 import { ColumnAnnotationInstructions } from '../utils/instructions';
+import BulkActionBar from './BulkActionBar';
 import ColumnAnnotationCard from './ColumnAnnotationCard';
 import Instruction from './Instruction';
 import SearchFilter from './SearchFilter';
@@ -15,7 +15,7 @@ import StandardizedVariablesList from './StandardizedVariablesList';
 function ColumnAnnotation() {
   const columns = useColumns();
   const standardizedVariables = useStandardizedVariables();
-  const { userUpdatesColumnDescription } = useDataActions();
+  const { userUpdatesColumnDescription, userUpdatesMultipleColumnDataTypes } = useDataActions();
   const standardizedVariableOptions = useStandardizedVariableOptions();
   const { searchTerm, debouncedSearchTerm, setSearchTerm, clearSearch } = useSearchFilter(300);
 
@@ -63,30 +63,13 @@ function ColumnAnnotation() {
                 totalCount={columnCardData.length}
                 filteredCount={filteredColumnCardData.length}
               />
-              {selectedIds.size > 0 && (
-                <Box
-                  className="bg-primary-50 border border-primary-200 rounded-lg px-4 py-2 shadow-sm flex-1 transition-all"
-                  data-cy="action-bar"
-                >
-                  <div className="w-full flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      <Typography variant="subtitle1" className="font-semibold text-primary-700">
-                        {selectedIds.size} column{selectedIds.size !== 1 ? 's' : ''} selected
-                      </Typography>
-                      <Button
-                        size="small"
-                        variant="text"
-                        color="inherit"
-                        onClick={clearSelection}
-                        startIcon={<CloseIcon fontSize="small" />}
-                        className="text-gray-500 hover:text-gray-700"
-                      >
-                        Clear
-                      </Button>
-                    </div>
-                  </div>
-                </Box>
-              )}
+              <BulkActionBar
+                selectedCount={selectedIds.size}
+                onClearSelection={clearSelection}
+                onAssignDataType={(dataType) =>
+                  userUpdatesMultipleColumnDataTypes(Array.from(selectedIds), dataType)
+                }
+              />
             </div>
           </div>
 

@@ -146,6 +146,7 @@ export type DataStoreActions = {
   userUploadsDataDictionaryFile: (dataDictionaryFile: File) => Promise<void>;
   userUpdatesColumnDescription: (columnID: string, description: string | null) => void;
   userUpdatesColumnDataType: (columnID: string, dataType: DataType | null) => void;
+  userUpdatesMultipleColumnDataTypes: (columnIDs: string[], dataType: DataType | null) => void;
   userUpdatesColumnStandardizedVariable: (
     columnID: string,
     standardizedVariableId: string | null

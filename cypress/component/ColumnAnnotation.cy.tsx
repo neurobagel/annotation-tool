@@ -46,7 +46,7 @@ describe('ColumnAnnotation', () => {
     });
   });
 
-  it('renders the component correctly', () => {
+  it('should render the component correctly', () => {
     cy.mount(<ColumnAnnotation />);
     cy.get('[data-cy="column-annotation-container"]').should('be.visible');
     cy.get('[data-cy="1-column-annotation-card"]').should('be.visible');
@@ -72,7 +72,7 @@ describe('ColumnAnnotation', () => {
       .and('contain', 'Continuous');
   });
 
-  it('allows scrolling to access all column cards', () => {
+  it('should scroll to access all column cards', () => {
     cy.mount(<ColumnAnnotation />);
     cy.get('[data-cy="scrollable-container"]').should('be.visible');
 
@@ -89,7 +89,7 @@ describe('ColumnAnnotation', () => {
     cy.get('[data-cy="scrollable-container"]').scrollTo('top');
     cy.get('[data-cy="1-column-annotation-card"]').should('be.visible');
   });
-  it('edits the description', () => {
+  it('should edit the description', () => {
     cy.spy(useDataStore.getState().actions, 'userUpdatesColumnDescription').as(
       'userUpdatesColumnDescription'
     );
@@ -103,7 +103,7 @@ describe('ColumnAnnotation', () => {
     cy.get('@userUpdatesColumnDescription').should('have.been.calledWith', '1', 'new description');
   });
 
-  it('filters columns based on search input', () => {
+  it('should filter columns based on search input', () => {
     cy.mount(<ColumnAnnotation />);
 
     cy.get('[data-cy="search-filter-input"]').should('be.visible');
@@ -130,7 +130,7 @@ describe('ColumnAnnotation', () => {
       .and('contain', 'NONEXISTENT');
   });
 
-  it('allows editing a column while filtered', () => {
+  it('should edit a column while filtered', () => {
     cy.spy(useDataStore.getState().actions, 'userUpdatesColumnDescription').as(
       'userUpdatesColumnDescription'
     );
@@ -151,5 +151,35 @@ describe('ColumnAnnotation', () => {
 
     cy.get('[data-cy="search-filter-clear"]').click();
     cy.get('[data-cy="search-filter-counter"]').should('contain', '4 of 4');
+  });
+
+  it('should bulk assign data types to selected columns', () => {
+    cy.spy(useDataStore.getState().actions, 'userUpdatesMultipleColumnDataTypes').as(
+      'userUpdatesMultipleColumnDataTypes'
+    );
+    cy.mount(<ColumnAnnotation />);
+
+    cy.get('[data-cy="1-column-annotation-card"]').click({ shiftKey: false, ctrlKey: false });
+    cy.get('[data-cy="2-column-annotation-card"]').click({ shiftKey: false, ctrlKey: true });
+
+    cy.get('[data-cy="bulk-assign-continuous"]').click();
+    cy.get('@userUpdatesMultipleColumnDataTypes').should(
+      'have.been.calledWith',
+      ['1', '2'],
+      DataType.continuous
+    );
+
+    cy.get('[data-cy="bulk-assign-none"]').click();
+    cy.get('@userUpdatesMultipleColumnDataTypes').should('have.been.calledWith', ['1', '2'], null);
+
+    cy.get('[data-cy="bulk-assign-categorical"]').click();
+    cy.get('@userUpdatesMultipleColumnDataTypes').should(
+      'have.been.calledWith',
+      ['1', '2'],
+      DataType.categorical
+    );
+
+    cy.get('[data-cy="clear-selection-button"]').click();
+    cy.get('[data-cy="action-bar"]').should('contain', '0 columns selected');
   });
 });

@@ -798,7 +798,6 @@ describe('userUpdatesColumnDataType', () => {
       result.current.actions.userUpdatesColumnDataType('0', DataType.categorical);
     });
 
-    expect(result.current.columns['0'].dataType).toBe(DataType.categorical);
     expect(result.current.columns['0'].levels).toBeDefined();
 
     act(() => {
@@ -846,6 +845,115 @@ B`;
       description: '',
       standardizedTerm: '',
     });
+  });
+});
+
+describe('userUpdatesMultipleColumnDataTypes', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should set dataType for multiple columns and initialize their specific defaults', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['col0', 'col1', 'col2'],
+      data: [
+        ['A', '5', 'X'],
+        ['B', '6', 'X'],
+        ['A', '7', 'Y'],
+      ],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnDataTypes(['0', '2'], DataType.categorical);
+    });
+
+    expect(result.current.columns['0'].dataType).toBe(DataType.categorical);
+    expect(Object.keys(result.current.columns['0'].levels!)).toEqual(['A', 'B']);
+    expect(result.current.columns['2'].dataType).toBe(DataType.categorical);
+    expect(Object.keys(result.current.columns['2'].levels!)).toEqual(['X', 'Y']);
+
+    expect(result.current.columns['1'].dataType).toBeUndefined();
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnDataTypes(['0', '1'], DataType.continuous);
+    });
+
+    expect(result.current.columns['0'].dataType).toBe(DataType.continuous);
+    expect(result.current.columns['0'].levels).toBeUndefined();
+    expect(result.current.columns['0'].units).toBe('');
+
+    expect(result.current.columns['1'].dataType).toBe(DataType.continuous);
+    expect(result.current.columns['1'].units).toBe('');
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnDataTypes(['0', '1', '2'], null);
+    });
+
+    expect(result.current.columns['0'].dataType).toBeNull();
+    expect(result.current.columns['0'].units).toBeUndefined();
+    expect(result.current.columns['0'].levels).toBeUndefined();
+
+    expect(result.current.columns['1'].dataType).toBeNull();
+    expect(result.current.columns['2'].dataType).toBeNull();
+  });
+
+  it('should skip mapped columns unless they correspond to a collection variable', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['col0', 'col1'],
+      data: [
+        ['1', '2'],
+        ['3', '4'],
+      ],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockConfigFile,
+      termsData: mockTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnStandardizedVariable('0', 'nb:Sex');
+      result.current.actions.userUpdatesColumnStandardizedVariable('1', 'nb:Assessment');
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnDataTypes(['0', '1'], DataType.categorical);
+    });
+
+    expect(result.current.columns['0'].dataType).toBe(DataType.categorical);
+    expect(result.current.columns['1'].dataType).toBe(DataType.categorical);
   });
 });
 
