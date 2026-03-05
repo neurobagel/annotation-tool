@@ -7,7 +7,7 @@ const props = {
 };
 
 describe('BulkActionBar', () => {
-  it('should render the component correctly when no columns are selected', () => {
+  it('should disable all buttons when no columns are selected', () => {
     cy.mount(
       <BulkActionBar
         selectedCount={0}
@@ -23,7 +23,7 @@ describe('BulkActionBar', () => {
     cy.get('[data-cy="bulk-assign-none"]').should('be.disabled');
   });
 
-  it('should render the component correctly with selected columns and enable buttons', () => {
+  it('should enable all buttons when at least 1 column is selected', () => {
     cy.mount(
       <BulkActionBar
         selectedCount={2}

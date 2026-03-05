@@ -159,22 +159,8 @@ describe('ColumnAnnotation', () => {
     );
     cy.mount(<ColumnAnnotation />);
 
-    cy.get('[data-cy="action-bar"]').should('be.visible').and('contain', '0 columns selected');
-    cy.get('[data-cy="bulk-assign-categorical"]').should('be.disabled');
-    cy.get('[data-cy="bulk-assign-continuous"]').should('be.disabled');
-    cy.get('[data-cy="bulk-assign-none"]').should('be.disabled');
-    cy.get('[data-cy="clear-selection-button"]').should('be.disabled');
-
     cy.get('[data-cy="1-column-annotation-card"]').click({ shiftKey: false, ctrlKey: false });
-
-    cy.get('[data-cy="action-bar"]').should('contain', '1 column selected');
-    cy.get('[data-cy="bulk-assign-categorical"]').should('not.be.disabled');
-    cy.get('[data-cy="bulk-assign-continuous"]').should('not.be.disabled');
-    cy.get('[data-cy="bulk-assign-none"]').should('not.be.disabled');
-    cy.get('[data-cy="clear-selection-button"]').should('not.be.disabled');
-
     cy.get('[data-cy="2-column-annotation-card"]').click({ shiftKey: false, ctrlKey: true });
-    cy.get('[data-cy="action-bar"]').should('contain', '2 columns selected');
 
     cy.get('[data-cy="bulk-assign-continuous"]').click();
     cy.get('@userUpdatesMultipleColumnDataTypes').should(
@@ -195,6 +181,5 @@ describe('ColumnAnnotation', () => {
 
     cy.get('[data-cy="clear-selection-button"]').click();
     cy.get('[data-cy="action-bar"]').should('contain', '0 columns selected');
-    cy.get('[data-cy="bulk-assign-categorical"]').should('be.disabled');
   });
 });
