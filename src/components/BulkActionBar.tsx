@@ -30,9 +30,7 @@ export default function BulkActionBar({
             variant="subtitle1"
             className={`font-semibold whitespace-nowrap ${hasSelection ? 'text-primary-700' : 'text-gray-500'}`}
           >
-            {selectedCount === 0
-              ? '0 columns selected'
-              : `${selectedCount} column${selectedCount !== 1 ? 's' : ''} selected`}
+            {`${selectedCount} column${selectedCount !== 1 ? 's' : ''} selected`}
           </Typography>
           <Button
             size="small"
