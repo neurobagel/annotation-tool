@@ -808,6 +808,44 @@ describe('userUpdatesColumnDataType', () => {
     expect(result.current.columns['0'].levels).toBeUndefined();
     expect(result.current.columns['0'].units).toBeUndefined();
   });
+
+  it('should handle empty values in categorical levels', async () => {
+    const tsvWithEmptyValues = `col1
+A
+
+B`;
+
+    const mockTsvFile = new File([tsvWithEmptyValues], 'data-with-empty.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(tsvWithEmptyValues);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['col1'],
+      data: [['A'], [''], ['B']],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('0', DataType.categorical);
+    });
+
+    expect(result.current.columns['0'].dataType).toBe(DataType.categorical);
+    expect(result.current.columns['0'].levels).toBeDefined();
+    expect(Object.keys(result.current.columns['0'].levels!)).toContain('');
+    expect(result.current.columns['0'].levels!['']).toEqual({
+      description: '',
+      standardizedTerm: '',
+    });
+  });
 });
 
 describe('userUpdatesMultipleColumnDataTypes', () => {
@@ -916,44 +954,6 @@ describe('userUpdatesMultipleColumnDataTypes', () => {
 
     expect(result.current.columns['0'].dataType).toBe(DataType.categorical);
     expect(result.current.columns['1'].dataType).toBe(DataType.categorical);
-  });
-});
-
-it('should handle empty values in categorical levels', async () => {
-  const tsvWithEmptyValues = `col1
-A
-
-B`;
-
-  const mockTsvFile = new File([tsvWithEmptyValues], 'data-with-empty.tsv', {
-    type: 'text/tab-separated-values',
-  });
-
-  mockedReadFile.mockResolvedValueOnce(tsvWithEmptyValues);
-  mockedParseTsvContent.mockReturnValueOnce({
-    headers: ['col1'],
-    data: [['A'], [''], ['B']],
-  });
-
-  const { result } = renderHook(() => ({
-    actions: useDataActions(),
-    columns: useColumns(),
-  }));
-
-  await act(async () => {
-    await result.current.actions.userUploadsDataTableFile(mockTsvFile);
-  });
-
-  act(() => {
-    result.current.actions.userUpdatesColumnDataType('0', DataType.categorical);
-  });
-
-  expect(result.current.columns['0'].dataType).toBe(DataType.categorical);
-  expect(result.current.columns['0'].levels).toBeDefined();
-  expect(Object.keys(result.current.columns['0'].levels!)).toContain('');
-  expect(result.current.columns['0'].levels!['']).toEqual({
-    description: '',
-    standardizedTerm: '',
   });
 });
 
