@@ -108,10 +108,9 @@ function ColumnAnnotationCard({
             <div
               className="h-10 px-3 flex items-center justify-start text-gray-400 w-full"
               data-cy={`${id}-column-annotation-card-mapped-variable-unassigned`}
-              title="Assign standardized variable"
             >
-              <Typography variant="body2" className="italic truncate">
-                Assign standardized variable
+              <Typography variant="body2" className="italic font-medium">
+                Assign variable
               </Typography>
             </div>
           )}

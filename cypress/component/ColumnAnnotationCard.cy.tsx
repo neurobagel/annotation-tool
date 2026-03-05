@@ -64,7 +64,7 @@ describe('ColumnAnnotationCard', () => {
 
     cy.get('[data-cy="1-column-annotation-card-mapped-variable-unassigned"]')
       .should('be.visible')
-      .and('contain', 'Assign standardized variable');
+      .and('contain', 'Assign variable');
   });
 
   it('should fire the onDescriptionChange event handler with the appropriate payload when description is auto-saved', () => {
