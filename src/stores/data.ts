@@ -175,12 +175,11 @@ const useDataStore = create<DataStore>()((set, get) => ({
 
     userUpdatesMultipleColumnDataTypes(columnIDs, dataType) {
       set((state) => ({
-        columns: produce(state.columns, (draft) => {
+        columns: produce(state.columns, (draft) =>
           columnIDs.forEach((columnID) => {
             const column = state.columns[columnID];
-            if (!column) return;
 
-            const isMapped = !!column.standardizedVariable;
+            const isMapped = !!column?.standardizedVariable;
             const isCollection =
               isMapped &&
               state.standardizedVariables[column.standardizedVariable!]?.variable_type ===
@@ -188,11 +187,11 @@ const useDataStore = create<DataStore>()((set, get) => ({
 
             // Skip updating columns that have a strictly defined data type from a mapped
             // standardized variable, unless that variable is a collection.
-            if (!isMapped || isCollection) {
+            if (column && (!isMapped || isCollection)) {
               draft[columnID] = applyDataTypeToColumn(column, dataType, column.allValues);
             }
-          });
-        }),
+          })
+        ),
       }));
     },
 
