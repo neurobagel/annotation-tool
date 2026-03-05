@@ -1,13 +1,12 @@
 import CloseIcon from '@mui/icons-material/Close';
 import { Box, Typography, Button } from '@mui/material';
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useColumns, useDataActions, useStandardizedVariables } from '~/stores/data';
 import { useColumnCardData } from '../hooks/useColumnCardData';
 import { useMultiSelect } from '../hooks/useMultiSelect';
 import { useSearchFilter } from '../hooks/useSearchFilter';
 import { useStandardizedVariableOptions } from '../hooks/useStandardizedVariableOptions';
 import { ColumnAnnotationInstructions } from '../utils/instructions';
-import { DataType } from '../utils/internal_types';
 import ColumnAnnotationCard from './ColumnAnnotationCard';
 import Instruction from './Instruction';
 import SearchFilter from './SearchFilter';
@@ -16,35 +15,9 @@ import StandardizedVariablesList from './StandardizedVariablesList';
 function ColumnAnnotation() {
   const columns = useColumns();
   const standardizedVariables = useStandardizedVariables();
-  const {
-    userUpdatesColumnDescription,
-    userUpdatesColumnStandardizedVariable,
-    userUpdatesColumnDataType,
-  } = useDataActions();
+  const { userUpdatesColumnDescription } = useDataActions();
   const standardizedVariableOptions = useStandardizedVariableOptions();
   const { searchTerm, debouncedSearchTerm, setSearchTerm, clearSearch } = useSearchFilter(300);
-
-  const handleStandardizedVariableChange = useCallback(
-    (columnId: string, newId: string | null) => {
-      userUpdatesColumnStandardizedVariable(columnId, newId);
-    },
-    [userUpdatesColumnStandardizedVariable]
-  );
-
-  const handleDataTypeChange = useCallback(
-    (columnId: string, newDataType: 'Categorical' | 'Continuous' | null) => {
-      let dataType: DataType | null;
-      if (newDataType === 'Categorical') {
-        dataType = DataType.categorical;
-      } else if (newDataType === 'Continuous') {
-        dataType = DataType.continuous;
-      } else {
-        dataType = null;
-      }
-      userUpdatesColumnDataType(columnId, dataType);
-    },
-    [userUpdatesColumnDataType]
-  );
 
   const columnCardData = useColumnCardData(columns, standardizedVariables);
 
@@ -142,11 +115,8 @@ function ColumnAnnotation() {
                       dataType={columnData.dataType}
                       standardizedVariableId={columnData.standardizedVariableId}
                       standardizedVariableOptions={standardizedVariableOptions}
-                      isDataTypeEditable={columnData.isDataTypeEditable}
                       inferredDataTypeLabel={columnData.inferredDataTypeLabel}
                       onDescriptionChange={userUpdatesColumnDescription}
-                      onDataTypeChange={handleDataTypeChange}
-                      onStandardizedVariableChange={handleStandardizedVariableChange}
                       selected={isSelected(columnData.columnId)}
                       onSelect={(e) =>
                         handleSelect(columnData.columnId, e.shiftKey, e.ctrlKey || e.metaKey)
