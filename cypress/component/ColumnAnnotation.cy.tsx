@@ -66,7 +66,7 @@ describe('ColumnAnnotation', () => {
       .and('have.value', 'This is another column');
     cy.get('[data-cy="2-column-annotation-card-mapped-variable-unassigned"]')
       .should('be.visible')
-      .and('contain', 'Assign standardized variable');
+      .and('contain', 'Assign variable');
     cy.get('[data-cy="2-column-annotation-card-data-type"]')
       .should('be.visible')
       .and('contain', 'Continuous');
