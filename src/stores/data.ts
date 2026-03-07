@@ -239,6 +239,47 @@ const useDataStore = create<DataStore>()((set, get) => ({
       }));
     },
 
+    userUpdatesMultipleColumnStandardizedVariables(columnIDs, standardizedVariableId) {
+      const { standardizedVariables } = get();
+
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          columnIDs.forEach((columnID) => {
+            if (standardizedVariableId === null) {
+              draft[columnID].standardizedVariable = null;
+              const columnWithDataType = applyDataTypeToColumn(
+                current(draft[columnID]),
+                null,
+                state.columns[columnID].allValues
+              );
+              draft[columnID] = columnWithDataType;
+            } else {
+              draft[columnID].standardizedVariable = standardizedVariableId;
+              const standardizedVariable = standardizedVariables[standardizedVariableId];
+
+              if (standardizedVariable) {
+                const variableType = standardizedVariable.variable_type;
+                let dataType: DataType | null = null;
+
+                if (variableType === VariableType.categorical) {
+                  dataType = DataType.categorical;
+                } else if (variableType === VariableType.continuous) {
+                  dataType = DataType.continuous;
+                }
+
+                const columnWithDataType = applyDataTypeToColumn(
+                  current(draft[columnID]),
+                  dataType,
+                  state.columns[columnID].allValues
+                );
+                draft[columnID] = columnWithDataType;
+              }
+            }
+          });
+        }),
+      }));
+    },
+
     userUpdatesColumnToCollectionMapping(columnID, termId) {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
@@ -247,6 +288,27 @@ const useDataStore = create<DataStore>()((set, get) => ({
           } else {
             delete draft[columnID].isPartOf;
           }
+        }),
+      }));
+    },
+
+    userUpdatesMultipleColumnToCollectionMappings(columnIDs, termId) {
+      const { standardizedTerms } = get();
+
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          columnIDs.forEach((columnID) => {
+            if (termId) {
+              draft[columnID].isPartOf = termId;
+              const term = standardizedTerms[termId];
+              if (term) {
+                draft[columnID].standardizedVariable = term.standardizedVariableId;
+              }
+            } else {
+              delete draft[columnID].isPartOf;
+              delete draft[columnID].standardizedVariable;
+            }
+          });
         }),
       }));
     },
