@@ -1,11 +1,17 @@
 import { Box } from '@mui/material';
 import { useMemo, useState } from 'react';
-import { useColumns, useDataActions, useStandardizedVariables } from '~/stores/data';
+import {
+  useColumns,
+  useDataActions,
+  useStandardizedVariables,
+  useStandardizedTerms,
+} from '~/stores/data';
 import { useColumnCardData } from '../hooks/useColumnCardData';
 import { useMultiSelect } from '../hooks/useMultiSelect';
 import { useSearchFilter } from '../hooks/useSearchFilter';
 import { useStandardizedVariableOptions } from '../hooks/useStandardizedVariableOptions';
 import { ColumnAnnotationInstructions } from '../utils/instructions';
+import { VariableType } from '../utils/internal_types';
 import BulkActionBar from './BulkActionBar';
 import ColumnAnnotationCard from './ColumnAnnotationCard';
 import Instruction from './Instruction';
@@ -15,11 +21,17 @@ import StandardizedVariablesList from './StandardizedVariablesList';
 function ColumnAnnotation() {
   const columns = useColumns();
   const standardizedVariables = useStandardizedVariables();
-  const { userUpdatesColumnDescription, userUpdatesMultipleColumnDataTypes } = useDataActions();
+  const standardizedTerms = useStandardizedTerms();
+  const {
+    userUpdatesColumnDescription,
+    userUpdatesMultipleColumnDataTypes,
+    userUpdatesMultipleColumnStandardizedVariables,
+    userUpdatesMultipleColumnToCollectionMappings,
+  } = useDataActions();
   const standardizedVariableOptions = useStandardizedVariableOptions();
   const { searchTerm, debouncedSearchTerm, setSearchTerm, clearSearch } = useSearchFilter(300);
 
-  const columnCardData = useColumnCardData(columns, standardizedVariables);
+  const columnCardData = useColumnCardData(columns, standardizedVariables, standardizedTerms);
 
   // Memoize the filtering logic to ensure that we only apply the .filter() operation
   // when the actual data changes OR when the 300ms debounce timer finishes, preventing
@@ -39,7 +51,35 @@ function ColumnAnnotation() {
   const { selectedIds, handleSelect, clearSelection, isSelected } =
     useMultiSelect(visibleColumnIds);
 
-  const [selectedSidebarNode, setSelectedSidebarNode] = useState<string | null>(null);
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+
+  const handleStandardizedVariablesListItemSelect = (itemId: string | null) => {
+    if (itemId && selectedIds.size > 0) {
+      const stdVar = standardizedVariables[itemId];
+      if (stdVar && stdVar.variable_type !== VariableType.collection) {
+        userUpdatesMultipleColumnStandardizedVariables(Array.from(selectedIds), itemId);
+        clearSelection();
+      } else {
+        userUpdatesMultipleColumnToCollectionMappings(Array.from(selectedIds), itemId);
+        clearSelection();
+      }
+      setSelectedItemId(null);
+    } else {
+      setSelectedItemId(itemId);
+    }
+  };
+
+  const hasMappedSelected = Array.from(selectedIds).some(
+    (colId) =>
+      columns[colId]?.standardizedVariable !== undefined || columns[colId]?.isPartOf !== undefined
+  );
+
+  const handleClearMappings = () => {
+    const selectedArray = Array.from(selectedIds);
+    userUpdatesMultipleColumnStandardizedVariables(selectedArray, null);
+    userUpdatesMultipleColumnToCollectionMappings(selectedArray, null);
+    clearSelection();
+  };
 
   return (
     <div
@@ -54,21 +94,25 @@ function ColumnAnnotation() {
             <Instruction title="Column Annotation" className="mb-0">
               <ColumnAnnotationInstructions />
             </Instruction>
-            <div className="w-full flex items-start gap-4">
-              <SearchFilter
-                searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
-                onClear={clearSearch}
-                placeholder="Filter columns by name..."
-                totalCount={columnCardData.length}
-                filteredCount={filteredColumnCardData.length}
-              />
+            <div className="w-full flex flex-col xl:flex-row items-stretch xl:items-center gap-4">
+              <div className="w-full xl:w-1/4 max-w-md flex-shrink-0">
+                <SearchFilter
+                  searchTerm={searchTerm}
+                  onSearchChange={setSearchTerm}
+                  onClear={clearSearch}
+                  placeholder="Filter columns by name..."
+                  totalCount={columnCardData.length}
+                  filteredCount={filteredColumnCardData.length}
+                />
+              </div>
               <BulkActionBar
                 selectedCount={selectedIds.size}
                 onClearSelection={clearSelection}
                 onAssignDataType={(dataType) =>
                   userUpdatesMultipleColumnDataTypes(Array.from(selectedIds), dataType)
                 }
+                hasMappedSelected={hasMappedSelected}
+                onClearMappings={handleClearMappings}
               />
             </div>
           </div>
@@ -97,6 +141,8 @@ function ColumnAnnotation() {
                       description={columnData.description}
                       dataType={columnData.dataType}
                       standardizedVariableId={columnData.standardizedVariableId}
+                      termLabel={columnData.termLabel}
+                      termAbbreviation={columnData.termAbbreviation}
                       standardizedVariableOptions={standardizedVariableOptions}
                       inferredDataTypeLabel={columnData.inferredDataTypeLabel}
                       onDescriptionChange={userUpdatesColumnDescription}
@@ -118,8 +164,9 @@ function ColumnAnnotation() {
         {/* Standardized Variables List */}
         <div className="py-4 h-full">
           <StandardizedVariablesList
-            selectedItemId={selectedSidebarNode}
-            onItemSelect={setSelectedSidebarNode}
+            selectedItemId={selectedItemId}
+            onItemSelect={handleStandardizedVariablesListItemSelect}
+            hasMultipleSelection={selectedIds.size > 1}
           />
         </div>
       </div>
