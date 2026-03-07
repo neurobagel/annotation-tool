@@ -4,6 +4,7 @@ import { DataType } from '../../src/utils/internal_types';
 const props = {
   onClearSelection: () => {},
   onAssignDataType: () => {},
+  onClearMappings: () => {},
 };
 
 describe('BulkActionBar', () => {
@@ -13,6 +14,7 @@ describe('BulkActionBar', () => {
         selectedCount={0}
         onClearSelection={props.onClearSelection}
         onAssignDataType={props.onAssignDataType}
+        onClearMappings={props.onClearMappings}
       />
     );
 
@@ -29,6 +31,7 @@ describe('BulkActionBar', () => {
         selectedCount={2}
         onClearSelection={props.onClearSelection}
         onAssignDataType={props.onAssignDataType}
+        onClearMappings={props.onClearMappings}
       />
     );
 
@@ -45,8 +48,9 @@ describe('BulkActionBar', () => {
     cy.mount(
       <BulkActionBar
         selectedCount={3}
-        onClearSelection={onClearSelection}
         onAssignDataType={props.onAssignDataType}
+        onClearMappings={props.onClearMappings}
+        onClearSelection={onClearSelection}
       />
     );
 
@@ -61,6 +65,7 @@ describe('BulkActionBar', () => {
       <BulkActionBar
         selectedCount={1}
         onClearSelection={props.onClearSelection}
+        onClearMappings={props.onClearMappings}
         onAssignDataType={onAssignDataType}
       />
     );
@@ -73,5 +78,23 @@ describe('BulkActionBar', () => {
 
     cy.get('[data-cy="bulk-assign-none"]').click();
     cy.get('@onAssignDataType').should('have.been.calledWith', null);
+  });
+
+  it('should fire onClearMappings event handler with the appropriate payload when clear mappings button is clicked', () => {
+    const onClearMappings = cy.stub().as('onClearMappings');
+
+    cy.mount(
+      <BulkActionBar
+        selectedCount={1}
+        onClearSelection={props.onClearSelection}
+        onAssignDataType={props.onAssignDataType}
+        hasMappedSelected
+        onClearMappings={onClearMappings}
+      />
+    );
+
+    cy.get('[data-cy="bulk-unassign-mappings"]').should('be.visible').and('not.be.disabled');
+    cy.get('[data-cy="bulk-unassign-mappings"]').click();
+    cy.get('@onClearMappings').should('have.been.calledOnce');
   });
 });
