@@ -15,6 +15,7 @@ const props = {
   ],
   inferredDataTypeLabel: null,
   onDescriptionChange: () => {},
+  onSelect: () => {},
 };
 
 describe('ColumnAnnotationCard', () => {
@@ -29,6 +30,7 @@ describe('ColumnAnnotationCard', () => {
         standardizedVariableOptions={props.standardizedVariableOptions}
         inferredDataTypeLabel={props.inferredDataTypeLabel}
         onDescriptionChange={props.onDescriptionChange}
+        onSelect={props.onSelect}
       />
     );
     cy.get('[data-cy="1-column-annotation-card"]')
@@ -56,6 +58,7 @@ describe('ColumnAnnotationCard', () => {
         standardizedVariableOptions={props.standardizedVariableOptions}
         inferredDataTypeLabel={null}
         onDescriptionChange={props.onDescriptionChange}
+        onSelect={props.onSelect}
       />
     );
     cy.get('[data-cy="1-column-annotation-card-data-type-unassigned"]')
@@ -79,6 +82,7 @@ describe('ColumnAnnotationCard', () => {
         standardizedVariableOptions={props.standardizedVariableOptions}
         inferredDataTypeLabel={props.inferredDataTypeLabel}
         onDescriptionChange={spy}
+        onSelect={props.onSelect}
       />
     );
     cy.get('[data-cy="1-description"]').should('be.visible');
@@ -98,9 +102,29 @@ describe('ColumnAnnotationCard', () => {
         standardizedVariableOptions={props.standardizedVariableOptions}
         inferredDataTypeLabel="Identifier"
         onDescriptionChange={props.onDescriptionChange}
+        onSelect={props.onSelect}
       />
     );
 
     cy.get('[data-cy="2-column-annotation-card-data-type"]').should('contain', 'Identifier');
+  });
+
+  it('should fire the onSelect event handler when the card is clicked', () => {
+    const spy = cy.spy().as('onSelectSpy');
+    cy.mount(
+      <ColumnAnnotationCard
+        id={props.id}
+        name={props.name}
+        description={props.description}
+        dataType={props.dataType}
+        standardizedVariableId={props.standardizedVariableId}
+        standardizedVariableOptions={props.standardizedVariableOptions}
+        inferredDataTypeLabel={props.inferredDataTypeLabel}
+        onDescriptionChange={props.onDescriptionChange}
+        onSelect={spy}
+      />
+    );
+    cy.get('[data-cy="1-column-annotation-card"]').click();
+    cy.get('@onSelectSpy').should('have.been.called');
   });
 });
