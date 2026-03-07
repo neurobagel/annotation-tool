@@ -1273,6 +1273,162 @@ describe('userUpdatesColumnToCollectionMapping', () => {
   });
 });
 
+describe('userUpdatesMultipleColumnStandardizedVariables', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const prepareMultiColumnVariables = async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['col1', 'col2'],
+      data: [
+        ['100', '101'],
+        ['110', '111'],
+        ['120', '121'],
+      ],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockConfigFile,
+      termsData: mockTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    return result;
+  };
+
+  it('should set standardized variable and apply correct data types to multiple columns', async () => {
+    const result = await prepareMultiColumnVariables();
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnStandardizedVariables(['0', '1'], 'nb:Age');
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Age');
+    expect(result.current.columns['0'].dataType).toBe(DataType.continuous);
+    expect(result.current.columns['1'].standardizedVariable).toBe('nb:Age');
+    expect(result.current.columns['1'].dataType).toBe(DataType.continuous);
+  });
+
+  it('should unmap standardized variables from multiple columns when null is provided', async () => {
+    const result = await prepareMultiColumnVariables();
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnStandardizedVariables(['0', '1'], 'nb:Age');
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Age');
+    expect(result.current.columns['1'].standardizedVariable).toBe('nb:Age');
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnStandardizedVariables(['0', '1'], null);
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBeNull();
+    expect(result.current.columns['0'].dataType).toBeNull();
+    expect(result.current.columns['1'].standardizedVariable).toBeNull();
+    expect(result.current.columns['1'].dataType).toBeNull();
+  });
+});
+
+describe('userUpdatesMultipleColumnToCollectionMappings', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const prepareMultiColumnAssessment = async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['assessment1', 'assessment2'],
+      data: [
+        ['100', '101'],
+        ['110', '111'],
+        ['120', '121'],
+      ],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockConfigFile,
+      termsData: mockTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    return result;
+  };
+
+  it('should set isPartOf and standardizedVariable for multiple columns', async () => {
+    const result = await prepareMultiColumnAssessment();
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnToCollectionMappings(
+        ['0', '1'],
+        'snomed:1303696008'
+      );
+    });
+
+    expect(result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Assessment');
+    expect(result.current.columns['1'].isPartOf).toBe('snomed:1303696008');
+    expect(result.current.columns['1'].standardizedVariable).toBe('nb:Assessment');
+  });
+
+  it('should delete isPartOf and standardizedVariable for multiple columns when null is provided', async () => {
+    const result = await prepareMultiColumnAssessment();
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnToCollectionMappings(
+        ['0', '1'],
+        'snomed:1303696008'
+      );
+    });
+
+    expect(result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
+    expect(result.current.columns['1'].isPartOf).toBe('snomed:1303696008');
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnToCollectionMappings(['0', '1'], null);
+    });
+
+    expect(result.current.columns['0'].isPartOf).toBeUndefined();
+    expect(result.current.columns['0'].standardizedVariable).toBeUndefined();
+    expect(result.current.columns['1'].isPartOf).toBeUndefined();
+    expect(result.current.columns['1'].standardizedVariable).toBeUndefined();
+  });
+});
+
 describe('userCreatesCollection', () => {
   beforeEach(() => {
     vi.clearAllMocks();
