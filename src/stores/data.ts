@@ -247,6 +247,9 @@ const useDataStore = create<DataStore>()((set, get) => ({
           columnIDs.forEach((columnID) => {
             if (standardizedVariableId === null) {
               draft[columnID].standardizedVariable = null;
+              if (draft[columnID].isPartOf !== undefined) {
+                delete draft[columnID].isPartOf;
+              }
               const columnWithDataType = applyDataTypeToColumn(
                 current(draft[columnID]),
                 null,
@@ -256,6 +259,10 @@ const useDataStore = create<DataStore>()((set, get) => ({
             } else {
               draft[columnID].standardizedVariable = standardizedVariableId;
               const standardizedVariable = standardizedVariables[standardizedVariableId];
+
+              if (draft[columnID].isPartOf !== undefined) {
+                delete draft[columnID].isPartOf;
+              }
 
               if (standardizedVariable) {
                 const variableType = standardizedVariable.variable_type;

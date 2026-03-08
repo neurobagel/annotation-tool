@@ -1346,6 +1346,43 @@ describe('userUpdatesMultipleColumnStandardizedVariables', () => {
     expect(result.current.columns['1'].standardizedVariable).toBeNull();
     expect(result.current.columns['1'].dataType).toBeNull();
   });
+
+  it('should remove isPartOf when changing from a multi-column measure to a regular standardized variable or null', async () => {
+    const result = await prepareMultiColumnVariables();
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnToCollectionMappings(
+        ['0', '1'],
+        'snomed:1303696008'
+      );
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Assessment');
+    expect(result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnStandardizedVariables(['0', '1'], 'nb:Age');
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Age');
+    expect(result.current.columns['0'].isPartOf).toBeUndefined();
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnToCollectionMappings(
+        ['0', '1'],
+        'snomed:1303696008'
+      );
+    });
+
+    expect(result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnStandardizedVariables(['0', '1'], null);
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBeNull();
+    expect(result.current.columns['0'].isPartOf).toBeUndefined();
+  });
 });
 
 describe('userUpdatesMultipleColumnToCollectionMappings', () => {
