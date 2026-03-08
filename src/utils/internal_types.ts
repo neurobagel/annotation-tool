@@ -146,11 +146,20 @@ export type DataStoreActions = {
   userUploadsDataDictionaryFile: (dataDictionaryFile: File) => Promise<void>;
   userUpdatesColumnDescription: (columnID: string, description: string | null) => void;
   userUpdatesColumnDataType: (columnID: string, dataType: DataType | null) => void;
+  userUpdatesMultipleColumnDataTypes: (columnIDs: string[], dataType: DataType | null) => void;
   userUpdatesColumnStandardizedVariable: (
     columnID: string,
     standardizedVariableId: string | null
   ) => void;
+  userUpdatesMultipleColumnStandardizedVariables: (
+    columnIDs: string[],
+    standardizedVariableId: string | null
+  ) => void;
   userUpdatesColumnToCollectionMapping: (columnID: string, termId: string | null) => void;
+  userUpdatesMultipleColumnToCollectionMappings: (
+    columnIDs: string[],
+    termId: string | null
+  ) => void;
   userCreatesCollection: (termId: string) => void;
   userDeletesCollection: (termId: string) => void;
   userUpdatesValueDescription: (columnID: string, value: string, description: string) => void;
@@ -177,5 +186,6 @@ export interface StandardizedTermItem {
 export interface StandardizedVariableItem {
   id: string;
   label: string;
+  can_have_multiple_columns?: boolean;
   terms?: StandardizedTermItem[];
 }

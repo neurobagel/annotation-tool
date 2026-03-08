@@ -54,7 +54,7 @@ describe('StandardizedVariablesList', () => {
     const onItemSelectSpy = cy.spy().as('onItemSelectSpy');
     cy.mount(<StandardizedVariablesList onItemSelect={onItemSelectSpy} selectedItemId={null} />);
 
-    cy.get('[data-cy="standardized-variables-list"]').contains('MOCA').click();
+    cy.get('[data-cy="collection-term-item-term-2"]').click();
 
     cy.get('@onItemSelectSpy').should('have.been.calledWith', 'term-2');
   });
@@ -63,7 +63,7 @@ describe('StandardizedVariablesList', () => {
     const onItemSelectSpy = cy.spy().as('onItemSelectSpy');
     cy.mount(<StandardizedVariablesList onItemSelect={onItemSelectSpy} selectedItemId="term-2" />);
 
-    cy.get('[data-cy="standardized-variables-list"]').contains('MOCA').click();
+    cy.get('[data-cy="collection-term-item-term-2"]').click();
 
     cy.get('@onItemSelectSpy').should('have.been.calledWith', null);
   });
@@ -72,7 +72,7 @@ describe('StandardizedVariablesList', () => {
     const onItemSelectSpy = cy.spy().as('onItemSelectSpy');
     cy.mount(<StandardizedVariablesList onItemSelect={onItemSelectSpy} selectedItemId={null} />);
 
-    cy.get('[data-cy="standardized-variables-list"]').contains('Age').click();
+    cy.get('[data-cy="standardized-variable-item-var-1"]').click();
 
     cy.get('@onItemSelectSpy').should('have.been.calledWith', 'var-1');
   });

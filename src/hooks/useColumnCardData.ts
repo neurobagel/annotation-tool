@@ -1,5 +1,10 @@
 import { useMemo } from 'react';
-import { Columns, DataType, StandardizedVariables } from '../utils/internal_types';
+import {
+  Columns,
+  DataType,
+  StandardizedVariables,
+  StandardizedTerms,
+} from '../utils/internal_types';
 
 export interface ColumnCardData {
   columnId: string;
@@ -7,13 +12,17 @@ export interface ColumnCardData {
   description: string | null;
   dataType: DataType | null;
   standardizedVariableId: string | null;
+  termId: string | null;
+  termLabel: string | null;
+  termAbbreviation: string | null;
   isDataTypeEditable: boolean;
   inferredDataTypeLabel: string | null;
 }
 
 export function useColumnCardData(
   columns: Columns,
-  standardizedVariables: StandardizedVariables
+  standardizedVariables: StandardizedVariables,
+  standardizedTerms: StandardizedTerms
 ): ColumnCardData[] {
   return useMemo(
     () =>
@@ -32,16 +41,28 @@ export function useColumnCardData(
           ? null
           : selectedStandardizedVariable?.variable_type || column.dataType || null;
 
+        const termId = column.isPartOf || null;
+        let termLabel = null;
+        let termAbbreviation = null;
+
+        if (termId && standardizedTerms[termId]) {
+          termLabel = standardizedTerms[termId].label;
+          termAbbreviation = standardizedTerms[termId].abbreviation || null;
+        }
+
         return {
           columnId,
           name: column.name,
           description: column.description || null,
           dataType: column.dataType || null,
           standardizedVariableId: column.standardizedVariable || null,
+          termId,
+          termLabel,
+          termAbbreviation,
           isDataTypeEditable,
           inferredDataTypeLabel,
         };
       }),
-    [columns, standardizedVariables]
+    [columns, standardizedVariables, standardizedTerms]
   );
 }
