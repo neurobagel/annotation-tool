@@ -1,4 +1,4 @@
-import { Typography } from '@mui/material';
+import { Typography, Tooltip } from '@mui/material';
 import { DataType } from '~/utils/internal_types';
 import { StandardizedVariableOption } from '../hooks/useStandardizedVariableOptions';
 import DataTypeDisplay from './DataTypeDisplay';
@@ -10,16 +10,19 @@ interface ColumnAnnotationCardProps {
   description: string | null;
   dataType: DataType | null;
   standardizedVariableId: string | null;
+  termLabel?: string | null;
+  termAbbreviation?: string | null;
   standardizedVariableOptions: StandardizedVariableOption[];
   inferredDataTypeLabel: string | null;
   onDescriptionChange: (columnId: string, newDescription: string | null) => void;
   selected?: boolean;
-  onSelect?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onSelect: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
 const defaultProps = {
   selected: false,
-  onSelect: undefined,
+  termLabel: null,
+  termAbbreviation: null,
 };
 
 function ColumnAnnotationCard({
@@ -28,13 +31,15 @@ function ColumnAnnotationCard({
   description,
   dataType,
   standardizedVariableId,
+  termLabel,
+  termAbbreviation,
   standardizedVariableOptions,
   inferredDataTypeLabel,
   onDescriptionChange,
-  selected = false,
+  selected,
   onSelect,
 }: ColumnAnnotationCardProps) {
-  const selectedOption =
+  const mappedStandardizedVariable =
     standardizedVariableId !== null
       ? standardizedVariableOptions.find((option) => option.id === standardizedVariableId) || null
       : null;
@@ -45,6 +50,14 @@ function ColumnAnnotationCard({
   } else if (dataTypeLabel === DataType.continuous) {
     dataTypeLabel = 'Continuous';
   }
+
+  // Prefix the term label with the variable label so that when the full text is
+  // displayed as a hover-tooltip, it provides clear context for the term.
+  const displayFullText =
+    [mappedStandardizedVariable?.label, termLabel].filter(Boolean).join(': ') || null;
+
+  const displayAbbrText =
+    [mappedStandardizedVariable?.label, termAbbreviation].filter(Boolean).join(': ') || null;
 
   return (
     // The jsx-a11y linter expects any element with role="button" and an onClick handler
@@ -92,18 +105,17 @@ function ColumnAnnotationCard({
         </div>
 
         <div className="flex-shrink-0 w-full">
-          {selectedOption ? (
-            <div
-              className="h-10 px-3 flex items-center justify-start border rounded border-gray-200 bg-white text-gray-900 w-full shadow-sm"
-              data-cy={`${id}-column-annotation-card-mapped-variable`}
-              // TODO: Update title to use `selectedOption.abbreviation` instead of `label`
-              title={selectedOption.label}
-            >
-              <Typography variant="body2" className="font-medium truncate">
-                {/* TODO: Display `selectedOption.abbreviation` here instead of `label` */}
-                {selectedOption.label}
-              </Typography>
-            </div>
+          {displayFullText ? (
+            <Tooltip title={displayFullText} arrow placement="top">
+              <div
+                className="h-10 px-3 flex items-center justify-start border rounded border-gray-200 bg-white text-gray-900 w-full shadow-sm"
+                data-cy={`${id}-column-annotation-card-mapped-variable`}
+              >
+                <Typography variant="body2" className="font-medium truncate">
+                  {displayAbbrText}
+                </Typography>
+              </div>
+            </Tooltip>
           ) : (
             <div
               className="h-10 px-3 flex items-center justify-start text-gray-400 w-full"

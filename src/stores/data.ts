@@ -239,6 +239,39 @@ const useDataStore = create<DataStore>()((set, get) => ({
       }));
     },
 
+    userUpdatesMultipleColumnStandardizedVariables(columnIDs, standardizedVariableId) {
+      const { standardizedVariables } = get();
+
+      let dataType: DataType | null = null;
+      if (standardizedVariableId !== null) {
+        const standardizedVariable = standardizedVariables[standardizedVariableId];
+        if (standardizedVariable) {
+          const variableType = standardizedVariable.variable_type;
+          if (variableType === VariableType.categorical) {
+            dataType = DataType.categorical;
+          } else if (variableType === VariableType.continuous) {
+            dataType = DataType.continuous;
+          }
+        }
+      }
+
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          columnIDs.forEach((columnID) => {
+            draft[columnID].standardizedVariable = standardizedVariableId;
+            delete draft[columnID].isPartOf;
+
+            const columnWithDataType = applyDataTypeToColumn(
+              current(draft[columnID]),
+              dataType,
+              state.columns[columnID].allValues
+            );
+            draft[columnID] = columnWithDataType;
+          });
+        }),
+      }));
+    },
+
     userUpdatesColumnToCollectionMapping(columnID, termId) {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
@@ -247,6 +280,28 @@ const useDataStore = create<DataStore>()((set, get) => ({
           } else {
             delete draft[columnID].isPartOf;
           }
+        }),
+      }));
+    },
+
+    userUpdatesMultipleColumnToCollectionMappings(columnIDs, termId) {
+      const { standardizedTerms } = get();
+
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          columnIDs.forEach((columnID) => {
+            if (termId) {
+              draft[columnID].isPartOf = termId;
+              const term = standardizedTerms[termId];
+              if (term) {
+                draft[columnID].standardizedVariable = term.standardizedVariableId;
+              }
+            } else {
+              // When clear mapping is clicked, both `isPartOf` and `standardizedVariable` are removed.
+              delete draft[columnID].isPartOf;
+              delete draft[columnID].standardizedVariable;
+            }
+          });
         }),
       }));
     },

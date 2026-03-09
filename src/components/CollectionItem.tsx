@@ -9,10 +9,17 @@ interface CollectionItemProps {
   variable: StandardizedVariableItem;
   onTermSelect: (termId: string) => void;
   selectedTermId?: string | null;
+  hasMultipleSelection?: boolean;
 }
 
-function CollectionItem({ variable, onTermSelect, selectedTermId }: CollectionItemProps) {
+function CollectionItem({
+  variable,
+  onTermSelect,
+  selectedTermId,
+  hasMultipleSelection = false,
+}: CollectionItemProps) {
   const [query, setQuery] = useState('');
+  const isDisabled = hasMultipleSelection && variable.can_have_multiple_columns === false;
   const filteredTerms = useMemo(() => {
     if (!variable.terms || query.trim() === '') return variable.terms || [];
     const q = query.toLowerCase();
@@ -20,7 +27,11 @@ function CollectionItem({ variable, onTermSelect, selectedTermId }: CollectionIt
   }, [variable.terms, query]);
 
   return (
-    <div className="flex flex-col space-y-2">
+    <div
+      className={`flex flex-col space-y-2 ${isDisabled ? 'opacity-50 pointer-events-none' : ''}`}
+      aria-disabled={isDisabled}
+      title={isDisabled ? `${variable.label} can only be assigned to a single column` : undefined}
+    >
       <Typography variant="subtitle2" className="font-semibold px-2 text-gray-700">
         {variable.label}
       </Typography>
@@ -76,6 +87,7 @@ function CollectionItem({ variable, onTermSelect, selectedTermId }: CollectionIt
                   }`}
                   onClick={() => onTermSelect(term.id)}
                   title={term.label}
+                  data-cy={`collection-term-item-${term.id}`}
                 >
                   <Typography variant="body2" noWrap>
                     {term.label}
@@ -97,6 +109,7 @@ function CollectionItem({ variable, onTermSelect, selectedTermId }: CollectionIt
 
 CollectionItem.defaultProps = {
   selectedTermId: null,
+  hasMultipleSelection: false,
 };
 
 export default CollectionItem;

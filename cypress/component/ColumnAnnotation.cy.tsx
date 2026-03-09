@@ -1,7 +1,7 @@
 import ColumnAnnotation from '../../src/components/ColumnAnnotation';
 import { useDataStore } from '../../src/stores/data';
 import { DataType, Columns } from '../../src/utils/internal_types';
-import { mockStandardizedVariables } from '../../src/utils/mocks';
+import { mockStandardizedVariables, mockStandardizedTerms } from '../../src/utils/mocks';
 
 const createMockColumns = (): Columns => ({
   '1': {
@@ -43,6 +43,7 @@ describe('ColumnAnnotation', () => {
     useDataStore.setState({
       columns: createMockColumns(),
       standardizedVariables: mockStandardizedVariables,
+      standardizedTerms: mockStandardizedTerms,
     });
   });
 
@@ -181,5 +182,77 @@ describe('ColumnAnnotation', () => {
 
     cy.get('[data-cy="clear-selection-button"]').click();
     cy.get('[data-cy="action-bar"]').should('contain', '0 columns selected');
+  });
+
+  it('should bulk assign standardized variable to selected columns from sidebar', () => {
+    cy.spy(useDataStore.getState().actions, 'userUpdatesMultipleColumnStandardizedVariables').as(
+      'userUpdatesMultipleColumnStandardizedVariables'
+    );
+    cy.mount(<ColumnAnnotation />);
+
+    cy.get('[data-cy="1-column-annotation-card"]').click({ shiftKey: false, ctrlKey: false });
+    cy.get('[data-cy="2-column-annotation-card"]').click({ shiftKey: false, ctrlKey: true });
+
+    cy.get('[data-cy="standardized-variable-item-nb:Diagnosis"]').click();
+
+    cy.get('@userUpdatesMultipleColumnStandardizedVariables').should(
+      'have.been.calledWith',
+      ['1', '2'],
+      'nb:Diagnosis'
+    );
+  });
+
+  it('should bulk assign collection term to selected columns from sidebar', () => {
+    cy.spy(useDataStore.getState().actions, 'userUpdatesMultipleColumnToCollectionMappings').as(
+      'userUpdatesMultipleColumnToCollectionMappings'
+    );
+    cy.mount(<ColumnAnnotation />);
+
+    cy.get('[data-cy="1-column-annotation-card"]').click({ shiftKey: false, ctrlKey: false });
+    cy.get('[data-cy="3-column-annotation-card"]').click({ shiftKey: false, ctrlKey: true });
+
+    cy.get('[data-cy="collection-term-item-snomed:1304062007"]').click();
+
+    cy.get('@userUpdatesMultipleColumnToCollectionMappings').should(
+      'have.been.calledWith',
+      ['1', '3'],
+      'snomed:1304062007'
+    );
+  });
+
+  it('should disable single-column variables when multiple columns are selected', () => {
+    cy.spy(useDataStore.getState().actions, 'userUpdatesMultipleColumnStandardizedVariables').as(
+      'userUpdatesMultipleColumnStandardizedVariables'
+    );
+    cy.mount(<ColumnAnnotation />);
+
+    cy.get('[data-cy="1-column-annotation-card"]').click({ shiftKey: false, ctrlKey: false });
+    cy.get('[data-cy="2-column-annotation-card"]').click({ shiftKey: false, ctrlKey: true });
+
+    cy.get('[data-cy="standardized-variable-item-nb:Sex"]').should(
+      'have.attr',
+      'aria-disabled',
+      'true'
+    );
+
+    cy.get('[data-cy="standardized-variable-item-nb:Sex"]').click({ force: true });
+
+    cy.get('@userUpdatesMultipleColumnStandardizedVariables').should('not.have.been.called');
+
+    cy.get('[data-cy="2-column-annotation-card"]').click({ shiftKey: false, ctrlKey: true });
+
+    cy.get('[data-cy="standardized-variable-item-nb:Sex"]').should(
+      'not.have.attr',
+      'aria-disabled',
+      'true'
+    );
+
+    cy.get('[data-cy="standardized-variable-item-nb:Sex"]').click();
+
+    cy.get('@userUpdatesMultipleColumnStandardizedVariables').should(
+      'have.been.calledWith',
+      ['1'],
+      'nb:Sex'
+    );
   });
 });

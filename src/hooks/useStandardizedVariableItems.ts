@@ -30,6 +30,7 @@ export function useStandardizedVariableItems() {
         demographics.push({
           id: stdVar.id,
           label: stdVar.name,
+          can_have_multiple_columns: stdVar.can_have_multiple_columns,
         } as StandardizedVariableItem);
       } else {
         const termsForVar = termsByVariableId[stdVar.id] || [];
@@ -38,6 +39,7 @@ export function useStandardizedVariableItems() {
         const stdVarItem: StandardizedVariableItem = {
           id: stdVar.id,
           label: stdVar.name,
+          can_have_multiple_columns: stdVar.can_have_multiple_columns,
           terms: termsForVar,
         };
 
