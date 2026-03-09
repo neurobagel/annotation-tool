@@ -51,6 +51,8 @@ function ColumnAnnotationCard({
     dataTypeLabel = 'Continuous';
   }
 
+  // Prefix the term label with the variable label so that when the full text is
+  // displayed as a hover-tooltip, it provides clear context for the term.
   const displayFullText =
     [mappedStandardizedVariable?.label, termLabel].filter(Boolean).join(': ') || null;
 
