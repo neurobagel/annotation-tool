@@ -297,6 +297,7 @@ const useDataStore = create<DataStore>()((set, get) => ({
                 draft[columnID].standardizedVariable = term.standardizedVariableId;
               }
             } else {
+              // When clear mapping is clicked, both `isPartOf` and `standardizedVariable` are removed.
               delete draft[columnID].isPartOf;
               delete draft[columnID].standardizedVariable;
             }
