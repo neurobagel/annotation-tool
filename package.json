@@ -21,7 +21,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@fontsource/roboto": "^5.2.10",
-    "@microlink/react-json-view": "^1.27.1",
+    "@microlink/react-json-view": "^1.31.4",
     "@mui/icons-material": "^6.5.0",
     "@mui/material": "^6.4.8",
     "@mui/system": "^6.4.3",
