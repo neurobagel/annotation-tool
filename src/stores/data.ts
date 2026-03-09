@@ -242,45 +242,31 @@ const useDataStore = create<DataStore>()((set, get) => ({
     userUpdatesMultipleColumnStandardizedVariables(columnIDs, standardizedVariableId) {
       const { standardizedVariables } = get();
 
+      let dataType: DataType | null = null;
+      if (standardizedVariableId !== null) {
+        const standardizedVariable = standardizedVariables[standardizedVariableId];
+        if (standardizedVariable) {
+          const variableType = standardizedVariable.variable_type;
+          if (variableType === VariableType.categorical) {
+            dataType = DataType.categorical;
+          } else if (variableType === VariableType.continuous) {
+            dataType = DataType.continuous;
+          }
+        }
+      }
+
       set((state) => ({
         columns: produce(state.columns, (draft) => {
           columnIDs.forEach((columnID) => {
-            if (standardizedVariableId === null) {
-              // Initialize the column mapping from empty
-              draft[columnID].standardizedVariable = null;
-              delete draft[columnID].isPartOf;
-              const columnWithDataType = applyDataTypeToColumn(
-                current(draft[columnID]),
-                null,
-                state.columns[columnID].allValues
-              );
-              draft[columnID] = columnWithDataType;
-            } else {
-              draft[columnID].standardizedVariable = standardizedVariableId;
-              const standardizedVariable = standardizedVariables[standardizedVariableId];
+            draft[columnID].standardizedVariable = standardizedVariableId;
+            delete draft[columnID].isPartOf;
 
-              if (draft[columnID].isPartOf !== undefined) {
-                delete draft[columnID].isPartOf;
-              }
-
-              if (standardizedVariable) {
-                const variableType = standardizedVariable.variable_type;
-                let dataType: DataType | null = null;
-
-                if (variableType === VariableType.categorical) {
-                  dataType = DataType.categorical;
-                } else if (variableType === VariableType.continuous) {
-                  dataType = DataType.continuous;
-                }
-
-                const columnWithDataType = applyDataTypeToColumn(
-                  current(draft[columnID]),
-                  dataType,
-                  state.columns[columnID].allValues
-                );
-                draft[columnID] = columnWithDataType;
-              }
-            }
+            const columnWithDataType = applyDataTypeToColumn(
+              current(draft[columnID]),
+              dataType,
+              state.columns[columnID].allValues
+            );
+            draft[columnID] = columnWithDataType;
           });
         }),
       }));
