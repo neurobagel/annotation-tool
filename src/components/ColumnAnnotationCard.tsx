@@ -1,6 +1,5 @@
 import { Typography, Tooltip } from '@mui/material';
 import { DataType } from '~/utils/internal_types';
-import { generateAbbreviation } from '~/utils/util';
 import { StandardizedVariableOption } from '../hooks/useStandardizedVariableOptions';
 import DataTypeDisplay from './DataTypeDisplay';
 import DescriptionEditor from './DescriptionEditor';
@@ -55,10 +54,8 @@ function ColumnAnnotationCard({
   const displayFullText =
     [mappedStandardizedVariable?.label, termLabel].filter(Boolean).join(': ') || null;
 
-  const abbr =
-    termAbbreviation || (termLabel ? generateAbbreviation(termLabel) || termLabel : null);
   const displayAbbrText =
-    [mappedStandardizedVariable?.label, abbr].filter(Boolean).join(': ') || null;
+    [mappedStandardizedVariable?.label, termAbbreviation].filter(Boolean).join(': ') || null;
 
   return (
     // The jsx-a11y linter expects any element with role="button" and an onClick handler
