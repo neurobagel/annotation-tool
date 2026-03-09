@@ -23,6 +23,7 @@ describe('BulkActionBar', () => {
     cy.get('[data-cy="bulk-assign-categorical"]').should('be.disabled');
     cy.get('[data-cy="bulk-assign-continuous"]').should('be.disabled');
     cy.get('[data-cy="bulk-assign-none"]').should('be.disabled');
+    cy.get('[data-cy="bulk-unassign-mappings"]').should('be.disabled');
   });
 
   it('should enable all buttons when at least 1 column is selected', () => {
@@ -32,6 +33,7 @@ describe('BulkActionBar', () => {
         onClearSelection={props.onClearSelection}
         onAssignDataType={props.onAssignDataType}
         onClearMappings={props.onClearMappings}
+        hasMappedSelected
       />
     );
 
@@ -40,6 +42,7 @@ describe('BulkActionBar', () => {
     cy.get('[data-cy="bulk-assign-categorical"]').should('not.be.disabled');
     cy.get('[data-cy="bulk-assign-continuous"]').should('not.be.disabled');
     cy.get('[data-cy="bulk-assign-none"]').should('not.be.disabled');
+    cy.get('[data-cy="bulk-unassign-mappings"]').should('not.be.disabled');
   });
 
   it('should call onClearSelection with appropriate payload when clear button is clicked', () => {
