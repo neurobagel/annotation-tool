@@ -71,10 +71,11 @@ function ColumnAnnotation() {
     }
   };
 
-  const hasMappedSelected = Array.from(selectedIds).some(
-    (colId) =>
-      columns[colId]?.standardizedVariable !== undefined || columns[colId]?.isPartOf !== undefined
-  );
+  const hasMappedSelected = Array.from(selectedIds).some((colId) => {
+    const col = columns[colId];
+    if (!col) return false;
+    return col.standardizedVariable != null || col.isPartOf != null;
+  });
 
   const handleClearMappings = () => {
     const selectedArray = Array.from(selectedIds);
