@@ -246,10 +246,9 @@ const useDataStore = create<DataStore>()((set, get) => ({
         columns: produce(state.columns, (draft) => {
           columnIDs.forEach((columnID) => {
             if (standardizedVariableId === null) {
+              // Initialize the column mapping from empty
               draft[columnID].standardizedVariable = null;
-              if (draft[columnID].isPartOf !== undefined) {
-                delete draft[columnID].isPartOf;
-              }
+              delete draft[columnID].isPartOf;
               const columnWithDataType = applyDataTypeToColumn(
                 current(draft[columnID]),
                 null,
