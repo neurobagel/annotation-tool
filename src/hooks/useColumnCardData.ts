@@ -41,6 +41,7 @@ export function useColumnCardData(
           ? null
           : selectedStandardizedVariable?.variable_type || column.dataType || null;
 
+        // Evaluate and attach standardized term information if a term is mapped
         const termId = column.isPartOf || null;
         let termLabel = null;
         let termAbbreviation = null;
