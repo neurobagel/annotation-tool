@@ -1,4 +1,4 @@
-import { Typography, Tooltip } from '@mui/material';
+import { Typography, Tooltip, Box } from '@mui/material';
 import { DataType } from '~/utils/internal_types';
 import { StandardizedVariableOption } from '../hooks/useStandardizedVariableOptions';
 import DataTypeDisplay from './DataTypeDisplay';
@@ -107,14 +107,16 @@ function ColumnAnnotationCard({
         <div className="flex-shrink-0 w-full">
           {displayFullText ? (
             <Tooltip title={displayFullText} arrow placement="top">
-              <div
-                className="h-10 px-3 flex items-center justify-start border rounded border-gray-200 bg-white text-gray-900 w-full shadow-sm"
+              <Box
+                bgcolor="primary.main"
+                color="primary.contrastText"
+                className="h-10 px-3 flex items-center justify-start rounded w-fit max-w-full shadow-sm"
                 data-cy={`${id}-column-annotation-card-mapped-variable`}
               >
                 <Typography variant="body2" className="font-medium truncate">
                   {displayAbbrText}
                 </Typography>
-              </div>
+              </Box>
             </Tooltip>
           ) : (
             <div

@@ -90,14 +90,14 @@ function ColumnAnnotation() {
       className="flex justify-center w-full h-[80vh] overflow-hidden"
       data-cy="column-annotation-container"
     >
-      <div className="flex w-full max-w-[1400px] h-full gap-8 px-4">
+      <div className="flex w-full h-full gap-8 px-8">
         {/* Main Column Listing - Left Side */}
         <div className="flex-1 flex flex-col min-w-0 py-4">
           <div className="flex-shrink-0 flex flex-col items-start gap-4 mb-4">
             <Instruction title="Column Annotation" className="mb-0">
               <ColumnAnnotationInstructions />
             </Instruction>
-            <div className="w-full flex flex-col xl:flex-row items-stretch xl:items-center gap-4">
+            <div className="w-full flex flex-col xl:flex-row items-stretch xl:items-center gap-4 pb-4">
               <div className="w-full xl:w-1/4 max-w-md flex-shrink-0">
                 <SearchFilter
                   searchTerm={searchTerm}
@@ -120,7 +120,10 @@ function ColumnAnnotation() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto pb-4 pr-2 w-full" data-cy="scrollable-container">
+          <div
+            className="flex-1 overflow-y-auto pb-4 px-2 -mx-2 w-full"
+            data-cy="scrollable-container"
+          >
             {/* Global Header Row - Sticky */}
             <Box className="sticky top-0 z-10 mb-4 border border-gray-200 shadow-sm rounded-t-lg backdrop-blur-sm bg-opacity-95 bg-gray-100 grid grid-cols-[6fr_1fr_3fr] gap-4 px-4 pt-3 pb-1 items-end min-w-[768px]">
               <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
@@ -137,7 +140,7 @@ function ColumnAnnotation() {
             <div className="space-y-3">
               {filteredColumnCardData.length > 0 ? (
                 filteredColumnCardData.map((columnData) => (
-                  <div key={columnData.columnId} className="w-full">
+                  <div key={columnData.columnId} className="w-full px-1">
                     <ColumnAnnotationCard
                       id={columnData.columnId}
                       name={columnData.name}
