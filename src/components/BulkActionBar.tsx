@@ -26,7 +26,7 @@ export default function BulkActionBar({
       }`}
       data-cy="action-bar"
     >
-      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
         <div className="flex flex-wrap items-center gap-4">
           <Typography
             variant="subtitle1"
@@ -38,16 +38,18 @@ export default function BulkActionBar({
           <Button
             size="small"
             variant="text"
-            color="inherit"
+            color="primary"
             onClick={onClearSelection}
             disabled={!hasSelection}
             startIcon={<CloseIcon fontSize="small" />}
-            className="text-gray-500 hover:text-gray-700 whitespace-nowrap"
+            className="whitespace-nowrap"
             data-cy="clear-selection-button"
           >
             Clear selection
           </Button>
         </div>
+
+        <div className="hidden sm:block h-6 w-px bg-gray-300" />
 
         <div className="flex flex-wrap items-center gap-3">
           <Typography variant="body2" className="text-gray-600 font-medium whitespace-nowrap pr-1">
@@ -88,24 +90,22 @@ export default function BulkActionBar({
               None
             </Button>
           </div>
+        </div>
 
-          {hasMappedSelected && (
-            <>
-              <div className="hidden sm:block h-6 w-px bg-primary-200" />
-              <Button
-                size="small"
-                variant="text"
-                color="error"
-                disabled={!hasSelection}
-                onClick={onClearMappings}
-                startIcon={<CloseIcon fontSize="small" />}
-                className="whitespace-nowrap"
-                data-cy="bulk-unassign-mappings"
-              >
-                Clear Mappings
-              </Button>
-            </>
-          )}
+        <div className="hidden sm:block h-6 w-px bg-gray-300" />
+        <div className="flex items-center">
+          <Button
+            size="small"
+            variant="text"
+            color="primary"
+            disabled={!hasSelection || !hasMappedSelected}
+            onClick={onClearMappings}
+            startIcon={<CloseIcon fontSize="small" />}
+            className="whitespace-nowrap"
+            data-cy="bulk-unassign-mappings"
+          >
+            Clear Mappings
+          </Button>
         </div>
       </div>
     </Box>
