@@ -30,7 +30,7 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Set up NodeNB_GOOGLE_APPS_SCRIPT_URL
+      - name: Set up Node
         uses: actions/setup-node@v6
         with:
           cache: 'npm'
@@ -73,6 +73,7 @@ jobs:
           NB_DISABLE_CONFIG: false
           NB_GOOGLE_APPS_SCRIPT_URL: ${{ secrets.NB_GOOGLE_APPS_SCRIPT_URL }}
           SECRETS_SCAN_OMIT_KEYS: NB_GOOGLE_APPS_SCRIPT_URL
+          
 
       - name: Deploy to Netlify
         run: npx netlify-cli deploy --dir=dist --prod
