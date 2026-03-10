@@ -45,6 +45,24 @@ describe('BulkActionBar', () => {
     cy.get('[data-cy="bulk-unassign-mappings"]').should('not.be.disabled');
   });
 
+  it('should leave clear mappings disabled when columns are selected but none are mapped', () => {
+    cy.mount(
+      <BulkActionBar
+        selectedCount={3}
+        onClearSelection={props.onClearSelection}
+        onAssignDataType={props.onAssignDataType}
+        onClearMappings={props.onClearMappings}
+      />
+    );
+
+    cy.get('[data-cy="action-bar"]').should('be.visible').and('contain', '3 columns selected');
+    cy.get('[data-cy="clear-selection-button"]').should('not.be.disabled');
+    cy.get('[data-cy="bulk-assign-categorical"]').should('not.be.disabled');
+    cy.get('[data-cy="bulk-assign-continuous"]').should('not.be.disabled');
+    cy.get('[data-cy="bulk-assign-none"]').should('not.be.disabled');
+    cy.get('[data-cy="bulk-unassign-mappings"]').should('be.visible').and('be.disabled');
+  });
+
   it('should call onClearSelection with appropriate payload when clear button is clicked', () => {
     const onClearSelection = cy.stub().as('onClearSelection');
 
