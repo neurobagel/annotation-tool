@@ -1,5 +1,5 @@
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, FormControlLabel, Switch } from '@mui/material';
 import { DataType } from '../utils/internal_types';
 
 export interface BulkActionBarProps {
@@ -8,6 +8,8 @@ export interface BulkActionBarProps {
   onAssignDataType: (dataType: DataType | null) => void;
   hasMappedSelected?: boolean;
   onClearMappings: () => void;
+  hideAnnotated: boolean;
+  onHideAnnotatedChange: (hide: boolean) => void;
 }
 
 export default function BulkActionBar({
@@ -16,6 +18,8 @@ export default function BulkActionBar({
   onAssignDataType,
   hasMappedSelected = false,
   onClearMappings,
+  hideAnnotated,
+  onHideAnnotatedChange,
 }: BulkActionBarProps) {
   const hasSelection = selectedCount > 0;
 
@@ -26,8 +30,8 @@ export default function BulkActionBar({
       }`}
       data-cy="action-bar"
     >
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-        <div className="flex flex-wrap items-center gap-4">
+      <div className="flex items-center gap-x-4 overflow-x-auto">
+        <div className="flex items-center gap-4">
           <Typography
             variant="subtitle1"
             className={`font-semibold whitespace-nowrap ${hasSelection ? 'text-primary-700' : 'text-gray-500'}`}
@@ -49,9 +53,9 @@ export default function BulkActionBar({
           </Button>
         </div>
 
-        <div className="hidden sm:block h-6 w-px bg-gray-300" />
+        <div className="hidden sm:block h-6 min-w-[1px] bg-gray-300" />
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-3">
           <Typography variant="body2" className="text-gray-600 font-medium whitespace-nowrap pr-1">
             Assign Data Type:
           </Typography>
@@ -92,8 +96,8 @@ export default function BulkActionBar({
           </div>
         </div>
 
-        <div className="hidden sm:block h-6 w-px bg-gray-300" />
-        <div className="flex items-center">
+        <div className="hidden sm:block h-6 min-w-[1px] bg-gray-300" />
+        <div className="flex items-center shrink-0">
           <Button
             size="small"
             variant="text"
@@ -106,6 +110,26 @@ export default function BulkActionBar({
           >
             Clear Mappings
           </Button>
+        </div>
+
+        <div className="hidden sm:block h-6 min-w-[1px] bg-gray-300 ml-auto" />
+        <div className="flex items-center ml-auto sm:ml-0 shrink-0">
+          <FormControlLabel
+            control={
+              <Switch
+                checked={hideAnnotated}
+                onChange={(e) => onHideAnnotatedChange(e.target.checked)}
+                color="primary"
+                size="small"
+                data-cy="hide-annotated-toggle"
+              />
+            }
+            label={
+              <Typography variant="body2" className="text-gray-700 whitespace-nowrap">
+                Hide annotated
+              </Typography>
+            }
+          />
         </div>
       </div>
     </Box>

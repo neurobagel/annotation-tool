@@ -5,6 +5,8 @@ const props = {
   onClearSelection: () => {},
   onAssignDataType: () => {},
   onClearMappings: () => {},
+  hideAnnotated: false,
+  onHideAnnotatedChange: () => {},
 };
 
 describe('BulkActionBar', () => {
@@ -15,6 +17,8 @@ describe('BulkActionBar', () => {
         onClearSelection={props.onClearSelection}
         onAssignDataType={props.onAssignDataType}
         onClearMappings={props.onClearMappings}
+        hideAnnotated={props.hideAnnotated}
+        onHideAnnotatedChange={props.onHideAnnotatedChange}
       />
     );
 
@@ -24,6 +28,7 @@ describe('BulkActionBar', () => {
     cy.get('[data-cy="bulk-assign-continuous"]').should('be.disabled');
     cy.get('[data-cy="bulk-assign-none"]').should('be.disabled');
     cy.get('[data-cy="bulk-unassign-mappings"]').should('be.disabled');
+    cy.get('[data-cy="hide-annotated-toggle"]').should('be.visible');
   });
 
   it('should enable all buttons when at least 1 column is selected', () => {
@@ -34,6 +39,8 @@ describe('BulkActionBar', () => {
         onAssignDataType={props.onAssignDataType}
         onClearMappings={props.onClearMappings}
         hasMappedSelected
+        hideAnnotated={props.hideAnnotated}
+        onHideAnnotatedChange={props.onHideAnnotatedChange}
       />
     );
 
@@ -52,6 +59,8 @@ describe('BulkActionBar', () => {
         onClearSelection={props.onClearSelection}
         onAssignDataType={props.onAssignDataType}
         onClearMappings={props.onClearMappings}
+        hideAnnotated={props.hideAnnotated}
+        onHideAnnotatedChange={props.onHideAnnotatedChange}
       />
     );
 
@@ -72,6 +81,8 @@ describe('BulkActionBar', () => {
         onAssignDataType={props.onAssignDataType}
         onClearMappings={props.onClearMappings}
         onClearSelection={onClearSelection}
+        hideAnnotated={props.hideAnnotated}
+        onHideAnnotatedChange={props.onHideAnnotatedChange}
       />
     );
 
@@ -88,6 +99,8 @@ describe('BulkActionBar', () => {
         onClearSelection={props.onClearSelection}
         onClearMappings={props.onClearMappings}
         onAssignDataType={onAssignDataType}
+        hideAnnotated={props.hideAnnotated}
+        onHideAnnotatedChange={props.onHideAnnotatedChange}
       />
     );
 
@@ -111,11 +124,32 @@ describe('BulkActionBar', () => {
         onAssignDataType={props.onAssignDataType}
         hasMappedSelected
         onClearMappings={onClearMappings}
+        hideAnnotated={props.hideAnnotated}
+        onHideAnnotatedChange={props.onHideAnnotatedChange}
       />
     );
 
     cy.get('[data-cy="bulk-unassign-mappings"]').should('be.visible').and('not.be.disabled');
     cy.get('[data-cy="bulk-unassign-mappings"]').click();
     cy.get('@onClearMappings').should('have.been.calledOnce');
+  });
+
+  it('should fire onHideAnnotatedChange event handler with the appropriate payload when the switch is clicked', () => {
+    const onHideAnnotatedChange = cy.stub().as('onHideAnnotatedChange');
+
+    cy.mount(
+      <BulkActionBar
+        selectedCount={0}
+        onClearSelection={props.onClearSelection}
+        onAssignDataType={props.onAssignDataType}
+        onClearMappings={props.onClearMappings}
+        hideAnnotated={false}
+        onHideAnnotatedChange={onHideAnnotatedChange}
+      />
+    );
+
+    cy.get('[data-cy="hide-annotated-toggle"] input').should('not.be.checked');
+    cy.get('[data-cy="hide-annotated-toggle"] input').check();
+    cy.get('@onHideAnnotatedChange').should('have.been.calledWith', true);
   });
 });
