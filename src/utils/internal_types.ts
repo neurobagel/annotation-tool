@@ -181,6 +181,7 @@ export type DataStore = DataStoreState & {
 export interface StandardizedTermItem {
   id: string;
   label: string;
+  abbreviation?: string;
 }
 
 export interface StandardizedVariableItem {

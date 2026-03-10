@@ -16,7 +16,10 @@ export function useStandardizedVariableItems() {
         const currentTerms = acc[term.standardizedVariableId] || [];
         return {
           ...acc,
-          [term.standardizedVariableId]: [...currentTerms, { id: term.id, label: term.label }],
+          [term.standardizedVariableId]: [
+            ...currentTerms,
+            { id: term.id, label: term.label, abbreviation: term.abbreviation },
+          ],
         };
       },
       {} as Record<string, StandardizedTermItem[]>
