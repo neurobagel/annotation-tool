@@ -33,15 +33,29 @@ function ColumnAnnotation() {
 
   const columnCardData = useColumnCardData(columns, standardizedVariables, standardizedTerms);
 
+  const [hideAnnotated, setHideAnnotated] = useState(false);
+
   // Memoize the filtering logic to ensure that we only apply the .filter() operation
   // when the actual data changes OR when the 300ms debounce timer finishes, preventing
   // sluggish filtering on every keystroke
   const filteredColumnCardData = useMemo(() => {
     const lowerSearchTerm = debouncedSearchTerm.toLowerCase();
-    if (!lowerSearchTerm) return columnCardData;
 
-    return columnCardData.filter((col) => col.name.toLowerCase().includes(lowerSearchTerm));
-  }, [columnCardData, debouncedSearchTerm]);
+    return columnCardData.filter((col) => {
+      if (lowerSearchTerm && !col.name.toLowerCase().includes(lowerSearchTerm)) {
+        return false;
+      }
+
+      if (hideAnnotated) {
+        // A column is considered "annotated" if it has either a standardized variable
+        // mapped to it directly, or if it's part of a collection mapping (has a termLabel)
+        const isAnnotated = col.standardizedVariableId !== null || col.termLabel !== null;
+        if (isAnnotated) return false;
+      }
+
+      return true;
+    });
+  }, [columnCardData, debouncedSearchTerm, hideAnnotated]);
 
   const visibleColumnIds = useMemo(
     () => filteredColumnCardData.map((col) => col.columnId),
@@ -116,6 +130,8 @@ function ColumnAnnotation() {
                 }
                 hasMappedSelected={hasMappedSelected}
                 onClearMappings={handleClearMappings}
+                hideAnnotated={hideAnnotated}
+                onHideAnnotatedChange={setHideAnnotated}
               />
             </div>
           </div>

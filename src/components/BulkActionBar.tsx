@@ -1,5 +1,5 @@
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, FormControlLabel, Switch } from '@mui/material';
 import { DataType } from '../utils/internal_types';
 
 export interface BulkActionBarProps {
@@ -8,6 +8,8 @@ export interface BulkActionBarProps {
   onAssignDataType: (dataType: DataType | null) => void;
   hasMappedSelected?: boolean;
   onClearMappings: () => void;
+  hideAnnotated: boolean;
+  onHideAnnotatedChange: (hide: boolean) => void;
 }
 
 export default function BulkActionBar({
@@ -16,6 +18,8 @@ export default function BulkActionBar({
   onAssignDataType,
   hasMappedSelected = false,
   onClearMappings,
+  hideAnnotated,
+  onHideAnnotatedChange,
 }: BulkActionBarProps) {
   const hasSelection = selectedCount > 0;
 
@@ -106,6 +110,26 @@ export default function BulkActionBar({
           >
             Clear Mappings
           </Button>
+        </div>
+
+        <div className="hidden sm:block h-6 w-px bg-gray-300 ml-auto" />
+        <div className="flex items-center ml-auto sm:ml-0">
+          <FormControlLabel
+            control={
+              <Switch
+                checked={hideAnnotated}
+                onChange={(e) => onHideAnnotatedChange(e.target.checked)}
+                color="primary"
+                size="small"
+                data-cy="hide-annotated-toggle"
+              />
+            }
+            label={
+              <Typography variant="body2" className="text-gray-700 whitespace-nowrap">
+                Hide annotated
+              </Typography>
+            }
+          />
         </div>
       </div>
     </Box>
