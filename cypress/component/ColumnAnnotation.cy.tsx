@@ -25,7 +25,7 @@ const createMockColumns = (): Columns => ({
     name: 'third column',
     description: 'This is third column',
     dataType: DataType.categorical,
-    standardizedVariable: 'nb:Sex',
+    standardizedVariable: null,
     allValues: ['M', 'F'],
   },
   '4': {

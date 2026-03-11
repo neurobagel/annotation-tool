@@ -6,12 +6,14 @@ interface StandardizedVariablesListProps {
   onItemSelect?: (itemId: string | null) => void;
   selectedItemId?: string | null;
   hasMultipleSelection?: boolean;
+  mappedVariableIds?: Set<string>;
 }
 
 function StandardizedVariablesList({
   onItemSelect,
   selectedItemId,
   hasMultipleSelection = false,
+  mappedVariableIds = new Set(),
 }: StandardizedVariablesListProps) {
   const { demographicVariables, collectionVariables } = useStandardizedVariableItems();
 
@@ -32,7 +34,9 @@ function StandardizedVariablesList({
       <div className="flex-1 overflow-y-auto pr-2">
         <div className="space-y-2">
           {demographicVariables.map((item) => {
-            const isDisabled = hasMultipleSelection && item.can_have_multiple_columns === false;
+            const isAlreadyMapped = mappedVariableIds.has(item.id);
+            const isDisabled =
+              (hasMultipleSelection || isAlreadyMapped) && item.can_have_multiple_columns === false;
             let itemClasses = 'px-3 py-2 rounded-md transition-colors ';
             if (isDisabled) {
               itemClasses += 'opacity-50 cursor-not-allowed bg-gray-50';
@@ -77,6 +81,7 @@ function StandardizedVariablesList({
               onTermSelect={handleSelect}
               selectedTermId={selectedItemId}
               hasMultipleSelection={hasMultipleSelection}
+              isAlreadyMapped={mappedVariableIds.has(item.id)}
             />
           ))}
         </div>
@@ -89,6 +94,7 @@ StandardizedVariablesList.defaultProps = {
   onItemSelect: undefined,
   selectedItemId: null,
   hasMultipleSelection: false,
+  mappedVariableIds: undefined,
 };
 
 export default StandardizedVariablesList;
