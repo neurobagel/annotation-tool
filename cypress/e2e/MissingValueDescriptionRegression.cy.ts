@@ -21,9 +21,8 @@ describe('Missing Value Description Regression', () => {
 
     // Column Annotation view
     cy.get('[data-cy="column-annotation-container"]').should('be.visible');
-    cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').type(
-      'sex{downArrow}{enter}'
-    );
+    cy.get('[data-cy="2-column-annotation-card"]').click();
+    cy.get('[data-cy="standardized-variable-item-nb:Sex"]').click();
     cy.get('[data-cy="next-button"]').click();
 
     // Value Annotation view
