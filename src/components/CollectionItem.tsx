@@ -11,6 +11,7 @@ interface CollectionItemProps {
   onTermSelect: (termId: string) => void;
   selectedTermId?: string | null;
   hasMultipleSelection?: boolean;
+  isAlreadyMapped?: boolean;
 }
 
 function CollectionItem({
@@ -18,9 +19,11 @@ function CollectionItem({
   onTermSelect,
   selectedTermId,
   hasMultipleSelection = false,
+  isAlreadyMapped = false,
 }: CollectionItemProps) {
   const [query, setQuery] = useState('');
-  const isDisabled = hasMultipleSelection && variable.can_have_multiple_columns === false;
+  const isDisabled =
+    (hasMultipleSelection || isAlreadyMapped) && variable.can_have_multiple_columns === false;
 
   const filteredTerms = useMemo(() => {
     if (!variable.terms) return [];
@@ -123,6 +126,7 @@ function CollectionItem({
 CollectionItem.defaultProps = {
   selectedTermId: null,
   hasMultipleSelection: false,
+  isAlreadyMapped: false,
 };
 
 export default CollectionItem;

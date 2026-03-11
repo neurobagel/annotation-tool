@@ -124,8 +124,11 @@ export function convertStandardizedTerms(
           ? `${variableNamespacePrefix}:${parentVariable.id}`
           : '';
 
-        const computedAbbreviation =
-          abbreviation || (name ? generateAbbreviation(name) || name : undefined);
+        const isCollection = parentVariable?.variable_type === VariableType.collection;
+
+        const computedAbbreviation = isCollection
+          ? abbreviation || (name ? generateAbbreviation(name) || name : undefined)
+          : undefined;
 
         return {
           [termIdentifier]: {

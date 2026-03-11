@@ -67,6 +67,17 @@ function ColumnAnnotation() {
 
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
+  const mappedVariableIds = useMemo(() => {
+    const ids = new Set<string>();
+    Object.values(columns).forEach((col) => {
+      if (selectedIds.has(col.id)) return;
+      if (col.standardizedVariable) {
+        ids.add(col.standardizedVariable);
+      }
+    });
+    return ids;
+  }, [columns, selectedIds]);
+
   const handleStandardizedVariablesListItemSelect = (itemId: string | null) => {
     if (itemId && selectedIds.size > 0) {
       const stdVar = standardizedVariables[itemId];
@@ -189,6 +200,7 @@ function ColumnAnnotation() {
             selectedItemId={selectedItemId}
             onItemSelect={handleStandardizedVariablesListItemSelect}
             hasMultipleSelection={selectedIds.size > 1}
+            mappedVariableIds={mappedVariableIds}
           />
         </div>
       </div>
