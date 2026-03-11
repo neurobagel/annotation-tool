@@ -2,7 +2,7 @@
 
 # Annotation Tool
 
-[![Website](https://img.shields.io/website?label=staging%20app&up_message=live&style=flat-square&url=https%3A%2F%2Fstaging-annotation.netlify.app)](https://staging-annotation.netlify.app/)
+[![Website](https://img.shields.io/website?label=staging%20app&up_message=live&style=flat-square&url=https%3A%2F%2Fstaging-annotate.netlify.app)](https://staging-annotate.netlify.app/)
 [![Main branch checks status](https://img.shields.io/github/check-runs/neurobagel/annotation-tool/main?style=flat-square&logo=github)](https://github.com/neurobagel/annotation-tool/actions?query=branch:main)
 [![Tests status](https://img.shields.io/github/actions/workflow/status/neurobagel/annotation-tool/tests.yaml?branch=main&style=flat-square&logo=github&label=tests)](https://github.com/neurobagel/annotation-tool/actions/workflows/tests.yaml)
 [![Codecov](https://img.shields.io/codecov/c/github/neurobagel/annotation-tool?style=flat-square&logo=codecov&link=https%3A%2F%2Fapp.codecov.io%2Fgh%2Fneurobagel%2Fannotation-tool)](https://app.codecov.io/gh/neurobagel/annotation-tool)
@@ -22,7 +22,7 @@ The annotation tool is a React application, developed in [TypeScript](https://ww
 
 ## Quickstart
 
-The staging version of the annotation tool is hosted at [https://staging-annotation.netlify.app/](https://staging-annotation.netlify.app/).
+The staging version of the annotation tool is hosted at [https://staging-annotate.netlify.app/](https://staging-annotate.netlify.app/).
 
 ## Local Installation
 
