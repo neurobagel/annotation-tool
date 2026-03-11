@@ -15,6 +15,7 @@ import {
   VariableType,
   DataType,
 } from './internal_types';
+import { generateAbbreviation } from './util';
 
 export async function fetchAvailableConfigs(): Promise<string[]> {
   try {
@@ -116,18 +117,25 @@ export function convertStandardizedTerms(
       const termsNamespace = vocab.namespace_prefix;
       return vocab.terms.map((term) => {
         const termIdentifier = `${termsNamespace}:${term.id}`;
-        const { id, name, ...restTermFields } = term;
+        const { id, name, abbreviation, ...restTermFields } = term;
 
         const parentVariable = variables.find((v) => v.terms_file === fileName);
         const standardizedVariableId = parentVariable
           ? `${variableNamespacePrefix}:${parentVariable.id}`
           : '';
 
+        const isCollection = parentVariable?.variable_type === VariableType.collection;
+
+        const computedAbbreviation = isCollection
+          ? abbreviation || (name ? generateAbbreviation(name) || name : undefined)
+          : undefined;
+
         return {
           [termIdentifier]: {
             standardizedVariableId,
             id: termIdentifier,
             label: name,
+            abbreviation: computedAbbreviation,
             ...restTermFields,
             collectionCreatedAt: undefined,
           },

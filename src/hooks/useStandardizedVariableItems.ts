@@ -16,7 +16,10 @@ export function useStandardizedVariableItems() {
         const currentTerms = acc[term.standardizedVariableId] || [];
         return {
           ...acc,
-          [term.standardizedVariableId]: [...currentTerms, { id: term.id, label: term.label }],
+          [term.standardizedVariableId]: [
+            ...currentTerms,
+            { id: term.id, label: term.label, abbreviation: term.abbreviation },
+          ],
         };
       },
       {} as Record<string, StandardizedTermItem[]>
@@ -30,6 +33,7 @@ export function useStandardizedVariableItems() {
         demographics.push({
           id: stdVar.id,
           label: stdVar.name,
+          can_have_multiple_columns: stdVar.can_have_multiple_columns,
         } as StandardizedVariableItem);
       } else {
         const termsForVar = termsByVariableId[stdVar.id] || [];
@@ -38,6 +42,7 @@ export function useStandardizedVariableItems() {
         const stdVarItem: StandardizedVariableItem = {
           id: stdVar.id,
           label: stdVar.name,
+          can_have_multiple_columns: stdVar.can_have_multiple_columns,
           terms: termsForVar,
         };
 

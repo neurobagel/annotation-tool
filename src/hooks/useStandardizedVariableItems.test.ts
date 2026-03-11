@@ -137,4 +137,36 @@ describe('useStandardizedVariableItems', () => {
       { id: 'var:empty_collection', label: 'Empty Collection', terms: [] },
     ]);
   });
+
+  it('should include the abbreviation property when mapping collection terms', () => {
+    mockedUseStandardizedVariables.mockReturnValue({
+      'var:collection': {
+        id: 'var:collection',
+        name: 'Assessment Tool',
+        description: '',
+        variable_type: VariableType.collection,
+      },
+    });
+
+    mockedUseStandardizedTerms.mockReturnValue({
+      'term:1': {
+        id: 'term:1',
+        label: 'Subscale A',
+        standardizedVariableId: 'var:collection',
+      },
+      'term:2': {
+        id: 'term:2',
+        label: 'Subscale B',
+        abbreviation: 'SB',
+        standardizedVariableId: 'var:collection',
+      },
+    });
+
+    const { result } = renderHook(() => useStandardizedVariableItems());
+
+    expect(result.current.collectionVariables[0].terms).toEqual([
+      { id: 'term:1', label: 'Subscale A', abbreviation: undefined },
+      { id: 'term:2', label: 'Subscale B', abbreviation: 'SB' },
+    ]);
+  });
 });

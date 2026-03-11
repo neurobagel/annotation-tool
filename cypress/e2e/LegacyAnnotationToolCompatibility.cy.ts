@@ -26,78 +26,36 @@ describe('Legacy Annotation Tool Compatibility', () => {
     // Column Annotation view
     cy.get('[data-cy="0-description"]').should('contain', 'A participant ID');
     cy.get('[data-cy="0-column-annotation-card-data-type"]').should('contain', 'Identifier');
-    cy.get('[data-cy="0-column-annotation-card-standardized-variable-dropdown"] input').should(
-      'have.value',
+    cy.get('[data-cy="0-column-annotation-card-mapped-variable"]').should(
+      'contain',
       'Participant ID'
     );
     cy.get('[data-cy="1-description"]').should('contain', 'A session ID');
     cy.get('[data-cy="2-description"]').should('contain', 'Age of the participant');
     cy.get('[data-cy="2-column-annotation-card-data-type"]').should('contain', 'Cont');
-    cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"] input').should(
-      'have.value',
-      'Age'
-    );
+    cy.get('[data-cy="2-column-annotation-card-mapped-variable"]').should('contain', 'Age');
     // Scroll to access the 4th column annotation card
     cy.get('[data-cy="3-column-annotation-card"]').scrollIntoView();
     cy.get('[data-cy="3-description"]').should('contain', 'Sex');
     cy.get('[data-cy="3-column-annotation-card-data-type"]').should('contain', 'Categorical');
-    cy.get('[data-cy="3-column-annotation-card-standardized-variable-dropdown"] input').should(
-      'have.value',
-      'Sex'
-    );
+    cy.get('[data-cy="3-column-annotation-card-mapped-variable"]').should('contain', 'Sex');
     cy.get('[data-cy="4-description"]').should('contain', 'Group variable');
     cy.get('[data-cy="4-column-annotation-card-data-type"]').should('contain', 'Categorical');
-    cy.get('[data-cy="4-column-annotation-card-standardized-variable-dropdown"] input').should(
-      'have.value',
-      'Diagnosis'
-    );
+    cy.get('[data-cy="4-column-annotation-card-mapped-variable"]').should('contain', 'Diagnosis');
     cy.get('[data-cy="5-description"]').should('contain', 'item 1 scores for tool1');
-    cy.get('[data-cy="5-column-annotation-card-data-type"]').should('contain', 'Cont');
-    cy.get('[data-cy="5-column-annotation-card-standardized-variable-dropdown"] input').should(
-      'have.value',
-      'Assessment Tool'
-    );
+    cy.get('[data-cy="5-column-annotation-card-mapped-variable"]')
+      .should('contain', 'Assessment Tool')
+      .and('contain', 'MCA');
     // Scroll to access the 7th and 8th column annotation cards
     cy.get('[data-cy="6-column-annotation-card"]').scrollIntoView();
     cy.get('[data-cy="6-description"]').should('contain', 'item 2 scores for tool1');
-    cy.get('[data-cy="6-column-annotation-card-data-type"]').should('contain', 'Cont');
-    cy.get('[data-cy="6-column-annotation-card-standardized-variable-dropdown"] input').should(
-      'have.value',
-      'Assessment Tool'
-    );
+    cy.get('[data-cy="6-column-annotation-card-mapped-variable"]')
+      .should('contain', 'Assessment Tool')
+      .and('contain', 'MCA');
     cy.get('[data-cy="7-description"]').should('contain', 'item 1 scores for tool2');
-    cy.get('[data-cy="7-column-annotation-card-data-type"]').should('contain', 'Cont');
-    cy.get('[data-cy="7-column-annotation-card-standardized-variable-dropdown"] input').should(
-      'have.value',
-      'Assessment Tool'
-    );
-    cy.get('[data-cy="next-button"]').click();
-
-    // Multi-Column Measures view
-    cy.get('[data-cy="multi-column-measures-card-0"]').should('be.visible');
-
-    cy.get('[data-cy="multi-column-measures"]').should('contain.text', '3 columns assigned');
-
-    cy.get('[data-cy="multi-column-measures-card-0"]').should('be.visible');
-    cy.get('[data-cy="mapped-column-5"]').should('be.visible').and('contain', 'tool1_item1');
-    cy.get('[data-cy="mapped-column-6"]').should('be.visible').and('contain', 'tool1_item2');
-    cy.get('[data-cy="multi-column-measures-card-0-header"]').should(
-      'contain.text',
-      'Montreal cognitive assessment'
-    );
-
-    cy.get('[data-cy="multi-column-measures-card-0"]')
-      .should('contain.text', 'tool1_item1')
-      .and('contain.text', 'tool1_item2');
-
-    cy.get('[data-cy="multi-column-measures-card-1"]').should('be.visible');
-    cy.get('[data-cy="mapped-column-7"]').should('be.visible').and('contain', 'tool2_item1');
-    cy.get('[data-cy="multi-column-measures-card-1-header"]').should(
-      'contain.text',
-      'Unified Parkinsons disease rating scale'
-    );
-    cy.get('[data-cy="multi-column-measures-card-1"]').should('contain.text', 'tool2_item1');
-
+    cy.get('[data-cy="7-column-annotation-card-mapped-variable"]')
+      .should('contain', 'Assessment Tool')
+      .and('contain', 'UPDRSS');
     cy.get('[data-cy="next-button"]').click();
 
     // Value Annotation view

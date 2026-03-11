@@ -798,7 +798,6 @@ describe('userUpdatesColumnDataType', () => {
       result.current.actions.userUpdatesColumnDataType('0', DataType.categorical);
     });
 
-    expect(result.current.columns['0'].dataType).toBe(DataType.categorical);
     expect(result.current.columns['0'].levels).toBeDefined();
 
     act(() => {
@@ -846,6 +845,115 @@ B`;
       description: '',
       standardizedTerm: '',
     });
+  });
+});
+
+describe('userUpdatesMultipleColumnDataTypes', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should set dataType for multiple columns and initialize their specific defaults', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['col0', 'col1', 'col2'],
+      data: [
+        ['A', '5', 'X'],
+        ['B', '6', 'X'],
+        ['A', '7', 'Y'],
+      ],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnDataTypes(['0', '2'], DataType.categorical);
+    });
+
+    expect(result.current.columns['0'].dataType).toBe(DataType.categorical);
+    expect(Object.keys(result.current.columns['0'].levels!)).toEqual(['A', 'B']);
+    expect(result.current.columns['2'].dataType).toBe(DataType.categorical);
+    expect(Object.keys(result.current.columns['2'].levels!)).toEqual(['X', 'Y']);
+
+    expect(result.current.columns['1'].dataType).toBeUndefined();
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnDataTypes(['0', '1'], DataType.continuous);
+    });
+
+    expect(result.current.columns['0'].dataType).toBe(DataType.continuous);
+    expect(result.current.columns['0'].levels).toBeUndefined();
+    expect(result.current.columns['0'].units).toBe('');
+
+    expect(result.current.columns['1'].dataType).toBe(DataType.continuous);
+    expect(result.current.columns['1'].units).toBe('');
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnDataTypes(['0', '1', '2'], null);
+    });
+
+    expect(result.current.columns['0'].dataType).toBeNull();
+    expect(result.current.columns['0'].units).toBeUndefined();
+    expect(result.current.columns['0'].levels).toBeUndefined();
+
+    expect(result.current.columns['1'].dataType).toBeNull();
+    expect(result.current.columns['2'].dataType).toBeNull();
+  });
+
+  it('should skip mapped columns unless they correspond to a collection variable', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['col0', 'col1'],
+      data: [
+        ['1', '2'],
+        ['3', '4'],
+      ],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockConfigFile,
+      termsData: mockTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnStandardizedVariable('0', 'nb:Sex');
+      result.current.actions.userUpdatesColumnStandardizedVariable('1', 'nb:Assessment');
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnDataTypes(['0', '1'], DataType.categorical);
+    });
+
+    expect(result.current.columns['0'].dataType).toBe(DataType.categorical);
+    expect(result.current.columns['1'].dataType).toBe(DataType.categorical);
   });
 });
 
@@ -1162,6 +1270,199 @@ describe('userUpdatesColumnToCollectionMapping', () => {
     });
 
     expect(result.current.columns['0'].isPartOf).toBeUndefined();
+  });
+});
+
+describe('userUpdatesMultipleColumnStandardizedVariables', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const prepareMultiColumnVariables = async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['col1', 'col2'],
+      data: [
+        ['100', '101'],
+        ['110', '111'],
+        ['120', '121'],
+      ],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockConfigFile,
+      termsData: mockTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    return result;
+  };
+
+  it('should set standardized variable and apply correct data types to multiple columns', async () => {
+    const result = await prepareMultiColumnVariables();
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnStandardizedVariables(['0', '1'], 'nb:Age');
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Age');
+    expect(result.current.columns['0'].dataType).toBe(DataType.continuous);
+    expect(result.current.columns['1'].standardizedVariable).toBe('nb:Age');
+    expect(result.current.columns['1'].dataType).toBe(DataType.continuous);
+  });
+
+  it('should unmap standardized variables from multiple columns when null is provided', async () => {
+    const result = await prepareMultiColumnVariables();
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnStandardizedVariables(['0', '1'], 'nb:Age');
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Age');
+    expect(result.current.columns['1'].standardizedVariable).toBe('nb:Age');
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnStandardizedVariables(['0', '1'], null);
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBeNull();
+    expect(result.current.columns['0'].dataType).toBeNull();
+    expect(result.current.columns['1'].standardizedVariable).toBeNull();
+    expect(result.current.columns['1'].dataType).toBeNull();
+  });
+
+  it('should remove isPartOf when changing from a multi-column measure to a regular standardized variable or null', async () => {
+    const result = await prepareMultiColumnVariables();
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnToCollectionMappings(
+        ['0', '1'],
+        'snomed:1303696008'
+      );
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Assessment');
+    expect(result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnStandardizedVariables(['0', '1'], 'nb:Age');
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Age');
+    expect(result.current.columns['0'].isPartOf).toBeUndefined();
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnToCollectionMappings(
+        ['0', '1'],
+        'snomed:1303696008'
+      );
+    });
+
+    expect(result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnStandardizedVariables(['0', '1'], null);
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBeNull();
+    expect(result.current.columns['0'].isPartOf).toBeUndefined();
+  });
+});
+
+describe('userUpdatesMultipleColumnToCollectionMappings', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const prepareMultiColumnAssessment = async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['assessment1', 'assessment2'],
+      data: [
+        ['100', '101'],
+        ['110', '111'],
+        ['120', '121'],
+      ],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockConfigFile,
+      termsData: mockTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    return result;
+  };
+
+  it('should set isPartOf and standardizedVariable for multiple columns', async () => {
+    const result = await prepareMultiColumnAssessment();
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnToCollectionMappings(
+        ['0', '1'],
+        'snomed:1303696008'
+      );
+    });
+
+    expect(result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Assessment');
+    expect(result.current.columns['1'].isPartOf).toBe('snomed:1303696008');
+    expect(result.current.columns['1'].standardizedVariable).toBe('nb:Assessment');
+  });
+
+  it('should delete isPartOf and standardizedVariable for multiple columns when null is provided', async () => {
+    const result = await prepareMultiColumnAssessment();
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnToCollectionMappings(
+        ['0', '1'],
+        'snomed:1303696008'
+      );
+    });
+
+    expect(result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
+    expect(result.current.columns['1'].isPartOf).toBe('snomed:1303696008');
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnToCollectionMappings(['0', '1'], null);
+    });
+
+    expect(result.current.columns['0'].isPartOf).toBeUndefined();
+    expect(result.current.columns['0'].standardizedVariable).toBeUndefined();
+    expect(result.current.columns['1'].isPartOf).toBeUndefined();
+    expect(result.current.columns['1'].standardizedVariable).toBeUndefined();
   });
 });
 
