@@ -40,10 +40,19 @@ describe('StandardizedVariablesList', () => {
     });
   });
 
-  it('renders the flat list of standardized variables', () => {
-    cy.mount(<StandardizedVariablesList />);
+  it('should render the flat list of standardized variables', () => {
+    cy.mount(
+      <StandardizedVariablesList
+        annotatedColumnsCount={5}
+        totalColumnsCount={65}
+        mappedVariableCounts={{}}
+        mappedTermCounts={{}}
+      />
+    );
 
-    cy.get('[data-cy="standardized-variables-list"]').should('be.visible');
+    cy.get('[data-cy="standardized-variables-list"]')
+      .should('be.visible')
+      .and('contain', '5/65 Annotated');
 
     cy.get('[data-cy="standardized-variables-list"]').should('contain', 'Age');
     cy.get('[data-cy="standardized-variables-list"]').should('contain', 'Sex');
@@ -54,7 +63,14 @@ describe('StandardizedVariablesList', () => {
   });
 
   it('should filter terms', () => {
-    cy.mount(<StandardizedVariablesList />);
+    cy.mount(
+      <StandardizedVariablesList
+        annotatedColumnsCount={0}
+        totalColumnsCount={0}
+        mappedVariableCounts={{}}
+        mappedTermCounts={{}}
+      />
+    );
 
     cy.get('[data-cy="standardized-variables-list"]').should('contain', 'UPDRS');
     cy.get('[data-cy="standardized-variables-list"]').should('contain', 'MOCA');
@@ -67,7 +83,16 @@ describe('StandardizedVariablesList', () => {
 
   it('should fire the onItemSelect event handler with the appropriate payload when a term is selected', () => {
     const onItemSelectSpy = cy.spy().as('onItemSelectSpy');
-    cy.mount(<StandardizedVariablesList onItemSelect={onItemSelectSpy} selectedItemId={null} />);
+    cy.mount(
+      <StandardizedVariablesList
+        onItemSelect={onItemSelectSpy}
+        selectedItemId={null}
+        annotatedColumnsCount={0}
+        totalColumnsCount={0}
+        mappedVariableCounts={{}}
+        mappedTermCounts={{}}
+      />
+    );
 
     cy.get('[data-cy="collection-term-item-term-2"]').click();
 
@@ -76,7 +101,16 @@ describe('StandardizedVariablesList', () => {
 
   it('should fire the onItemSelect event handler with the appropriate payload if the same item is selected again', () => {
     const onItemSelectSpy = cy.spy().as('onItemSelectSpy');
-    cy.mount(<StandardizedVariablesList onItemSelect={onItemSelectSpy} selectedItemId="term-2" />);
+    cy.mount(
+      <StandardizedVariablesList
+        onItemSelect={onItemSelectSpy}
+        selectedItemId="term-2"
+        annotatedColumnsCount={0}
+        totalColumnsCount={0}
+        mappedVariableCounts={{}}
+        mappedTermCounts={{}}
+      />
+    );
 
     cy.get('[data-cy="collection-term-item-term-2"]').click();
 
@@ -85,7 +119,16 @@ describe('StandardizedVariablesList', () => {
 
   it('should fire the onItemSelect event handler with the appropriate payload when a non-collection variable is selected', () => {
     const onItemSelectSpy = cy.spy().as('onItemSelectSpy');
-    cy.mount(<StandardizedVariablesList onItemSelect={onItemSelectSpy} selectedItemId={null} />);
+    cy.mount(
+      <StandardizedVariablesList
+        onItemSelect={onItemSelectSpy}
+        selectedItemId={null}
+        annotatedColumnsCount={0}
+        totalColumnsCount={0}
+        mappedVariableCounts={{}}
+        mappedTermCounts={{}}
+      />
+    );
 
     cy.get('[data-cy="standardized-variable-item-var-1"]').click();
 
@@ -93,8 +136,15 @@ describe('StandardizedVariablesList', () => {
   });
 
   it('should disable single-column variables that are already mapped', () => {
-    const mappedVariableIds = new Set(['var-1', 'var-2', 'var-3']);
-    cy.mount(<StandardizedVariablesList mappedVariableIds={mappedVariableIds} />);
+    const mappedVariableCounts = { 'var-1': 1, 'var-2': 1, 'var-3': 1 };
+    cy.mount(
+      <StandardizedVariablesList
+        mappedVariableCounts={mappedVariableCounts}
+        annotatedColumnsCount={0}
+        totalColumnsCount={0}
+        mappedTermCounts={{}}
+      />
+    );
 
     // var-1 should be disabled
     cy.get('[data-cy="standardized-variable-item-var-1"]')
@@ -110,5 +160,42 @@ describe('StandardizedVariablesList', () => {
     cy.get('[data-cy="collection-item-var-2"]')
       .should('have.class', 'opacity-50')
       .and('have.attr', 'aria-disabled', 'true');
+  });
+
+  it('should render badges for mapped variable counts', () => {
+    const mappedVariableCounts = {
+      'var-1': 2,
+      'var-2': 5,
+    };
+    cy.mount(
+      <StandardizedVariablesList
+        mappedVariableCounts={mappedVariableCounts}
+        annotatedColumnsCount={0}
+        totalColumnsCount={0}
+        mappedTermCounts={{}}
+      />
+    );
+
+    cy.get('[data-cy="mapped-count-badge-var-1"]').should('contain', '2');
+    cy.get('[data-cy="mapped-count-badge-var-2"]').should('contain', '5');
+
+    cy.get('[data-cy="mapped-count-badge-var-3"]').should('not.exist');
+  });
+
+  it('should render badges for mapped term counts', () => {
+    const mappedTermCounts = {
+      'term-1': 3,
+    };
+    cy.mount(
+      <StandardizedVariablesList
+        mappedTermCounts={mappedTermCounts}
+        annotatedColumnsCount={0}
+        totalColumnsCount={0}
+        mappedVariableCounts={{}}
+      />
+    );
+
+    cy.get('[data-cy="mapped-count-badge-term-term-1"]').should('contain', '3');
+    cy.get('[data-cy="mapped-count-badge-term-term-2"]').should('not.exist');
   });
 });

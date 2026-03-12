@@ -1,6 +1,6 @@
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
-import { Typography, TextField, IconButton, InputAdornment } from '@mui/material';
+import { Typography, TextField, IconButton, InputAdornment, Box } from '@mui/material';
 import { matchSorter, rankings } from 'match-sorter';
 import { useState, useMemo } from 'react';
 import { StandardizedVariableItem } from '~/utils/internal_types';
@@ -11,7 +11,8 @@ interface CollectionItemProps {
   onTermSelect: (termId: string) => void;
   selectedTermId?: string | null;
   hasMultipleSelection?: boolean;
-  isAlreadyMapped?: boolean;
+  totalCollectionMappedCount: number;
+  mappedTermCounts: Record<string, number>;
 }
 
 function CollectionItem({
@@ -19,11 +20,13 @@ function CollectionItem({
   onTermSelect,
   selectedTermId,
   hasMultipleSelection = false,
-  isAlreadyMapped = false,
+  totalCollectionMappedCount,
+  mappedTermCounts,
 }: CollectionItemProps) {
   const [query, setQuery] = useState('');
   const isDisabled =
-    (hasMultipleSelection || isAlreadyMapped) && variable.can_have_multiple_columns === false;
+    (hasMultipleSelection || totalCollectionMappedCount > 0) &&
+    variable.can_have_multiple_columns === false;
 
   const filteredTerms = useMemo(() => {
     if (!variable.terms) return [];
@@ -42,9 +45,21 @@ function CollectionItem({
       aria-disabled={isDisabled}
       title={isDisabled ? `${variable.label} can only be assigned to a single column` : undefined}
     >
-      <Typography variant="subtitle2" className="font-semibold px-2 text-gray-700">
-        {variable.label}
-      </Typography>
+      <div className="flex items-center justify-between px-2">
+        <Typography variant="subtitle2" className="font-semibold text-gray-700 truncate">
+          {variable.label}
+        </Typography>
+        {totalCollectionMappedCount > 0 && (
+          <Box
+            component="span"
+            sx={{ bgcolor: 'primary.main', color: 'primary.contrastText' }}
+            className="ml-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium"
+            data-cy={`mapped-count-badge-${variable.id}`}
+          >
+            {totalCollectionMappedCount}
+          </Box>
+        )}
+      </div>
       <div className="px-2">
         <TextField
           data-cy="search-terms-input"
@@ -104,9 +119,21 @@ function CollectionItem({
                     title={displayString}
                     data-cy={`collection-term-item-${term.id}`}
                   >
-                    <Typography variant="body2" noWrap>
-                      {displayString}
-                    </Typography>
+                    <div className="flex items-center justify-between w-full">
+                      <Typography variant="body2" noWrap className="truncate pr-2">
+                        {displayString}
+                      </Typography>
+                      {mappedTermCounts[term.id] > 0 && (
+                        <Box
+                          component="span"
+                          sx={{ bgcolor: 'primary.main', color: 'primary.contrastText' }}
+                          className="flex-shrink-0 ml-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium"
+                          data-cy={`mapped-count-badge-term-${term.id}`}
+                        >
+                          {mappedTermCounts[term.id]}
+                        </Box>
+                      )}
+                    </div>
                   </div>
                 );
               })}
@@ -126,7 +153,6 @@ function CollectionItem({
 CollectionItem.defaultProps = {
   selectedTermId: null,
   hasMultipleSelection: false,
-  isAlreadyMapped: false,
 };
 
 export default CollectionItem;

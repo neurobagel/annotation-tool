@@ -29,7 +29,7 @@ export interface DataTable {
   [key: string]: string[];
 }
 
-interface Column {
+export interface Column {
   id: string;
   name: string;
   allValues: string[]; // because we want to show the datable preview
