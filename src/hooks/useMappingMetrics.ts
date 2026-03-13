@@ -13,7 +13,7 @@ export function useMappingMetrics(): MappingMetrics {
 
   return useMemo(() => {
     const columnValues = Object.values(columns);
-    const totalColumnsCount = columnValues.length;
+    const numOfColumns = columnValues.length;
     let annotatedColumnsCount = 0;
     const mappedVariableCounts: Record<string, number> = {};
     const mappedTermCounts: Record<string, number> = {};
@@ -37,7 +37,7 @@ export function useMappingMetrics(): MappingMetrics {
     });
 
     return {
-      totalColumnsCount,
+      totalColumnsCount: numOfColumns,
       annotatedColumnsCount,
       mappedVariableCounts,
       mappedTermCounts,

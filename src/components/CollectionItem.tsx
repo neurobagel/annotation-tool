@@ -24,9 +24,9 @@ function CollectionItem({
   mappedTermCounts,
 }: CollectionItemProps) {
   const [query, setQuery] = useState('');
+  const isAlreadyMapped = totalCollectionMappedCount > 0;
   const isDisabled =
-    (hasMultipleSelection || totalCollectionMappedCount > 0) &&
-    variable.can_have_multiple_columns === false;
+    (hasMultipleSelection || isAlreadyMapped) && variable.can_have_multiple_columns === false;
 
   const filteredTerms = useMemo(() => {
     if (!variable.terms) return [];
@@ -49,7 +49,7 @@ function CollectionItem({
         <Typography variant="subtitle2" className="font-semibold text-gray-700 truncate">
           {variable.label}
         </Typography>
-        {totalCollectionMappedCount > 0 && (
+        {isAlreadyMapped && (
           <Box
             component="span"
             sx={{ bgcolor: 'primary.main', color: 'primary.contrastText' }}

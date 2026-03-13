@@ -95,6 +95,12 @@ function StandardizedVariablesList({
             );
           })}
 
+          {/* 
+            TODO or NOTE: We currently pass the entire `mappedTermCounts` record to each CollectionItem, 
+            relying on `term.id` being globally unique across all collections. 
+            If/when we introduce multiple Collection-type variables, we should scope `mappedTermCounts` 
+            by the parent `item.id` to avoid term ID collisions between different collections.
+          */}
           {collectionVariables.map((item) => (
             <CollectionItem
               key={item.id}
