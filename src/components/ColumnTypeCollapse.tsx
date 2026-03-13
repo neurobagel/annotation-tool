@@ -1,6 +1,6 @@
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import { Typography, Collapse, List, ListItem, IconButton } from '@mui/material';
+import { Typography, Collapse, List, ListItem, IconButton, Tooltip } from '@mui/material';
 import { capitalize } from 'lodash';
 import { useMemo, useState } from 'react';
 import type { ColumnGroupColumn } from '~/hooks/useValueAnnotationColumns';
@@ -173,20 +173,26 @@ function ColumnTypeCollapse({
                     >
                       {isGroupExpanded ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
                     </IconButton>
-                    <Typography
-                      onClick={() => handleGroupSelect(groupColumns)}
-                      data-cy={`side-column-nav-bar-${labelToDisplay}-${groupName}`}
-                      sx={{
-                        cursor: 'pointer',
-                        fontWeight: isGroupSelected ? 'bold' : 'normal',
-                        color: isGroupSelected ? 'primary.main' : '',
-                        '&:hover': {
-                          color: 'primary.main',
-                        },
-                      }}
-                    >
-                      {groupName}
-                    </Typography>
+                    <Tooltip title={groupName} placement="right">
+                      <Typography
+                        onClick={() => handleGroupSelect(groupColumns)}
+                        data-cy={`side-column-nav-bar-${labelToDisplay}-${groupName}`}
+                        sx={{
+                          cursor: 'pointer',
+                          fontWeight: isGroupSelected ? 'bold' : 'normal',
+                          color: isGroupSelected ? 'primary.main' : '',
+                          '&:hover': {
+                            color: 'primary.main',
+                          },
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          maxWidth: '220px',
+                        }}
+                      >
+                        {groupName}
+                      </Typography>
+                    </Tooltip>
                   </div>
                   <Collapse in={isGroupExpanded}>
                     <List sx={{ pl: 4 }}>
