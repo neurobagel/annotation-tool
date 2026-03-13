@@ -7,6 +7,7 @@ import {
   useStandardizedTerms,
 } from '~/stores/data';
 import { useColumnCardData } from '../hooks/useColumnCardData';
+import { useMappingMetrics } from '../hooks/useMappingMetrics';
 import { useMultiSelect } from '../hooks/useMultiSelect';
 import { useSearchFilter } from '../hooks/useSearchFilter';
 import { useStandardizedVariableOptions } from '../hooks/useStandardizedVariableOptions';
@@ -30,6 +31,8 @@ function ColumnAnnotation() {
   } = useDataActions();
   const standardizedVariableOptions = useStandardizedVariableOptions();
   const { searchTerm, debouncedSearchTerm, setSearchTerm, clearSearch } = useSearchFilter(300);
+  const { annotatedColumnsCount, totalColumnsCount, mappedVariableCounts, mappedTermCounts } =
+    useMappingMetrics();
 
   const columnCardData = useColumnCardData(columns, standardizedVariables, standardizedTerms);
 
@@ -66,17 +69,6 @@ function ColumnAnnotation() {
     useMultiSelect(visibleColumnIds);
 
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-
-  const mappedVariableIds = useMemo(() => {
-    const ids = new Set<string>();
-    Object.values(columns).forEach((col) => {
-      if (selectedIds.has(col.id)) return;
-      if (col.standardizedVariable) {
-        ids.add(col.standardizedVariable);
-      }
-    });
-    return ids;
-  }, [columns, selectedIds]);
 
   const handleStandardizedVariablesListItemSelect = (itemId: string | null) => {
     if (itemId && selectedIds.size > 0) {
@@ -200,7 +192,10 @@ function ColumnAnnotation() {
             selectedItemId={selectedItemId}
             onItemSelect={handleStandardizedVariablesListItemSelect}
             hasMultipleSelection={selectedIds.size > 1}
-            mappedVariableIds={mappedVariableIds}
+            annotatedColumnsCount={annotatedColumnsCount}
+            totalColumnsCount={totalColumnsCount}
+            mappedVariableCounts={mappedVariableCounts}
+            mappedTermCounts={mappedTermCounts}
           />
         </div>
       </div>
