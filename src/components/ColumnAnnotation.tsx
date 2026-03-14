@@ -78,7 +78,6 @@ function ColumnAnnotation() {
         clearSelection();
       } else {
         userUpdatesMultipleColumnToCollectionMappings(Array.from(selectedIds), itemId);
-        clearSelection();
       }
       setSelectedItemId(null);
     } else {
