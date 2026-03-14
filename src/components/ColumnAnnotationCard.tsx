@@ -124,7 +124,7 @@ function ColumnAnnotationCard({
               data-cy={`${id}-column-annotation-card-mapped-variable-unassigned`}
             >
               <Typography variant="body2" className="italic font-medium">
-                Assign variable
+                Map to standardized variable
               </Typography>
             </div>
           )}

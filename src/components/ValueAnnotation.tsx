@@ -72,7 +72,7 @@ function ValueAnnotation() {
           <Typography variant="h6" component="div">
             {`The following column${
               unknownDataTypeColumns.length > 1 ? 's' : ''
-            } do not have an assigned data type:`}
+            } do not have a mapped data type:`}
             <List dense sx={{ listStyleType: 'disc', pl: 4 }}>
               {unknownDataTypeColumns.map((columnId) => (
                 <ListItem key={columnId} sx={{ display: 'list-item' }}>

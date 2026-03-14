@@ -121,7 +121,7 @@ describe('ValueAnnotation', () => {
     cy.get('[data-cy="side-column-nav-bar-other-select-button"]').click();
     cy.get('[data-cy="other"]')
       .should('be.visible')
-      .and('contain', 'The following column do not have an assigned data type')
+      .and('contain', 'The following column do not have a mapped data type')
       .and('contain', 'unknown_type');
   });
 

@@ -32,6 +32,6 @@ describe('DataTypeDisplay', () => {
 
     cy.get('[data-cy="4-column-annotation-card-data-type-unassigned"]')
       .should('be.visible')
-      .and('contain', 'Assign data type');
+      .and('contain', 'Map to data type');
   });
 });

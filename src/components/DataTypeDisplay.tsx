@@ -39,7 +39,7 @@ function DataTypeDisplay({ columnId, label, isInferred = false }: DataTypeDispla
       data-cy={`${columnId}-column-annotation-card-data-type-unassigned`}
     >
       <Typography variant="body2" className="italic truncate">
-        Assign data type
+        Map to data type
       </Typography>
     </div>
   );

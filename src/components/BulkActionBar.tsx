@@ -57,7 +57,7 @@ export default function BulkActionBar({
 
         <div className="flex items-center gap-3">
           <Typography variant="body2" className="text-gray-600 font-medium whitespace-nowrap pr-1">
-            Assign Data Type:
+            Map Data Type:
           </Typography>
           <div className="flex items-center gap-2">
             <Button
@@ -88,10 +88,11 @@ export default function BulkActionBar({
               color="inherit"
               disabled={!hasSelection}
               onClick={() => onAssignDataType(null)}
+              startIcon={<CloseIcon fontSize="small" />}
               className={`whitespace-nowrap border-gray-300 ${hasSelection ? 'bg-white text-gray-700 hover:bg-gray-50' : 'text-gray-400'}`}
               data-cy="bulk-assign-none"
             >
-              None
+              Clear
             </Button>
           </div>
         </div>
