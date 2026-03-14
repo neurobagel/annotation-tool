@@ -155,4 +155,19 @@ describe('ColumnAnnotationCard', () => {
     cy.get('[data-cy="1-column-annotation-card"]').click();
     cy.get('@onSelectSpy').should('have.been.called');
   });
+
+  it('should visually reflect the selected state via the checkbox', () => {
+    cy.mount(<ColumnAnnotationCard {...props} selected={false} />);
+    cy.get('[data-cy="1-column-annotation-card-checkbox"] input').should('not.be.checked');
+
+    cy.mount(<ColumnAnnotationCard {...props} selected />);
+    cy.get('[data-cy="1-column-annotation-card-checkbox"] input').should('be.checked');
+  });
+
+  it('should fire the onSelect event handler when the checkbox is clicked', () => {
+    const spy = cy.spy().as('onSelectSpy');
+    cy.mount(<ColumnAnnotationCard {...props} onSelect={spy} />);
+    cy.get('[data-cy="1-column-annotation-card-checkbox"]').click();
+    cy.get('@onSelectSpy').should('have.been.called');
+  });
 });

@@ -1,5 +1,5 @@
 import CloseIcon from '@mui/icons-material/Close';
-import { Typography, Tooltip, Box, IconButton } from '@mui/material';
+import { Typography, Tooltip, Box, IconButton, Checkbox } from '@mui/material';
 import { DataType } from '~/utils/internal_types';
 import { StandardizedVariableOption } from '../hooks/useStandardizedVariableOptions';
 import DataTypeDisplay from './DataTypeDisplay';
@@ -93,12 +93,22 @@ function ColumnAnnotationCard({
       </div>
 
       <div className="grid grid-cols-[6fr_1fr_3fr] gap-4 px-4 py-3 items-center">
-        <div className="w-full min-w-0">
-          <DescriptionEditor
-            description={description}
-            onDescriptionChange={onDescriptionChange}
-            columnID={id}
+        <div className="flex items-center gap-2 w-full min-w-0">
+          <Checkbox
+            checked={selected}
+            size="small"
+            tabIndex={-1}
+            disableRipple
+            className="p-0.5 -ml-1 flex-shrink-0"
+            data-cy={`${id}-column-annotation-card-checkbox`}
           />
+          <div className="flex-grow min-w-0">
+            <DescriptionEditor
+              description={description}
+              onDescriptionChange={onDescriptionChange}
+              columnID={id}
+            />
+          </div>
         </div>
 
         <div className="flex-shrink-0">
