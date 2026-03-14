@@ -10,7 +10,6 @@ function RowComponent({ index, items, style }: RowComponentProps<{ items: ReactN
 }
 
 export interface VirtualListboxProps extends HTMLAttributes<HTMLElement> {
-  // eslint-disable-next-line react/require-default-props
   itemSize?: (index: number) => number;
 }
 
