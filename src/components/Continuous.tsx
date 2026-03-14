@@ -149,7 +149,6 @@ function Continuous({
               options={formatOptions}
               getOptionLabel={(option) => option.label}
               renderOption={(props, option) => (
-                // eslint-disable-next-line react/jsx-props-no-spreading
                 <li {...props}>
                   <div>
                     <div>{option.label}</div>
@@ -166,7 +165,6 @@ function Continuous({
                 onUpdateFormat(columnID, newValue?.id ?? null);
               }}
               renderInput={(params) => (
-                // eslint-disable-next-line react/jsx-props-no-spreading
                 <TextField {...params} label="Format" variant="outlined" fullWidth />
               )}
             />

@@ -31,7 +31,6 @@ const VirtualListbox = forwardRef<HTMLDivElement, VirtualListboxProps>((props, r
 
   return (
     <div ref={ref}>
-      {/* eslint-disable-next-line react/jsx-props-no-spreading */}
       <div ref={innerRef} style={{ height, overflow: 'auto' }} {...other}>
         <List
           rowComponent={RowComponent}
