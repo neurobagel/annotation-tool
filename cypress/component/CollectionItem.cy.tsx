@@ -46,7 +46,7 @@ describe('CollectionItem', () => {
     cy.get('[data-cy^="collection-term-item-"]').should('have.length', 4);
   });
 
-  it('should render the terms with correctly parsed labels, combining abbreviations', () => {
+  it('should render the terms with correctly parsed labels, combining abbreviations, and visual dividers', () => {
     cy.mount(
       <CollectionItem
         variable={props.variable}
@@ -63,6 +63,22 @@ describe('CollectionItem', () => {
       'contain',
       'QPE - Questionnaire for Psychotic Experiences'
     );
+
+    // Verify that long terms naturally wrap and are fully displayed without truncation
+    cy.get('[data-cy="collection-term-item-nb:termThree"]').within(() => {
+      cy.contains('Questionnaire for Psychotic Experiences; hallucinations_psychosis').should(
+        ($el) => {
+          const element = $el?.[0] as unknown as HTMLElement;
+          // scrollWidth should not exceed clientWidth, meaning it's wrapped and not overflowing horizontally
+          expect(element?.scrollWidth).to.be.at.most(element?.clientWidth);
+          // It shouldn't be using CSS truncation
+          expect($el).to.not.have.css('text-overflow', 'ellipsis');
+          expect($el).to.not.have.css('white-space', 'nowrap');
+        }
+      );
+    });
+
+    cy.get('hr.MuiDivider-root').should('be.visible');
   });
 
   describe('fuzzy search filtering', () => {
