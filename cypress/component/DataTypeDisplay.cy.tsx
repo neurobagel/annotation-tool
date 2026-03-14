@@ -34,4 +34,19 @@ describe('DataTypeDisplay', () => {
       .should('be.visible')
       .and('contain', 'Map to data type');
   });
+
+  it('should call onClear when the x clear button is clicked', () => {
+    const onClearSpy = cy.spy().as('onClearSpy');
+    cy.mount(<DataTypeDisplay columnId="5" label="Continuous" onClear={onClearSpy} />);
+
+    cy.get('[data-cy="5-clear-data-type"]').should('be.visible').click();
+    cy.get('@onClearSpy').should('have.been.called');
+  });
+
+  it('should not render clear button when isInferred is true', () => {
+    const onClearSpy = cy.spy().as('onClearSpy');
+    cy.mount(<DataTypeDisplay columnId="6" label="Identifier" isInferred onClear={onClearSpy} />);
+
+    cy.get('[data-cy="6-clear-data-type"]').should('not.exist');
+  });
 });

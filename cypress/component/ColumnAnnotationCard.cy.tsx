@@ -109,6 +109,34 @@ describe('ColumnAnnotationCard', () => {
     cy.get('[data-cy="2-column-annotation-card-data-type"]').should('contain', 'Identifier');
   });
 
+  it('should call onClearMapping and prevent card selection when the clear mapped variable button is clicked', () => {
+    const onSelectSpy = cy.spy().as('onSelectSpy');
+    const onClearMappingSpy = cy.spy().as('onClearMappingSpy');
+    cy.mount(
+      <ColumnAnnotationCard {...props} onSelect={onSelectSpy} onClearMapping={onClearMappingSpy} />
+    );
+
+    cy.get('[data-cy="1-clear-mapped-variable"]').should('be.visible').click();
+    cy.get('@onClearMappingSpy').should('have.been.calledWith', '1');
+    cy.get('@onSelectSpy').should('not.have.been.called');
+  });
+
+  it('should call onClearDataType and prevent card selection when the clear data type button is clicked', () => {
+    const onSelectSpy = cy.spy().as('onSelectSpy');
+    const onClearDataTypeSpy = cy.spy().as('onClearDataTypeSpy');
+    cy.mount(
+      <ColumnAnnotationCard
+        {...props}
+        onSelect={onSelectSpy}
+        onClearDataType={onClearDataTypeSpy}
+      />
+    );
+
+    cy.get('[data-cy="1-clear-data-type"]').should('be.visible').click();
+    cy.get('@onClearDataTypeSpy').should('have.been.calledWith', '1');
+    cy.get('@onSelectSpy').should('not.have.been.called');
+  });
+
   it('should fire the onSelect event handler when the card is clicked', () => {
     const spy = cy.spy().as('onSelectSpy');
     cy.mount(
