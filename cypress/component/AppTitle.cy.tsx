@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import Logo from '../../src/assets/logo.svg';
 import AppTitle from '../../src/components/AppTitle';
 

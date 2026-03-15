@@ -1,4 +1,5 @@
-import { Typography, Tooltip, Box } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import { Typography, Tooltip, Box, IconButton, Checkbox } from '@mui/material';
 import { DataType } from '~/utils/internal_types';
 import { StandardizedVariableOption } from '../hooks/useStandardizedVariableOptions';
 import DataTypeDisplay from './DataTypeDisplay';
@@ -15,6 +16,8 @@ interface ColumnAnnotationCardProps {
   standardizedVariableOptions: StandardizedVariableOption[];
   inferredDataTypeLabel: string | null;
   onDescriptionChange: (columnId: string, newDescription: string | null) => void;
+  onClearDataType?: (columnId: string) => void;
+  onClearMapping?: (columnId: string) => void;
   selected?: boolean;
   onSelect: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
@@ -36,6 +39,8 @@ function ColumnAnnotationCard({
   standardizedVariableOptions,
   inferredDataTypeLabel,
   onDescriptionChange,
+  onClearDataType,
+  onClearMapping,
   selected,
   onSelect,
 }: ColumnAnnotationCardProps) {
@@ -88,12 +93,22 @@ function ColumnAnnotationCard({
       </div>
 
       <div className="grid grid-cols-[6fr_1fr_3fr] gap-4 px-4 py-3 items-center">
-        <div className="w-full min-w-0">
-          <DescriptionEditor
-            description={description}
-            onDescriptionChange={onDescriptionChange}
-            columnID={id}
+        <div className="flex items-center gap-2 w-full min-w-0">
+          <Checkbox
+            checked={selected}
+            size="small"
+            tabIndex={-1}
+            disableRipple
+            className="p-0.5 -ml-1 flex-shrink-0"
+            data-cy={`${id}-column-annotation-card-checkbox`}
           />
+          <div className="flex-grow min-w-0">
+            <DescriptionEditor
+              description={description}
+              onDescriptionChange={onDescriptionChange}
+              columnID={id}
+            />
+          </div>
         </div>
 
         <div className="flex-shrink-0">
@@ -101,6 +116,7 @@ function ColumnAnnotationCard({
             columnId={id}
             label={dataTypeLabel}
             isInferred={!!inferredDataTypeLabel}
+            onClear={onClearDataType ? () => onClearDataType(id) : undefined}
           />
         </div>
 
@@ -110,12 +126,28 @@ function ColumnAnnotationCard({
               <Box
                 bgcolor="primary.main"
                 color="primary.contrastText"
-                className="h-10 px-3 flex items-center justify-start rounded w-fit max-w-full shadow-sm"
+                className="h-10 pl-3 pr-1 flex items-center justify-between rounded w-fit max-w-full shadow-sm"
                 data-cy={`${id}-column-annotation-card-mapped-variable`}
               >
-                <Typography variant="body2" className="font-medium truncate">
-                  {displayAbbrText}
-                </Typography>
+                <div className="flex items-center min-w-0 pr-2">
+                  <Typography variant="body2" className="font-medium truncate">
+                    {displayAbbrText}
+                  </Typography>
+                </div>
+                {onClearMapping && (
+                  <IconButton
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onClearMapping(id);
+                    }}
+                    sx={{ color: 'primary.contrastText', opacity: 0.8, '&:hover': { opacity: 1 } }}
+                    data-cy={`${id}-clear-mapped-variable`}
+                    className="flex-shrink-0"
+                  >
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
+                )}
               </Box>
             </Tooltip>
           ) : (
@@ -124,7 +156,7 @@ function ColumnAnnotationCard({
               data-cy={`${id}-column-annotation-card-mapped-variable-unassigned`}
             >
               <Typography variant="body2" className="italic font-medium">
-                Assign variable
+                Map to standardized variable
               </Typography>
             </div>
           )}

@@ -73,7 +73,7 @@ function StandardizedVariablesList({
                     }
                   }}
                   title={
-                    isDisabled ? `${item.label} can only be assigned to a single column` : undefined
+                    isDisabled ? `${item.label} can only be mapped to a single column` : undefined
                   }
                   data-cy={`standardized-variable-item-${item.id}`}
                 >

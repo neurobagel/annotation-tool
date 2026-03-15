@@ -78,7 +78,6 @@ function ColumnAnnotation() {
         clearSelection();
       } else {
         userUpdatesMultipleColumnToCollectionMappings(Array.from(selectedIds), itemId);
-        clearSelection();
       }
       setSelectedItemId(null);
     } else {
@@ -171,6 +170,10 @@ function ColumnAnnotation() {
                       standardizedVariableOptions={standardizedVariableOptions}
                       inferredDataTypeLabel={columnData.inferredDataTypeLabel}
                       onDescriptionChange={userUpdatesColumnDescription}
+                      onClearDataType={(id) => userUpdatesMultipleColumnDataTypes([id], null)}
+                      onClearMapping={(id) =>
+                        userUpdatesMultipleColumnStandardizedVariables([id], null)
+                      }
                       selected={isSelected(columnData.columnId)}
                       onSelect={(e) =>
                         handleSelect(columnData.columnId, e.shiftKey, e.ctrlKey || e.metaKey)

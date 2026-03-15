@@ -52,7 +52,7 @@ function CollectionItem({
       data-cy={`collection-item-${variable.id}`}
       className={`flex flex-col space-y-2 ${isDisabled ? 'opacity-50 pointer-events-none' : ''}`}
       aria-disabled={isDisabled}
-      title={isDisabled ? `${variable.label} can only be assigned to a single column` : undefined}
+      title={isDisabled ? `${variable.label} can only be mapped to a single column` : undefined}
     >
       <div className="flex items-center justify-between px-2">
         <Typography variant="subtitle2" className="font-semibold text-gray-700 truncate">

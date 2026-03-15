@@ -149,7 +149,6 @@ function Categorical({
                     }}
                     filterOptions={filterOptions}
                     renderInput={(params) => (
-                      // eslint-disable-next-line react/jsx-props-no-spreading
                       <TextField {...params} variant="standard" size="small" fullWidth />
                     )}
                     renderOption={(optionProps, option) => {
@@ -173,7 +172,6 @@ function Categorical({
                         >
                           <li
                             key={option.id}
-                            // eslint-disable-next-line react/jsx-props-no-spreading
                             {...otherProps}
                             data-cy={`${columnID}-${value}-term-dropdown-option`}
                           >
