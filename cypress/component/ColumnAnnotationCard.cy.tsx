@@ -118,6 +118,7 @@ describe('ColumnAnnotationCard', () => {
 
     cy.get('[data-cy="1-clear-mapped-variable"]').should('be.visible').click();
     cy.get('@onClearMappingSpy').should('have.been.calledWith', '1');
+    // Ensure that clicking the clear button doesn't bubble up and accidentally select the card
     cy.get('@onSelectSpy').should('not.have.been.called');
   });
 
@@ -134,6 +135,7 @@ describe('ColumnAnnotationCard', () => {
 
     cy.get('[data-cy="1-clear-data-type"]').should('be.visible').click();
     cy.get('@onClearDataTypeSpy').should('have.been.calledWith', '1');
+    // Ensure that clicking the clear button doesn't bubble up and accidentally select the card
     cy.get('@onSelectSpy').should('not.have.been.called');
   });
 
