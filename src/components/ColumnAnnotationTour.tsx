@@ -23,30 +23,23 @@ export default function ColumnAnnotationTour() {
       {
         target: '[data-tour="tour-page-container"]',
         content:
-          'Welcome to Column Annotation. This page allows you to review your dataset columns, specify their data types, and map them to standardized variables.',
+          'Welcome to the Neurobagel Annotation tool. On this page, you can review the columns in your data table and explain what information they contain by mapping them to the appropriate standardized variables on the right. You can also specify the type of data (categorical or continuous) in each column.',
         disableBeacon: true,
         placement: 'center',
       },
       {
-        target: '[data-tour="tour-search-filter"]',
-        content: 'Use this search bar to quickly filter and find specific columns by name.',
-        placement: 'bottom',
-      },
-      {
-        target: '[data-tour="tour-bulk-action-bar"]',
-        content: 'Use this bar to perform bulk actions on multiple columns at once.',
-        placement: 'bottom',
-      },
-      {
         target: '[data-tour="tour-column-list"]',
         content:
-          'Here you will see the list of your columns. You can add a description for your column and view the mapped data type and standardized variable.',
-        placement: 'right',
+          'This is the list of your columns. You can add a description for each column and view the mapped data type and standardized variable. You can select a column by clicking on it, and then map the column to a standardized variable on the right by clicking the name of the variable. To select multiple columns to map, use CTRL+click or SHIFT+click.',
+        placement: 'top',
+        floaterProps: {
+          disableFlip: true,
+        },
       },
       {
         target: '[data-tour="tour-standardized-variables-list"]',
         content:
-          'Select a column on the left by clicking anywhere on the card and then select a standardized variable from this list to map them together.',
+          'This is the standardized variable list. While you have one or more columns selected, click on the corresponding standardized variable to map your column to the variable.',
         placement: 'left',
       },
     ];
@@ -55,10 +48,24 @@ export default function ColumnAnnotationTour() {
       baseSteps.push({
         target: `[data-cy="collection-item-${firstCollectionVarId}"]`,
         content:
-          'For collection variables (like Assessment Tool), you can search and select standardized terms (from the designated vocabulary) below.',
+          'This is a list of recognized assessment tools. To map one or more selected columns to an assessment tool, click on the term from this list that best matches the assessment. You can filter the list of assessment tools using the search bar directly above.',
         placement: 'left',
       });
     }
+
+    baseSteps.push(
+      {
+        target: '[data-tour="tour-search-filter"]',
+        content: 'This is the search bar. Use it to quickly filter columns in your table by name.',
+        placement: 'bottom',
+      },
+      {
+        target: '[data-tour="tour-bulk-action-bar"]',
+        content:
+          'This is the action bar. Use it to assign a data type to all currently selected columns, or to clear the existing mappings (data type and standardized variable).',
+        placement: 'bottom',
+      }
+    );
 
     return baseSteps;
   }, [firstCollectionVarId]);

@@ -18,21 +18,20 @@ describe('Column Annotation Tour', () => {
     cy.get('.react-joyride__tooltip').should('be.visible');
     cy.get('button[data-test-id="button-primary"]').click();
 
-    cy.get('[data-tour="tour-search-filter"]').should('exist');
-    cy.get('button[data-test-id="button-primary"]').click();
-
-    cy.get('[data-tour="tour-bulk-action-bar"]').should('exist');
-    cy.get('button[data-test-id="button-primary"]').click();
-
     cy.get('[data-tour="tour-column-list"]').should('exist');
     cy.get('button[data-test-id="button-primary"]').click();
 
     cy.get('[data-tour="tour-standardized-variables-list"]').should('exist');
     cy.get('button[data-test-id="button-primary"]').click();
 
-    cy.contains('For collection variables').should('be.visible');
+    cy.contains('recognized assessment tools').should('be.visible');
     cy.get('[data-cy^="collection-item-"]').should('exist');
+    cy.get('button[data-test-id="button-primary"]').click();
 
+    cy.get('[data-tour="tour-search-filter"]').should('exist');
+    cy.get('button[data-test-id="button-primary"]').click();
+
+    cy.get('[data-tour="tour-bulk-action-bar"]').should('exist');
     cy.get('button[data-test-id="button-primary"]').click();
 
     // Verify session storage was updated by starting a new 'session' on the page
