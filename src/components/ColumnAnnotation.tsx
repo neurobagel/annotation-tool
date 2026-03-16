@@ -199,6 +199,7 @@ function ColumnAnnotation() {
                       onSelect={(e) =>
                         handleSelect(columnData.columnId, e.shiftKey, e.ctrlKey || e.metaKey)
                       }
+                      onToggleCheckbox={() => handleSelect(columnData.columnId, false, true)}
                     />
                   </div>
                 ))
