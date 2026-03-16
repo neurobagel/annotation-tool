@@ -91,10 +91,6 @@ function ColumnAnnotation() {
         userUpdatesMultipleColumnToCollectionMappings(Array.from(selectedIds), itemId);
       }
       setSelectedItemId(null);
-    } else {
-      // TODO: This fallback state retains the selected item ID for future feature implementation
-      // where we will support mapping an std var/term to multiple columns, which requires holding.
-      setSelectedItemId(itemId);
     }
   };
 
