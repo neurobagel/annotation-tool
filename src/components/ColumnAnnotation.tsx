@@ -142,7 +142,7 @@ function ColumnAnnotation() {
                   filteredCount={filteredColumnCardData.length}
                 />
               </div>
-              <div data-tour="tour-bulk-action-bar" className="flex-1">
+              <div data-tour="tour-bulk-action-bar" className="flex-1 min-w-0">
                 <BulkActionBar
                   selectedCount={selectedIds.size}
                   onClearSelection={clearSelection}

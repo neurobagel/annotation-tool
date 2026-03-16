@@ -30,7 +30,7 @@ export default function BulkActionBar({
       }`}
       data-cy="action-bar"
     >
-      <div className="flex items-center gap-x-4 overflow-x-auto">
+      <div className="flex flex-wrap items-center gap-y-3 gap-x-4">
         <div className="flex items-center gap-4">
           <Typography
             variant="subtitle1"
@@ -49,7 +49,7 @@ export default function BulkActionBar({
             className="whitespace-nowrap"
             data-cy="clear-selection-button"
           >
-            Clear selection
+            Deselect all
           </Button>
         </div>
 
