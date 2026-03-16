@@ -8,10 +8,15 @@ const props = {
   dataType: 'Categorical' as DataType,
   standardizedVariableId: 'nb:ParticipantID',
   standardizedVariableOptions: [
-    { id: 'nb:ParticipantID', label: 'Participant ID', disabled: true },
-    { id: 'nb:Sex', label: 'Sex', disabled: true },
-    { id: 'nb:Age', label: 'Age', disabled: false },
-    { id: 'nb:Assessment', label: 'Assessment Tool', disabled: false },
+    {
+      id: 'nb:ParticipantID',
+      label: 'Participant ID',
+      disabled: true,
+      variable_type: 'identifier',
+    },
+    { id: 'nb:Sex', label: 'Sex', disabled: true, variable_type: 'continuous' },
+    { id: 'nb:Age', label: 'Age', disabled: false, variable_type: 'continuous' },
+    { id: 'nb:Assessment', label: 'Assessment Tool', disabled: false, variable_type: 'collection' },
   ],
   inferredDataTypeLabel: null,
   onDescriptionChange: () => {},
@@ -118,6 +123,7 @@ describe('ColumnAnnotationCard', () => {
 
     cy.get('[data-cy="1-clear-mapped-variable"]').should('be.visible').click();
     cy.get('@onClearMappingSpy').should('have.been.calledWith', '1');
+    // Ensure that clicking the clear button doesn't bubble up and accidentally select the card
     cy.get('@onSelectSpy').should('not.have.been.called');
   });
 
@@ -134,6 +140,7 @@ describe('ColumnAnnotationCard', () => {
 
     cy.get('[data-cy="1-clear-data-type"]').should('be.visible').click();
     cy.get('@onClearDataTypeSpy').should('have.been.calledWith', '1');
+    // Ensure that clicking the clear button doesn't bubble up and accidentally select the card
     cy.get('@onSelectSpy').should('not.have.been.called');
   });
 

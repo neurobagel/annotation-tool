@@ -34,6 +34,7 @@
     "papaparse": "^5.5.3",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "react-joyride": "^2.9.3",
     "react-window": "^2.2.7",
     "seedrandom": "^3.0.5",
     "use-debounce": "^10.1.0",
@@ -85,5 +86,16 @@
     "vite": "^6.4.1",
     "vite-plugin-istanbul": "^6.0.2",
     "vitest": "^3.0.9"
+  },
+  "//overrides": "react-joyride and react-floater require React 15-18. This causes an ERESOLVE peer dependency error during strict npm ci installs in our React 19 environment. These overrides force npm to resolve to React 19.",
+  "overrides": {
+    "react-joyride": {
+      "react": "$react",
+      "react-dom": "$react-dom"
+    },
+    "react-floater": {
+      "react": "$react",
+      "react-dom": "$react-dom"
+    }
   }
 }

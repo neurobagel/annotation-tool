@@ -4,6 +4,7 @@ export interface StandardizedVariableOption {
   id: string;
   label: string;
   disabled: boolean;
+  variable_type: string;
 }
 
 export function useStandardizedVariableOptions(): StandardizedVariableOption[] {
@@ -35,6 +36,7 @@ export function useStandardizedVariableOptions(): StandardizedVariableOption[] {
       id,
       label: variable.name,
       disabled: isSingleColumn && singleColumnAssignments.has(id),
+      variable_type: variable.variable_type || '',
     };
   });
 }
