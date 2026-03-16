@@ -6,20 +6,17 @@ type SessionStore = {
   setHasSeenColumnAnnotationTour: (seen: boolean) => void;
 };
 
-const useSessionStore = create<SessionStore>()(
-  devtools(
-    persist(
-      (set) => ({
-        hasSeenColumnAnnotationTour: false,
-        setHasSeenColumnAnnotationTour: (seen: boolean) =>
-          set({ hasSeenColumnAnnotationTour: seen }),
-      }),
-      {
-        name: 'session',
-        storage: createJSONStorage(() => sessionStorage),
-      }
-    )
-  )
+const sessionStoreCreator = persist<SessionStore>(
+  (set) => ({
+    hasSeenColumnAnnotationTour: false,
+    setHasSeenColumnAnnotationTour: (seen: boolean) => set({ hasSeenColumnAnnotationTour: seen }),
+  }),
+  {
+    name: 'session',
+    storage: createJSONStorage(() => sessionStorage),
+  }
 );
+
+const useSessionStore = create<SessionStore>()(devtools(sessionStoreCreator));
 
 export default useSessionStore;

@@ -41,6 +41,14 @@ function ColumnAnnotation() {
 
   const [hideAnnotated, setHideAnnotated] = useState(false);
 
+  // Find the first collection variable to highlight its specific section in the tour
+  const firstCollectionVarId = useMemo(() => {
+    const collectionVars = standardizedVariableOptions.filter(
+      (opt) => opt.variable_type === VariableType.collection
+    );
+    return collectionVars.length > 0 ? collectionVars[0].id : null;
+  }, [standardizedVariableOptions]);
+
   // Memoize the filtering logic to ensure that we only apply the .filter() operation
   // when the actual data changes OR when the 300ms debounce timer finishes, preventing
   // sluggish filtering on every keystroke
@@ -110,7 +118,7 @@ function ColumnAnnotation() {
       data-cy="column-annotation-container"
       data-tour="tour-page-container"
     >
-      <ColumnAnnotationTour />
+      <ColumnAnnotationTour firstCollectionVarId={firstCollectionVarId} />
       <div className="flex w-full h-full gap-8 px-8">
         {/* Main Column Listing - Left Side */}
         <div className="flex-1 flex flex-col min-w-0 py-4">
@@ -168,7 +176,7 @@ function ColumnAnnotation() {
                 Data Type
               </span>
               <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
-                Mapped Variable
+                Standardized Variable
               </span>
             </Box>
 
