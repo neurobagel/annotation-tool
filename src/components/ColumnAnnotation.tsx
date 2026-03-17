@@ -79,6 +79,7 @@ function ColumnAnnotation() {
   const { selectedIds, handleSelect, clearSelection, isSelected } =
     useMultiSelect(visibleColumnIds);
 
+  // TODO: properly remove this state variable, it is no longer used
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
   const handleStandardizedVariablesListItemSelect = (itemId: string | null) => {

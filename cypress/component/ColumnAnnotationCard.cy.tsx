@@ -171,7 +171,7 @@ describe('ColumnAnnotationCard', () => {
     cy.get('[data-cy="1-column-annotation-card-checkbox"] input').should('be.checked');
   });
 
-  it('should prevent card selection (onSelect) and fire onToggleCheckbox when the checkbox is clicked', () => {
+  it('should fire onToggleCheckbox (checkbox handler) and not fire onSelect (generic card selection handler) when the checkbox is clicked', () => {
     const onSelectSpy = cy.spy().as('onSelectSpy');
     const onToggleCheckboxSpy = cy.spy().as('onToggleCheckboxSpy');
     cy.mount(
