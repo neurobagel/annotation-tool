@@ -20,8 +20,7 @@ interface ColumnAnnotationCardProps {
   onClearMapping?: (columnId: string) => void;
   selected?: boolean;
   onSelect: (e: React.MouseEvent<HTMLDivElement>) => void;
-  // TODO: onToggleCheckbox is optional prop
-  onToggleCheckbox?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onToggleCheckbox: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const defaultProps = {
@@ -105,11 +104,8 @@ function ColumnAnnotationCard({
             className="p-0.5 -ml-1 flex-shrink-0"
             data-cy={`${id}-column-annotation-card-checkbox`}
             onChange={(e) => {
-              // TODO: double check stop propagation here because onToggleCheckbox is optional
               e.stopPropagation();
-              if (onToggleCheckbox) {
-                onToggleCheckbox(e);
-              }
+              onToggleCheckbox(e);
             }}
             onClick={(e) => e.stopPropagation()}
           />

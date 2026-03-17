@@ -21,6 +21,7 @@ const props = {
   inferredDataTypeLabel: null,
   onDescriptionChange: () => {},
   onSelect: () => {},
+  onToggleCheckbox: () => {},
 };
 
 describe('ColumnAnnotationCard', () => {
@@ -36,6 +37,7 @@ describe('ColumnAnnotationCard', () => {
         inferredDataTypeLabel={props.inferredDataTypeLabel}
         onDescriptionChange={props.onDescriptionChange}
         onSelect={props.onSelect}
+        onToggleCheckbox={props.onToggleCheckbox}
       />
     );
     cy.get('[data-cy="1-column-annotation-card"]')
@@ -64,6 +66,7 @@ describe('ColumnAnnotationCard', () => {
         inferredDataTypeLabel={null}
         onDescriptionChange={props.onDescriptionChange}
         onSelect={props.onSelect}
+        onToggleCheckbox={props.onToggleCheckbox}
       />
     );
     cy.get('[data-cy="1-column-annotation-card-data-type-unassigned"]')
@@ -88,6 +91,7 @@ describe('ColumnAnnotationCard', () => {
         inferredDataTypeLabel={props.inferredDataTypeLabel}
         onDescriptionChange={spy}
         onSelect={props.onSelect}
+        onToggleCheckbox={props.onToggleCheckbox}
       />
     );
     cy.get('[data-cy="1-description"]').should('be.visible');
@@ -108,6 +112,7 @@ describe('ColumnAnnotationCard', () => {
         inferredDataTypeLabel="Identifier"
         onDescriptionChange={props.onDescriptionChange}
         onSelect={props.onSelect}
+        onToggleCheckbox={props.onToggleCheckbox}
       />
     );
 
@@ -157,6 +162,7 @@ describe('ColumnAnnotationCard', () => {
         inferredDataTypeLabel={props.inferredDataTypeLabel}
         onDescriptionChange={props.onDescriptionChange}
         onSelect={spy}
+        onToggleCheckbox={props.onToggleCheckbox}
       />
     );
     cy.get('[data-cy="1-column-annotation-card"]').click();
