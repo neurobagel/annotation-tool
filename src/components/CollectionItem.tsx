@@ -18,7 +18,6 @@ const getEstimatedHeight = (displayString: string) => {
 interface CollectionItemProps {
   variable: StandardizedVariableItem;
   onTermSelect: (termId: string) => void;
-  selectedTermId?: string | null;
   hasMultipleSelection?: boolean;
   totalCollectionMappedCount: number;
   mappedTermCounts: Record<string, number>;
@@ -27,7 +26,6 @@ interface CollectionItemProps {
 function CollectionItem({
   variable,
   onTermSelect,
-  selectedTermId,
   hasMultipleSelection = false,
   totalCollectionMappedCount,
   mappedTermCounts,
@@ -126,11 +124,7 @@ function CollectionItem({
                     {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus */}
                     <div
                       role="button"
-                      className={`flex items-center w-full px-3 py-2.5 cursor-pointer transition-colors ${
-                        selectedTermId === term.id
-                          ? 'bg-blue-100 text-blue-900 font-medium'
-                          : 'hover:bg-gray-100 text-gray-800'
-                      }`}
+                      className="flex items-center w-full px-3 py-2.5 cursor-pointer transition-colors hover:bg-gray-100 text-gray-800"
                       onClick={() => onTermSelect(term.id)}
                       title={displayString}
                       data-cy={`collection-term-item-${term.id}`}
@@ -169,7 +163,6 @@ function CollectionItem({
 }
 
 CollectionItem.defaultProps = {
-  selectedTermId: null,
   hasMultipleSelection: false,
 };
 
