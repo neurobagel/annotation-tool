@@ -79,6 +79,7 @@ function ColumnAnnotation() {
   const { selectedIds, handleSelect, clearSelection, isSelected } =
     useMultiSelect(visibleColumnIds);
 
+  // TODO: properly remove this state variable, it is no longer used
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
   const handleStandardizedVariablesListItemSelect = (itemId: string | null) => {
@@ -91,10 +92,6 @@ function ColumnAnnotation() {
         userUpdatesMultipleColumnToCollectionMappings(Array.from(selectedIds), itemId);
       }
       setSelectedItemId(null);
-    } else {
-      // TODO: This fallback state retains the selected item ID for future feature implementation
-      // where we will support mapping an std var/term to multiple columns, which requires holding.
-      setSelectedItemId(itemId);
     }
   };
 
@@ -146,7 +143,7 @@ function ColumnAnnotation() {
                   filteredCount={filteredColumnCardData.length}
                 />
               </div>
-              <div data-tour="tour-bulk-action-bar" className="flex-1">
+              <div data-tour="tour-bulk-action-bar" className="flex-1 min-w-0">
                 <BulkActionBar
                   selectedCount={selectedIds.size}
                   onClearSelection={clearSelection}
@@ -203,6 +200,7 @@ function ColumnAnnotation() {
                       onSelect={(e) =>
                         handleSelect(columnData.columnId, e.shiftKey, e.ctrlKey || e.metaKey)
                       }
+                      onToggleCheckbox={() => handleSelect(columnData.columnId, false, true)}
                     />
                   </div>
                 ))

@@ -171,10 +171,23 @@ describe('ColumnAnnotationCard', () => {
     cy.get('[data-cy="1-column-annotation-card-checkbox"] input').should('be.checked');
   });
 
-  it('should fire the onSelect event handler when the checkbox is clicked', () => {
-    const spy = cy.spy().as('onSelectSpy');
-    cy.mount(<ColumnAnnotationCard {...props} onSelect={spy} />);
-    cy.get('[data-cy="1-column-annotation-card-checkbox"]').click();
-    cy.get('@onSelectSpy').should('have.been.called');
+  it('should fire onToggleCheckbox (checkbox handler) and not fire onSelect (generic card selection handler) when the checkbox is clicked', () => {
+    const onSelectSpy = cy.spy().as('onSelectSpy');
+    const onToggleCheckboxSpy = cy.spy().as('onToggleCheckboxSpy');
+    cy.mount(
+      <ColumnAnnotationCard
+        {...props}
+        onSelect={onSelectSpy}
+        onToggleCheckbox={onToggleCheckboxSpy}
+      />
+    );
+    // Click the actual input element of the Checkbox
+    cy.get('[data-cy="1-column-annotation-card-checkbox"] input').click();
+
+    // onToggleCheckbox should be called (via onChange)
+    cy.get('@onToggleCheckboxSpy').should('have.been.called');
+
+    // The main card selection (onSelect) should NOT be called due to stopPropagation
+    cy.get('@onSelectSpy').should('not.have.been.called');
   });
 });
