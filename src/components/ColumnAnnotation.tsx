@@ -79,9 +79,6 @@ function ColumnAnnotation() {
   const { selectedIds, handleSelect, clearSelection, isSelected } =
     useMultiSelect(visibleColumnIds);
 
-  // TODO: properly remove this state variable, it is no longer used
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-
   const handleStandardizedVariablesListItemSelect = (itemId: string | null) => {
     if (itemId && selectedIds.size > 0) {
       const stdVar = standardizedVariables[itemId];
@@ -91,7 +88,6 @@ function ColumnAnnotation() {
       } else {
         userUpdatesMultipleColumnToCollectionMappings(Array.from(selectedIds), itemId);
       }
-      setSelectedItemId(null);
     }
   };
 
@@ -215,7 +211,6 @@ function ColumnAnnotation() {
         {/* Standardized Variables List */}
         <div className="py-4 h-full" data-tour="tour-standardized-variables-list">
           <StandardizedVariablesList
-            selectedItemId={selectedItemId}
             onItemSelect={handleStandardizedVariablesListItemSelect}
             hasMultipleSelection={selectedIds.size > 1}
             annotatedColumnsCount={annotatedColumnsCount}
