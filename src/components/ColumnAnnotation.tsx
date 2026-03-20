@@ -19,6 +19,7 @@ import ColumnAnnotationCard from './ColumnAnnotationCard';
 import ColumnAnnotationTour from './ColumnAnnotationTour';
 import SearchFilter from './SearchFilter';
 import StandardizedVariablesList from './StandardizedVariablesList';
+import VirtualColumnList from './VirtualColumnList';
 
 function ColumnAnnotation() {
   const columns = useColumns();
@@ -202,12 +203,12 @@ function ColumnAnnotation() {
           </div>
 
           <div
-            className="flex-1 overflow-y-auto pb-4 px-2 -mx-2 w-full"
+            className="flex-1 overflow-hidden flex flex-col pb-4 px-2 -mx-2 w-full"
             data-cy="scrollable-container"
             data-tour="tour-column-list"
           >
-            {/* Global Header Row - Sticky */}
-            <Box className="sticky top-0 z-10 mb-4 border border-gray-200 shadow-sm rounded-t-lg backdrop-blur-sm bg-opacity-95 bg-gray-100 grid grid-cols-[6fr_1fr_3fr] gap-4 px-4 pt-3 pb-1 items-end min-w-[768px]">
+            {/* Global Header Row - Static since virtual list handles scrolling */}
+            <Box className="flex-none mb-4 border border-gray-200 shadow-sm rounded-t-lg bg-gray-100 grid grid-cols-[6fr_1fr_3fr] gap-4 px-4 pt-3 pb-1 items-end min-w-[768px]">
               <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
                 Description
               </span>
@@ -219,11 +220,12 @@ function ColumnAnnotation() {
               </span>
             </Box>
 
-            <div className="space-y-3">
+            <div className="flex-1 min-h-0 relative">
               {filteredColumnCardData.length > 0 ? (
-                filteredColumnCardData.map((columnData) => (
-                  <div key={columnData.columnId} className="w-full px-1">
+                <VirtualColumnList>
+                  {filteredColumnCardData.map((columnData) => (
                     <ColumnAnnotationCard
+                      key={columnData.columnId}
                       id={columnData.columnId}
                       name={columnData.name}
                       description={columnData.description}
@@ -240,8 +242,8 @@ function ColumnAnnotation() {
                       onSelect={handleCardSelect}
                       onToggleCheckbox={handleCardToggleCheckbox}
                     />
-                  </div>
-                ))
+                  ))}
+                </VirtualColumnList>
               ) : (
                 <div className="text-center py-8 text-gray-500" data-cy="no-columns-found-message">
                   No columns found matching &quot;{debouncedSearchTerm}&quot;
