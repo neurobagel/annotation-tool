@@ -1,6 +1,6 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Box, Button } from '@mui/material';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import {
   useColumns,
   useDataActions,
@@ -79,17 +79,31 @@ function ColumnAnnotation() {
   const { selectedIds, handleSelect, clearSelection, isSelected } =
     useMultiSelect(visibleColumnIds);
 
-  const handleStandardizedVariablesListItemSelect = (itemId: string | null) => {
-    if (itemId && selectedIds.size > 0) {
-      const stdVar = standardizedVariables[itemId];
-      if (stdVar && stdVar.variable_type !== VariableType.collection) {
-        userUpdatesMultipleColumnStandardizedVariables(Array.from(selectedIds), itemId);
-        clearSelection();
-      } else {
-        userUpdatesMultipleColumnToCollectionMappings(Array.from(selectedIds), itemId);
+  const selectedIdsRef = useRef(selectedIds);
+  useEffect(() => {
+    selectedIdsRef.current = selectedIds;
+  }, [selectedIds]);
+
+  const handleStandardizedVariablesListItemSelect = useCallback(
+    (itemId: string | null) => {
+      const currentSelectedIds = selectedIdsRef.current;
+      if (itemId && currentSelectedIds.size > 0) {
+        const stdVar = standardizedVariables[itemId];
+        if (stdVar && stdVar.variable_type !== VariableType.collection) {
+          userUpdatesMultipleColumnStandardizedVariables(Array.from(currentSelectedIds), itemId);
+          clearSelection();
+        } else {
+          userUpdatesMultipleColumnToCollectionMappings(Array.from(currentSelectedIds), itemId);
+        }
       }
-    }
-  };
+    },
+    [
+      standardizedVariables,
+      userUpdatesMultipleColumnStandardizedVariables,
+      userUpdatesMultipleColumnToCollectionMappings,
+      clearSelection,
+    ]
+  );
 
   const hasMappedSelected = Array.from(selectedIds).some((colId) => {
     const col = columns[colId];
@@ -97,12 +111,44 @@ function ColumnAnnotation() {
     return col.standardizedVariable != null || col.isPartOf != null;
   });
 
-  const handleClearMappings = () => {
-    const selectedArray = Array.from(selectedIds);
+  const handleClearMappings = useCallback(() => {
+    const selectedArray = Array.from(selectedIdsRef.current);
     userUpdatesMultipleColumnStandardizedVariables(selectedArray, null);
     userUpdatesMultipleColumnToCollectionMappings(selectedArray, null);
     clearSelection();
-  };
+  }, [
+    userUpdatesMultipleColumnStandardizedVariables,
+    userUpdatesMultipleColumnToCollectionMappings,
+    clearSelection,
+  ]);
+
+  const handleCardSelect = useCallback(
+    (id: string, e: React.MouseEvent<HTMLDivElement>) => {
+      handleSelect(id, e.shiftKey, e.ctrlKey || e.metaKey);
+    },
+    [handleSelect]
+  );
+
+  const handleCardToggleCheckbox = useCallback(
+    (id: string) => {
+      handleSelect(id, false, true);
+    },
+    [handleSelect]
+  );
+
+  const handleClearDataType = useCallback(
+    (id: string) => {
+      userUpdatesMultipleColumnDataTypes([id], null);
+    },
+    [userUpdatesMultipleColumnDataTypes]
+  );
+
+  const handleClearMapping = useCallback(
+    (id: string) => {
+      userUpdatesMultipleColumnStandardizedVariables([id], null);
+    },
+    [userUpdatesMultipleColumnStandardizedVariables]
+  );
 
   return (
     <div
@@ -188,15 +234,11 @@ function ColumnAnnotation() {
                       standardizedVariableOptions={standardizedVariableOptions}
                       inferredDataTypeLabel={columnData.inferredDataTypeLabel}
                       onDescriptionChange={userUpdatesColumnDescription}
-                      onClearDataType={(id) => userUpdatesMultipleColumnDataTypes([id], null)}
-                      onClearMapping={(id) =>
-                        userUpdatesMultipleColumnStandardizedVariables([id], null)
-                      }
+                      onClearDataType={handleClearDataType}
+                      onClearMapping={handleClearMapping}
                       selected={isSelected(columnData.columnId)}
-                      onSelect={(e) =>
-                        handleSelect(columnData.columnId, e.shiftKey, e.ctrlKey || e.metaKey)
-                      }
-                      onToggleCheckbox={() => handleSelect(columnData.columnId, false, true)}
+                      onSelect={handleCardSelect}
+                      onToggleCheckbox={handleCardToggleCheckbox}
                     />
                   </div>
                 ))
