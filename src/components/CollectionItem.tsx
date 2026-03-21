@@ -106,6 +106,7 @@ function CollectionItem({
         <div className="px-2 w-full">
           <div className="border rounded-md border-gray-200 overflow-hidden bg-white">
             <VirtualListbox
+              itemCount={filteredTerms.length}
               itemSize={(index) => {
                 const term = filteredTerms[index];
                 const displayString = term.abbreviation
@@ -114,13 +115,14 @@ function CollectionItem({
                 return getEstimatedHeight(displayString);
               }}
             >
-              {filteredTerms.map((term) => {
+              {({ index, style }) => {
+                const term = filteredTerms[index];
                 const displayString = term.abbreviation
                   ? `${term.abbreviation} - ${term.label}`
                   : term.label;
 
                 return (
-                  <div key={term.id}>
+                  <div key={term.id} style={style}>
                     {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus */}
                     <div
                       role="button"
@@ -148,7 +150,7 @@ function CollectionItem({
                     {term !== filteredTerms[filteredTerms.length - 1] && <Divider />}
                   </div>
                 );
-              })}
+              }}
             </VirtualListbox>
           </div>
         </div>

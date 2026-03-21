@@ -11,7 +11,7 @@ import {
   Tooltip,
 } from '@mui/material';
 import { matchSorter } from 'match-sorter';
-import { useState } from 'react';
+import React, { useState, forwardRef } from 'react';
 import type { TermOption } from '~/hooks/useTermOptions';
 import { useSortedValues } from '../hooks/useSortedValues';
 import DescriptionEditor from './DescriptionEditor';
@@ -36,6 +36,22 @@ const defaultProps = {
   showStandardizedTerm: false,
   showMissingToggle: false,
 };
+
+const CategoricalVirtualListbox = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLElement>>(
+  (props, ref) => {
+    const { children, ...other } = props;
+    const items = React.Children.toArray(children);
+
+    return (
+      <VirtualListbox ref={ref} itemCount={items.length} {...other}>
+        {({ index, style }) => {
+          const item = items[index] as React.ReactElement<{ style?: React.CSSProperties }>;
+          return React.cloneElement(item, { style: { ...item.props.style, ...style } });
+        }}
+      </VirtualListbox>
+    );
+  }
+);
 
 function Categorical({
   columnID,
@@ -182,7 +198,7 @@ function Categorical({
                     }}
                     slotProps={{
                       listbox: {
-                        component: VirtualListbox,
+                        component: CategoricalVirtualListbox,
                       },
                       paper: {
                         sx: {

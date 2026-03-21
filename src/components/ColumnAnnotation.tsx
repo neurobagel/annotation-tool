@@ -222,27 +222,30 @@ function ColumnAnnotation() {
 
             <div className="flex-1 min-h-0 relative">
               {filteredColumnCardData.length > 0 ? (
-                <VirtualColumnList>
-                  {filteredColumnCardData.map((columnData) => (
-                    <ColumnAnnotationCard
-                      key={columnData.columnId}
-                      id={columnData.columnId}
-                      name={columnData.name}
-                      description={columnData.description}
-                      dataType={columnData.dataType}
-                      standardizedVariableId={columnData.standardizedVariableId}
-                      termLabel={columnData.termLabel}
-                      termAbbreviation={columnData.termAbbreviation}
-                      standardizedVariableOptions={standardizedVariableOptions}
-                      inferredDataTypeLabel={columnData.inferredDataTypeLabel}
-                      onDescriptionChange={userUpdatesColumnDescription}
-                      onClearDataType={handleClearDataType}
-                      onClearMapping={handleClearMapping}
-                      selected={isSelected(columnData.columnId)}
-                      onSelect={handleCardSelect}
-                      onToggleCheckbox={handleCardToggleCheckbox}
-                    />
-                  ))}
+                <VirtualColumnList itemCount={filteredColumnCardData.length}>
+                  {({ index }) => {
+                    const columnData = filteredColumnCardData[index];
+                    return (
+                      <ColumnAnnotationCard
+                        key={columnData.columnId}
+                        id={columnData.columnId}
+                        name={columnData.name}
+                        description={columnData.description}
+                        dataType={columnData.dataType}
+                        standardizedVariableId={columnData.standardizedVariableId}
+                        termLabel={columnData.termLabel}
+                        termAbbreviation={columnData.termAbbreviation}
+                        standardizedVariableOptions={standardizedVariableOptions}
+                        inferredDataTypeLabel={columnData.inferredDataTypeLabel}
+                        onDescriptionChange={userUpdatesColumnDescription}
+                        onClearDataType={handleClearDataType}
+                        onClearMapping={handleClearMapping}
+                        selected={isSelected(columnData.columnId)}
+                        onSelect={handleCardSelect}
+                        onToggleCheckbox={handleCardToggleCheckbox}
+                      />
+                    );
+                  }}
                 </VirtualColumnList>
               ) : (
                 <div className="text-center py-8 text-gray-500" data-cy="no-columns-found-message">
