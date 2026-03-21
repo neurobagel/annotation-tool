@@ -204,7 +204,6 @@ function ColumnAnnotation() {
 
           <div
             className="flex-1 overflow-hidden flex flex-col pb-4 px-2 -mx-2 w-full"
-            data-cy="scrollable-container"
             data-tour="tour-column-list"
           >
             {/* Global Header Row - Static since virtual list handles scrolling */}

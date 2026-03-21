@@ -24,7 +24,7 @@ function VirtualColumnList({ children, itemCount }: VirtualColumnListProps) {
   const dynamicRowHeight = useDynamicRowHeight({ defaultRowHeight: DEFAULT_ROW_HEIGHT });
 
   return (
-    <div className="flex-1 w-full h-full relative overflow-y-auto" data-cy="virtual-column-list">
+    <div className="flex-1 w-full h-full relative overflow-hidden" data-cy="virtual-column-list">
       <List
         rowCount={itemCount}
         rowHeight={dynamicRowHeight}

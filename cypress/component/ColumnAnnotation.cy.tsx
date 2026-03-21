@@ -75,19 +75,19 @@ describe('ColumnAnnotation', () => {
 
   it('should scroll to access all column cards', () => {
     cy.mount(<ColumnAnnotation />);
-    cy.get('[data-cy="scrollable-container"]').should('be.visible');
+    cy.get('[data-cy="virtual-column-list"]').should('be.visible');
 
     // Initially visible cards
     cy.get('[data-cy="1-column-annotation-card"]').should('be.visible');
     cy.get('[data-cy="2-column-annotation-card"]').should('be.visible');
 
     // Scroll to bottom to access remaining cards
-    cy.get('[data-cy="scrollable-container"]').scrollTo('bottom');
+    cy.get('[data-cy="virtual-column-list"] > div').scrollTo('bottom');
     cy.get('[data-cy="3-column-annotation-card"]').should('be.visible');
     cy.get('[data-cy="4-column-annotation-card"]').should('be.visible');
 
     // Scroll back to top
-    cy.get('[data-cy="scrollable-container"]').scrollTo('top');
+    cy.get('[data-cy="virtual-column-list"] > div').scrollTo('top');
     cy.get('[data-cy="1-column-annotation-card"]').should('be.visible');
   });
   it('should edit the description', () => {
