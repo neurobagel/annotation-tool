@@ -3,31 +3,33 @@ import { List, type RowComponentProps, useDynamicRowHeight } from 'react-window'
 
 const DEFAULT_ROW_HEIGHT = 160;
 
-function RowComponent({ index, items, style }: RowComponentProps<{ items: ReactNode[] }>) {
+interface RenderProp {
+  (props: { index: number; style: React.CSSProperties }): ReactNode;
+}
+
+function RowComponent({ index, items, style }: RowComponentProps<{ items: RenderProp }>) {
   return (
     <div style={style} className="w-full px-1 pb-3">
-      {items[index]}
+      {items({ index, style: {} })}
     </div>
   );
 }
 
 interface VirtualColumnListProps {
-  children: ReactNode | ReactNode[];
+  children: RenderProp;
+  itemCount: number;
 }
 
-function VirtualColumnList({ children }: VirtualColumnListProps) {
-  const items = (Array.isArray(children) ? children : [children]) as ReactNode[];
-  const rowCount = items.length;
-
+function VirtualColumnList({ children, itemCount }: VirtualColumnListProps) {
   const dynamicRowHeight = useDynamicRowHeight({ defaultRowHeight: DEFAULT_ROW_HEIGHT });
 
   return (
     <div className="flex-1 w-full h-full relative overflow-y-auto" data-cy="virtual-column-list">
       <List
-        rowCount={rowCount}
+        rowCount={itemCount}
         rowHeight={dynamicRowHeight}
         rowComponent={RowComponent}
-        rowProps={{ items }}
+        rowProps={{ items: children }}
       />
     </div>
   );
