@@ -1,4 +1,4 @@
-import { produce, current } from 'immer';
+import { produce } from 'immer';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import {
@@ -200,24 +200,12 @@ const useDataStore = create<DataStore>()((set, get) => ({
 
       set((state) => ({
         columns: produce(state.columns, (draft) => {
-          draft[columnID].standardizedVariable = standardizedVariableId;
-
-          // Handle isPartOf for multi-column measures
           const standardizedVariable = standardizedVariableId
             ? standardizedVariables[standardizedVariableId]
             : null;
 
-          if (standardizedVariable?.is_multi_column_measure) {
-            // When setting to a multi-column measure, initialize isPartOf if it doesn't exist
-            if (!draft[columnID].isPartOf) {
-              draft[columnID].isPartOf = '';
-            }
-          } else if (draft[columnID].isPartOf !== undefined) {
-            // Remove isPartOf when changing from multi-column measure to something else
-            delete draft[columnID].isPartOf;
-          }
+          let updatedColumn = state.columns[columnID];
 
-          // Apply data type from standardized variable if available
           if (standardizedVariable) {
             const variableType = standardizedVariable.variable_type;
             let dataType: DataType | null = null;
@@ -228,13 +216,28 @@ const useDataStore = create<DataStore>()((set, get) => ({
               dataType = DataType.continuous;
             }
 
-            const columnWithDataType = applyDataTypeToColumn(
-              current(draft[columnID]),
+            updatedColumn = applyDataTypeToColumn(
+              state.columns[columnID],
               dataType,
               state.columns[columnID].allValues
             );
-            draft[columnID] = columnWithDataType;
+          } else {
+            // if no standardized variable, we just clone the state to mutate it
+            updatedColumn = { ...state.columns[columnID] };
           }
+
+          updatedColumn.standardizedVariable = standardizedVariableId;
+
+          // Handle isPartOf for multi-column measures
+          if (standardizedVariable?.is_multi_column_measure) {
+            if (!updatedColumn.isPartOf) {
+              updatedColumn.isPartOf = '';
+            }
+          } else if (updatedColumn.isPartOf !== undefined) {
+            delete updatedColumn.isPartOf;
+          }
+
+          draft[columnID] = updatedColumn;
         }),
       }));
     },
@@ -258,15 +261,13 @@ const useDataStore = create<DataStore>()((set, get) => ({
       set((state) => ({
         columns: produce(state.columns, (draft) => {
           columnIDs.forEach((columnID) => {
-            draft[columnID].standardizedVariable = standardizedVariableId;
-            delete draft[columnID].isPartOf;
+            const rawColumn = state.columns[columnID];
+            const updatedColumn = applyDataTypeToColumn(rawColumn, dataType, rawColumn.allValues);
 
-            const columnWithDataType = applyDataTypeToColumn(
-              current(draft[columnID]),
-              dataType,
-              state.columns[columnID].allValues
-            );
-            draft[columnID] = columnWithDataType;
+            updatedColumn.standardizedVariable = standardizedVariableId;
+            delete updatedColumn.isPartOf;
+
+            draft[columnID] = updatedColumn;
           });
         }),
       }));
