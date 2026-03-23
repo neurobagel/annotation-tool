@@ -21,7 +21,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@fontsource/roboto": "^5.2.10",
-    "@microlink/react-json-view": "^1.31.4",
+    "@microlink/react-json-view": "^1.31.14",
     "@mui/icons-material": "^6.5.0",
     "@mui/material": "^6.4.8",
     "@mui/system": "^6.4.3",
@@ -39,7 +39,7 @@
     "seedrandom": "^3.0.5",
     "use-debounce": "^10.1.0",
     "uuid": "^11.1.0",
-    "zustand": "^5.0.11"
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@cypress/code-coverage": "^3.14.7",
