@@ -1,4 +1,4 @@
-import { ReactNode, memo } from 'react';
+import { ReactNode } from 'react';
 import { List, type RowComponentProps, useDynamicRowHeight } from 'react-window';
 
 const DEFAULT_ROW_HEIGHT = 160;
@@ -35,4 +35,4 @@ function VirtualColumnList({ children, itemCount }: VirtualColumnListProps) {
   );
 }
 
-export default memo(VirtualColumnList);
+export default VirtualColumnList;

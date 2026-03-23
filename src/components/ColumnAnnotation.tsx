@@ -221,7 +221,10 @@ function ColumnAnnotation() {
 
             <div className="flex-1 min-h-0 relative">
               {filteredColumnCardData.length > 0 ? (
-                <VirtualColumnList itemCount={filteredColumnCardData.length}>
+                <VirtualColumnList
+                  key={`${debouncedSearchTerm}-${hideAnnotated}`}
+                  itemCount={filteredColumnCardData.length}
+                >
                   {({ index }) => {
                     const columnData = filteredColumnCardData[index];
                     return (

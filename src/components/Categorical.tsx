@@ -37,6 +37,15 @@ const defaultProps = {
   showMissingToggle: false,
 };
 
+/**
+ * Virtualized wrapper for MUI Autocomplete options to prevent React rendering bottlenecks.
+ *
+ * MUI creates React elements for all matched options upfront. This wrapper intercepts
+ * that process by taking the lightweight <li> elements and only wrapping them in
+ * expensive <Tooltip> components when they actually scroll into the visible DOM.
+ *
+ * Deferring tooltip generation drastically improves performance for thousands of options.
+ */
 const CategoricalVirtualListbox = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLElement>>(
   (props, ref) => {
     const { children, ...other } = props;
@@ -45,8 +54,38 @@ const CategoricalVirtualListbox = forwardRef<HTMLDivElement, React.HTMLAttribute
     return (
       <VirtualListbox ref={ref} itemCount={items.length} {...other}>
         {({ index, style }) => {
-          const item = items[index] as React.ReactElement<{ style?: React.CSSProperties }>;
-          return React.cloneElement(item, { style: { ...item.props.style, ...style } });
+          const item = items[index] as React.ReactElement<{
+            style?: React.CSSProperties;
+            'data-tooltip-title'?: string;
+            'data-tooltip-cy'?: string;
+          }>;
+          const tooltipTitle = item.props['data-tooltip-title'];
+          const tooltipCy = item.props['data-tooltip-cy'];
+
+          const clonedItem = React.cloneElement(item, {
+            style: { ...item.props.style, ...style },
+          });
+
+          if (tooltipTitle) {
+            return (
+              <Tooltip
+                title={tooltipTitle}
+                placement="right"
+                enterDelay={400}
+                arrow
+                slotProps={{
+                  tooltip: {
+                    ...({ 'data-cy': tooltipCy } as React.HTMLAttributes<HTMLDivElement>),
+                    sx: { fontSize: '16px' },
+                  },
+                }}
+              >
+                {clonedItem}
+              </Tooltip>
+            );
+          }
+
+          return clonedItem;
         }}
       </VirtualListbox>
     );
@@ -170,30 +209,15 @@ function Categorical({
                     renderOption={(optionProps, option) => {
                       const { key, ...otherProps } = optionProps;
                       return (
-                        <Tooltip
-                          title={option.label}
-                          placement="right"
-                          enterDelay={400}
-                          arrow
-                          slotProps={{
-                            tooltip: {
-                              ...({
-                                'data-cy': `${columnID}-${value}-term-tooltip`,
-                              } as React.HTMLAttributes<HTMLDivElement>),
-                              sx: {
-                                fontSize: '16px',
-                              },
-                            },
-                          }}
+                        <li
+                          key={option.id}
+                          {...otherProps}
+                          data-cy={`${columnID}-${value}-term-dropdown-option`}
+                          data-tooltip-title={option.label}
+                          data-tooltip-cy={`${columnID}-${value}-term-tooltip`}
                         >
-                          <li
-                            key={option.id}
-                            {...otherProps}
-                            data-cy={`${columnID}-${value}-term-dropdown-option`}
-                          >
-                            <div className="w-full truncate">{option.label}</div>
-                          </li>
-                        </Tooltip>
+                          <div className="w-full truncate">{option.label}</div>
+                        </li>
                       );
                     }}
                     slotProps={{
