@@ -1,6 +1,6 @@
 import CloseIcon from '@mui/icons-material/Close';
 import { Typography, Tooltip, Box, IconButton, Checkbox } from '@mui/material';
-import React, { memo } from 'react';
+import React from 'react';
 import { DataType } from '~/utils/internal_types';
 import { StandardizedVariableOption } from '../hooks/useStandardizedVariableOptions';
 import DataTypeDisplay from './DataTypeDisplay';
@@ -176,4 +176,4 @@ function ColumnAnnotationCard({
 
 ColumnAnnotationCard.defaultProps = defaultProps;
 
-export default memo(ColumnAnnotationCard);
+export default ColumnAnnotationCard;

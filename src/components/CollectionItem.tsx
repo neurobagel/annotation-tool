@@ -2,7 +2,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import { Typography, TextField, IconButton, InputAdornment, Box, Divider } from '@mui/material';
 import { matchSorter, rankings } from 'match-sorter';
-import { useState, useMemo, memo } from 'react';
+import { useState, useMemo } from 'react';
 import { StandardizedVariableItem } from '~/utils/internal_types';
 import VirtualListbox from './VirtualListBox';
 
@@ -168,4 +168,4 @@ CollectionItem.defaultProps = {
   hasMultipleSelection: false,
 };
 
-export default memo(CollectionItem);
+export default CollectionItem;

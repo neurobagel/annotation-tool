@@ -1,5 +1,4 @@
 import { Typography, Box } from '@mui/material';
-import { useCallback, memo } from 'react';
 import { useStandardizedVariableItems } from '~/hooks/useStandardizedVariableItems';
 import CollectionItem from './CollectionItem';
 
@@ -22,14 +21,11 @@ function StandardizedVariablesList({
 }: StandardizedVariablesListProps) {
   const { demographicVariables, collectionVariables } = useStandardizedVariableItems();
 
-  const handleSelect = useCallback(
-    (itemId: string) => {
-      if (onItemSelect) {
-        onItemSelect(itemId);
-      }
-    },
-    [onItemSelect]
-  );
+  const handleSelect = (itemId: string) => {
+    if (onItemSelect) {
+      onItemSelect(itemId);
+    }
+  };
 
   return (
     <div
@@ -122,4 +118,4 @@ StandardizedVariablesList.defaultProps = {
   hasMultipleSelection: false,
 };
 
-export default memo(StandardizedVariablesList);
+export default StandardizedVariablesList;
