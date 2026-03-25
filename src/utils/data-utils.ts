@@ -244,17 +244,15 @@ export function buildCategoricalLevels({
   standardizedTerms,
 }: BuildCategoricalLevelsOptions): LevelMap {
   const missingValuesSet = new Set(column.missingValues ?? []);
-  const initialLevels = Array.from(new Set(column.allValues ?? []))
+  const initialLevels: LevelMap = {};
+  Array.from(new Set(column.allValues ?? []))
     .filter((value) => !missingValuesSet.has(value))
-    .reduce(
-      (acc, value) => ({
-        ...acc,
-        [value]: { description: '', standardizedTerm: '' },
-      }),
-      {} as LevelMap
-    );
+    .forEach((value) => {
+      initialLevels[value] = { description: '', standardizedTerm: '' };
+    });
 
-  return Object.entries(initialLevels).reduce((acc, [value, level]) => {
+  const finalLevels: LevelMap = {};
+  Object.entries(initialLevels).forEach(([value, level]) => {
     const dictLevel = columnData.Levels?.[value];
     const annotationLevel = columnData.Annotations?.Levels?.[value];
     const standardizedTerm =
@@ -262,14 +260,12 @@ export function buildCategoricalLevels({
         ? annotationLevel.TermURL
         : level.standardizedTerm;
 
-    return {
-      ...acc,
-      [value]: {
-        description: dictLevel?.Description || level.description,
-        standardizedTerm,
-      },
+    finalLevels[value] = {
+      description: dictLevel?.Description || level.description,
+      standardizedTerm,
     };
-  }, {} as LevelMap);
+  });
+  return finalLevels;
 }
 
 export function applyDataTypeToColumn<T extends ColumnDataShape>(
@@ -286,13 +282,11 @@ export function applyDataTypeToColumn<T extends ColumnDataShape>(
     const uniqueValues = Array.from(new Set(allValues));
 
     if (!column.levels) {
-      updatedColumn.levels = uniqueValues.reduce(
-        (acc, value) => ({
-          ...acc,
-          [value]: { description: '', standardizedTerm: '' },
-        }),
-        {} as { [key: string]: { description: string; standardizedTerm: string } }
-      );
+      const newLevels: { [key: string]: { description: string; standardizedTerm: string } } = {};
+      uniqueValues.forEach((value) => {
+        newLevels[value] = { description: '', standardizedTerm: '' };
+      });
+      updatedColumn.levels = newLevels;
     }
 
     delete updatedColumn.units;

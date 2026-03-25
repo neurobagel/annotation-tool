@@ -11,19 +11,17 @@ export function useStandardizedVariableItems() {
   const standardizedTerms = useStandardizedTerms();
 
   return useMemo(() => {
-    const termsByVariableId = Object.values(standardizedTerms).reduce(
-      (acc, term) => {
-        const currentTerms = acc[term.standardizedVariableId] || [];
-        return {
-          ...acc,
-          [term.standardizedVariableId]: [
-            ...currentTerms,
-            { id: term.id, label: term.label, abbreviation: term.abbreviation },
-          ],
-        };
-      },
-      {} as Record<string, StandardizedTermItem[]>
-    );
+    const termsByVariableId: Record<string, StandardizedTermItem[]> = {};
+    Object.values(standardizedTerms).forEach((term) => {
+      if (!termsByVariableId[term.standardizedVariableId]) {
+        termsByVariableId[term.standardizedVariableId] = [];
+      }
+      termsByVariableId[term.standardizedVariableId].push({
+        id: term.id,
+        label: term.label,
+        abbreviation: term.abbreviation,
+      });
+    });
 
     const demographics: StandardizedVariableItem[] = [];
     const collections: StandardizedVariableItem[] = [];
