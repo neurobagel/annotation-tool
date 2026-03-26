@@ -344,7 +344,7 @@ describe('buildCategoricalLevels', () => {
     expect(result.B).toEqual({ description: '', standardizedTerm: '' });
   });
 
-  it('should exclude missing values from levels', () => {
+  it('should include missing values in levels', () => {
     const result = buildCategoricalLevels({
       column: { allValues: ['A', 'N/A', 'B'], missingValues: ['N/A'] },
       columnData: { Description: '' },
@@ -353,7 +353,7 @@ describe('buildCategoricalLevels', () => {
 
     expect(result.A).toEqual({ description: '', standardizedTerm: '' });
     expect(result.B).toEqual({ description: '', standardizedTerm: '' });
-    expect(result['N/A']).toBeUndefined();
+    expect(result['N/A']).toEqual({ description: '', standardizedTerm: '' });
   });
 
   it('should apply dictionary descriptions only for matching values', () => {
@@ -455,7 +455,7 @@ describe('applyDataDictionaryToColumns', () => {
       '0': {
         id: '0',
         name: 'sex',
-        allValues: ['M', 'F'],
+        allValues: ['M', 'F', 'N/A'],
       },
     };
 
@@ -599,7 +599,38 @@ describe('applyDataDictionaryToColumns', () => {
 
     expect(result['0'].levels?.PD).toBeUndefined();
     expect(result['0'].levels?.HC).toBeUndefined();
-    expect(result['0'].levels?.XYZ).toBeUndefined();
+  });
+
+  it('should ignore dictionary MissingValues that are not present in TSV values', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'sex',
+        allValues: ['M', 'F'],
+        dataType: DataType.categorical,
+      },
+    };
+
+    const mockDataDict = {
+      sex: {
+        Description: 'Sex of the participant',
+        Annotations: {
+          VariableType: 'Categorical' as const,
+          MissingValues: ['N/A', 'UNKNOWN'],
+        },
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      {},
+      {},
+      {}
+    );
+
+    // Should be completely empty since 'N/A' and 'UNKNOWN' are not in ['M', 'F']
+    expect(result['0'].missingValues).toEqual([]);
   });
 
   it('should handle multi-column measures with IsPartOf', () => {
@@ -799,7 +830,7 @@ describe('applyDataDictionaryToColumns', () => {
     expect(result['0'].levels?.good.standardizedTerm).toBe('snomed:1304062007');
     expect(result['0'].levels?.bad.description).toBe('Bad');
     expect(result['0'].levels?.extra).toBeUndefined();
-    expect(result['0'].levels?.['N/A']).toBeUndefined();
+    expect(result['0'].levels?.['N/A']).toEqual({ description: '', standardizedTerm: '' });
     expect(result['0'].missingValues).toEqual(['N/A']);
   });
 
@@ -1051,7 +1082,7 @@ describe('applyDataDictionaryToColumns', () => {
     expect(result['0'].description).toBe('Test description');
   });
 
-  it('should not include missing values in categorical levels', () => {
+  it('should include missing values in categorical levels', () => {
     const mockColumns = {
       '0': {
         id: '0',
@@ -1082,7 +1113,7 @@ describe('applyDataDictionaryToColumns', () => {
 
     expect(result['0'].missingValues).toEqual(['NA']);
     expect(result['0'].levels).toBeDefined();
-    expect(result['0'].levels?.NA).toBeUndefined();
+    expect(result['0'].levels?.NA).toEqual({ description: '', standardizedTerm: '' });
   });
 });
 
