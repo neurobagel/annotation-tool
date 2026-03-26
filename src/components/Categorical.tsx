@@ -179,7 +179,6 @@ function Categorical({
                   columnID={columnID}
                   levelValue={value}
                   description={levels[value]?.description || ''}
-                  disabled={missingValues.includes(value)}
                   onDescriptionChange={(id, description) => {
                     onUpdateDescription(id, value, description || '');
                   }}
