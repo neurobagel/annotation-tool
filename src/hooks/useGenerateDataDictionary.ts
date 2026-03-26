@@ -43,18 +43,21 @@ const buildColumnLevelsDictionary = (
 
 const buildAnnotationLevelsDictionary = (
   levels: ColumnLevels | null | undefined,
-  standardizedTerms: StandardizedTerms
+  standardizedTerms: StandardizedTerms,
+  missingValues: string[] = []
 ): AnnotationLevels =>
-  Object.entries(levels ?? {}).reduce<AnnotationLevels>((acc, [levelValue, levelData]) => {
-    const term = standardizedTerms[levelData.standardizedTerm];
-    return {
-      ...acc,
-      [levelValue]:
-        term?.id && term.label
-          ? { TermURL: term.id, Label: term.label }
-          : ({} as { TermURL: string; Label: string }),
-    };
-  }, {});
+  Object.entries(levels ?? {})
+    .filter(([levelValue]) => !missingValues.includes(levelValue))
+    .reduce<AnnotationLevels>((acc, [levelValue, levelData]) => {
+      const term = standardizedTerms[levelData.standardizedTerm];
+      return {
+        ...acc,
+        [levelValue]:
+          term?.id && term.label
+            ? { TermURL: term.id, Label: term.label }
+            : ({} as { TermURL: string; Label: string }),
+      };
+    }, {});
 
 export function useGenerateDataDictionary(): DataDictionary {
   const columns = useColumns();
@@ -102,7 +105,8 @@ export function useGenerateDataDictionary(): DataDictionary {
           ) {
             entry.Annotations.Levels = buildAnnotationLevelsDictionary(
               column.levels,
-              standardizedTerms
+              standardizedTerms,
+              column.missingValues
             );
           }
 
