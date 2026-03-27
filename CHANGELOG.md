@@ -1,3 +1,15 @@
+# v0.6.1 (Fri Mar 27 2026)
+
+#### 🚀 Enhancements
+
+- [ENH] Enable description editing for missing values [#507](https://github.com/neurobagel/annotation-tool/pull/507) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.6.0 (Wed Mar 25 2026)
 
 #### 💥 Breaking Changes
