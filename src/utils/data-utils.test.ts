@@ -344,7 +344,7 @@ describe('buildCategoricalLevels', () => {
     expect(result.B).toEqual({ description: '', standardizedTerm: '' });
   });
 
-  it('should include missing values in levels', () => {
+  it('should include missing values in BIDS levels', () => {
     const result = buildCategoricalLevels({
       column: { allValues: ['A', 'N/A', 'B'], missingValues: ['N/A'] },
       columnData: { Description: '' },

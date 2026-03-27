@@ -49,7 +49,7 @@ const buildAnnotationLevelsDictionary = (
   Object.entries(levels ?? {})
     // Missing values are excluded from the Annotations.Levels dictionary because they do not
     // represent valid categorical levels for standardized terminology mapping. Instead, they
-    // are explicitly captured under Annotations.MissingValues as per the BIDS specification.
+    // are included in Annotations.MissingValues.
     .filter(([levelValue]) => !missingValues.includes(levelValue))
     .reduce<AnnotationLevels>((acc, [levelValue, levelData]) => {
       const term = standardizedTerms[levelData.standardizedTerm];
