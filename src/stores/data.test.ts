@@ -356,6 +356,7 @@ describe('userUploadsDataDictionaryFile', () => {
       data: [
         ['sub-718211', '28.4', 'M', 'ADHD', 'HC', '80'],
         ['sub-718213', '24.6', 'F', 'ADHD', 'HC', '90'],
+        ['sub-718214', '25.0', 'N/A', 'ADHD', 'HC', '95'],
       ],
     });
 
@@ -1586,7 +1587,7 @@ describe('userUpdatesColumnLevelDescription', () => {
     expect(result.current.columns['0'].levels?.B.description).toBe('');
   });
 
-  it('should ignore updates for missing value levels', async () => {
+  it('should allow updates for missing value levels', async () => {
     const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
       type: 'text/tab-separated-values',
     });
@@ -1612,54 +1613,20 @@ describe('userUpdatesColumnLevelDescription', () => {
     });
 
     expect(result.current.columns['0'].missingValues).toEqual(['A']);
-    expect(result.current.columns['0'].levels?.A).toBeUndefined();
-
-    expect(() => {
-      act(() => {
-        result.current.actions.userUpdatesValueDescription('0', 'A', 'Group A');
-      });
-    }).not.toThrow();
-
-    expect(result.current.columns['0'].levels?.A).toBeUndefined();
-  });
-
-  it('should ignore updates when the level entry is absent', async () => {
-    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
-      type: 'text/tab-separated-values',
-    });
-
-    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
-    mockedParseTsvContent.mockReturnValueOnce({
-      headers: ['category'],
-      data: [['A'], ['B'], ['C']],
-    });
-
-    const { result } = renderHook(() => ({
-      actions: useDataActions(),
-      columns: useColumns(),
-    }));
-
-    await act(async () => {
-      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    // the missing value gets a default empty description
+    expect(result.current.columns['0'].levels?.A).toEqual({
+      description: '',
+      standardizedTerm: '',
     });
 
     act(() => {
-      result.current.actions.userUpdatesColumnDataType('0', DataType.categorical);
+      result.current.actions.userUpdatesValueDescription('0', 'A', 'Group A');
     });
 
-    expect(result.current.columns['0'].levels).toBeDefined();
-
-    act(() => {
-      result.current.actions.userUpdatesColumnDataType('0', DataType.continuous);
+    expect(result.current.columns['0'].levels?.A).toEqual({
+      description: 'Group A',
+      standardizedTerm: '',
     });
-
-    expect(result.current.columns['0'].levels).toBeUndefined();
-
-    act(() => {
-      result.current.actions.userUpdatesValueDescription('0', 'C', 'Category C');
-    });
-
-    expect(result.current.columns['0'].levels).toBeUndefined();
   });
 });
 
@@ -1820,7 +1787,7 @@ describe('userUpdatesColumnMissingValues', () => {
     return result;
   };
 
-  it('should add missing values and remove them from levels for categorical columns', async () => {
+  it('should add missing values and clear standardizedTerm from levels for categorical columns', async () => {
     const result = await setupCategoricalColumn();
 
     act(() => {
@@ -1828,17 +1795,23 @@ describe('userUpdatesColumnMissingValues', () => {
     });
 
     expect(result.current.columns['0'].missingValues).toEqual(['A']);
-    expect(result.current.columns['0'].levels?.A).toBeUndefined();
+    expect(result.current.columns['0'].levels?.A).toEqual({
+      description: '',
+      standardizedTerm: '',
+    });
 
     act(() => {
       result.current.actions.userUpdatesColumnMissingValues('0', 'B', true);
     });
 
     expect(result.current.columns['0'].missingValues).toEqual(['A', 'B']);
-    expect(result.current.columns['0'].levels?.B).toBeUndefined();
+    expect(result.current.columns['0'].levels?.B).toEqual({
+      description: '',
+      standardizedTerm: '',
+    });
   });
 
-  it('should remove missing values and reintroduce levels when toggled off', async () => {
+  it('should remove missing values and retain levels when toggled off', async () => {
     const result = await setupCategoricalColumn();
 
     act(() => {

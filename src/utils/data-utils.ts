@@ -243,13 +243,10 @@ export function buildCategoricalLevels({
   columnData,
   standardizedTerms,
 }: BuildCategoricalLevelsOptions): LevelMap {
-  const missingValuesSet = new Set(column.missingValues ?? []);
   const initialLevels: LevelMap = {};
-  Array.from(new Set(column.allValues ?? []))
-    .filter((value) => !missingValuesSet.has(value))
-    .forEach((value) => {
-      initialLevels[value] = { description: '', standardizedTerm: '' };
-    });
+  Array.from(new Set(column.allValues ?? [])).forEach((value) => {
+    initialLevels[value] = { description: '', standardizedTerm: '' };
+  });
 
   const finalLevels: LevelMap = {};
   Object.entries(initialLevels).forEach(([value, level]) => {
@@ -325,7 +322,10 @@ export function applyDataDictionaryToColumns(
     }
 
     if (columnData.Annotations?.MissingValues) {
-      column.missingValues = columnData.Annotations.MissingValues;
+      const uniqueValues = new Set(column.allValues ?? []);
+      column.missingValues = columnData.Annotations.MissingValues.filter((value) =>
+        uniqueValues.has(value)
+      );
     }
 
     let variableType: VariableType | undefined;
