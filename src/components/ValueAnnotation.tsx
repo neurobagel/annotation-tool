@@ -5,6 +5,7 @@ import { useValueAnnotationColumn } from '../hooks/useValueAnnotationColumn';
 import { useValueAnnotationNavData } from '../hooks/useValueAnnotationNavData';
 import { useDataActions } from '../stores/data';
 import { ValueAnnotationInstructions } from '../utils/instructions';
+import GlobalMissingValues from './GlobalMissingValues';
 import Instruction from './Instruction';
 import SideColumnNavBar from './SideColumnNavBar';
 import ValueAnnotationTabs from './ValueAnnotationTabs';
@@ -19,12 +20,14 @@ function ValueAnnotation() {
   } = useDataActions();
   const [selectedColumnIds, setSelectedColumnIds] = useState<string[]>([]);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
+  const [showGlobalMissingValues, setShowGlobalMissingValues] = useState(false);
   const navData = useValueAnnotationNavData();
 
   const handleSelect = (params: {
     columnIDs: string[];
     dataType?: 'Categorical' | 'Continuous' | null;
   }) => {
+    setShowGlobalMissingValues(false);
     setSelectedColumnIds(params.columnIDs);
     setActiveColumnId((current) => {
       if (params.columnIDs.length === 0) {
@@ -49,6 +52,10 @@ function ValueAnnotation() {
   const activeColumn = useValueAnnotationColumn(activeColumnId);
 
   const renderContent = () => {
+    if (showGlobalMissingValues) {
+      return <GlobalMissingValues />;
+    }
+
     if (selectedColumnIds.length === 0) {
       return (
         <Paper
@@ -131,6 +138,12 @@ function ValueAnnotation() {
           unannotatedGroups={navData.unannotatedGroups}
           onSelect={handleSelect}
           selectedColumnId={selectedColumnIds[0] || null}
+          isGlobalMissingValuesSelected={showGlobalMissingValues}
+          onSelectGlobalMissingValues={() => {
+            setShowGlobalMissingValues(true);
+            setSelectedColumnIds([]);
+            setActiveColumnId(null);
+          }}
         />
         <div className="flex-1 min-w-0">{renderContent()}</div>
       </div>
