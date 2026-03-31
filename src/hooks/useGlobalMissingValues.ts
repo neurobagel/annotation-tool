@@ -1,0 +1,72 @@
+import { useState, useMemo } from 'react';
+import {
+  useColumns,
+  useGlobalMissingValues as useStoredGlobalMissingValues,
+  useDataActions,
+} from '../stores/data';
+
+export const COMMON_MISSING_VALUES = ['N/A', 'NA', 'NaN', 'null', '-999', 'Unknown', 'Missing'];
+
+export function useGlobalMissingValues() {
+  const missingValues = useStoredGlobalMissingValues();
+  const columns = useColumns();
+  const { userUpdatesGlobalMissingValue } = useDataActions();
+
+  const [inputValue, setInputValue] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
+  const allUniqueValues = useMemo(() => {
+    const unique = new Set<string>();
+    Object.values(columns).forEach((column) => {
+      column.allValues.forEach((val) => unique.add(val));
+    });
+    return unique;
+  }, [columns]);
+
+  // Compute suggestions based on whats present in the uploaded data
+  const availableSuggestions = useMemo(
+    () =>
+      COMMON_MISSING_VALUES.filter((sv) => allUniqueValues.has(sv)).filter(
+        (sv) => !missingValues.some((mv) => mv.value === sv)
+      ),
+    [allUniqueValues, missingValues]
+  );
+
+  const handleAdd = (value: string | null) => {
+    if (value && value.trim() !== '') {
+      const trimmed = value.trim();
+
+      // If the value doesn't exist in any of the column data, throw error.
+      if (!allUniqueValues.has(trimmed)) {
+        setError(`Value "${trimmed}" not found in dataset.`);
+        return;
+      }
+
+      setError(null);
+      if (!missingValues.some((mv) => mv.value === trimmed)) {
+        userUpdatesGlobalMissingValue(trimmed, true, '');
+      }
+      setInputValue('');
+    }
+  };
+
+  const handleRemove = (valueToRemove: string) => {
+    userUpdatesGlobalMissingValue(valueToRemove, false);
+  };
+
+  const handleUpdateDescription = (value: string, description: string) => {
+    userUpdatesGlobalMissingValue(value, true, description);
+  };
+
+  return {
+    missingValues,
+    availableSuggestions,
+    inputValue,
+    setInputValue,
+    error,
+    setError,
+    handleAdd,
+    handleRemove,
+    handleUpdateDescription,
+  };
+}
