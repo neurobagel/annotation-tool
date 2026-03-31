@@ -23,7 +23,7 @@ export function useGlobalMissingValues() {
     return unique;
   }, [columns]);
 
-  // Compute suggestions based on whats present in the uploaded data
+  // Compute suggestions based on what's present in the uploaded data
   const availableSuggestions = useMemo(() => {
     const commonLower = COMMON_MISSING_VALUES.map((v) => v.toLowerCase());
     return Array.from(allUniqueValues)
