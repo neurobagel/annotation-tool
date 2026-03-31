@@ -23,6 +23,7 @@ import {
   useColumns,
   useUploadedDataTableFileName,
   useUploadedDataDictionary,
+  useGlobalMissingValues,
 } from './data';
 
 const mockedFetchAvailableConfigs = vi.spyOn(storeUtils, 'fetchAvailableConfigs');
@@ -1869,6 +1870,210 @@ describe('userUpdatesColumnMissingValues', () => {
 
     expect(result.current.columns['0'].missingValues).toEqual(['N/A']);
     expect(result.current.columns['0'].levels).toBeUndefined();
+  });
+});
+
+describe('userUpdatesGlobalMissingValue', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const setupTest = async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['col1', 'col2'],
+      data: [
+        ['1', 'A'],
+        ['2', 'N/A'],
+        ['N/A', 'B'],
+      ],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useDataActions(),
+      columns: useColumns(),
+      globalMissingValues: useGlobalMissingValues(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('1', DataType.categorical);
+    });
+
+    return result;
+  };
+
+  it('should add a global missing value to the store and apply to relevant columns', async () => {
+    const result = await setupTest();
+
+    act(() => {
+      result.current.actions.userUpdatesGlobalMissingValue('N/A', true, 'Not Applicable');
+    });
+
+    expect(result.current.globalMissingValues).toEqual([
+      { value: 'N/A', description: 'Not Applicable' },
+    ]);
+
+    expect(result.current.columns['0'].missingValues).toEqual(['N/A']);
+    expect(result.current.columns['0'].levels).toBeUndefined();
+
+    expect(result.current.columns['1'].missingValues).toEqual(['N/A']);
+    expect(result.current.columns['1'].levels?.['N/A']).toEqual({
+      description: 'Not Applicable',
+      standardizedTerm: '',
+    });
+  });
+
+  it('should remove a global missing value and clean up columns', async () => {
+    const result = await setupTest();
+
+    act(() => {
+      result.current.actions.userUpdatesGlobalMissingValue('N/A', true, 'Not Applicable');
+    });
+
+    expect(result.current.globalMissingValues).toHaveLength(1);
+
+    act(() => {
+      result.current.actions.userUpdatesGlobalMissingValue('N/A', false);
+    });
+
+    expect(result.current.globalMissingValues).toHaveLength(0);
+    expect(result.current.columns['0'].missingValues).toEqual([]);
+    expect(result.current.columns['1'].missingValues).toEqual([]);
+
+    expect(result.current.columns['1'].levels?.['N/A']).toEqual({
+      description: 'Not Applicable',
+      standardizedTerm: '',
+    });
+  });
+
+  it('should update the description of an existing global missing value', async () => {
+    const result = await setupTest();
+
+    act(() => {
+      result.current.actions.userUpdatesGlobalMissingValue('N/A', true, 'First Description');
+    });
+
+    expect(result.current.globalMissingValues[0].description).toBe('First Description');
+    expect(result.current.columns['1'].levels?.['N/A'].description).toBe('First Description');
+
+    act(() => {
+      result.current.actions.userUpdatesGlobalMissingValue('N/A', true, 'Updated Description');
+    });
+
+    expect(result.current.globalMissingValues[0].description).toBe('Updated Description');
+    expect(result.current.columns['1'].levels?.['N/A'].description).toBe('Updated Description');
+  });
+
+  it('should correctly handle collision when a column already has the missing value set', async () => {
+    const result = await setupTest();
+
+    // Set "N/A" as missing on column 1
+    act(() => {
+      result.current.actions.userUpdatesColumnMissingValues('1', 'N/A', true);
+    });
+
+    // Verify it's set but has no description
+    expect(result.current.columns['1'].missingValues).toEqual(['N/A']);
+    expect(result.current.columns['1'].levels?.['N/A'].description).toBe('');
+
+    // Globally set "N/A" as missing with a description
+    act(() => {
+      result.current.actions.userUpdatesGlobalMissingValue(
+        'N/A',
+        true,
+        'Global Overarching Description'
+      );
+    });
+
+    // Verify the array has no duplicates
+    expect(result.current.columns['1'].missingValues).toEqual(['N/A']);
+    // Verify the global description successfully updated and overwrote the local one
+    expect(result.current.columns['1'].levels?.['N/A'].description).toBe(
+      'Global Overarching Description'
+    );
+
+    expect(result.current.globalMissingValues.length).toBe(1);
+    expect(result.current.globalMissingValues[0].value).toBe('N/A');
+  });
+
+  it('should overwrite existing local level descriptions when a global missing value is added with a description', async () => {
+    const result = await setupTest();
+
+    // Mark a level as missing locally and give it a description
+    act(() => {
+      result.current.actions.userUpdatesColumnMissingValues('1', 'N/A', true);
+      result.current.actions.userUpdatesValueDescription(
+        '1',
+        'N/A',
+        'Highly specific local description'
+      );
+    });
+
+    // Verify local is set correctly
+    expect(result.current.columns['1'].missingValues).toEqual(['N/A']);
+    expect(result.current.columns['1'].levels?.['N/A'].description).toBe(
+      'Highly specific local description'
+    );
+
+    // Mark it as missing globally with a description
+    act(() => {
+      result.current.actions.userUpdatesGlobalMissingValue(
+        'N/A',
+        true,
+        'A Broad Global Description'
+      );
+    });
+
+    expect(result.current.globalMissingValues[0].value).toBe('N/A');
+    expect(result.current.globalMissingValues[0].description).toBe('A Broad Global Description');
+
+    // Verify the specific local description was successfully overwritten with global one
+    expect(result.current.columns['1'].levels?.['N/A'].description).toBe(
+      'A Broad Global Description'
+    );
+  });
+
+  it('should allow a local description update to overwrite an inherited global description on a specific column', async () => {
+    const result = await setupTest();
+
+    // Mark a value as missing globally with a description
+    act(() => {
+      result.current.actions.userUpdatesGlobalMissingValue(
+        'N/A',
+        true,
+        'A Broad Global Description'
+      );
+    });
+
+    // Verify both global and local have the global description
+    expect(result.current.globalMissingValues[0].description).toBe('A Broad Global Description');
+    expect(result.current.columns['1'].levels?.['N/A'].description).toBe(
+      'A Broad Global Description'
+    );
+
+    // Update the description locally
+    act(() => {
+      result.current.actions.userUpdatesValueDescription(
+        '1',
+        'N/A',
+        'Highly specific specific local override'
+      );
+    });
+
+    // Verify the column has local description
+    expect(result.current.columns['1'].levels?.['N/A'].description).toBe(
+      'Highly specific specific local override'
+    );
+
+    expect(result.current.globalMissingValues[0].description).toBe('A Broad Global Description');
   });
 });
 

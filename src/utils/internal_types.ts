@@ -7,6 +7,11 @@ export enum View {
   Download = 'download',
 }
 
+export interface GlobalMissingValue {
+  value: string;
+  description: string;
+}
+
 export type StepConfig = {
   label: string;
   view: View;
@@ -136,6 +141,7 @@ export type DataStoreState = {
   config: string;
   configOptions: string[];
   uploadedDataDictionary: UploadedDataDictionaryFile;
+  globalMissingValues: GlobalMissingValue[];
 };
 
 export type DataStoreActions = {
@@ -171,6 +177,7 @@ export type DataStoreActions = {
   userUpdatesColumnUnits: (columnID: string, units: string) => void;
   userUpdatesColumnFormat: (columnID: string, formatId: string | null) => void;
   userUpdatesColumnMissingValues: (columnID: string, value: string, isMissing: boolean) => void;
+  userUpdatesGlobalMissingValue: (value: string, isMissing: boolean, description?: string) => void;
   reset: () => void;
 };
 
