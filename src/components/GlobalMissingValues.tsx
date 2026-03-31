@@ -1,6 +1,7 @@
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Paper, Typography, TextField, Card, IconButton, Box, Chip } from '@mui/material';
 import { useGlobalMissingValues } from '../hooks/useGlobalMissingValues';
+import DescriptionEditor from './DescriptionEditor';
 
 export default function GlobalMissingValues() {
   const {
@@ -101,19 +102,16 @@ export default function GlobalMissingValues() {
                   {mv.value}
                 </Typography>
               </Box>
-              <TextField
-                fullWidth
-                size="small"
-                variant="outlined"
-                placeholder="Enter a description (e.g., Missing data)..."
-                value={mv.description}
-                onChange={(e) => handleUpdateDescription(mv.value, e.target.value)}
-                slotProps={{
-                  htmlInput: {
-                    'data-cy': `global-missing-value-description-${mv.value}`,
-                  },
-                }}
-              />
+              <Box sx={{ flex: 1, minWidth: 0, '& .MuiTextField-root': { my: 0 } }}>
+                <DescriptionEditor
+                  description={mv.description || null}
+                  columnID="global-missing-value"
+                  levelValue={mv.value}
+                  onDescriptionChange={(_, newDesc) =>
+                    handleUpdateDescription(mv.value, newDesc || '')
+                  }
+                />
+              </Box>
               <IconButton
                 color="error"
                 onClick={() => handleRemove(mv.value)}

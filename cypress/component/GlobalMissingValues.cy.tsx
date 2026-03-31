@@ -49,7 +49,7 @@ describe('GlobalMissingValues', () => {
     cy.get('[data-cy="global-missing-value-suggested-N/A"]').should('not.exist');
 
     cy.get('[data-cy="global-missing-value-card-N/A"]').should('be.visible');
-    cy.get('[data-cy="global-missing-value-description-N/A"]').should('be.visible');
+    cy.get('[data-cy="global-missing-value-N/A-description"]').should('be.visible');
   });
 
   it('should allow manually adding a missing value via input', () => {
@@ -70,7 +70,7 @@ describe('GlobalMissingValues', () => {
       .and('contain', 'not found in dataset');
   });
 
-  it('should update the description and delete a missing value', () => {
+  it('should update the description of a missing value', () => {
     useDataStore.setState((state) => ({
       ...state,
       globalMissingValues: [{ value: 'N/A', description: '' }],
@@ -78,12 +78,18 @@ describe('GlobalMissingValues', () => {
 
     cy.mount(<GlobalMissingValues />);
 
-    cy.get('[data-cy="global-missing-value-description-N/A"]').type('Not Applicable');
-    cy.get('[data-cy="global-missing-value-description-N/A"]').should(
-      'have.value',
-      'Not Applicable'
-    );
+    cy.get('[data-cy="global-missing-value-N/A-description"]').type('Not Applicable');
+    cy.get('[data-cy="global-missing-value-N/A-description"] textarea')
+      .first()
+      .should('have.value', 'Not Applicable');
+  });
+  it('should delete a missing value', () => {
+    useDataStore.setState((state) => ({
+      ...state,
+      globalMissingValues: [{ value: 'N/A', description: '' }],
+    }));
 
+    cy.mount(<GlobalMissingValues />);
     cy.get('[data-cy="global-missing-value-delete-N/A"]').click();
     cy.get('[data-cy="global-missing-values-empty-state"]').should('be.visible');
     cy.get('[data-cy="global-missing-value-suggested-N/A"]').should('be.visible');
