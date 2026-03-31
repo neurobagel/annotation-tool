@@ -24,13 +24,12 @@ export function useGlobalMissingValues() {
   }, [columns]);
 
   // Compute suggestions based on whats present in the uploaded data
-  const availableSuggestions = useMemo(
-    () =>
-      COMMON_MISSING_VALUES.filter((sv) => allUniqueValues.has(sv)).filter(
-        (sv) => !missingValues.some((mv) => mv.value === sv)
-      ),
-    [allUniqueValues, missingValues]
-  );
+  const availableSuggestions = useMemo(() => {
+    const commonLower = COMMON_MISSING_VALUES.map((v) => v.toLowerCase());
+    return Array.from(allUniqueValues)
+      .filter((uniqueVal) => commonLower.includes(uniqueVal.trim().toLowerCase()))
+      .filter((sv) => !missingValues.some((mv) => mv.value === sv));
+  }, [allUniqueValues, missingValues]);
 
   const handleAdd = (value: string | null) => {
     if (value && value.trim() !== '') {

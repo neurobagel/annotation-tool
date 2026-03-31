@@ -37,7 +37,7 @@ describe('useGlobalMissingValues', () => {
     '2': {
       id: '2',
       name: 'sex',
-      allValues: ['M', 'F', 'N/A', '-999'],
+      allValues: ['M', 'F', 'N/A', '-999', 'missing', 'UNKNOWN'],
     } as unknown as Column,
   });
 
@@ -52,13 +52,13 @@ describe('useGlobalMissingValues', () => {
     expect(result.current.missingValues).toEqual([]);
   });
 
-  it('should generate available suggestions based on data', () => {
+  it('should generate available suggestions case-insensitively based on data', () => {
     mockedUseColumns.mockReturnValue(createMockColumns());
     mockedUseGlobalMissingValues.mockReturnValue([]);
 
     const { result } = renderHook(() => useGlobalMissingValues());
 
-    expect(result.current.availableSuggestions).toEqual(['N/A', '-999']);
+    expect(result.current.availableSuggestions).toEqual(['N/A', '-999', 'missing', 'UNKNOWN']);
   });
 
   it('should filter out suggestions that are already active global missing values', () => {
@@ -67,7 +67,7 @@ describe('useGlobalMissingValues', () => {
 
     const { result } = renderHook(() => useGlobalMissingValues());
 
-    expect(result.current.availableSuggestions).toEqual(['-999']);
+    expect(result.current.availableSuggestions).toEqual(['-999', 'missing', 'UNKNOWN']);
   });
   it('should set an error and not add value if value is not in any column', () => {
     mockedUseColumns.mockReturnValue(createMockColumns());
