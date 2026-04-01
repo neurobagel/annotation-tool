@@ -20,14 +20,14 @@ function ValueAnnotation() {
   } = useDataActions();
   const [selectedColumnIds, setSelectedColumnIds] = useState<string[]>([]);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
-  const [showGlobalMissingValues, setShowGlobalMissingValues] = useState(false);
+  const [showGlobalSettings, setShowGlobalSettings] = useState(false);
   const navData = useValueAnnotationNavData();
 
   const handleSelect = (params: {
     columnIDs: string[];
     dataType?: 'Categorical' | 'Continuous' | null;
   }) => {
-    setShowGlobalMissingValues(false);
+    setShowGlobalSettings(false);
     setSelectedColumnIds(params.columnIDs);
     setActiveColumnId((current) => {
       if (params.columnIDs.length === 0) {
@@ -52,7 +52,7 @@ function ValueAnnotation() {
   const activeColumn = useValueAnnotationColumn(activeColumnId);
 
   const renderContent = () => {
-    if (showGlobalMissingValues) {
+    if (showGlobalSettings) {
       return <GlobalMissingValues />;
     }
 
@@ -138,9 +138,9 @@ function ValueAnnotation() {
           unannotatedGroups={navData.unannotatedGroups}
           onSelect={handleSelect}
           selectedColumnId={selectedColumnIds[0] || null}
-          isGlobalMissingValuesSelected={showGlobalMissingValues}
-          onSelectGlobalMissingValues={() => {
-            setShowGlobalMissingValues(true);
+          isGlobalSettingsSelected={showGlobalSettings}
+          onSelectGlobalSettings={() => {
+            setShowGlobalSettings(true);
             setSelectedColumnIds([]);
             setActiveColumnId(null);
           }}

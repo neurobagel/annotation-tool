@@ -15,8 +15,8 @@ interface SideColumnNavBarProps extends ValueAnnotationNavData {
     dataType?: 'Categorical' | 'Continuous' | null;
   }) => void;
   selectedColumnId: string | null;
-  isGlobalMissingValuesSelected?: boolean;
-  onSelectGlobalMissingValues?: () => void;
+  isGlobalSettingsSelected?: boolean;
+  onSelectGlobalSettings?: () => void;
 }
 
 function AnnotatedColumnGroupCollapse({
@@ -73,8 +73,8 @@ function SideColumnNavBar({
   unannotatedGroups,
   onSelect,
   selectedColumnId,
-  isGlobalMissingValuesSelected = false,
-  onSelectGlobalMissingValues,
+  isGlobalSettingsSelected = false,
+  onSelectGlobalSettings,
 }: SideColumnNavBarProps) {
   return (
     <Paper
@@ -82,10 +82,7 @@ function SideColumnNavBar({
       elevation={3}
       data-cy="side-column-nav-bar"
     >
-      <GlobalSettingsNav
-        isSelected={isGlobalMissingValuesSelected}
-        onSelect={onSelectGlobalMissingValues!}
-      />
+      <GlobalSettingsNav isSelected={isGlobalSettingsSelected} onSelect={onSelectGlobalSettings!} />
 
       <ExpandableSection title="annotated">
         <List>

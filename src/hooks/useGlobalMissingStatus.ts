@@ -1,16 +1,13 @@
 import { useState, useMemo } from 'react';
-import {
-  useColumns,
-  useGlobalMissingValues as useStoredGlobalMissingValues,
-  useDataActions,
-} from '../stores/data';
+import { useColumns, useDataActions } from '../stores/data';
+import { GlobalMissingValue } from '../utils/internal_types';
 
 export const COMMON_MISSING_VALUES = ['N/A', 'NA', 'NaN', 'null', '-999', 'Unknown', 'Missing', ''];
 
-export function useGlobalMissingValues() {
-  const missingValues = useStoredGlobalMissingValues();
+export function useGlobalMissingStatus() {
+  const [missingValues, setMissingValues] = useState<GlobalMissingValue[]>([]);
   const columns = useColumns();
-  const { userUpdatesGlobalMissingValue } = useDataActions();
+  const { userAppliesGlobalMissingStatus, userRemovesGlobalMissingStatus } = useDataActions();
 
   const [inputValue, setInputValue] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -41,18 +38,31 @@ export function useGlobalMissingValues() {
 
       setError(null);
       if (!missingValues.some((mv) => mv.value === value)) {
-        userUpdatesGlobalMissingValue(value, true, '');
+        setMissingValues((prev) => [...prev, { value, description: '' }]);
       }
       setInputValue('');
     }
   };
 
   const handleRemove = (valueToRemove: string) => {
-    userUpdatesGlobalMissingValue(valueToRemove, false);
+    setMissingValues((prev) => prev.filter((mv) => mv.value !== valueToRemove));
   };
 
   const handleUpdateDescription = (value: string, description: string) => {
-    userUpdatesGlobalMissingValue(value, true, description);
+    setMissingValues((prev) =>
+      prev.map((mv) => (mv.value === value ? { ...mv, description } : mv))
+    );
+  };
+
+  const handleApplyToAll = (value: string) => {
+    const stagedValue = missingValues.find((mv) => mv.value === value);
+    if (stagedValue) {
+      userAppliesGlobalMissingStatus([stagedValue]);
+    }
+  };
+
+  const handleRemoveFromColumns = (value: string) => {
+    userRemovesGlobalMissingStatus(value);
   };
 
   return {
@@ -65,5 +75,7 @@ export function useGlobalMissingValues() {
     handleAdd,
     handleRemove,
     handleUpdateDescription,
+    handleApplyToAll,
+    handleRemoveFromColumns,
   };
 }

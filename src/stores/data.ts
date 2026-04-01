@@ -33,7 +33,6 @@ const initialState = {
     fileName: '',
     dataDictionary: {},
   },
-  globalMissingValues: [],
 };
 
 const useDataStore = create<DataStore>()((set, get) => ({
@@ -385,56 +384,49 @@ const useDataStore = create<DataStore>()((set, get) => ({
         }),
       }));
     },
+    userAppliesGlobalMissingStatus(valuesToApply) {
+      const state = get();
 
-    userUpdatesGlobalMissingValue(value, isMissing, description = '') {
-      set((state) => ({
-        globalMissingValues: produce(state.globalMissingValues, (draft) => {
-          if (isMissing) {
-            const existing = draft.find((v) => v.value === value);
-            if (existing) {
-              // If previously set missing globally, update its description
-              existing.description = description;
-            } else {
-              // Otherwise append new global missing value
-              draft.push({ value, description });
-            }
-          } else {
-            // Remove from global missing values
-            const idx = draft.findIndex((v) => v.value === value);
-            if (idx !== -1) {
-              draft.splice(idx, 1);
-            }
-          }
-        }),
-
-        // Update columns
+      set(() => ({
         columns: produce(state.columns, (draft) => {
           Object.keys(draft).forEach((colId) => {
             const column = draft[colId];
+            if (!column) return;
 
-            // Only update columns that have this value
-            if (column && column.allValues.includes(value)) {
-              const existingMissingValues = column.missingValues ?? [];
+            valuesToApply.forEach(({ value, description }) => {
+              if (column.allValues.includes(value)) {
+                const existingMissingValues = column.missingValues ?? [];
+                column.missingValues = Array.from(new Set([...existingMissingValues, value]));
 
-              // Prevent duplicate missing values
-              const updatedMissingValues = isMissing
-                ? Array.from(new Set([...existingMissingValues, value]))
-                : existingMissingValues.filter((missingValue) => missingValue !== value);
+                // For categorical columns, manage description and standardized term in level fields
+                if (column.dataType === DataType.categorical && column.levels) {
+                  if (column.levels[value]) {
+                    // Remove standardized term when marked as missing
+                    column.levels[value].standardizedTerm = '';
 
-              column.missingValues = updatedMissingValues;
-
-              // For categorical columns, manage description and standardized term in level fields
-              if (column.dataType === DataType.categorical && column.levels) {
-                if (isMissing && column.levels[value]) {
-                  // Remove standardized term when marked as missing
-                  column.levels[value].standardizedTerm = '';
-
-                  // Only overwrite local descriptions if a global one was provided
-                  if (description) {
-                    column.levels[value].description = description;
+                    // Only overwrite local descriptions if a global one was provided
+                    if (description) {
+                      column.levels[value].description = description;
+                    }
                   }
                 }
               }
+            });
+          });
+        }),
+      }));
+    },
+
+    userRemovesGlobalMissingStatus(valueToRemove) {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          Object.keys(draft).forEach((colId) => {
+            const column = draft[colId];
+            if (!column) return;
+
+            if (column.allValues.includes(valueToRemove)) {
+              const existingMissingValues = column.missingValues ?? [];
+              column.missingValues = existingMissingValues.filter((mv) => mv !== valueToRemove);
             }
           });
         }),
@@ -465,7 +457,6 @@ const useDataStore = create<DataStore>()((set, get) => ({
 }));
 
 export const useColumns = () => useDataStore((state) => state.columns);
-export const useGlobalMissingValues = () => useDataStore((state) => state.globalMissingValues);
 export const useStandardizedVariables = () => useDataStore((state) => state.standardizedVariables);
 export const useStandardizedTerms = () => useDataStore((state) => state.standardizedTerms);
 export const useStandardizedFormats = () => useDataStore((state) => state.standardizedFormats);
