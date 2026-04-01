@@ -5,7 +5,7 @@ import {
   useDataActions,
 } from '../stores/data';
 
-export const COMMON_MISSING_VALUES = ['N/A', 'NA', 'NaN', 'null', '-999', 'Unknown', 'Missing'];
+export const COMMON_MISSING_VALUES = ['N/A', 'NA', 'NaN', 'null', '-999', 'Unknown', 'Missing', ''];
 
 export function useGlobalMissingValues() {
   const missingValues = useStoredGlobalMissingValues();
@@ -32,18 +32,16 @@ export function useGlobalMissingValues() {
   }, [allUniqueValues, missingValues]);
 
   const handleAdd = (value: string | null) => {
-    if (value && value.trim() !== '') {
-      const trimmed = value.trim();
-
+    if (value !== null) {
       // If the value doesn't exist in any of the column data, throw error.
-      if (!allUniqueValues.has(trimmed)) {
-        setError(`Value "${trimmed}" not found in dataset.`);
+      if (!allUniqueValues.has(value)) {
+        setError(`Value "${value}" not found in dataset.`);
         return;
       }
 
       setError(null);
-      if (!missingValues.some((mv) => mv.value === trimmed)) {
-        userUpdatesGlobalMissingValue(trimmed, true, '');
+      if (!missingValues.some((mv) => mv.value === value)) {
+        userUpdatesGlobalMissingValue(value, true, '');
       }
       setInputValue('');
     }
