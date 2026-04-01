@@ -1890,6 +1890,10 @@ describe('userUpdatesGlobalMissingValue', () => {
         ['1', 'A'],
         ['2', 'N/A'],
         ['N/A', 'B'],
+        ['', ''],
+        [' ', ' '],
+        ['n/a ', 'n/a '],
+        [' n/a', ' n/a'],
       ],
     });
 
@@ -1900,6 +1904,7 @@ describe('userUpdatesGlobalMissingValue', () => {
     }));
 
     await act(async () => {
+      result.current.actions.reset();
       await result.current.actions.userUploadsDataTableFile(mockTsvFile);
     });
 
@@ -2074,6 +2079,43 @@ describe('userUpdatesGlobalMissingValue', () => {
     );
 
     expect(result.current.globalMissingValues[0].description).toBe('A Broad Global Description');
+  });
+  it('should handle whitespace and empty string global missing values', async () => {
+    const result = await setupTest();
+
+    act(() => {
+      result.current.actions.userUpdatesGlobalMissingValue(' ', true, 'Whitespace Missing');
+      result.current.actions.userUpdatesGlobalMissingValue('n/a ', true, 'Trailing Space Missing');
+      result.current.actions.userUpdatesGlobalMissingValue(' n/a', true, 'Leading Space Missing');
+      result.current.actions.userUpdatesGlobalMissingValue('', true, 'Empty String Missing');
+    });
+
+    expect(result.current.globalMissingValues).toEqual([
+      { value: ' ', description: 'Whitespace Missing' },
+      { value: 'n/a ', description: 'Trailing Space Missing' },
+      { value: ' n/a', description: 'Leading Space Missing' },
+      { value: '', description: 'Empty String Missing' },
+    ]);
+
+    expect(result.current.columns['1'].missingValues).toEqual([' ', 'n/a ', ' n/a', '']);
+
+    // Verify descriptions applied correctly to the categorical levels
+    expect(result.current.columns['1'].levels?.[' '].description).toBe('Whitespace Missing');
+    expect(result.current.columns['1'].levels?.['n/a '].description).toBe('Trailing Space Missing');
+    expect(result.current.columns['1'].levels?.[' n/a'].description).toBe('Leading Space Missing');
+    expect(result.current.columns['1'].levels?.[''].description).toBe('Empty String Missing');
+
+    // Remove the whitespace missing value and verify it was removed from column 1
+    act(() => {
+      result.current.actions.userUpdatesGlobalMissingValue(' ', false);
+    });
+
+    expect(result.current.globalMissingValues).toEqual([
+      { value: 'n/a ', description: 'Trailing Space Missing' },
+      { value: ' n/a', description: 'Leading Space Missing' },
+      { value: '', description: 'Empty String Missing' },
+    ]);
+    expect(result.current.columns['1'].missingValues).toEqual(['n/a ', ' n/a', '']);
   });
 });
 
