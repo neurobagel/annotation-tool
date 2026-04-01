@@ -1,6 +1,18 @@
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Paper, Typography, TextField, Card, IconButton, Box, Chip } from '@mui/material';
-import { useGlobalMissingValues } from '../hooks/useGlobalMissingValues';
+import {
+  Paper,
+  Typography,
+  TextField,
+  Card,
+  IconButton,
+  Box,
+  Chip,
+  Button,
+  Snackbar,
+  Alert,
+} from '@mui/material';
+import { useState } from 'react';
+import { useGlobalMissingStatus } from '../hooks/useGlobalMissingStatus';
 import DescriptionEditor from './DescriptionEditor';
 
 const formatMissingValueToken = (val: string) => {
@@ -36,7 +48,19 @@ export default function GlobalMissingValues() {
     handleAdd,
     handleRemove,
     handleUpdateDescription,
-  } = useGlobalMissingValues();
+    handleApplyToAll,
+    handleRemoveFromColumns,
+  } = useGlobalMissingStatus();
+
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: 'success' | 'info';
+  }>({ open: false, message: '', severity: 'success' });
+
+  const handleCloseSnackbar = () => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  };
 
   return (
     <Paper elevation={3} className="flex h-full flex-col p-6 shadow-lg">
@@ -46,8 +70,8 @@ export default function GlobalMissingValues() {
         color="text.secondary"
         data-cy="global-missing-values-description"
       >
-        Define missing values and descriptions globally here. These descriptions will be
-        automatically applied across all columns that contain these values.
+        Stage missing values and their descriptions here. You must explicitly <b>Apply</b> them to
+        propagate these updates across all relevant columns.
       </Typography>
 
       <Box sx={{ mb: 4, mt: 2, maxWidth: 500 }}>
@@ -119,12 +143,10 @@ export default function GlobalMissingValues() {
               data-cy={`global-missing-value-card-${mv.value}`}
               sx={{ display: 'flex', alignItems: 'center', p: 1.5 }}
             >
-              <Box sx={{ flexShrink: 0, mr: 2, width: 140 }}>
-                <Typography variant="body1" sx={{ fontFamily: 'monospace', fontWeight: 'bold' }}>
-                  {formatMissingValueToken(mv.value)}
-                </Typography>
+              <Box sx={{ flexShrink: 0, width: 110 }}>
+                <Typography variant="body1">{formatMissingValueToken(mv.value)}</Typography>
               </Box>
-              <Box sx={{ flex: 1, minWidth: 0, '& .MuiTextField-root': { my: 0 } }}>
+              <Box sx={{ flex: 1, minWidth: 200, mr: 2, '& .MuiTextField-root': { my: 0 } }}>
                 <DescriptionEditor
                   description={mv.description || null}
                   columnID="global-missing-value"
@@ -134,19 +156,63 @@ export default function GlobalMissingValues() {
                   }
                 />
               </Box>
-              <IconButton
-                color="error"
-                onClick={() => handleRemove(mv.value)}
-                sx={{ ml: 1 }}
-                aria-label="delete"
-                data-cy={`global-missing-value-delete-${mv.value}`}
-              >
-                <DeleteIcon />
-              </IconButton>
+              <Box sx={{ display: 'flex', gap: 1, ml: 'auto', alignItems: 'center' }}>
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={() => {
+                    handleApplyToAll(mv.value);
+                    setSnackbar({
+                      open: true,
+                      message: 'Applied matching values to all columns!',
+                      severity: 'success',
+                    });
+                  }}
+                  data-cy={`global-missing-value-apply-${mv.value}`}
+                >
+                  Apply
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  color="error"
+                  onClick={() => {
+                    handleRemoveFromColumns(mv.value);
+                    setSnackbar({
+                      open: true,
+                      message: 'Stripped value from all columns!',
+                      severity: 'success',
+                    });
+                  }}
+                  data-cy={`global-missing-value-strip-${mv.value}`}
+                >
+                  Strip from Columns
+                </Button>
+                <IconButton
+                  color="error"
+                  onClick={() => handleRemove(mv.value)}
+                  aria-label="Remove from staging"
+                  title="Remove from staging"
+                  data-cy={`global-missing-value-delete-${mv.value}`}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
             </Card>
           ))}
         </Box>
       )}
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} variant="filled">
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Paper>
   );
 }

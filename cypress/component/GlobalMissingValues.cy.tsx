@@ -31,7 +31,9 @@ describe('GlobalMissingValues', () => {
 
   it('should render the component and show empty state', () => {
     cy.mount(<GlobalMissingValues />);
-    cy.get('[data-cy="global-missing-values-description"]').should('be.visible');
+    cy.get('[data-cy="global-missing-values-description"]')
+      .should('be.visible')
+      .and('contain', 'Stage missing values');
     cy.get('[data-cy="global-missing-values-empty-state"]').should('be.visible');
   });
 
@@ -42,7 +44,7 @@ describe('GlobalMissingValues', () => {
     cy.get('[data-cy="global-missing-value-suggested--999"]').should('be.visible');
   });
 
-  it('should add a suggested missing value to the active list', () => {
+  it('should add a suggested missing value to the staging area', () => {
     cy.mount(<GlobalMissingValues />);
     cy.get('[data-cy="global-missing-value-suggested-N/A"]').click();
 
@@ -70,28 +72,40 @@ describe('GlobalMissingValues', () => {
       .and('contain', 'not found in dataset');
   });
 
-  it('should update the description of a missing value', () => {
-    useDataStore.setState((state) => ({
-      ...state,
-      globalMissingValues: [{ value: 'N/A', description: '' }],
-    }));
-
+  it('should update the description of a staged missing value', () => {
     cy.mount(<GlobalMissingValues />);
+    cy.get('[data-cy="global-missing-value-suggested-N/A"]').click();
 
     cy.get('[data-cy="global-missing-value-N/A-description"]').type('Not Applicable');
     cy.get('[data-cy="global-missing-value-N/A-description"] textarea')
       .first()
       .should('have.value', 'Not Applicable');
   });
-  it('should delete a missing value', () => {
-    useDataStore.setState((state) => ({
-      ...state,
-      globalMissingValues: [{ value: 'N/A', description: '' }],
-    }));
 
+  it('should remove a missing value from the staging area but not trigger an apply', () => {
     cy.mount(<GlobalMissingValues />);
+    cy.get('[data-cy="global-missing-value-suggested-N/A"]').click();
+
     cy.get('[data-cy="global-missing-value-delete-N/A"]').click();
     cy.get('[data-cy="global-missing-values-empty-state"]').should('be.visible');
     cy.get('[data-cy="global-missing-value-suggested-N/A"]').should('be.visible');
+  });
+
+  it('should trigger bulk apply and show success feedback', () => {
+    cy.mount(<GlobalMissingValues />);
+    cy.get('[data-cy="global-missing-value-suggested-N/A"]').click();
+
+    cy.get('[data-cy="global-missing-value-apply-N/A"]').click();
+
+    cy.contains('Applied matching values to all columns!').should('be.visible');
+  });
+
+  it('should trigger bulk strip and show info feedback', () => {
+    cy.mount(<GlobalMissingValues />);
+    cy.get('[data-cy="global-missing-value-suggested-N/A"]').click();
+
+    cy.get('[data-cy="global-missing-value-strip-N/A"]').click();
+
+    cy.contains('Stripped value from all columns!').should('be.visible');
   });
 });
