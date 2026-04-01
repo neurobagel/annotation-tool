@@ -3,6 +3,28 @@ import { Paper, Typography, TextField, Card, IconButton, Box, Chip } from '@mui/
 import { useGlobalMissingValues } from '../hooks/useGlobalMissingValues';
 import DescriptionEditor from './DescriptionEditor';
 
+const formatMissingValueToken = (val: string) => {
+  if (val === '') {
+    return (
+      <Typography
+        component="span"
+        sx={{ fontStyle: 'italic', color: 'text.disabled', fontFamily: 'inherit' }}
+      >
+        (empty string)
+      </Typography>
+    );
+  }
+
+  if (val !== val.trim()) {
+    return (
+      <Typography component="span" sx={{ whiteSpace: 'pre', fontFamily: 'inherit' }}>
+        {`"${val}"`}
+      </Typography>
+    );
+  }
+  return val;
+};
+
 export default function GlobalMissingValues() {
   const {
     missingValues,
@@ -67,7 +89,7 @@ export default function GlobalMissingValues() {
           {availableSuggestions.map((suggestion) => (
             <Chip
               key={suggestion}
-              label={`+ ${suggestion}`}
+              label={<>+ {formatMissingValueToken(suggestion)}</>}
               onClick={() => handleAdd(suggestion)}
               color="primary"
               variant="outlined"
@@ -99,7 +121,7 @@ export default function GlobalMissingValues() {
             >
               <Box sx={{ flexShrink: 0, mr: 2, width: 140 }}>
                 <Typography variant="body1" sx={{ fontFamily: 'monospace', fontWeight: 'bold' }}>
-                  {mv.value}
+                  {formatMissingValueToken(mv.value)}
                 </Typography>
               </Box>
               <Box sx={{ flex: 1, minWidth: 0, '& .MuiTextField-root': { my: 0 } }}>

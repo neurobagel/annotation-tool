@@ -13,7 +13,7 @@ const createColumns = (): Columns => ({
   '2': {
     id: '2',
     name: 'sex',
-    allValues: ['M', 'F', 'N/A', '-999', 'missing_value'],
+    allValues: ['M', 'F', 'N/A', '-999', 'missing_value', '', ' ', '  ', 'n/a ', ' n/a'],
     dataType: DataType.categorical,
     missingValues: [],
   },
