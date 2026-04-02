@@ -117,7 +117,7 @@ describe('useGlobalMissingStatus', () => {
     });
 
     expect(result.current.error).toBeNull();
-    expect(result.current.missingValues).toEqual([{ value: 'N/A', description: '' }]);
+    expect(result.current.missingValues).toEqual([{ value: 'N/A' }]);
     expect(result.current.inputValue).toBe('');
   });
 
