@@ -404,8 +404,8 @@ const useDataStore = create<DataStore>()((set, get) => ({
                     // Remove standardized term when marked as missing
                     column.levels[value].standardizedTerm = '';
 
-                    // Only overwrite local descriptions if a global one was provided
-                    if (description) {
+                    // Overwrite local descriptions if a global one was provided or explicitly cleared
+                    if (description !== undefined) {
                       column.levels[value].description = description;
                     }
                   }

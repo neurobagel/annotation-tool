@@ -9,7 +9,7 @@ export enum View {
 
 export interface GlobalMissingValue {
   value: string;
-  description: string;
+  description?: string;
 }
 
 export type StepConfig = {

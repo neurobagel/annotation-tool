@@ -148,11 +148,11 @@ export default function GlobalMissingValues() {
               </Box>
               <Box sx={{ flex: 1, minWidth: 200, mr: 2, '& .MuiTextField-root': { my: 0 } }}>
                 <DescriptionEditor
-                  description={mv.description || null}
+                  description={mv.description ?? null}
                   columnID="global-missing-value"
                   levelValue={mv.value}
                   onDescriptionChange={(_, newDesc) =>
-                    handleUpdateDescription(mv.value, newDesc || '')
+                    handleUpdateDescription(mv.value, newDesc === null ? '' : newDesc)
                   }
                 />
               </Box>

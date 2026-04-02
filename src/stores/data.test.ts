@@ -1977,6 +1977,44 @@ describe('userAppliesGlobalMissingStatus', () => {
     expect(result.current.columns['1'].levels?.[' n/a'].description).toBe('Leading Space Missing');
     expect(result.current.columns['1'].levels?.[''].description).toBe('Empty String Missing');
   });
+
+  it('should not overwrite existing local level descriptions if description is undefined (untouched)', async () => {
+    const result = await setupTest();
+
+    // Mark a level as missing locally and give it a description
+    act(() => {
+      result.current.actions.userUpdatesColumnMissingValues('1', 'N/A', true);
+      result.current.actions.userUpdatesValueDescription('1', 'N/A', 'Specific local description');
+    });
+
+    act(() => {
+      // Pass value without description (undefined)
+      result.current.actions.userAppliesGlobalMissingStatus([{ value: 'N/A' }]);
+    });
+
+    // Verify the specific local description remains untouched
+    expect(result.current.columns['1'].levels?.['N/A'].description).toBe(
+      'Specific local description'
+    );
+  });
+
+  it('should overwrite existing local level descriptions with empty string if description is explicitly cleared', async () => {
+    const result = await setupTest();
+
+    // Mark a level as missing locally and give it a description
+    act(() => {
+      result.current.actions.userUpdatesColumnMissingValues('1', 'N/A', true);
+      result.current.actions.userUpdatesValueDescription('1', 'N/A', 'Specific local description');
+    });
+
+    act(() => {
+      // Pass value with empty string description
+      result.current.actions.userAppliesGlobalMissingStatus([{ value: 'N/A', description: '' }]);
+    });
+
+    // Verify the specific local description was successfully overwritten with an empty string
+    expect(result.current.columns['1'].levels?.['N/A'].description).toBe('');
+  });
 });
 
 describe('userRemovesGlobalMissingStatus', () => {

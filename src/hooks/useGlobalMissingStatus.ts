@@ -38,7 +38,7 @@ export function useGlobalMissingStatus() {
 
       setError(null);
       if (!missingValues.some((mv) => mv.value === value)) {
-        setMissingValues((prev) => [...prev, { value, description: '' }]);
+        setMissingValues((prev) => [...prev, { value }]);
       }
       setInputValue('');
     }
