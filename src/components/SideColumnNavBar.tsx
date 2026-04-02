@@ -1,4 +1,4 @@
-import { List, Paper, ListItem } from '@mui/material';
+import { List, Paper, ListItem, ListItemButton, ListItemText } from '@mui/material';
 import type { UnannotatedColumnGroup } from '~/hooks/useValueAnnotationColumns';
 import type {
   ValueAnnotationNavAnnotatedGroup,
@@ -7,7 +7,6 @@ import type {
 import { DataType } from '../utils/internal_types';
 import ColumnTypeCollapse from './ColumnTypeCollapse';
 import ExpandableSection from './ExpandableSection';
-import GlobalSettingsNav from './GlobalSettingsNav';
 
 interface SideColumnNavBarProps extends ValueAnnotationNavData {
   onSelect: (params: {
@@ -82,7 +81,19 @@ function SideColumnNavBar({
       elevation={3}
       data-cy="side-column-nav-bar"
     >
-      <GlobalSettingsNav isSelected={isGlobalSettingsSelected} onSelect={onSelectGlobalSettings!} />
+      <ExpandableSection title="Global Operations" defaultExpanded>
+        <List>
+          <ListItem disablePadding sx={{ paddingLeft: 2 }}>
+            <ListItemButton
+              selected={isGlobalSettingsSelected}
+              onClick={onSelectGlobalSettings}
+              sx={{ borderRadius: 1 }}
+            >
+              <ListItemText primary="Global Missing Values" />
+            </ListItemButton>
+          </ListItem>
+        </List>
+      </ExpandableSection>
 
       <ExpandableSection title="annotated">
         <List>
