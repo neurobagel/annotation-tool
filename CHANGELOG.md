@@ -1,3 +1,15 @@
+# v0.6.2 (Tue Apr 07 2026)
+
+#### 🚀 Enhancements
+
+- [ENH] Added global missing value flow [#515](https://github.com/neurobagel/annotation-tool/pull/515) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.6.1 (Fri Mar 27 2026)
 
 #### 🚀 Enhancements
