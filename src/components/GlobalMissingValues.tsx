@@ -52,9 +52,13 @@ export default function GlobalMissingValues() {
     open: boolean;
     message: string;
     severity: 'success' | 'info';
-  }>({ open: false, message: '', severity: 'success' });
+    id: number;
+  }>({ open: false, message: '', severity: 'success', id: 0 });
 
-  const handleCloseSnackbar = () => {
+  const handleCloseSnackbar = (_event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
@@ -162,6 +166,7 @@ export default function GlobalMissingValues() {
                       open: true,
                       message: 'Applied matching values to all columns!',
                       severity: 'success',
+                      id: Date.now(),
                     });
                   }}
                   data-cy={`global-missing-value-apply-${mv.value}`}
@@ -178,6 +183,7 @@ export default function GlobalMissingValues() {
                       open: true,
                       message: 'Stripped value from all columns!',
                       severity: 'success',
+                      id: Date.now(),
                     });
                   }}
                   data-cy={`global-missing-value-strip-${mv.value}`}
@@ -200,6 +206,7 @@ export default function GlobalMissingValues() {
       )}
 
       <Snackbar
+        key={snackbar.id}
         open={snackbar.open}
         autoHideDuration={4000}
         onClose={handleCloseSnackbar}
