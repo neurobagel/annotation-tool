@@ -26,15 +26,11 @@ const formatMissingValueToken = (val: string) => {
       </Typography>
     );
   }
-
-  if (val !== val.trim()) {
-    return (
-      <Typography component="span" sx={{ whiteSpace: 'pre', fontFamily: 'inherit' }}>
-        {`"${val}"`}
-      </Typography>
-    );
-  }
-  return val;
+  return (
+    <Typography component="span" sx={{ whiteSpace: 'pre', fontFamily: 'inherit' }}>
+      {`"${val}"`}
+    </Typography>
+  );
 };
 
 export default function GlobalMissingValues() {
