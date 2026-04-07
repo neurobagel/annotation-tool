@@ -14,8 +14,6 @@ interface SideColumnNavBarProps extends ValueAnnotationNavData {
     dataType?: 'Categorical' | 'Continuous' | null;
   }) => void;
   selectedColumnId: string | null;
-  isGlobalSettingsSelected?: boolean;
-  onSelectGlobalSettings?: () => void;
 }
 
 function AnnotatedColumnGroupCollapse({
@@ -72,8 +70,6 @@ function SideColumnNavBar({
   unannotatedGroups,
   onSelect,
   selectedColumnId,
-  isGlobalSettingsSelected = false,
-  onSelectGlobalSettings,
 }: SideColumnNavBarProps) {
   return (
     <Paper
@@ -85,8 +81,8 @@ function SideColumnNavBar({
         <List>
           <ListItem disablePadding sx={{ paddingLeft: 2 }}>
             <ListItemButton
-              selected={isGlobalSettingsSelected}
-              onClick={onSelectGlobalSettings}
+              selected={selectedColumnId === null}
+              onClick={() => onSelect({ columnIDs: [] })}
               sx={{ borderRadius: 1 }}
             >
               <ListItemText primary="Global Missing Values" />

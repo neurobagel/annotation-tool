@@ -20,14 +20,12 @@ function ValueAnnotation() {
   } = useDataActions();
   const [selectedColumnIds, setSelectedColumnIds] = useState<string[]>([]);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
-  const [showGlobalSettings, setShowGlobalSettings] = useState(false);
   const navData = useValueAnnotationNavData();
 
   const handleSelect = (params: {
     columnIDs: string[];
     dataType?: 'Categorical' | 'Continuous' | null;
   }) => {
-    setShowGlobalSettings(false);
     setSelectedColumnIds(params.columnIDs);
     setActiveColumnId((current) => {
       if (params.columnIDs.length === 0) {
@@ -52,20 +50,8 @@ function ValueAnnotation() {
   const activeColumn = useValueAnnotationColumn(activeColumnId);
 
   const renderContent = () => {
-    if (showGlobalSettings) {
-      return <GlobalMissingValues />;
-    }
-
     if (selectedColumnIds.length === 0) {
-      return (
-        <Paper
-          data-cy="no-column-selected"
-          elevation={3}
-          className="flex h-full items-center justify-center shadow-lg"
-        >
-          <Typography variant="h6">Please select a column to annotate values.</Typography>
-        </Paper>
-      );
+      return <GlobalMissingValues />;
     }
 
     // Multi-column measure groups intentionally lack a data type; they render as continuous by default.
@@ -137,13 +123,7 @@ function ValueAnnotation() {
           annotatedGroups={navData.annotatedGroups}
           unannotatedGroups={navData.unannotatedGroups}
           onSelect={handleSelect}
-          selectedColumnId={selectedColumnIds[0] || null}
-          isGlobalSettingsSelected={showGlobalSettings}
-          onSelectGlobalSettings={() => {
-            setShowGlobalSettings(true);
-            setSelectedColumnIds([]);
-            setActiveColumnId(null);
-          }}
+          selectedColumnId={selectedColumnIds.length === 1 ? selectedColumnIds[0] : null}
         />
         <div className="flex-1 min-w-0">{renderContent()}</div>
       </div>
