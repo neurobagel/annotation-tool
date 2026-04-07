@@ -377,19 +377,58 @@ const useDataStore = create<DataStore>()((set, get) => ({
           column.missingValues = updatedMissingValues;
 
           if (column.dataType === DataType.categorical && column.levels) {
-            if (isMissing) {
-              if (column.levels[value]) {
-                column.levels[value].standardizedTerm = '';
-              } else {
-                column.levels[value] = { description: '', standardizedTerm: '' };
-              }
-            } else if (!column.levels[value]) {
-              column.levels[value] = {
-                description: '',
-                standardizedTerm: '',
-              };
+            if (isMissing && column.levels[value]) {
+              column.levels[value].standardizedTerm = '';
             }
           }
+        }),
+      }));
+    },
+    userAppliesGlobalMissingStatus(valuesToApply) {
+      const state = get();
+
+      set(() => ({
+        columns: produce(state.columns, (draft) => {
+          Object.keys(draft).forEach((colId) => {
+            const column = draft[colId];
+            if (!column) return;
+
+            valuesToApply.forEach(({ value, description }) => {
+              if (column.allValues.includes(value)) {
+                const existingMissingValues = column.missingValues ?? [];
+                column.missingValues = Array.from(new Set([...existingMissingValues, value]));
+
+                // For categorical columns, manage description and standardized term in level fields
+                if (column.dataType === DataType.categorical && column.levels) {
+                  if (column.levels[value]) {
+                    // Remove standardized term when marked as missing
+                    column.levels[value].standardizedTerm = '';
+
+                    // Overwrite local descriptions if a global one was provided or explicitly cleared
+                    if (description !== undefined) {
+                      column.levels[value].description = description;
+                    }
+                  }
+                }
+              }
+            });
+          });
+        }),
+      }));
+    },
+
+    userRemovesGlobalMissingStatus(valueToRemove) {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          Object.keys(draft).forEach((colId) => {
+            const column = draft[colId];
+            if (!column) return;
+
+            if (column.allValues.includes(valueToRemove)) {
+              const existingMissingValues = column.missingValues ?? [];
+              column.missingValues = existingMissingValues.filter((mv) => mv !== valueToRemove);
+            }
+          });
         }),
       }));
     },

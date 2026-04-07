@@ -1,4 +1,4 @@
-import { List, Paper, ListItem } from '@mui/material';
+import { List, Paper, ListItem, ListItemButton, ListItemText } from '@mui/material';
 import type { UnannotatedColumnGroup } from '~/hooks/useValueAnnotationColumns';
 import type {
   ValueAnnotationNavAnnotatedGroup,
@@ -77,6 +77,20 @@ function SideColumnNavBar({
       elevation={3}
       data-cy="side-column-nav-bar"
     >
+      <ExpandableSection title="Global Operations" defaultExpanded>
+        <List>
+          <ListItem disablePadding sx={{ paddingLeft: 2 }}>
+            <ListItemButton
+              selected={selectedColumnId === null}
+              onClick={() => onSelect({ columnIDs: [] })}
+              sx={{ borderRadius: 1 }}
+            >
+              <ListItemText primary="Global Missing Values" />
+            </ListItemButton>
+          </ListItem>
+        </List>
+      </ExpandableSection>
+
       <ExpandableSection title="annotated">
         <List>
           {annotatedGroups.map((group) => (
