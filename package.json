@@ -28,7 +28,7 @@
     "ajv": "^8.18.0",
     "axios": "^1.13.6",
     "immer": "^10.2.0",
-    "lodash": "^4.17.23",
+    "lodash": "^4.18.1",
     "match-sorter": "^8.2.0",
     "natural-compare-lite": "^1.4.0",
     "papaparse": "^5.5.3",
