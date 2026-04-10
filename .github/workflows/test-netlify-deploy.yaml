@@ -46,3 +46,4 @@ jobs:
         env:
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_STAGING_SITE_ID }}
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          SECRETS_SCAN_OMIT_KEYS: NB_GOOGLE_APPS_SCRIPT_URL
