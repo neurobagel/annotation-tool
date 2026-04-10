@@ -38,7 +38,7 @@ jobs:
         run: npm run build
         env:
           NB_ANALYTICS: true
-          NB_DISABLE_CONFIG: false
+          # NB_DISABLE_CONFIG: false
           # NB_GOOGLE_APPS_SCRIPT_URL: ${{ secrets.NB_GOOGLE_APPS_SCRIPT_URL }}
 
       - name: Deploy to Netlify

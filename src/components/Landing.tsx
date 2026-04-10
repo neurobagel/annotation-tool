@@ -12,7 +12,7 @@ function Landing() {
         <div className="flex items-center justify-center space-x-4">
           <img src={landingEmoji} alt="Landing emoji" className="mb-6 h-24 w-24" />
           <Typography variant="h3" component="h1" className="font-bold">
-            Welcome to the Neurobagel Annotation Tool
+            Welcome to the Neurobagel Annotation Tool hello world
           </Typography>
         </div>
 
