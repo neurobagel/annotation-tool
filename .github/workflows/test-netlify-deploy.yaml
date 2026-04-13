@@ -35,22 +35,7 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: |
-          if [ -z "${{ secrets.NB_GOOGLE_APPS_SCRIPT_URL }}" ]; then
-            echo "::error::SECRET IS EMPTY"
-            exit 1
-          else
-            echo "Secret length: ${#SECRET_VAR}"
-          fi
-        env:
-          SECRET_VAR: ${{ secrets.NB_GOOGLE_APPS_SCRIPT_URL }}
-
-      - name: Compile
         run: npm run build
-        env:
-          NB_ANALYTICS: true
-          NB_DISABLE_CONFIG: false
-          NB_GOOGLE_APPS_SCRIPT_URL: ${{ secrets.NB_GOOGLE_APPS_SCRIPT_URL }}
 
       - name: Deploy to Netlify
         run: npx netlify-cli deploy --dir=dist --prod
