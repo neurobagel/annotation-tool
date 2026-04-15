@@ -22,10 +22,6 @@ const baseProps = {
 };
 
 describe('Continuous', () => {
-  // Helper function to get the value of a specific row
-  const rowValue = (rowIdx: number) =>
-    cy.get(`[data-cy="${baseProps.columnID}-continuous-table"] tbody tr:eq(${rowIdx}) td:eq(0)`);
-
   it('should render the component correctly for an annotated column', () => {
     cy.mount(
       <Continuous
@@ -44,7 +40,7 @@ describe('Continuous', () => {
       />
     );
     cy.get('[data-cy="1-description"]').should('be.visible').and('contain', 'some units');
-    cy.get('[data-cy="1-1-0-value"]').should('be.visible').and('contain', '1');
+    cy.get('[data-cy="1-1-value"]').should('be.visible').and('contain', '1');
     cy.get('[data-cy="1-3-missing-value-button-group"]').should('be.visible');
     cy.get('[data-cy="1-format-dropdown"]').should('be.visible');
   });
@@ -68,7 +64,7 @@ describe('Continuous', () => {
     cy.get('[data-cy="1-description"]').should('be.visible').and('contain', 'some units');
     cy.get('[data-cy="1-3-missing-value-button-group"]').should('not.exist');
     cy.get('[data-cy="1-format-dropdown"]').should('not.exist');
-    cy.get('[data-cy="1-continuous-table"]').should('be.visible');
+    cy.get('[data-cy="1-continuous"]').should('be.visible');
   });
   it('should fire the onUpdateUnits event handler with the appropriate payload when the description is changed', () => {
     const spy = cy.spy().as('spy');
@@ -128,99 +124,5 @@ describe('Continuous', () => {
     );
     cy.get('[data-cy="1-format-dropdown"]').type('float{downarrow}{enter}');
     cy.get('@spy').should('have.been.calledWith', '1', 'nb:FromFloat');
-  });
-  it('should sort values in natural order', () => {
-    cy.mount(
-      <Continuous
-        columnID={baseProps.columnID}
-        units={baseProps.units}
-        uniqueValues={['1', '9', '22', '19', '99', '2']}
-        missingValues={[]}
-        formatId={baseProps.formatId}
-        formatOptions={baseProps.formatOptions}
-        showMissingToggle
-        onUpdateUnits={baseProps.onUpdateUnits}
-        onToggleMissingValue={baseProps.onToggleMissingValue}
-        onUpdateFormat={baseProps.onUpdateFormat}
-      />
-    );
-
-    // Initial state: values asc
-    rowValue(0).should('contain', '1');
-    rowValue(1).should('contain', '2');
-    rowValue(2).should('contain', '9');
-    rowValue(3).should('contain', '19');
-    rowValue(4).should('contain', '22');
-    rowValue(5).should('contain', '99');
-
-    // Click value sort to desc
-    cy.get('[data-cy="1-sort-values-button"]').click();
-    rowValue(0).should('contain', '99');
-    rowValue(1).should('contain', '22');
-    rowValue(2).should('contain', '19');
-    rowValue(3).should('contain', '9');
-    rowValue(4).should('contain', '2');
-    rowValue(5).should('contain', '1');
-
-    // Click value sort back to asc
-    cy.get('[data-cy="1-sort-values-button"]').click();
-    rowValue(0).should('contain', '1');
-    rowValue(1).should('contain', '2');
-    rowValue(2).should('contain', '9');
-    rowValue(3).should('contain', '19');
-    rowValue(4).should('contain', '22');
-    rowValue(5).should('contain', '99');
-  });
-
-  it('should sort values by missing status', () => {
-    cy.mount(
-      <Continuous
-        columnID={baseProps.columnID}
-        units={baseProps.units}
-        uniqueValues={['22', '1', '19', '9', '99', '2']}
-        missingValues={['9', '22']}
-        formatId={baseProps.formatId}
-        formatOptions={baseProps.formatOptions}
-        showMissingToggle
-        onUpdateUnits={baseProps.onUpdateUnits}
-        onToggleMissingValue={baseProps.onToggleMissingValue}
-        onUpdateFormat={baseProps.onUpdateFormat}
-      />
-    );
-
-    // Initial state: sorting by value asc
-    rowValue(0).should('contain', '1');
-    rowValue(1).should('contain', '2');
-    rowValue(2).should('contain', '9');
-    rowValue(3).should('contain', '19');
-    rowValue(4).should('contain', '22');
-    rowValue(5).should('contain', '99');
-
-    // Click missing status sort - switches to missing sort asc (missing first)
-    cy.get('[data-cy="1-sort-status-button"]').click();
-    rowValue(0).should('contain', '9');
-    rowValue(1).should('contain', '22');
-    rowValue(2).should('contain', '1');
-    rowValue(3).should('contain', '2');
-    rowValue(4).should('contain', '19');
-    rowValue(5).should('contain', '99');
-
-    // Click missing status sort again to desc (non-missing)
-    cy.get('[data-cy="1-sort-status-button"]').click();
-    rowValue(0).should('contain', '1');
-    rowValue(1).should('contain', '2');
-    rowValue(2).should('contain', '19');
-    rowValue(3).should('contain', '99');
-    rowValue(4).should('contain', '9');
-    rowValue(5).should('contain', '22');
-
-    // Click value sort - switches back to value sort asc
-    cy.get('[data-cy="1-sort-values-button"]').click();
-    rowValue(0).should('contain', '1');
-    rowValue(1).should('contain', '2');
-    rowValue(2).should('contain', '9');
-    rowValue(3).should('contain', '19');
-    rowValue(4).should('contain', '22');
-    rowValue(5).should('contain', '99');
   });
 });
