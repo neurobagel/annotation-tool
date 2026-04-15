@@ -5,6 +5,7 @@ import type { ActiveValueAnnotationColumn } from '../hooks/useValueAnnotationCol
 import { DataType } from '../utils/internal_types';
 import Categorical from './Categorical';
 import Continuous from './Continuous';
+import ValueTable from './ValueTable';
 
 export type ValueAnnotationTabMetadata = ColumnMetadataSummary;
 
@@ -102,35 +103,53 @@ function ValueAnnotationTabs({
         })}
       </Tabs>
       <div className="flex-1 overflow-auto p-2">
-        {activeColumn.dataType === DataType.categorical ? (
-          <Categorical
-            columnID={activeColumn.id}
-            uniqueValues={activeColumn.uniqueValues}
-            levels={activeColumn.levels}
-            missingValues={activeColumn.missingValues}
-            termOptions={activeColumn.termOptions}
-            showStandardizedTerm={activeColumn.showStandardizedTerm}
-            showMissingToggle={activeColumn.showMissingToggle}
-            onUpdateDescription={onUpdateDescription}
-            onToggleMissingValue={onToggleMissingValue}
-            onUpdateLevelTerm={onUpdateLevelTerm}
-          />
-        ) : (
-          <Continuous
-            columnID={activeColumn.id}
-            units={activeColumn.units}
-            missingValues={activeColumn.missingValues}
-            uniqueValues={activeColumn.uniqueValues}
-            formatId={activeColumn.formatId}
-            formatOptions={activeColumn.formatOptions}
-            showFormat={activeColumn.showFormat}
-            showUnits={activeColumn.showUnits}
-            showMissingToggle={activeColumn.showMissingToggle}
-            onUpdateUnits={onUpdateUnits}
-            onToggleMissingValue={onToggleMissingValue}
-            onUpdateFormat={onUpdateFormat}
-          />
-        )}
+        {(() => {
+          switch (activeColumn.dataType) {
+            case DataType.categorical:
+              return (
+                <Categorical
+                  columnID={activeColumn.id}
+                  uniqueValues={activeColumn.uniqueValues}
+                  levels={activeColumn.levels}
+                  missingValues={activeColumn.missingValues}
+                  termOptions={activeColumn.termOptions}
+                  showStandardizedTerm={activeColumn.showStandardizedTerm}
+                  showMissingToggle={activeColumn.showMissingToggle}
+                  onUpdateDescription={onUpdateDescription}
+                  onToggleMissingValue={onToggleMissingValue}
+                  onUpdateLevelTerm={onUpdateLevelTerm}
+                />
+              );
+            case DataType.continuous:
+              return (
+                <Continuous
+                  columnID={activeColumn.id}
+                  units={activeColumn.units}
+                  missingValues={activeColumn.missingValues}
+                  uniqueValues={activeColumn.uniqueValues}
+                  formatId={activeColumn.formatId}
+                  formatOptions={activeColumn.formatOptions}
+                  showFormat={activeColumn.showFormat}
+                  showUnits={activeColumn.showUnits}
+                  showMissingToggle={activeColumn.showMissingToggle}
+                  onUpdateUnits={onUpdateUnits}
+                  onToggleMissingValue={onToggleMissingValue}
+                  onUpdateFormat={onUpdateFormat}
+                />
+              );
+            default:
+              return (
+                <ValueTable
+                  columnID={activeColumn.id}
+                  uniqueValues={activeColumn.uniqueValues}
+                  missingValues={activeColumn.missingValues}
+                  showMissingToggle={activeColumn.showMissingToggle}
+                  onToggleMissingValue={onToggleMissingValue}
+                  dataCy={`${activeColumn.id}-basic`}
+                />
+              );
+          }
+        })()}
       </div>
     </Paper>
   );
