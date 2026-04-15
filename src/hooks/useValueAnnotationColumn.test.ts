@@ -92,7 +92,7 @@ describe('useValueAnnotationColumn', () => {
     });
   });
 
-  it('defaults multi-column measure columns to continuous data type', () => {
+  it('leaves multi-column measure columns data type as null when undefined', () => {
     mockedUseColumns.mockReturnValue({
       '1': {
         id: '1',
@@ -115,8 +115,10 @@ describe('useValueAnnotationColumn', () => {
 
     const { result } = renderHook(() => useValueAnnotationColumn('1'));
 
-    expect(result.current?.dataType).toBe(DataType.continuous);
+    expect(result.current?.dataType).toBeNull();
     expect(result.current?.showStandardizedTerm).toBe(false);
+    expect(result.current?.showFormat).toBe(false);
+    expect(result.current?.showUnits).toBe(false);
   });
 
   it('hides missing values toggle when there are no unique values', () => {
