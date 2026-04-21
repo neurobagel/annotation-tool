@@ -273,8 +273,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="4-Patient-missing-value-yes"]').click();
 
     cy.get('[data-cy="side-column-nav-bar-assessment tool-select-button"]').click();
-    cy.get('[data-cy="5-continuous"]').should('be.visible');
-    cy.get('[data-cy="5-continuous-table"]').should('be.visible').and('contain.text', '110');
+    cy.get('[data-cy="5-table-container"]').should('be.visible').and('contain.text', '110');
     cy.get('[data-cy="next-button"]').click();
 
     // Download view
