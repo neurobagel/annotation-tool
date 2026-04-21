@@ -1,3 +1,15 @@
+# v0.6.3 (Mon Apr 13 2026)
+
+#### 🐛 Bug Fixes
+
+- [FIX] skip Netlify local build to preserve injected secrets [#524](https://github.com/neurobagel/annotation-tool/pull/524) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.6.2 (Tue Apr 07 2026)
 
 #### 🚀 Enhancements
