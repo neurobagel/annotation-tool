@@ -130,7 +130,6 @@ function ValueAnnotationTabs({
                   formatId={activeColumn.formatId}
                   formatOptions={activeColumn.formatOptions}
                   showFormat={activeColumn.showFormat}
-                  showUnits={activeColumn.showUnits}
                   showMissingToggle={activeColumn.showMissingToggle}
                   onUpdateUnits={onUpdateUnits}
                   onToggleMissingValue={onToggleMissingValue}

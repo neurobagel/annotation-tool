@@ -10,7 +10,7 @@ interface ContinuousProps {
   missingValues: string[];
   formatId?: string | null;
   formatOptions: FormatOption[];
-  showUnits?: boolean;
+
   showFormat?: boolean;
   showMissingToggle?: boolean;
   onUpdateUnits: (columnID: string, units: string) => void;
@@ -25,7 +25,7 @@ function Continuous({
   missingValues,
   formatId = null,
   formatOptions,
-  showUnits = true,
+
   showFormat = true,
   showMissingToggle = false,
   onUpdateUnits,
@@ -42,17 +42,15 @@ function Continuous({
       dataCy={`${columnID}-continuous`}
       rightSidebarContent={
         <>
-          {showUnits && (
-            <DescriptionEditor
-              key={`${columnID}-units`}
-              label="Units"
-              columnID={columnID}
-              description={units}
-              onDescriptionChange={(id, newUnits) => {
-                onUpdateUnits(id, newUnits || '');
-              }}
-            />
-          )}
+          <DescriptionEditor
+            key={`${columnID}-units`}
+            label="Units"
+            columnID={columnID}
+            description={units}
+            onDescriptionChange={(id, newUnits) => {
+              onUpdateUnits(id, newUnits || '');
+            }}
+          />
 
           {showFormat && (
             <Autocomplete

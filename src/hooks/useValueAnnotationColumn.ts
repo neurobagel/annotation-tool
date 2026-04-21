@@ -21,7 +21,6 @@ export interface ActiveValueAnnotationColumn {
   showStandardizedTerm: boolean;
   showMissingToggle: boolean;
   showFormat: boolean;
-  showUnits: boolean;
 }
 
 /**
@@ -58,7 +57,6 @@ export function useValueAnnotationColumn(
       termOptions.length > 0;
 
     const showFormat = dataType === DataType.continuous && formatOptions.length > 0;
-    const showUnits = dataType === DataType.continuous;
     const showMissingToggle = uniqueValues.length > 0;
 
     return {
@@ -75,7 +73,6 @@ export function useValueAnnotationColumn(
       showStandardizedTerm,
       showMissingToggle,
       showFormat,
-      showUnits,
     };
   }, [
     column,

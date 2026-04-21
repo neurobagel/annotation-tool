@@ -88,7 +88,6 @@ describe('useValueAnnotationColumn', () => {
       showStandardizedTerm: true,
       showMissingToggle: true,
       showFormat: false,
-      showUnits: false,
     });
   });
 
@@ -118,7 +117,6 @@ describe('useValueAnnotationColumn', () => {
     expect(result.current?.dataType).toBeNull();
     expect(result.current?.showStandardizedTerm).toBe(false);
     expect(result.current?.showFormat).toBe(false);
-    expect(result.current?.showUnits).toBe(false);
   });
 
   it('hides missing values toggle when there are no unique values', () => {

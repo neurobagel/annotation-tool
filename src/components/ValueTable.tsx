@@ -37,8 +37,7 @@ export default function ValueTable({
   const tableContent = (
     <TableContainer
       id={`${columnID}-table-container`}
-      className="flex-1 overflow-auto"
-      style={{ maxHeight: '500px' }}
+      className="flex-1 overflow-auto max-h-[500px]"
       data-cy={`${columnID}-table-container`}
     >
       <Table
