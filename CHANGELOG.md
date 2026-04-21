@@ -1,3 +1,19 @@
+# v0.6.4 (Tue Apr 21 2026)
+
+#### 🚀 Enhancements
+
+- [ENH] Added version string to navbar [#532](https://github.com/neurobagel/annotation-tool/pull/532) ([@rmanaem](https://github.com/rmanaem))
+
+#### 🏠 Internal
+
+- [REF] Centralize table rendering into unified `ValueTable` base component [#528](https://github.com/neurobagel/annotation-tool/pull/528) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.6.3 (Mon Apr 13 2026)
 
 #### 🐛 Bug Fixes
