@@ -106,10 +106,12 @@ function Categorical({
       extraTableHeadCells={
         <>
           <TableCell
+            component="div"
             align="left"
             sx={{
               fontWeight: 'bold',
               color: 'primary.main',
+              flexShrink: 0,
               width: showStandardizedTerm ? '40%' : '80%',
             }}
           >
@@ -117,8 +119,9 @@ function Categorical({
           </TableCell>
           {showStandardizedTerm && (
             <TableCell
+              component="div"
               align="left"
-              sx={{ fontWeight: 'bold', color: 'primary.main', width: '40%' }}
+              sx={{ fontWeight: 'bold', color: 'primary.main', flexShrink: 0, width: '40%' }}
             >
               Standardized Term
             </TableCell>
@@ -127,7 +130,11 @@ function Categorical({
       }
       renderExtraTableCells={(value) => (
         <>
-          <TableCell align="left">
+          <TableCell
+            component="div"
+            align="left"
+            sx={{ width: showStandardizedTerm ? '40%' : '80%', flexShrink: 0, overflow: 'hidden' }}
+          >
             <DescriptionEditor
               columnID={columnID}
               levelValue={value}
@@ -138,7 +145,11 @@ function Categorical({
             />
           </TableCell>
           {showStandardizedTerm && (
-            <TableCell align="left">
+            <TableCell
+              component="div"
+              align="left"
+              sx={{ width: '40%', flexShrink: 0, overflow: 'hidden' }}
+            >
               <Autocomplete
                 disabled={missingValues.includes(value)}
                 data-cy={`${columnID}-${value}-term-dropdown`}

@@ -1,8 +1,9 @@
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Table, TableBody, TableContainer, TableHead, TableRow } from '@mui/material';
 import React, { useState } from 'react';
+import { List, useDynamicRowHeight } from 'react-window';
 import { useSortedValues } from '../hooks/useSortedValues';
-import MissingValueGroupButton from './MissingValueGroupButton';
 import SortCell from './SortCell';
+import ValueTableRow from './ValueTableRow';
 
 interface ValueTableProps {
   columnID: string;
@@ -34,20 +35,24 @@ export default function ValueTable({
 
   const { visibleValues } = useSortedValues(uniqueValues, missingValues, sortBy, sortDir);
 
+  const dynamicRowHeight = useDynamicRowHeight({ defaultRowHeight: 73 });
+
   const tableContent = (
     <TableContainer
       id={`${columnID}-table-container`}
-      className="flex-1 overflow-auto max-h-[500px]"
+      className="flex-1 overflow-hidden"
       data-cy={`${columnID}-table-container`}
+      component="div"
     >
       <Table
         stickyHeader
-        className={tableClassName}
+        className={`${tableClassName} h-full flex flex-col`}
         sx={{ tableLayout: 'fixed' }}
         data-cy={`${columnID}-value-table-element`}
+        component="div"
       >
-        <TableHead data-cy={`${columnID}-value-table-head`}>
-          <TableRow className="bg-blue-50">
+        <TableHead data-cy={`${columnID}-value-table-head`} component="div">
+          <TableRow className="bg-blue-50" component="div" sx={{ display: 'flex', width: '100%' }}>
             <SortCell
               label="Value"
               sortDir={sortDir}
@@ -61,7 +66,8 @@ export default function ValueTable({
               }}
               isActive={sortBy === 'value'}
               dataCy={`${columnID}-sort-values-button`}
-              width="20%"
+              component="div"
+              width={extraTableHeadCells ? '20%' : undefined}
             />
             {extraTableHeadCells}
             {showMissingToggle && (
@@ -80,29 +86,27 @@ export default function ValueTable({
                 dataCy={`${columnID}-sort-status-button`}
                 align="center"
                 width="20%"
+                component="div"
               />
             )}
           </TableRow>
         </TableHead>
-        <TableBody>
-          {visibleValues.map((value, index) => (
-            <TableRow key={`${columnID}-${value}`} data-cy={`${columnID}-${value}`}>
-              <TableCell align="left" data-cy={`${columnID}-${value}-value`}>
-                {value}
-              </TableCell>
-              {renderExtraTableCells && renderExtraTableCells(value, index)}
-              {showMissingToggle && onToggleMissingValue && (
-                <TableCell align="center">
-                  <MissingValueGroupButton
-                    value={value}
-                    columnId={columnID}
-                    missingValues={missingValues}
-                    onToggleMissingValue={onToggleMissingValue}
-                  />
-                </TableCell>
-              )}
-            </TableRow>
-          ))}
+        <TableBody component="div" className="flex-1 w-full relative overflow-hidden">
+          <List
+            rowCount={visibleValues.length}
+            rowHeight={dynamicRowHeight}
+            rowComponent={ValueTableRow}
+            rowProps={{
+              items: {
+                visibleValues,
+                columnID,
+                missingValues,
+                showMissingToggle,
+                onToggleMissingValue,
+                renderExtraTableCells,
+              },
+            }}
+          />
         </TableBody>
       </Table>
     </TableContainer>

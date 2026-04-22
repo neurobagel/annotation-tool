@@ -9,6 +9,7 @@ interface SortCellProps {
   dataCy?: string;
   isActive?: boolean;
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify';
+  component?: 'th' | 'td' | 'div';
 }
 
 function SortCell({
@@ -19,9 +20,11 @@ function SortCell({
   dataCy,
   isActive,
   align = 'left',
+  component,
 }: SortCellProps) {
   return (
     <TableCell
+      component={component}
       data-cy={dataCy}
       align={align}
       sx={{
@@ -29,6 +32,7 @@ function SortCell({
         color: 'primary.main',
         cursor: 'pointer',
         width: width ?? undefined,
+        flex: width ? 'none' : 1,
       }}
       onClick={onToggle}
     >
