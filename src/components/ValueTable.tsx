@@ -10,6 +10,7 @@ interface ValueTableProps {
   uniqueValues: string[];
   missingValues: string[];
   showMissingToggle?: boolean;
+  gridTemplateColumns?: string;
   onToggleMissingValue?: (columnId: string, value: string, isMissing: boolean) => void;
   extraTableHeadCells?: React.ReactNode;
   renderExtraTableCells?: (value: string, index: number) => React.ReactNode;
@@ -29,6 +30,7 @@ export default function ValueTable({
   rightSidebarContent,
   dataCy,
   tableClassName = 'min-w-[768px]',
+  gridTemplateColumns = '1.5fr 2.5fr',
 }: ValueTableProps) {
   const [sortBy, setSortBy] = useState<'value' | 'missing'>('value');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
@@ -36,11 +38,6 @@ export default function ValueTable({
   const { visibleValues } = useSortedValues(uniqueValues, missingValues, sortBy, sortDir);
 
   const dynamicRowHeight = useDynamicRowHeight({ defaultRowHeight: 73 });
-
-  let valueWidth: string | undefined;
-  if (extraTableHeadCells) {
-    valueWidth = showMissingToggle ? '15%' : '20%';
-  }
 
   const tableContent = (
     <TableContainer
@@ -57,7 +54,11 @@ export default function ValueTable({
         component="div"
       >
         <TableHead data-cy={`${columnID}-value-table-head`} component="div">
-          <TableRow className="bg-blue-50" component="div" sx={{ display: 'flex', width: '100%' }}>
+          <TableRow
+            className="bg-blue-50"
+            component="div"
+            sx={{ display: 'grid', gridTemplateColumns, width: '100%' }}
+          >
             <SortCell
               label="Value"
               sortDir={sortDir}
@@ -72,7 +73,6 @@ export default function ValueTable({
               isActive={sortBy === 'value'}
               dataCy={`${columnID}-sort-values-button`}
               component="div"
-              width={valueWidth}
             />
             {extraTableHeadCells}
             {showMissingToggle && (
@@ -90,7 +90,6 @@ export default function ValueTable({
                 isActive={sortBy === 'missing'}
                 dataCy={`${columnID}-sort-status-button`}
                 align="center"
-                width={extraTableHeadCells ? '25%' : '35%'}
                 component="div"
               />
             )}
@@ -109,6 +108,7 @@ export default function ValueTable({
                 showMissingToggle,
                 onToggleMissingValue,
                 renderExtraTableCells,
+                gridTemplateColumns,
               },
             }}
           />

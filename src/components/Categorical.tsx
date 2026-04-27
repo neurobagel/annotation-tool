@@ -95,12 +95,13 @@ function Categorical({
       baseSort: (a, b) => a.index - b.index,
     });
 
-  let descWidth = '80%';
-  if (showStandardizedTerm) {
-    descWidth = showMissingToggle ? '30%' : '40%';
-  } else if (showMissingToggle) {
-    descWidth = '60%';
-  }
+  const gridTemplate = [
+    showMissingToggle ? '15%' : '20%',
+    showStandardizedTerm ? '1fr 1fr' : '1fr',
+    showMissingToggle ? '25%' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <ValueTable
@@ -110,6 +111,7 @@ function Categorical({
       showMissingToggle={showMissingToggle}
       onToggleMissingValue={onToggleMissingValue}
       dataCy={`${columnID}-categorical`}
+      gridTemplateColumns={gridTemplate}
       extraTableHeadCells={
         <>
           <TableCell
@@ -119,7 +121,6 @@ function Categorical({
               fontWeight: 'bold',
               color: 'primary.main',
               flexShrink: 0,
-              width: descWidth,
             }}
           >
             Description
@@ -132,7 +133,6 @@ function Categorical({
                 fontWeight: 'bold',
                 color: 'primary.main',
                 flexShrink: 0,
-                width: showMissingToggle ? '30%' : '40%',
               }}
             >
               Standardized Term
@@ -146,7 +146,6 @@ function Categorical({
             component="div"
             align="left"
             sx={{
-              width: descWidth,
               flexShrink: 0,
               overflow: 'hidden',
             }}
@@ -161,11 +160,7 @@ function Categorical({
             />
           </TableCell>
           {showStandardizedTerm && (
-            <TableCell
-              component="div"
-              align="left"
-              sx={{ width: showMissingToggle ? '30%' : '40%', flexShrink: 0, overflow: 'hidden' }}
-            >
+            <TableCell component="div" align="left" sx={{ flexShrink: 0, overflow: 'hidden' }}>
               <Autocomplete
                 disabled={missingValues.includes(value)}
                 data-cy={`${columnID}-${value}-term-dropdown`}

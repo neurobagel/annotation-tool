@@ -10,6 +10,7 @@ export interface ValueTableRowData {
   showMissingToggle: boolean;
   onToggleMissingValue?: (columnId: string, value: string, isMissing: boolean) => void;
   renderExtraTableCells?: (value: string, index: number) => React.ReactNode;
+  gridTemplateColumns?: string;
 }
 
 export default function ValueTableRow({
@@ -24,13 +25,9 @@ export default function ValueTableRow({
     showMissingToggle,
     onToggleMissingValue,
     renderExtraTableCells,
+    gridTemplateColumns = '1.5fr 2.5fr',
   } = items;
   const value = visibleValues[index];
-
-  let valueWidth: string | undefined;
-  if (renderExtraTableCells) {
-    valueWidth = showMissingToggle ? '15%' : '20%';
-  }
 
   return (
     <TableRow
@@ -39,7 +36,8 @@ export default function ValueTableRow({
       data-cy={`${columnID}-${value}`}
       style={style}
       sx={{
-        display: 'flex',
+        display: 'grid',
+        gridTemplateColumns,
         width: '100%',
         alignItems: 'center',
         borderBottom: 1,
@@ -54,9 +52,6 @@ export default function ValueTableRow({
         align="left"
         data-cy={`${columnID}-${value}-value`}
         sx={{
-          flex: renderExtraTableCells ? 'none' : 1,
-          width: valueWidth,
-          flexShrink: 0,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
         }}
@@ -68,12 +63,7 @@ export default function ValueTableRow({
         <TableCell
           component="div"
           align="center"
-          sx={{
-            width: renderExtraTableCells ? '25%' : '35%',
-            flexShrink: 0,
-            display: 'flex',
-            justifyContent: 'center',
-          }}
+          sx={{ display: 'flex', justifyContent: 'center' }}
         >
           <MissingValueGroupButton
             value={value}
