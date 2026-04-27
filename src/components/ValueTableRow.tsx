@@ -27,13 +27,27 @@ export default function ValueTableRow({
   } = items;
   const value = visibleValues[index];
 
+  let valueWidth: string | undefined;
+  if (renderExtraTableCells) {
+    valueWidth = showMissingToggle ? '15%' : '20%';
+  }
+
   return (
     <TableRow
       component="div"
       key={`${columnID}-${value}`}
       data-cy={`${columnID}-${value}`}
       style={style}
-      sx={{ display: 'flex', width: '100%', alignItems: 'center' }}
+      sx={{
+        display: 'flex',
+        width: '100%',
+        alignItems: 'center',
+        borderBottom: 1,
+        borderColor: 'divider',
+        '& .MuiTableCell-root': {
+          borderBottom: 'none',
+        },
+      }}
     >
       <TableCell
         component="div"
@@ -41,7 +55,7 @@ export default function ValueTableRow({
         data-cy={`${columnID}-${value}-value`}
         sx={{
           flex: renderExtraTableCells ? 'none' : 1,
-          width: renderExtraTableCells ? '20%' : undefined,
+          width: valueWidth,
           flexShrink: 0,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -54,7 +68,12 @@ export default function ValueTableRow({
         <TableCell
           component="div"
           align="center"
-          sx={{ width: '20%', flexShrink: 0, display: 'flex', justifyContent: 'center' }}
+          sx={{
+            width: renderExtraTableCells ? '25%' : '35%',
+            flexShrink: 0,
+            display: 'flex',
+            justifyContent: 'center',
+          }}
         >
           <MissingValueGroupButton
             value={value}

@@ -40,6 +40,7 @@ function Continuous({
       showMissingToggle={showMissingToggle}
       onToggleMissingValue={onToggleMissingValue}
       dataCy={`${columnID}-continuous`}
+      tableClassName="min-w-full"
       rightSidebarContent={
         <>
           <DescriptionEditor

@@ -37,10 +37,15 @@ export default function ValueTable({
 
   const dynamicRowHeight = useDynamicRowHeight({ defaultRowHeight: 73 });
 
+  let valueWidth: string | undefined;
+  if (extraTableHeadCells) {
+    valueWidth = showMissingToggle ? '15%' : '20%';
+  }
+
   const tableContent = (
     <TableContainer
       id={`${columnID}-table-container`}
-      className="flex-1 overflow-hidden"
+      className="flex-1 overflow-x-auto overflow-y-hidden"
       data-cy={`${columnID}-table-container`}
       component="div"
     >
@@ -67,7 +72,7 @@ export default function ValueTable({
               isActive={sortBy === 'value'}
               dataCy={`${columnID}-sort-values-button`}
               component="div"
-              width={extraTableHeadCells ? '20%' : undefined}
+              width={valueWidth}
             />
             {extraTableHeadCells}
             {showMissingToggle && (
@@ -85,7 +90,7 @@ export default function ValueTable({
                 isActive={sortBy === 'missing'}
                 dataCy={`${columnID}-sort-status-button`}
                 align="center"
-                width="20%"
+                width={extraTableHeadCells ? '25%' : '35%'}
                 component="div"
               />
             )}

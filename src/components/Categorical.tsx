@@ -95,6 +95,13 @@ function Categorical({
       baseSort: (a, b) => a.index - b.index,
     });
 
+  let descWidth = '80%';
+  if (showStandardizedTerm) {
+    descWidth = showMissingToggle ? '30%' : '40%';
+  } else if (showMissingToggle) {
+    descWidth = '60%';
+  }
+
   return (
     <ValueTable
       columnID={columnID}
@@ -112,7 +119,7 @@ function Categorical({
               fontWeight: 'bold',
               color: 'primary.main',
               flexShrink: 0,
-              width: showStandardizedTerm ? '40%' : '80%',
+              width: descWidth,
             }}
           >
             Description
@@ -121,7 +128,12 @@ function Categorical({
             <TableCell
               component="div"
               align="left"
-              sx={{ fontWeight: 'bold', color: 'primary.main', flexShrink: 0, width: '40%' }}
+              sx={{
+                fontWeight: 'bold',
+                color: 'primary.main',
+                flexShrink: 0,
+                width: showMissingToggle ? '30%' : '40%',
+              }}
             >
               Standardized Term
             </TableCell>
@@ -133,7 +145,11 @@ function Categorical({
           <TableCell
             component="div"
             align="left"
-            sx={{ width: showStandardizedTerm ? '40%' : '80%', flexShrink: 0, overflow: 'hidden' }}
+            sx={{
+              width: descWidth,
+              flexShrink: 0,
+              overflow: 'hidden',
+            }}
           >
             <DescriptionEditor
               columnID={columnID}
@@ -148,7 +164,7 @@ function Categorical({
             <TableCell
               component="div"
               align="left"
-              sx={{ width: '40%', flexShrink: 0, overflow: 'hidden' }}
+              sx={{ width: showMissingToggle ? '30%' : '40%', flexShrink: 0, overflow: 'hidden' }}
             >
               <Autocomplete
                 disabled={missingValues.includes(value)}
