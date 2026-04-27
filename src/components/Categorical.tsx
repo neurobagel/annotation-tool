@@ -95,6 +95,14 @@ function Categorical({
       baseSort: (a, b) => a.index - b.index,
     });
 
+  const gridTemplate = [
+    showMissingToggle ? '15%' : '20%',
+    showStandardizedTerm ? '1fr 1fr' : '1fr',
+    showMissingToggle ? '25%' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
     <ValueTable
       columnID={columnID}
@@ -103,22 +111,29 @@ function Categorical({
       showMissingToggle={showMissingToggle}
       onToggleMissingValue={onToggleMissingValue}
       dataCy={`${columnID}-categorical`}
+      gridTemplateColumns={gridTemplate}
       extraTableHeadCells={
         <>
           <TableCell
+            component="div"
             align="left"
             sx={{
               fontWeight: 'bold',
               color: 'primary.main',
-              width: showStandardizedTerm ? '40%' : '80%',
+              flexShrink: 0,
             }}
           >
             Description
           </TableCell>
           {showStandardizedTerm && (
             <TableCell
+              component="div"
               align="left"
-              sx={{ fontWeight: 'bold', color: 'primary.main', width: '40%' }}
+              sx={{
+                fontWeight: 'bold',
+                color: 'primary.main',
+                flexShrink: 0,
+              }}
             >
               Standardized Term
             </TableCell>
@@ -127,7 +142,14 @@ function Categorical({
       }
       renderExtraTableCells={(value) => (
         <>
-          <TableCell align="left">
+          <TableCell
+            component="div"
+            align="left"
+            sx={{
+              flexShrink: 0,
+              overflow: 'hidden',
+            }}
+          >
             <DescriptionEditor
               columnID={columnID}
               levelValue={value}
@@ -138,7 +160,7 @@ function Categorical({
             />
           </TableCell>
           {showStandardizedTerm && (
-            <TableCell align="left">
+            <TableCell component="div" align="left" sx={{ flexShrink: 0, overflow: 'hidden' }}>
               <Autocomplete
                 disabled={missingValues.includes(value)}
                 data-cy={`${columnID}-${value}-term-dropdown`}
