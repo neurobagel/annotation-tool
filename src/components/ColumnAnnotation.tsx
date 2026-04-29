@@ -1,4 +1,5 @@
-import { Box } from '@mui/material';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { Box, Button } from '@mui/material';
 import { useMemo, useState } from 'react';
 import {
   useColumns,
@@ -6,18 +7,19 @@ import {
   useStandardizedVariables,
   useStandardizedTerms,
 } from '~/stores/data';
+import useSessionStore from '~/stores/session';
 import { useColumnCardData } from '../hooks/useColumnCardData';
 import { useMappingMetrics } from '../hooks/useMappingMetrics';
 import { useMultiSelect } from '../hooks/useMultiSelect';
 import { useSearchFilter } from '../hooks/useSearchFilter';
 import { useStandardizedVariableOptions } from '../hooks/useStandardizedVariableOptions';
-import { ColumnAnnotationInstructions } from '../utils/instructions';
 import { VariableType } from '../utils/internal_types';
 import BulkActionBar from './BulkActionBar';
 import ColumnAnnotationCard from './ColumnAnnotationCard';
-import Instruction from './Instruction';
+import ColumnAnnotationTour from './ColumnAnnotationTour';
 import SearchFilter from './SearchFilter';
 import StandardizedVariablesList from './StandardizedVariablesList';
+import VirtualColumnList from './VirtualColumnList';
 
 function ColumnAnnotation() {
   const columns = useColumns();
@@ -34,9 +36,19 @@ function ColumnAnnotation() {
   const { annotatedColumnsCount, totalColumnsCount, mappedVariableCounts, mappedTermCounts } =
     useMappingMetrics();
 
+  const { setHasSeenColumnAnnotationTour } = useSessionStore();
+
   const columnCardData = useColumnCardData(columns, standardizedVariables, standardizedTerms);
 
   const [hideAnnotated, setHideAnnotated] = useState(false);
+
+  // Find the first collection variable to highlight its specific section in the tour
+  const firstCollectionVarId = useMemo(() => {
+    const collectionVars = standardizedVariableOptions.filter(
+      (opt) => opt.variable_type === VariableType.collection
+    );
+    return collectionVars.length > 0 ? collectionVars[0].id : null;
+  }, [standardizedVariableOptions]);
 
   // Memoize the filtering logic to ensure that we only apply the .filter() operation
   // when the actual data changes OR when the 300ms debounce timer finishes, preventing
@@ -68,8 +80,6 @@ function ColumnAnnotation() {
   const { selectedIds, handleSelect, clearSelection, isSelected } =
     useMultiSelect(visibleColumnIds);
 
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-
   const handleStandardizedVariablesListItemSelect = (itemId: string | null) => {
     if (itemId && selectedIds.size > 0) {
       const stdVar = standardizedVariables[itemId];
@@ -79,11 +89,6 @@ function ColumnAnnotation() {
       } else {
         userUpdatesMultipleColumnToCollectionMappings(Array.from(selectedIds), itemId);
       }
-      setSelectedItemId(null);
-    } else {
-      // TODO: This fallback state retains the selected item ID for future feature implementation
-      // where we will support mapping an std var/term to multiple columns, which requires holding.
-      setSelectedItemId(itemId);
     }
   };
 
@@ -100,21 +105,48 @@ function ColumnAnnotation() {
     clearSelection();
   };
 
+  const handleCardSelect = (id: string, e: React.MouseEvent<HTMLDivElement>) => {
+    handleSelect(id, e.shiftKey, e.ctrlKey || e.metaKey);
+  };
+
+  const handleCardToggleCheckbox = (id: string) => {
+    handleSelect(id, false, true);
+  };
+
+  const handleClearDataType = (id: string) => {
+    userUpdatesMultipleColumnDataTypes([id], null);
+  };
+
+  const handleClearMapping = (id: string) => {
+    userUpdatesMultipleColumnStandardizedVariables([id], null);
+  };
+
   return (
     <div
       role="presentation"
       className="flex justify-center w-full h-[80vh] overflow-hidden"
       data-cy="column-annotation-container"
+      data-tour="tour-page-container"
     >
+      <ColumnAnnotationTour firstCollectionVarId={firstCollectionVarId} />
       <div className="flex w-full h-full gap-8 px-8">
         {/* Main Column Listing - Left Side */}
         <div className="flex-1 flex flex-col min-w-0 py-4">
           <div className="flex-shrink-0 flex flex-col items-start gap-4 mb-4">
-            <Instruction title="Column Annotation" className="mb-0">
-              <ColumnAnnotationInstructions />
-            </Instruction>
+            <Button
+              variant="outlined"
+              startIcon={<InfoOutlinedIcon />}
+              onClick={() => setHasSeenColumnAnnotationTour(false)}
+              className="mb-0"
+              data-cy="tour-start-button"
+            >
+              How to use this page
+            </Button>
             <div className="w-full flex flex-col xl:flex-row items-stretch xl:items-center gap-4 pb-4">
-              <div className="w-full xl:w-1/4 max-w-md flex-shrink-0">
+              <div
+                className="w-full xl:w-1/4 max-w-md flex-shrink-0"
+                data-tour="tour-search-filter"
+              >
                 <SearchFilter
                   searchTerm={searchTerm}
                   onSearchChange={setSearchTerm}
@@ -124,26 +156,28 @@ function ColumnAnnotation() {
                   filteredCount={filteredColumnCardData.length}
                 />
               </div>
-              <BulkActionBar
-                selectedCount={selectedIds.size}
-                onClearSelection={clearSelection}
-                onAssignDataType={(dataType) =>
-                  userUpdatesMultipleColumnDataTypes(Array.from(selectedIds), dataType)
-                }
-                hasMappedSelected={hasMappedSelected}
-                onClearMappings={handleClearMappings}
-                hideAnnotated={hideAnnotated}
-                onHideAnnotatedChange={setHideAnnotated}
-              />
+              <div data-tour="tour-bulk-action-bar" className="flex-1 min-w-0">
+                <BulkActionBar
+                  selectedCount={selectedIds.size}
+                  onClearSelection={clearSelection}
+                  onAssignDataType={(dataType) =>
+                    userUpdatesMultipleColumnDataTypes(Array.from(selectedIds), dataType)
+                  }
+                  hasMappedSelected={hasMappedSelected}
+                  onClearMappings={handleClearMappings}
+                  hideAnnotated={hideAnnotated}
+                  onHideAnnotatedChange={setHideAnnotated}
+                />
+              </div>
             </div>
           </div>
 
           <div
-            className="flex-1 overflow-y-auto pb-4 px-2 -mx-2 w-full"
-            data-cy="scrollable-container"
+            className="flex-1 overflow-hidden flex flex-col pb-4 px-2 -mx-2 w-full"
+            data-tour="tour-column-list"
           >
-            {/* Global Header Row - Sticky */}
-            <Box className="sticky top-0 z-10 mb-4 border border-gray-200 shadow-sm rounded-t-lg backdrop-blur-sm bg-opacity-95 bg-gray-100 grid grid-cols-[6fr_1fr_3fr] gap-4 px-4 pt-3 pb-1 items-end min-w-[768px]">
+            {/* Global Header Row - Static since virtual list handles scrolling */}
+            <Box className="flex-none mb-4 border border-gray-200 shadow-sm rounded-t-lg bg-gray-100 grid grid-cols-[6fr_1fr_3fr] gap-4 px-4 pt-3 pb-1 items-end min-w-[768px]">
               <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
                 Description
               </span>
@@ -151,36 +185,40 @@ function ColumnAnnotation() {
                 Data Type
               </span>
               <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
-                Mapped Variable
+                Standardized Variable
               </span>
             </Box>
 
-            <div className="space-y-3">
+            <div className="flex-1 min-h-0 relative">
               {filteredColumnCardData.length > 0 ? (
-                filteredColumnCardData.map((columnData) => (
-                  <div key={columnData.columnId} className="w-full px-1">
-                    <ColumnAnnotationCard
-                      id={columnData.columnId}
-                      name={columnData.name}
-                      description={columnData.description}
-                      dataType={columnData.dataType}
-                      standardizedVariableId={columnData.standardizedVariableId}
-                      termLabel={columnData.termLabel}
-                      termAbbreviation={columnData.termAbbreviation}
-                      standardizedVariableOptions={standardizedVariableOptions}
-                      inferredDataTypeLabel={columnData.inferredDataTypeLabel}
-                      onDescriptionChange={userUpdatesColumnDescription}
-                      onClearDataType={(id) => userUpdatesMultipleColumnDataTypes([id], null)}
-                      onClearMapping={(id) =>
-                        userUpdatesMultipleColumnStandardizedVariables([id], null)
-                      }
-                      selected={isSelected(columnData.columnId)}
-                      onSelect={(e) =>
-                        handleSelect(columnData.columnId, e.shiftKey, e.ctrlKey || e.metaKey)
-                      }
-                    />
-                  </div>
-                ))
+                <VirtualColumnList
+                  key={`${debouncedSearchTerm}-${hideAnnotated}`}
+                  itemCount={filteredColumnCardData.length}
+                >
+                  {({ index }) => {
+                    const columnData = filteredColumnCardData[index];
+                    return (
+                      <ColumnAnnotationCard
+                        key={columnData.columnId}
+                        id={columnData.columnId}
+                        name={columnData.name}
+                        description={columnData.description}
+                        dataType={columnData.dataType}
+                        standardizedVariableId={columnData.standardizedVariableId}
+                        termLabel={columnData.termLabel}
+                        termAbbreviation={columnData.termAbbreviation}
+                        standardizedVariableOptions={standardizedVariableOptions}
+                        inferredDataTypeLabel={columnData.inferredDataTypeLabel}
+                        onDescriptionChange={userUpdatesColumnDescription}
+                        onClearDataType={handleClearDataType}
+                        onClearMapping={handleClearMapping}
+                        selected={isSelected(columnData.columnId)}
+                        onSelect={handleCardSelect}
+                        onToggleCheckbox={handleCardToggleCheckbox}
+                      />
+                    );
+                  }}
+                </VirtualColumnList>
               ) : (
                 <div className="text-center py-8 text-gray-500" data-cy="no-columns-found-message">
                   No columns found matching &quot;{debouncedSearchTerm}&quot;
@@ -190,9 +228,8 @@ function ColumnAnnotation() {
           </div>
         </div>
         {/* Standardized Variables List */}
-        <div className="py-4 h-full">
+        <div className="py-4 h-full" data-tour="tour-standardized-variables-list">
           <StandardizedVariablesList
-            selectedItemId={selectedItemId}
             onItemSelect={handleStandardizedVariablesListItemSelect}
             hasMultipleSelection={selectedIds.size > 1}
             annotatedColumnsCount={annotatedColumnsCount}

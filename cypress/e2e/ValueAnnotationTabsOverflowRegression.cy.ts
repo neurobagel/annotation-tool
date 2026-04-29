@@ -19,7 +19,11 @@ describe('Value Annotation Tabs Overflow Regression', () => {
     cy.get('[data-cy="next-button"]').click();
 
     // Bulk annotate many columns as "About" an assessment tool term
+    // Scroll down to make the cards visible since we use a virtual list
+    cy.get('[data-cy="virtual-column-list"] > div').scrollTo(0, 9 * 160);
     cy.get('[data-cy="9-column-annotation-card"]').click();
+    cy.get('[data-cy="virtual-column-list"] > div').scrollTo(0, 23 * 160);
+
     cy.get('body').type('{shift}', { release: false });
     cy.get('[data-cy="23-column-annotation-card"]').click();
     cy.get('body').type('{shift}', { release: true });

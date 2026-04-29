@@ -4,7 +4,6 @@ import CollectionItem from './CollectionItem';
 
 interface StandardizedVariablesListProps {
   onItemSelect?: (itemId: string | null) => void;
-  selectedItemId?: string | null;
   hasMultipleSelection?: boolean;
   annotatedColumnsCount: number;
   totalColumnsCount: number;
@@ -14,7 +13,6 @@ interface StandardizedVariablesListProps {
 
 function StandardizedVariablesList({
   onItemSelect,
-  selectedItemId,
   hasMultipleSelection = false,
   annotatedColumnsCount,
   totalColumnsCount,
@@ -25,7 +23,7 @@ function StandardizedVariablesList({
 
   const handleSelect = (itemId: string) => {
     if (onItemSelect) {
-      onItemSelect(itemId === selectedItemId ? null : itemId);
+      onItemSelect(itemId);
     }
   };
 
@@ -51,8 +49,6 @@ function StandardizedVariablesList({
             let itemClasses = 'px-3 py-2 rounded-md transition-colors ';
             if (isDisabled) {
               itemClasses += 'opacity-50 cursor-not-allowed bg-gray-50';
-            } else if (selectedItemId === item.id) {
-              itemClasses += 'bg-blue-100 text-blue-900 font-medium cursor-pointer';
             } else {
               itemClasses += 'hover:bg-gray-100 cursor-pointer';
             }
@@ -106,7 +102,6 @@ function StandardizedVariablesList({
               key={item.id}
               variable={item}
               onTermSelect={handleSelect}
-              selectedTermId={selectedItemId}
               hasMultipleSelection={hasMultipleSelection}
               totalCollectionMappedCount={mappedVariableCounts[item.id] || 0}
               mappedTermCounts={mappedTermCounts}
@@ -120,7 +115,6 @@ function StandardizedVariablesList({
 
 StandardizedVariablesList.defaultProps = {
   onItemSelect: undefined,
-  selectedItemId: null,
   hasMultipleSelection: false,
 };
 

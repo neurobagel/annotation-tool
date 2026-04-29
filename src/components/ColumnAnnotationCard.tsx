@@ -1,5 +1,6 @@
 import CloseIcon from '@mui/icons-material/Close';
 import { Typography, Tooltip, Box, IconButton, Checkbox } from '@mui/material';
+import React from 'react';
 import { DataType } from '~/utils/internal_types';
 import { StandardizedVariableOption } from '../hooks/useStandardizedVariableOptions';
 import DataTypeDisplay from './DataTypeDisplay';
@@ -19,7 +20,8 @@ interface ColumnAnnotationCardProps {
   onClearDataType?: (columnId: string) => void;
   onClearMapping?: (columnId: string) => void;
   selected?: boolean;
-  onSelect: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onSelect: (columnId: string, e: React.MouseEvent<HTMLDivElement>) => void;
+  onToggleCheckbox: (columnId: string, e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const defaultProps = {
@@ -43,6 +45,7 @@ function ColumnAnnotationCard({
   onClearMapping,
   selected,
   onSelect,
+  onToggleCheckbox,
 }: ColumnAnnotationCardProps) {
   const mappedStandardizedVariable =
     standardizedVariableId !== null
@@ -80,7 +83,7 @@ function ColumnAnnotationCard({
           ? 'bg-blue-50/50 border-blue-500 ring-1 ring-blue-500 shadow-md'
           : 'bg-white border-gray-200 border shadow-sm hover:shadow-md'
       }`}
-      onClick={onSelect}
+      onClick={(e) => onSelect(id, e)}
     >
       <div
         className={`w-full px-4 py-2 border-b flex items-center select-none ${
@@ -101,6 +104,11 @@ function ColumnAnnotationCard({
             disableRipple
             className="p-0.5 -ml-1 flex-shrink-0"
             data-cy={`${id}-column-annotation-card-checkbox`}
+            onChange={(e) => {
+              e.stopPropagation();
+              onToggleCheckbox(id, e);
+            }}
+            onClick={(e) => e.stopPropagation()}
           />
           <div className="flex-grow min-w-0">
             <DescriptionEditor

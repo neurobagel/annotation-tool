@@ -18,7 +18,6 @@ const getEstimatedHeight = (displayString: string) => {
 interface CollectionItemProps {
   variable: StandardizedVariableItem;
   onTermSelect: (termId: string) => void;
-  selectedTermId?: string | null;
   hasMultipleSelection?: boolean;
   totalCollectionMappedCount: number;
   mappedTermCounts: Record<string, number>;
@@ -27,7 +26,6 @@ interface CollectionItemProps {
 function CollectionItem({
   variable,
   onTermSelect,
-  selectedTermId,
   hasMultipleSelection = false,
   totalCollectionMappedCount,
   mappedTermCounts,
@@ -108,6 +106,7 @@ function CollectionItem({
         <div className="px-2 w-full">
           <div className="border rounded-md border-gray-200 overflow-hidden bg-white">
             <VirtualListbox
+              itemCount={filteredTerms.length}
               itemSize={(index) => {
                 const term = filteredTerms[index];
                 const displayString = term.abbreviation
@@ -116,21 +115,18 @@ function CollectionItem({
                 return getEstimatedHeight(displayString);
               }}
             >
-              {filteredTerms.map((term) => {
+              {({ index, style }) => {
+                const term = filteredTerms[index];
                 const displayString = term.abbreviation
                   ? `${term.abbreviation} - ${term.label}`
                   : term.label;
 
                 return (
-                  <div key={term.id}>
+                  <div key={term.id} style={style}>
                     {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus */}
                     <div
                       role="button"
-                      className={`flex items-center w-full px-3 py-2.5 cursor-pointer transition-colors ${
-                        selectedTermId === term.id
-                          ? 'bg-blue-100 text-blue-900 font-medium'
-                          : 'hover:bg-gray-100 text-gray-800'
-                      }`}
+                      className="flex items-center w-full px-3 py-2.5 cursor-pointer transition-colors hover:bg-gray-100 text-gray-800"
                       onClick={() => onTermSelect(term.id)}
                       title={displayString}
                       data-cy={`collection-term-item-${term.id}`}
@@ -154,7 +150,7 @@ function CollectionItem({
                     {term !== filteredTerms[filteredTerms.length - 1] && <Divider />}
                   </div>
                 );
-              })}
+              }}
             </VirtualListbox>
           </div>
         </div>
@@ -169,7 +165,6 @@ function CollectionItem({
 }
 
 CollectionItem.defaultProps = {
-  selectedTermId: null,
   hasMultipleSelection: false,
 };
 

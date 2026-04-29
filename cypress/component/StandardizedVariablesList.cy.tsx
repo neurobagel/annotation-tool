@@ -86,7 +86,6 @@ describe('StandardizedVariablesList', () => {
     cy.mount(
       <StandardizedVariablesList
         onItemSelect={onItemSelectSpy}
-        selectedItemId={null}
         annotatedColumnsCount={0}
         totalColumnsCount={0}
         mappedVariableCounts={{}}
@@ -99,30 +98,11 @@ describe('StandardizedVariablesList', () => {
     cy.get('@onItemSelectSpy').should('have.been.calledWith', 'term-2');
   });
 
-  it('should fire the onItemSelect event handler with the appropriate payload if the same item is selected again', () => {
-    const onItemSelectSpy = cy.spy().as('onItemSelectSpy');
-    cy.mount(
-      <StandardizedVariablesList
-        onItemSelect={onItemSelectSpy}
-        selectedItemId="term-2"
-        annotatedColumnsCount={0}
-        totalColumnsCount={0}
-        mappedVariableCounts={{}}
-        mappedTermCounts={{}}
-      />
-    );
-
-    cy.get('[data-cy="collection-term-item-term-2"]').click();
-
-    cy.get('@onItemSelectSpy').should('have.been.calledWith', null);
-  });
-
   it('should fire the onItemSelect event handler with the appropriate payload when a non-collection variable is selected', () => {
     const onItemSelectSpy = cy.spy().as('onItemSelectSpy');
     cy.mount(
       <StandardizedVariablesList
         onItemSelect={onItemSelectSpy}
-        selectedItemId={null}
         annotatedColumnsCount={0}
         totalColumnsCount={0}
         mappedVariableCounts={{}}
