@@ -106,9 +106,9 @@ describe('ValueAnnotation', () => {
 
   it('should render the component correctly', () => {
     cy.mount(<ValueAnnotation />);
-    cy.get('[data-cy="no-column-selected"]')
+    cy.get('[data-cy="global-missing-values-description"]')
       .should('be.visible')
-      .and('contain', 'Please select a column to annotate values.');
+      .and('contain', 'Stage missing values and their descriptions here.');
     cy.get('[data-cy="side-column-nav-bar-diagnosis-select-button"]').click();
     cy.get('[data-cy="4-categorical"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-assessment tool-select-button"]').click();

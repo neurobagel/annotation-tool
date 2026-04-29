@@ -1,12 +1,6 @@
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import { TableCell } from '@mui/material';
 
-const defaultProps = {
-  width: '',
-  dataCy: '',
-  isActive: false,
-};
-
 interface SortCellProps {
   label: string;
   sortDir: 'asc' | 'desc';
@@ -14,13 +8,22 @@ interface SortCellProps {
   width?: string | number;
   dataCy?: string;
   isActive?: boolean;
+  align?: 'inherit' | 'left' | 'center' | 'right' | 'justify';
 }
 
-function SortCell({ label, sortDir, onToggle, width, dataCy, isActive }: SortCellProps) {
+function SortCell({
+  label,
+  sortDir,
+  onToggle,
+  width,
+  dataCy,
+  isActive,
+  align = 'left',
+}: SortCellProps) {
   return (
     <TableCell
       data-cy={dataCy}
-      align="left"
+      align={align}
       sx={{
         fontWeight: 'bold',
         color: 'primary.main',
@@ -40,5 +43,4 @@ function SortCell({ label, sortDir, onToggle, width, dataCy, isActive }: SortCel
   );
 }
 
-SortCell.defaultProps = defaultProps;
 export default SortCell;
