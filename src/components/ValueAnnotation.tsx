@@ -5,6 +5,7 @@ import { useValueAnnotationColumn } from '../hooks/useValueAnnotationColumn';
 import { useValueAnnotationNavData } from '../hooks/useValueAnnotationNavData';
 import { useDataActions } from '../stores/data';
 import { ValueAnnotationInstructions } from '../utils/instructions';
+import GlobalMissingValues from './GlobalMissingValues';
 import Instruction from './Instruction';
 import SideColumnNavBar from './SideColumnNavBar';
 import ValueAnnotationTabs from './ValueAnnotationTabs';
@@ -50,15 +51,7 @@ function ValueAnnotation() {
 
   const renderContent = () => {
     if (selectedColumnIds.length === 0) {
-      return (
-        <Paper
-          data-cy="no-column-selected"
-          elevation={3}
-          className="flex h-full items-center justify-center shadow-lg"
-        >
-          <Typography variant="h6">Please select a column to annotate values.</Typography>
-        </Paper>
-      );
+      return <GlobalMissingValues />;
     }
 
     // Multi-column measure groups intentionally lack a data type; they render as continuous by default.
@@ -130,7 +123,7 @@ function ValueAnnotation() {
           annotatedGroups={navData.annotatedGroups}
           unannotatedGroups={navData.unannotatedGroups}
           onSelect={handleSelect}
-          selectedColumnId={selectedColumnIds[0] || null}
+          selectedColumnId={selectedColumnIds.length === 1 ? selectedColumnIds[0] : null}
         />
         <div className="flex-1 min-w-0">{renderContent()}</div>
       </div>

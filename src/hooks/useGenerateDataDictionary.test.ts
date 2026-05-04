@@ -86,6 +86,61 @@ describe('useGenerateDataDictionary', () => {
     });
   });
 
+  it('should not include missing values in Annotations.Levels but include them in BIDS Levels', () => {
+    mockedUseColumns.mockReturnValue({
+      '1': {
+        id: '1',
+        name: 'diagnosis',
+        allValues: [],
+        description: 'Diagnosis of participant',
+        dataType: DataType.categorical,
+        levels: {
+          HC: { description: 'Healthy Control', standardizedTerm: 'term:hc' },
+          PD: { description: 'Parkinsons Disease', standardizedTerm: 'term:pd' },
+          UNK: { description: 'Unknown diagnosis', standardizedTerm: '' },
+        },
+        standardizedVariable: 'nb:Diagnosis',
+        missingValues: ['UNK'],
+      },
+    });
+
+    mockedUseStandardizedVariables.mockReturnValue({
+      'nb:Diagnosis': {
+        id: 'nb:Diagnosis',
+        name: 'Diagnosis',
+      },
+    });
+
+    mockedUseStandardizedTerms.mockReturnValue({
+      'term:hc': {
+        id: 'term:hc',
+        label: 'Healthy Control',
+        standardizedVariableId: 'nb:Diagnosis',
+      },
+      'term:pd': {
+        id: 'term:pd',
+        label: 'Parkinsons Disease',
+        standardizedVariableId: 'nb:Diagnosis',
+      },
+    });
+
+    const { result } = renderHook(() => useGenerateDataDictionary());
+    const entry = result.current.diagnosis;
+
+    expect(entry.Levels).toEqual({
+      HC: { Description: 'Healthy Control', TermURL: 'term:hc' },
+      PD: { Description: 'Parkinsons Disease', TermURL: 'term:pd' },
+      UNK: { Description: 'Unknown diagnosis' },
+    });
+
+    expect(entry.Annotations?.Levels).toEqual({
+      HC: { TermURL: 'term:hc', Label: 'Healthy Control' },
+      PD: { TermURL: 'term:pd', Label: 'Parkinsons Disease' },
+    });
+
+    expect(entry.Annotations?.MissingValues).toEqual(['UNK']);
+  });
+
   it('should build dictionary entries for continuous columns with units and formats', () => {
     mockedUseColumns.mockReturnValue({
       '2': {
