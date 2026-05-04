@@ -63,14 +63,14 @@ describe('Legacy Annotation Tool Compatibility', () => {
     cy.get('[data-cy="side-column-nav-bar-age-select-button"]').click();
     cy.get('[data-cy="2-continuous"]').should('be.visible');
     cy.get('[data-cy="2-format-dropdown"] input').should('have.value', 'euro');
-    cy.get('[data-cy="2-continuous-table"]').should('be.visible').and('contain.text', 'NA');
+    cy.get('[data-cy="2-table-container"]').should('be.visible').and('contain.text', 'NA');
     cy.get('[data-cy="2-sort-status-button"]').click();
     cy.get('[data-cy="2-NA-missing-value-yes"]').should('have.class', 'Mui-selected');
 
     cy.get('[data-cy="side-column-nav-bar-sex-pheno_sex"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-sex-select-button"]').click();
     cy.get('[data-cy="3-categorical"]').should('be.visible');
-    cy.get('[data-cy="3-categorical-table"]').should('be.visible').and('contain.text', 'missing');
+    cy.get('[data-cy="3-table-container"]').should('be.visible').and('contain.text', 'missing');
     cy.get('[data-cy="3-M-term-dropdown"] input').should('have.value', 'Male');
     cy.get('[data-cy="3-F-term-dropdown"] input').should('have.value', 'Female');
     cy.get('[data-cy="3-missing-missing-value-yes"]').should('have.class', 'Mui-selected');
@@ -78,7 +78,7 @@ describe('Legacy Annotation Tool Compatibility', () => {
     cy.get('[data-cy="side-column-nav-bar-diagnosis-pheno_group"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-diagnosis-select-button"]').click();
     cy.get('[data-cy="4-categorical"]').should('be.visible');
-    cy.get('[data-cy="4-categorical-table"]').should('be.visible').and('contain.text', 'missing');
+    cy.get('[data-cy="4-table-container"]').should('be.visible').and('contain.text', 'missing');
     cy.get('[data-cy="4-PAT-term-dropdown"] input').should(
       'have.value',
       'Attention deficit hyperactivity disorder'
@@ -98,13 +98,11 @@ describe('Legacy Annotation Tool Compatibility', () => {
       '[data-cy="side-column-nav-bar-assessment tool-Montreal cognitive assessment-tool1_item2"]'
     ).should('be.visible');
     cy.get('[data-cy="5-tab"]').should('be.visible').and('contain.text', 'tool1_item1');
-    cy.get('[data-cy="5-continuous"]').should('be.visible');
-    cy.get('[data-cy="5-continuous-table"]').should('be.visible').and('contain.text', 'good');
+    cy.get('[data-cy="5-table-container"]').should('be.visible').and('contain.text', 'good');
     cy.get('[data-cy="5-missing-missing-value-yes"]').should('have.class', 'Mui-selected');
 
     cy.get('[data-cy="6-tab"]').should('be.visible').and('contain.text', 'tool1_item2').click();
-    cy.get('[data-cy="6-continuous"]').should('be.visible');
-    cy.get('[data-cy="6-continuous-table"]').should('be.visible').and('contain.text', 'far');
+    cy.get('[data-cy="6-table-container"]').should('be.visible').and('contain.text', 'far');
     cy.get('[data-cy="6-missing-missing-value-yes"]').should('have.class', 'Mui-selected');
 
     cy.get(
@@ -121,8 +119,7 @@ describe('Legacy Annotation Tool Compatibility', () => {
       '[data-cy="side-column-nav-bar-assessment tool-Unified Parkinsons disease rating scale score-tool2_item1"]'
     ).should('be.visible');
     cy.get('[data-cy="7-tab"]').should('be.visible').and('contain.text', 'tool2_item1');
-    cy.get('[data-cy="7-continuous"]').should('be.visible');
-    cy.get('[data-cy="7-continuous-table"]').should('be.visible').and('contain.text', 'hello');
+    cy.get('[data-cy="7-table-container"]').should('be.visible').and('contain.text', 'hello');
     cy.get('[data-cy="7-not completed-missing-value-yes"]').should('have.class', 'Mui-selected');
 
     cy.get('[data-cy="side-column-nav-bar-unannotated"]').click();
