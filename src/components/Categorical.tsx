@@ -95,6 +95,12 @@ function Categorical({
       baseSort: (a, b) => a.index - b.index,
     });
 
+  // Dynamically constructs the CSS grid-template-columns string for the table layout.
+  // The array elements map to the table columns in order from left to right:
+  // 1. Value Column: Takes 15% width if the missing toggle is present, otherwise 20%.
+  // 2. Middle Column(s): Description and (optionally) Standardized Term. If Standardized Term is shown,
+  //    they share the remaining space equally ('1fr 1fr'). Otherwise, Description takes all remaining space ('1fr').
+  // 3. Missing Toggle Column: Takes 25% width if shown, otherwise omitted.
   const gridTemplate = [
     showMissingToggle ? '15%' : '20%',
     showStandardizedTerm ? '1fr 1fr' : '1fr',

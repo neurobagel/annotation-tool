@@ -5,7 +5,6 @@ interface SortCellProps {
   label: string;
   sortDir: 'asc' | 'desc';
   onToggle: () => void;
-  width?: string | number;
   dataCy?: string;
   isActive?: boolean;
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify';
@@ -16,7 +15,6 @@ function SortCell({
   label,
   sortDir,
   onToggle,
-  width,
   dataCy,
   isActive,
   align = 'left',
@@ -31,8 +29,6 @@ function SortCell({
         fontWeight: 'bold',
         color: 'primary.main',
         cursor: 'pointer',
-        width: width ?? undefined,
-        flex: width ? 'none' : 1,
       }}
       onClick={onToggle}
     >
