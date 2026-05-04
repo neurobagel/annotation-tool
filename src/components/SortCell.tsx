@@ -5,30 +5,30 @@ interface SortCellProps {
   label: string;
   sortDir: 'asc' | 'desc';
   onToggle: () => void;
-  width?: string | number;
   dataCy?: string;
   isActive?: boolean;
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify';
+  component?: 'th' | 'td' | 'div';
 }
 
 function SortCell({
   label,
   sortDir,
   onToggle,
-  width,
   dataCy,
   isActive,
   align = 'left',
+  component,
 }: SortCellProps) {
   return (
     <TableCell
+      component={component}
       data-cy={dataCy}
       align={align}
       sx={{
         fontWeight: 'bold',
         color: 'primary.main',
         cursor: 'pointer',
-        width: width ?? undefined,
       }}
       onClick={onToggle}
     >
