@@ -1,7 +1,7 @@
 {
   "name": "annotation-tool",
   "private": true,
-  "version": "0.6.0",
+  "version": "0.6.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -28,7 +28,7 @@
     "ajv": "^8.18.0",
     "axios": "^1.13.6",
     "immer": "^10.2.0",
-    "lodash": "^4.17.23",
+    "lodash": "^4.18.1",
     "match-sorter": "^8.2.0",
     "natural-compare-lite": "^1.4.0",
     "papaparse": "^5.5.3",
@@ -38,7 +38,7 @@
     "react-window": "^2.2.7",
     "seedrandom": "^3.0.5",
     "use-debounce": "^10.1.0",
-    "uuid": "^11.1.0",
+    "uuid": "^14.0.0",
     "zustand": "^5.0.11"
   },
   "devDependencies": {
@@ -78,12 +78,12 @@
     "jsdom": "^25.0.1",
     "lint-staged": "^15.5.2",
     "nyc": "^17.1.0",
-    "postcss": "^8.5.6",
+    "postcss": "^8.5.12",
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^3.4.19",
     "typescript": "^5.9.3",
-    "vite": "^6.4.1",
+    "vite": "^6.4.2",
     "vite-plugin-istanbul": "^6.0.2",
     "vitest": "^3.0.9"
   },

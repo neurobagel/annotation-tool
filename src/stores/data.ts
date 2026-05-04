@@ -339,17 +339,8 @@ const useDataStore = create<DataStore>()((set, get) => ({
       set((state) => ({
         columns: produce(state.columns, (draft) => {
           const column = draft[columnID];
-          // Guard against missing columns or removed levels (e.g., toggled to missing).
-          if (!column?.levels?.[value]) {
-            return;
-          }
 
-          // Skip updates for values currently marked as missing.
-          if (column.missingValues?.includes(value)) {
-            return;
-          }
-
-          column.levels[value].description = description;
+          column.levels![value].description = description;
         }),
       }));
     },
@@ -357,11 +348,7 @@ const useDataStore = create<DataStore>()((set, get) => ({
     userUpdatesValueStandardizedTerm(columnID, value, termId) {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
-          if (!draft[columnID].levels || !draft[columnID].levels[value]) {
-            return;
-          }
-
-          draft[columnID].levels[value].standardizedTerm = termId ?? '';
+          draft[columnID].levels![value].standardizedTerm = termId ?? '';
         }),
       }));
     },
@@ -390,15 +377,58 @@ const useDataStore = create<DataStore>()((set, get) => ({
           column.missingValues = updatedMissingValues;
 
           if (column.dataType === DataType.categorical && column.levels) {
-            if (isMissing) {
-              delete column.levels[value];
-            } else if (!column.levels[value]) {
-              column.levels[value] = {
-                description: '',
-                standardizedTerm: '',
-              };
+            if (isMissing && column.levels[value]) {
+              column.levels[value].standardizedTerm = '';
             }
           }
+        }),
+      }));
+    },
+    userAppliesGlobalMissingStatus(valuesToApply) {
+      const state = get();
+
+      set(() => ({
+        columns: produce(state.columns, (draft) => {
+          Object.keys(draft).forEach((colId) => {
+            const column = draft[colId];
+            if (!column) return;
+
+            valuesToApply.forEach(({ value, description }) => {
+              if (column.allValues.includes(value)) {
+                const existingMissingValues = column.missingValues ?? [];
+                column.missingValues = Array.from(new Set([...existingMissingValues, value]));
+
+                // For categorical columns, manage description and standardized term in level fields
+                if (column.dataType === DataType.categorical && column.levels) {
+                  if (column.levels[value]) {
+                    // Remove standardized term when marked as missing
+                    column.levels[value].standardizedTerm = '';
+
+                    // Overwrite local descriptions if a global one was provided or explicitly cleared
+                    if (description !== undefined) {
+                      column.levels[value].description = description;
+                    }
+                  }
+                }
+              }
+            });
+          });
+        }),
+      }));
+    },
+
+    userRemovesGlobalMissingStatus(valueToRemove) {
+      set((state) => ({
+        columns: produce(state.columns, (draft) => {
+          Object.keys(draft).forEach((colId) => {
+            const column = draft[colId];
+            if (!column) return;
+
+            if (column.allValues.includes(valueToRemove)) {
+              const existingMissingValues = column.missingValues ?? [];
+              column.missingValues = existingMissingValues.filter((mv) => mv !== valueToRemove);
+            }
+          });
         }),
       }));
     },

@@ -41,14 +41,14 @@ jobs:
         env:
           NB_ANALYTICS: true
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: './dist'
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
   deploy-netlify:
     runs-on: ubuntu-latest
@@ -76,7 +76,7 @@ jobs:
           
 
       - name: Deploy to Netlify
-        run: npx netlify-cli deploy --dir=dist --prod
+        run: npx netlify-cli deploy --no-build --dir=dist --prod
         env:
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_PROD_SITE_ID }}
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
