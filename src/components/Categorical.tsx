@@ -95,6 +95,20 @@ function Categorical({
       baseSort: (a, b) => a.index - b.index,
     });
 
+  // Dynamically constructs the CSS grid-template-columns string for the table layout.
+  // The array elements map to the table columns in order from left to right:
+  // 1. Value Column: Takes 15% width if the missing toggle is present, otherwise 20%.
+  // 2. Middle Column(s): Description and (optionally) Standardized Term. If Standardized Term is shown,
+  //    they share the remaining space equally ('1fr 1fr'). Otherwise, Description takes all remaining space ('1fr').
+  // 3. Missing Toggle Column: Takes 25% width if shown, otherwise omitted.
+  const gridTemplate = [
+    showMissingToggle ? '15%' : '20%',
+    showStandardizedTerm ? '1fr 1fr' : '1fr',
+    showMissingToggle ? '25%' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
     <ValueTable
       columnID={columnID}
@@ -103,22 +117,29 @@ function Categorical({
       showMissingToggle={showMissingToggle}
       onToggleMissingValue={onToggleMissingValue}
       dataCy={`${columnID}-categorical`}
+      gridTemplateColumns={gridTemplate}
       extraTableHeadCells={
         <>
           <TableCell
+            component="div"
             align="left"
             sx={{
               fontWeight: 'bold',
               color: 'primary.main',
-              width: showStandardizedTerm ? '40%' : '80%',
+              flexShrink: 0,
             }}
           >
             Description
           </TableCell>
           {showStandardizedTerm && (
             <TableCell
+              component="div"
               align="left"
-              sx={{ fontWeight: 'bold', color: 'primary.main', width: '40%' }}
+              sx={{
+                fontWeight: 'bold',
+                color: 'primary.main',
+                flexShrink: 0,
+              }}
             >
               Standardized Term
             </TableCell>
@@ -127,7 +148,14 @@ function Categorical({
       }
       renderExtraTableCells={(value) => (
         <>
-          <TableCell align="left">
+          <TableCell
+            component="div"
+            align="left"
+            sx={{
+              flexShrink: 0,
+              overflow: 'hidden',
+            }}
+          >
             <DescriptionEditor
               columnID={columnID}
               levelValue={value}
@@ -138,7 +166,7 @@ function Categorical({
             />
           </TableCell>
           {showStandardizedTerm && (
-            <TableCell align="left">
+            <TableCell component="div" align="left" sx={{ flexShrink: 0, overflow: 'hidden' }}>
               <Autocomplete
                 disabled={missingValues.includes(value)}
                 data-cy={`${columnID}-${value}-term-dropdown`}

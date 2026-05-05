@@ -11,7 +11,11 @@ const props = {
 describe('ValueTable', () => {
   // Helper function to get the value of a specific row
   const rowValue = (rowIdx: number) =>
-    cy.get(`[data-cy="${props.columnID}-value-table-element"] tbody tr:eq(${rowIdx}) td:eq(0)`);
+    cy
+      .get(`[data-cy="${props.columnID}-value-table-element"] .MuiTableRow-root`)
+      .eq(rowIdx + 1)
+      .find('.MuiTableCell-root')
+      .eq(0);
 
   it('should render the component correctly', () => {
     cy.mount(
