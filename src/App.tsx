@@ -1,23 +1,18 @@
 import { useTheme } from '@mui/material/styles';
-import { useEffect } from 'react';
 import AppTitle from './components/AppTitle';
 import ColumnAnnotation from './components/ColumnAnnotation';
 import Download from './components/Download';
 import Landing from './components/Landing';
-import MultiColumnMeasures from './components/MultiColumnMeasures';
 import NavStepper from './components/NavStepper';
 import NavigationButton from './components/NavigationButton';
 import Upload from './components/Upload';
 import ValueAnnotation from './components/ValueAnnotation';
-import { useHasMultiColumnMeasures } from './hooks/useHasMultiColumnMeasures';
 import { useUploadedDataTableFileName } from './stores/data';
 import useViewStore, { getNavigationProps } from './stores/view';
 import { View } from './utils/internal_types';
 
 function App() {
   const currentView = useViewStore((state) => state.currentView);
-  const setCurrentView = useViewStore((state) => state.setCurrentView);
-  const hasMultiColumnMeasures = useHasMultiColumnMeasures();
 
   const disableUploadNextButton = useUploadedDataTableFileName() == null;
 
@@ -26,16 +21,7 @@ function App() {
 
   const disableConfig = (import.meta.env.NB_DISABLE_CONFIG ?? 'true').toLowerCase() === 'true';
 
-  const { backView, nextView, backLabel, nextLabel, className } = getNavigationProps(
-    currentView,
-    hasMultiColumnMeasures
-  );
-
-  useEffect(() => {
-    if (currentView === View.MultiColumnMeasures && !hasMultiColumnMeasures) {
-      setCurrentView(View.ColumnAnnotation);
-    }
-  }, [currentView, hasMultiColumnMeasures, setCurrentView]);
+  const { backView, nextView, backLabel, nextLabel, className } = getNavigationProps(currentView);
 
   const determineView = () => {
     switch (currentView) {
@@ -45,8 +31,7 @@ function App() {
         return <Upload disableConfig={disableConfig} />;
       case View.ColumnAnnotation:
         return <ColumnAnnotation />;
-      case View.MultiColumnMeasures:
-        return <MultiColumnMeasures />;
+
       case View.ValueAnnotation:
         return <ValueAnnotation />;
       case View.Download:

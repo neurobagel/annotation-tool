@@ -30,6 +30,7 @@ module.exports = {
   rules: {
     'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     'react/react-in-jsx-scope': 'off',
+    'react/require-default-props': 'off',
     'tsdoc/syntax': 'warn',
     // Disabling this rule allows us to use blanket exports from components
     'import/prefer-default-export': 'off',
@@ -57,5 +58,6 @@ module.exports = {
         ignorePropertyModificationsFor: ['draft'],
       },
     ],
+    'react/jsx-props-no-spreading': 'off',
   },
 };

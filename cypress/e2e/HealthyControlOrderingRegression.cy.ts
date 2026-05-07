@@ -17,9 +17,8 @@ describe('Regression tests', () => {
     cy.get('[data-cy="next-button"]').click();
 
     // Column Annotation view
-    cy.get('[data-cy="3-column-annotation-card-standardized-variable-dropdown"]').type(
-      'diagnosis{downArrow}{enter}'
-    );
+    cy.get('[data-cy="3-column-annotation-card"]').click();
+    cy.get('[data-cy="standardized-variable-item-nb:Diagnosis"]').click();
     cy.get('[data-cy="next-button"]').click();
 
     // Value Annotation view

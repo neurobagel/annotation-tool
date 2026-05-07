@@ -7,6 +7,11 @@ export enum View {
   Download = 'download',
 }
 
+export interface GlobalMissingValue {
+  value: string;
+  description?: string;
+}
+
 export type StepConfig = {
   label: string;
   view: View;
@@ -29,7 +34,7 @@ export interface DataTable {
   [key: string]: string[];
 }
 
-interface Column {
+export interface Column {
   id: string;
   name: string;
   allValues: string[]; // because we want to show the datable preview
@@ -146,11 +151,20 @@ export type DataStoreActions = {
   userUploadsDataDictionaryFile: (dataDictionaryFile: File) => Promise<void>;
   userUpdatesColumnDescription: (columnID: string, description: string | null) => void;
   userUpdatesColumnDataType: (columnID: string, dataType: DataType | null) => void;
+  userUpdatesMultipleColumnDataTypes: (columnIDs: string[], dataType: DataType | null) => void;
   userUpdatesColumnStandardizedVariable: (
     columnID: string,
     standardizedVariableId: string | null
   ) => void;
+  userUpdatesMultipleColumnStandardizedVariables: (
+    columnIDs: string[],
+    standardizedVariableId: string | null
+  ) => void;
   userUpdatesColumnToCollectionMapping: (columnID: string, termId: string | null) => void;
+  userUpdatesMultipleColumnToCollectionMappings: (
+    columnIDs: string[],
+    termId: string | null
+  ) => void;
   userCreatesCollection: (termId: string) => void;
   userDeletesCollection: (termId: string) => void;
   userUpdatesValueDescription: (columnID: string, value: string, description: string) => void;
@@ -162,9 +176,26 @@ export type DataStoreActions = {
   userUpdatesColumnUnits: (columnID: string, units: string) => void;
   userUpdatesColumnFormat: (columnID: string, formatId: string | null) => void;
   userUpdatesColumnMissingValues: (columnID: string, value: string, isMissing: boolean) => void;
+  userAppliesGlobalMissingStatus: (
+    valuesToApply: { value: string; description?: string }[]
+  ) => void;
+  userRemovesGlobalMissingStatus: (valueToRemove: string) => void;
   reset: () => void;
 };
 
 export type DataStore = DataStoreState & {
   actions: DataStoreActions;
 };
+
+export interface StandardizedTermItem {
+  id: string;
+  label: string;
+  abbreviation?: string;
+}
+
+export interface StandardizedVariableItem {
+  id: string;
+  label: string;
+  can_have_multiple_columns?: boolean;
+  terms?: StandardizedTermItem[];
+}

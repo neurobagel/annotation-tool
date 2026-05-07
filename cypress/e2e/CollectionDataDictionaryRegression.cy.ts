@@ -97,9 +97,6 @@ describe('Collection Data Dictionary Regression', () => {
     cy.get('[data-cy="5-column-annotation-card-data-type"]').should('contain', 'Cat');
     cy.get('[data-cy="next-button"]').click();
 
-    // Multi-column measure view
-    cy.get('[data-cy="next-button"]').click();
-
     // Value Annotation view: Assessment Tool columns should render as categorical with level descriptions applied
     cy.get('[data-cy="side-column-nav-bar-assessment tool-select-button"]').click();
     cy.get('[data-cy="5-tab"]').click();

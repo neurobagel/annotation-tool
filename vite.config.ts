@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react-swc';
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import istanbul from 'vite-plugin-istanbul';
+import pkg from './package.json' with { type: 'json' };
 
 const injectAnalytics = () => ({
   name: 'inject-analytics',
@@ -25,6 +26,9 @@ const injectAnalytics = () => ({
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  define: {
+    APP_VERSION: JSON.stringify(pkg.version),
+  },
   // This setting fixes the preview port to the same
   // default as the dev server port.
   // Allows cypress e2e tests to run both on dev and

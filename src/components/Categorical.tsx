@@ -1,22 +1,9 @@
-import {
-  Autocomplete,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  Tooltip,
-} from '@mui/material';
+import { Autocomplete, TableCell, TextField, Tooltip } from '@mui/material';
 import { matchSorter } from 'match-sorter';
-import { useState } from 'react';
+import React, { forwardRef } from 'react';
 import type { TermOption } from '~/hooks/useTermOptions';
-import { useSortedValues } from '../hooks/useSortedValues';
 import DescriptionEditor from './DescriptionEditor';
-import MissingValueGroupButton from './MissingValueGroupButton';
-import SortCell from './SortCell';
+import ValueTable from './ValueTable';
 import VirtualListbox from './VirtualListBox';
 
 interface CategoricalProps {
@@ -32,10 +19,60 @@ interface CategoricalProps {
   onUpdateLevelTerm: (columnId: string, value: string, termId: string | null) => void;
 }
 
-const defaultProps = {
-  showStandardizedTerm: false,
-  showMissingToggle: false,
-};
+/**
+ * Virtualized wrapper for MUI Autocomplete options to prevent React rendering bottlenecks.
+ *
+ * MUI creates React elements for all matched options upfront. This wrapper intercepts
+ * that process by taking the lightweight <li> elements and only wrapping them in
+ * expensive <Tooltip> components when they actually scroll into the visible DOM.
+ *
+ * Deferring tooltip generation drastically improves performance for thousands of options.
+ */
+const CategoricalVirtualListbox = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLElement>>(
+  (props, ref) => {
+    const { children, ...other } = props;
+    const items = React.Children.toArray(children);
+
+    return (
+      <VirtualListbox ref={ref} itemCount={items.length} {...other}>
+        {({ index, style }) => {
+          const item = items[index] as React.ReactElement<{
+            style?: React.CSSProperties;
+            'data-tooltip-title'?: string;
+            'data-tooltip-cy'?: string;
+          }>;
+          const tooltipTitle = item.props['data-tooltip-title'];
+          const tooltipCy = item.props['data-tooltip-cy'];
+
+          const clonedItem = React.cloneElement(item, {
+            style: { ...item.props.style, ...style },
+          });
+
+          if (tooltipTitle) {
+            return (
+              <Tooltip
+                title={tooltipTitle}
+                placement="right"
+                enterDelay={400}
+                arrow
+                slotProps={{
+                  tooltip: {
+                    ...({ 'data-cy': tooltipCy } as React.HTMLAttributes<HTMLDivElement>),
+                    sx: { fontSize: '16px' },
+                  },
+                }}
+              >
+                {clonedItem}
+              </Tooltip>
+            );
+          }
+
+          return clonedItem;
+        }}
+      </VirtualListbox>
+    );
+  }
+);
 
 function Categorical({
   columnID,
@@ -49,11 +86,6 @@ function Categorical({
   onToggleMissingValue,
   onUpdateLevelTerm,
 }: CategoricalProps) {
-  const [sortBy, setSortBy] = useState<'value' | 'missing'>('value');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
-
-  const { visibleValues } = useSortedValues(uniqueValues, missingValues, sortBy, sortDir);
-
   const filterOptions = (items: TermOption[], { inputValue }: { inputValue: string }) =>
     matchSorter(items, inputValue, {
       keys: [
@@ -63,157 +95,127 @@ function Categorical({
       baseSort: (a, b) => a.index - b.index,
     });
 
+  // Dynamically constructs the CSS grid-template-columns string for the table layout.
+  // The array elements map to the table columns in order from left to right:
+  // 1. Value Column: Takes 15% width if the missing toggle is present, otherwise 20%.
+  // 2. Middle Column(s): Description and (optionally) Standardized Term. If Standardized Term is shown,
+  //    they share the remaining space equally ('1fr 1fr'). Otherwise, Description takes all remaining space ('1fr').
+  // 3. Missing Toggle Column: Takes 25% width if shown, otherwise omitted.
+  const gridTemplate = [
+    showMissingToggle ? '15%' : '20%',
+    showStandardizedTerm ? '1fr 1fr' : '1fr',
+    showMissingToggle ? '25%' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
-    <TableContainer
-      id={`${columnID}-table-container`}
-      component={Paper}
-      elevation={3}
-      className="h-full shadow-lg overflow-auto"
-      style={{ maxHeight: '500px' }}
-      data-cy={`${columnID}-categorical`}
-    >
-      <Table stickyHeader className="min-w-[768px]" data-cy={`${columnID}-categorical-table`}>
-        <TableHead data-cy={`${columnID}-categorical-table-head`}>
-          <TableRow className="bg-blue-50">
-            <SortCell
-              label="Value"
-              sortDir={sortDir}
-              onToggle={() => {
-                if (sortBy === 'value') {
-                  setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
-                } else {
-                  setSortBy('value');
-                  setSortDir('asc');
-                }
+    <ValueTable
+      columnID={columnID}
+      uniqueValues={uniqueValues}
+      missingValues={missingValues}
+      showMissingToggle={showMissingToggle}
+      onToggleMissingValue={onToggleMissingValue}
+      dataCy={`${columnID}-categorical`}
+      gridTemplateColumns={gridTemplate}
+      extraTableHeadCells={
+        <>
+          <TableCell
+            component="div"
+            align="left"
+            sx={{
+              fontWeight: 'bold',
+              color: 'primary.main',
+              flexShrink: 0,
+            }}
+          >
+            Description
+          </TableCell>
+          {showStandardizedTerm && (
+            <TableCell
+              component="div"
+              align="left"
+              sx={{
+                fontWeight: 'bold',
+                color: 'primary.main',
+                flexShrink: 0,
               }}
-              isActive={sortBy === 'value'}
-              dataCy={`${columnID}-sort-values-button`}
-            />
-            <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-              Description
+            >
+              Standardized Term
             </TableCell>
-            {showStandardizedTerm && (
-              <TableCell align="left" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                Standardized Term
-              </TableCell>
-            )}
-            {showMissingToggle && (
-              <SortCell
-                label="Treat as missing value"
-                sortDir={sortDir}
-                onToggle={() => {
-                  if (sortBy === 'missing') {
-                    setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
-                  } else {
-                    setSortBy('missing');
-                    setSortDir('asc');
-                  }
+          )}
+        </>
+      }
+      renderExtraTableCells={(value) => (
+        <>
+          <TableCell
+            component="div"
+            align="left"
+            sx={{
+              flexShrink: 0,
+              overflow: 'hidden',
+            }}
+          >
+            <DescriptionEditor
+              columnID={columnID}
+              levelValue={value}
+              description={levels[value]?.description || ''}
+              onDescriptionChange={(id, description) => {
+                onUpdateDescription(id, value, description || '');
+              }}
+            />
+          </TableCell>
+          {showStandardizedTerm && (
+            <TableCell component="div" align="left" sx={{ flexShrink: 0, overflow: 'hidden' }}>
+              <Autocomplete
+                disabled={missingValues.includes(value)}
+                data-cy={`${columnID}-${value}-term-dropdown`}
+                options={termOptions}
+                getOptionLabel={(option: TermOption) =>
+                  option.abbreviation ? `${option.abbreviation} - ${option.label}` : option.label
+                }
+                value={
+                  termOptions.find((opt) => opt.id === levels[value]?.standardizedTerm) || null
+                }
+                onChange={(_, newValue) => {
+                  onUpdateLevelTerm(columnID, value, newValue?.id ?? null);
                 }}
-                isActive={sortBy === 'missing'}
-                dataCy={`${columnID}-sort-status-button`}
+                filterOptions={filterOptions}
+                renderInput={(params) => (
+                  <TextField {...params} variant="standard" size="small" fullWidth />
+                )}
+                renderOption={(optionProps, option) => {
+                  const { key, ...otherProps } = optionProps;
+                  return (
+                    <li
+                      key={option.id}
+                      {...otherProps}
+                      data-cy={`${columnID}-${value}-term-dropdown-option`}
+                      data-tooltip-title={option.label}
+                      data-tooltip-cy={`${columnID}-${value}-term-tooltip`}
+                    >
+                      <div className="w-full truncate">{option.label}</div>
+                    </li>
+                  );
+                }}
+                slotProps={{
+                  listbox: {
+                    component: CategoricalVirtualListbox,
+                  },
+                  paper: {
+                    sx: {
+                      width: 'max-content',
+                      minWidth: '500px',
+                    },
+                  },
+                }}
               />
-            )}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {visibleValues.map((value) => (
-            <TableRow key={`${columnID}-${value}`} data-cy={`${columnID}-${value}`}>
-              <TableCell align="left">{value}</TableCell>
-              <TableCell align="left">
-                <DescriptionEditor
-                  columnID={columnID}
-                  levelValue={value}
-                  description={levels[value]?.description || ''}
-                  disabled={missingValues.includes(value)}
-                  onDescriptionChange={(id, description) => {
-                    onUpdateDescription(id, value, description || '');
-                  }}
-                />
-              </TableCell>
-              {showStandardizedTerm && (
-                <TableCell align="left">
-                  <Autocomplete
-                    disabled={missingValues.includes(value)}
-                    data-cy={`${columnID}-${value}-term-dropdown`}
-                    options={termOptions}
-                    getOptionLabel={(option: TermOption) =>
-                      option.abbreviation
-                        ? `${option.abbreviation} - ${option.label}`
-                        : option.label
-                    }
-                    value={
-                      termOptions.find((opt) => opt.id === levels[value]?.standardizedTerm) || null
-                    }
-                    onChange={(_, newValue) => {
-                      onUpdateLevelTerm(columnID, value, newValue?.id ?? null);
-                    }}
-                    filterOptions={filterOptions}
-                    renderInput={(params) => (
-                      // eslint-disable-next-line react/jsx-props-no-spreading
-                      <TextField {...params} variant="standard" size="small" fullWidth />
-                    )}
-                    renderOption={(optionProps, option) => {
-                      const { key, ...otherProps } = optionProps;
-                      return (
-                        <Tooltip
-                          title={option.label}
-                          placement="right"
-                          enterDelay={400}
-                          arrow
-                          slotProps={{
-                            tooltip: {
-                              ...({
-                                'data-cy': `${columnID}-${value}-term-tooltip`,
-                              } as React.HTMLAttributes<HTMLDivElement>),
-                              sx: {
-                                fontSize: '16px',
-                              },
-                            },
-                          }}
-                        >
-                          <li
-                            key={option.id}
-                            // eslint-disable-next-line react/jsx-props-no-spreading
-                            {...otherProps}
-                            data-cy={`${columnID}-${value}-term-dropdown-option`}
-                          >
-                            <div className="w-full truncate">{option.label}</div>
-                          </li>
-                        </Tooltip>
-                      );
-                    }}
-                    slotProps={{
-                      listbox: {
-                        component: VirtualListbox,
-                      },
-                      paper: {
-                        sx: {
-                          width: 'max-content',
-                          minWidth: '500px',
-                        },
-                      },
-                    }}
-                  />
-                </TableCell>
-              )}
-              {showMissingToggle && (
-                <TableCell align="center">
-                  <MissingValueGroupButton
-                    value={value}
-                    columnId={columnID}
-                    missingValues={missingValues}
-                    onToggleMissingValue={onToggleMissingValue}
-                  />
-                </TableCell>
-              )}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+            </TableCell>
+          )}
+        </>
+      )}
+    />
   );
 }
-
-Categorical.defaultProps = defaultProps;
 
 export default Categorical;

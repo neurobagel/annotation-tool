@@ -23,40 +23,16 @@ const useViewStore = create<ViewStore>()(
   }))
 );
 
-export const getNavigationProps = (
-  currentView: View,
-  showMultiColumnMeasures: boolean
-): NavigationProps => {
+export const getNavigationProps = (currentView: View): NavigationProps => {
   const navigationFlow = [
     View.Landing,
     View.Upload,
     View.ColumnAnnotation,
-    ...(showMultiColumnMeasures ? [View.MultiColumnMeasures] : []),
     View.ValueAnnotation,
     View.Download,
   ];
 
   const currentIndex = navigationFlow.indexOf(currentView);
-
-  if (currentView === View.ColumnAnnotation && showMultiColumnMeasures) {
-    return {
-      backView: View.Upload,
-      nextView: View.MultiColumnMeasures,
-      backLabel: 'Back to Upload',
-      nextLabel: 'Next: Multi-Column Measures',
-      className: 'p-4',
-    };
-  }
-
-  if (currentView === View.ValueAnnotation && showMultiColumnMeasures) {
-    return {
-      backView: View.MultiColumnMeasures,
-      nextView: View.Download,
-      backLabel: 'Back to Multi-Column Measures',
-      nextLabel: 'Next: Download',
-      className: 'p-4',
-    };
-  }
 
   if (currentIndex === -1) {
     return {

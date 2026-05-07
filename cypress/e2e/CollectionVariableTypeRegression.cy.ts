@@ -15,19 +15,15 @@ describe('Regression tests for collection variable type', () => {
   });
   it('Maps a column to assessment tool', () => {
     // Column Annotation view
-    cy.get('[data-cy="0-column-annotation-card-standardized-variable-dropdown"]').type(
-      'assess{downArrow}{enter}'
-    );
-    cy.get('[data-cy="next-button"]').click();
-
-    // Multi-column measure view
+    cy.get('[data-cy="0-column-annotation-card"]').click();
+    cy.get('[data-cy="search-terms-input"]').type('Montreal');
+    cy.get('[data-cy^="collection-term-item-"]').first().click();
     cy.get('[data-cy="next-button"]').click();
 
     // Value Annotation view
     cy.get('[data-cy="next-button"]').click();
 
     // Download view
-    cy.get('[data-cy="force-download-switch"]').click();
     cy.get('[data-cy="download-datadictionary-button"]').click();
 
     cy.readFile('cypress/downloads/mock_annotated.json').then((fileContent) => {
@@ -39,20 +35,17 @@ describe('Regression tests for collection variable type', () => {
   });
   it('Maps a column to assessment tool and selects Continuous data type', () => {
     // Column Annotation view
-    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
-      'assess{downArrow}{enter}'
-    );
-    cy.get('[data-cy="1-column-annotation-card-data-type-continuous-button"]').click();
-    cy.get('[data-cy="next-button"]').click();
-
-    // Multi-column measure view
+    cy.get('[data-cy="1-column-annotation-card"]').click();
+    cy.get('[data-cy="search-terms-input"]').type('Montreal');
+    cy.get('[data-cy^="collection-term-item-"]').first().click();
+    cy.get('[data-cy="1-column-annotation-card"]').click();
+    cy.get('[data-cy="bulk-assign-continuous"]').click();
     cy.get('[data-cy="next-button"]').click();
 
     // Value Annotation view
     cy.get('[data-cy="next-button"]').click();
 
     // Download view
-    cy.get('[data-cy="force-download-switch"]').click();
     cy.get('[data-cy="download-datadictionary-button"]').click();
 
     cy.readFile('cypress/downloads/mock_annotated.json').then((fileContent) => {
@@ -62,13 +55,11 @@ describe('Regression tests for collection variable type', () => {
   });
   it('Maps a column to assessment tool and selects Categorical data type', () => {
     // Column Annotation view
-    cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').type(
-      'assess{downArrow}{enter}'
-    );
-    cy.get('[data-cy="2-column-annotation-card-data-type-categorical-button"]').click();
-    cy.get('[data-cy="next-button"]').click();
-
-    // Multi-column measure view
+    cy.get('[data-cy="2-column-annotation-card"]').click();
+    cy.get('[data-cy="search-terms-input"]').type('Montreal');
+    cy.get('[data-cy^="collection-term-item-"]').first().click();
+    cy.get('[data-cy="2-column-annotation-card"]').click();
+    cy.get('[data-cy="bulk-assign-categorical"]').click();
     cy.get('[data-cy="next-button"]').click();
 
     // Value Annotation view
@@ -84,7 +75,6 @@ describe('Regression tests for collection variable type', () => {
     cy.get('[data-cy="next-button"]').click();
 
     // Download view
-    cy.get('[data-cy="force-download-switch"]').click();
     cy.get('[data-cy="download-datadictionary-button"]').click();
 
     cy.readFile('cypress/downloads/mock_annotated.json').then((fileContent) => {

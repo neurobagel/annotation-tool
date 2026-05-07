@@ -30,7 +30,6 @@ const columnData: Record<string, ActiveValueAnnotationColumn> = {
     showStandardizedTerm: false,
     showMissingToggle: true,
     showFormat: true,
-    showUnits: true,
   },
   '2': {
     id: '2',
@@ -52,7 +51,6 @@ const columnData: Record<string, ActiveValueAnnotationColumn> = {
     showStandardizedTerm: true,
     showMissingToggle: true,
     showFormat: false,
-    showUnits: true,
   },
 };
 

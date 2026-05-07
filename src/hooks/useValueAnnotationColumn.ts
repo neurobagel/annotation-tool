@@ -21,7 +21,6 @@ export interface ActiveValueAnnotationColumn {
   showStandardizedTerm: boolean;
   showMissingToggle: boolean;
   showFormat: boolean;
-  showUnits: boolean;
 }
 
 /**
@@ -50,10 +49,7 @@ export function useValueAnnotationColumn(
       return null;
     }
 
-    // Multi-column measure variables (Collection) do not receive a dataType from the store.
-    // To mirror the legacy behavior (which rendered the continuous component for these groups),
-    // default them to continuous when the user hasn't manually selected a type.
-    const dataType = column.dataType ?? (isMultiColumnMeasure ? DataType.continuous : null);
+    const dataType = column.dataType ?? null;
     const showStandardizedTerm =
       dataType === DataType.categorical &&
       Boolean(standardizedVariableId) &&
@@ -61,7 +57,6 @@ export function useValueAnnotationColumn(
       termOptions.length > 0;
 
     const showFormat = dataType === DataType.continuous && formatOptions.length > 0;
-    const showUnits = dataType === DataType.continuous;
     const showMissingToggle = uniqueValues.length > 0;
 
     return {
@@ -78,7 +73,6 @@ export function useValueAnnotationColumn(
       showStandardizedTerm,
       showMissingToggle,
       showFormat,
-      showUnits,
     };
   }, [
     column,

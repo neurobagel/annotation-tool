@@ -356,6 +356,7 @@ describe('userUploadsDataDictionaryFile', () => {
       data: [
         ['sub-718211', '28.4', 'M', 'ADHD', 'HC', '80'],
         ['sub-718213', '24.6', 'F', 'ADHD', 'HC', '90'],
+        ['sub-718214', '25.0', 'N/A', 'ADHD', 'HC', '95'],
       ],
     });
 
@@ -798,7 +799,6 @@ describe('userUpdatesColumnDataType', () => {
       result.current.actions.userUpdatesColumnDataType('0', DataType.categorical);
     });
 
-    expect(result.current.columns['0'].dataType).toBe(DataType.categorical);
     expect(result.current.columns['0'].levels).toBeDefined();
 
     act(() => {
@@ -846,6 +846,115 @@ B`;
       description: '',
       standardizedTerm: '',
     });
+  });
+});
+
+describe('userUpdatesMultipleColumnDataTypes', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should set dataType for multiple columns and initialize their specific defaults', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['col0', 'col1', 'col2'],
+      data: [
+        ['A', '5', 'X'],
+        ['B', '6', 'X'],
+        ['A', '7', 'Y'],
+      ],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnDataTypes(['0', '2'], DataType.categorical);
+    });
+
+    expect(result.current.columns['0'].dataType).toBe(DataType.categorical);
+    expect(Object.keys(result.current.columns['0'].levels!)).toEqual(['A', 'B']);
+    expect(result.current.columns['2'].dataType).toBe(DataType.categorical);
+    expect(Object.keys(result.current.columns['2'].levels!)).toEqual(['X', 'Y']);
+
+    expect(result.current.columns['1'].dataType).toBeUndefined();
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnDataTypes(['0', '1'], DataType.continuous);
+    });
+
+    expect(result.current.columns['0'].dataType).toBe(DataType.continuous);
+    expect(result.current.columns['0'].levels).toBeUndefined();
+    expect(result.current.columns['0'].units).toBe('');
+
+    expect(result.current.columns['1'].dataType).toBe(DataType.continuous);
+    expect(result.current.columns['1'].units).toBe('');
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnDataTypes(['0', '1', '2'], null);
+    });
+
+    expect(result.current.columns['0'].dataType).toBeNull();
+    expect(result.current.columns['0'].units).toBeUndefined();
+    expect(result.current.columns['0'].levels).toBeUndefined();
+
+    expect(result.current.columns['1'].dataType).toBeNull();
+    expect(result.current.columns['2'].dataType).toBeNull();
+  });
+
+  it('should skip mapped columns unless they correspond to a collection variable', async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['col0', 'col1'],
+      data: [
+        ['1', '2'],
+        ['3', '4'],
+      ],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockConfigFile,
+      termsData: mockTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnStandardizedVariable('0', 'nb:Sex');
+      result.current.actions.userUpdatesColumnStandardizedVariable('1', 'nb:Assessment');
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnDataTypes(['0', '1'], DataType.categorical);
+    });
+
+    expect(result.current.columns['0'].dataType).toBe(DataType.categorical);
+    expect(result.current.columns['1'].dataType).toBe(DataType.categorical);
   });
 });
 
@@ -1165,6 +1274,199 @@ describe('userUpdatesColumnToCollectionMapping', () => {
   });
 });
 
+describe('userUpdatesMultipleColumnStandardizedVariables', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const prepareMultiColumnVariables = async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['col1', 'col2'],
+      data: [
+        ['100', '101'],
+        ['110', '111'],
+        ['120', '121'],
+      ],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockConfigFile,
+      termsData: mockTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    return result;
+  };
+
+  it('should set standardized variable and apply correct data types to multiple columns', async () => {
+    const result = await prepareMultiColumnVariables();
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnStandardizedVariables(['0', '1'], 'nb:Age');
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Age');
+    expect(result.current.columns['0'].dataType).toBe(DataType.continuous);
+    expect(result.current.columns['1'].standardizedVariable).toBe('nb:Age');
+    expect(result.current.columns['1'].dataType).toBe(DataType.continuous);
+  });
+
+  it('should unmap standardized variables from multiple columns when null is provided', async () => {
+    const result = await prepareMultiColumnVariables();
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnStandardizedVariables(['0', '1'], 'nb:Age');
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Age');
+    expect(result.current.columns['1'].standardizedVariable).toBe('nb:Age');
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnStandardizedVariables(['0', '1'], null);
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBeNull();
+    expect(result.current.columns['0'].dataType).toBeNull();
+    expect(result.current.columns['1'].standardizedVariable).toBeNull();
+    expect(result.current.columns['1'].dataType).toBeNull();
+  });
+
+  it('should remove isPartOf when changing from a multi-column measure to a regular standardized variable or null', async () => {
+    const result = await prepareMultiColumnVariables();
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnToCollectionMappings(
+        ['0', '1'],
+        'snomed:1303696008'
+      );
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Assessment');
+    expect(result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnStandardizedVariables(['0', '1'], 'nb:Age');
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Age');
+    expect(result.current.columns['0'].isPartOf).toBeUndefined();
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnToCollectionMappings(
+        ['0', '1'],
+        'snomed:1303696008'
+      );
+    });
+
+    expect(result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnStandardizedVariables(['0', '1'], null);
+    });
+
+    expect(result.current.columns['0'].standardizedVariable).toBeNull();
+    expect(result.current.columns['0'].isPartOf).toBeUndefined();
+  });
+});
+
+describe('userUpdatesMultipleColumnToCollectionMappings', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const prepareMultiColumnAssessment = async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['assessment1', 'assessment2'],
+      data: [
+        ['100', '101'],
+        ['110', '111'],
+        ['120', '121'],
+      ],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    mockedFetchConfig.mockResolvedValueOnce({
+      config: mockConfigFile,
+      termsData: mockTermsData,
+    });
+
+    await act(async () => {
+      await result.current.actions.userSelectsConfig('Neurobagel');
+    });
+
+    return result;
+  };
+
+  it('should set isPartOf and standardizedVariable for multiple columns', async () => {
+    const result = await prepareMultiColumnAssessment();
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnToCollectionMappings(
+        ['0', '1'],
+        'snomed:1303696008'
+      );
+    });
+
+    expect(result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
+    expect(result.current.columns['0'].standardizedVariable).toBe('nb:Assessment');
+    expect(result.current.columns['1'].isPartOf).toBe('snomed:1303696008');
+    expect(result.current.columns['1'].standardizedVariable).toBe('nb:Assessment');
+  });
+
+  it('should delete isPartOf and standardizedVariable for multiple columns when null is provided', async () => {
+    const result = await prepareMultiColumnAssessment();
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnToCollectionMappings(
+        ['0', '1'],
+        'snomed:1303696008'
+      );
+    });
+
+    expect(result.current.columns['0'].isPartOf).toBe('snomed:1303696008');
+    expect(result.current.columns['1'].isPartOf).toBe('snomed:1303696008');
+
+    act(() => {
+      result.current.actions.userUpdatesMultipleColumnToCollectionMappings(['0', '1'], null);
+    });
+
+    expect(result.current.columns['0'].isPartOf).toBeUndefined();
+    expect(result.current.columns['0'].standardizedVariable).toBeUndefined();
+    expect(result.current.columns['1'].isPartOf).toBeUndefined();
+    expect(result.current.columns['1'].standardizedVariable).toBeUndefined();
+  });
+});
+
 describe('userCreatesCollection', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -1285,7 +1587,7 @@ describe('userUpdatesColumnLevelDescription', () => {
     expect(result.current.columns['0'].levels?.B.description).toBe('');
   });
 
-  it('should ignore updates for missing value levels', async () => {
+  it('should allow updates for missing value levels', async () => {
     const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
       type: 'text/tab-separated-values',
     });
@@ -1311,54 +1613,20 @@ describe('userUpdatesColumnLevelDescription', () => {
     });
 
     expect(result.current.columns['0'].missingValues).toEqual(['A']);
-    expect(result.current.columns['0'].levels?.A).toBeUndefined();
-
-    expect(() => {
-      act(() => {
-        result.current.actions.userUpdatesValueDescription('0', 'A', 'Group A');
-      });
-    }).not.toThrow();
-
-    expect(result.current.columns['0'].levels?.A).toBeUndefined();
-  });
-
-  it('should ignore updates when the level entry is absent', async () => {
-    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
-      type: 'text/tab-separated-values',
-    });
-
-    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
-    mockedParseTsvContent.mockReturnValueOnce({
-      headers: ['category'],
-      data: [['A'], ['B'], ['C']],
-    });
-
-    const { result } = renderHook(() => ({
-      actions: useDataActions(),
-      columns: useColumns(),
-    }));
-
-    await act(async () => {
-      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    // the missing value gets a default empty description
+    expect(result.current.columns['0'].levels?.A).toEqual({
+      description: '',
+      standardizedTerm: '',
     });
 
     act(() => {
-      result.current.actions.userUpdatesColumnDataType('0', DataType.categorical);
+      result.current.actions.userUpdatesValueDescription('0', 'A', 'Group A');
     });
 
-    expect(result.current.columns['0'].levels).toBeDefined();
-
-    act(() => {
-      result.current.actions.userUpdatesColumnDataType('0', DataType.continuous);
+    expect(result.current.columns['0'].levels?.A).toEqual({
+      description: 'Group A',
+      standardizedTerm: '',
     });
-
-    expect(result.current.columns['0'].levels).toBeUndefined();
-
-    act(() => {
-      result.current.actions.userUpdatesValueDescription('0', 'C', 'Category C');
-    });
-
-    expect(result.current.columns['0'].levels).toBeUndefined();
   });
 });
 
@@ -1519,7 +1787,7 @@ describe('userUpdatesColumnMissingValues', () => {
     return result;
   };
 
-  it('should add missing values and remove them from levels for categorical columns', async () => {
+  it('should add missing values and clear standardizedTerm from levels for categorical columns', async () => {
     const result = await setupCategoricalColumn();
 
     act(() => {
@@ -1527,17 +1795,23 @@ describe('userUpdatesColumnMissingValues', () => {
     });
 
     expect(result.current.columns['0'].missingValues).toEqual(['A']);
-    expect(result.current.columns['0'].levels?.A).toBeUndefined();
+    expect(result.current.columns['0'].levels?.A).toEqual({
+      description: '',
+      standardizedTerm: '',
+    });
 
     act(() => {
       result.current.actions.userUpdatesColumnMissingValues('0', 'B', true);
     });
 
     expect(result.current.columns['0'].missingValues).toEqual(['A', 'B']);
-    expect(result.current.columns['0'].levels?.B).toBeUndefined();
+    expect(result.current.columns['0'].levels?.B).toEqual({
+      description: '',
+      standardizedTerm: '',
+    });
   });
 
-  it('should remove missing values and reintroduce levels when toggled off', async () => {
+  it('should remove missing values and retain levels when toggled off', async () => {
     const result = await setupCategoricalColumn();
 
     act(() => {
@@ -1595,6 +1869,231 @@ describe('userUpdatesColumnMissingValues', () => {
 
     expect(result.current.columns['0'].missingValues).toEqual(['N/A']);
     expect(result.current.columns['0'].levels).toBeUndefined();
+  });
+});
+
+describe('userAppliesGlobalMissingStatus', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const setupTest = async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['col1', 'col2'],
+      data: [
+        ['1', 'A'],
+        ['2', 'N/A'],
+        ['N/A', 'B'],
+        ['', ''],
+        [' ', ' '],
+        ['n/a ', 'n/a '],
+        [' n/a', ' n/a'],
+      ],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      result.current.actions.reset();
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('1', DataType.categorical);
+    });
+
+    return result;
+  };
+
+  it('should apply missing status to columns', async () => {
+    const result = await setupTest();
+
+    act(() => {
+      result.current.actions.userAppliesGlobalMissingStatus([
+        { value: 'N/A', description: 'Not Applicable' },
+      ]);
+    });
+
+    expect(result.current.columns['0'].missingValues).toEqual(['N/A']);
+    expect(result.current.columns['0'].levels).toBeUndefined();
+
+    expect(result.current.columns['1'].missingValues).toEqual(['N/A']);
+    expect(result.current.columns['1'].levels?.['N/A']).toEqual({
+      description: 'Not Applicable',
+      standardizedTerm: '',
+    });
+  });
+
+  it('should overwrite existing local level descriptions', async () => {
+    const result = await setupTest();
+
+    // Mark a level as missing locally and give it a description
+    act(() => {
+      result.current.actions.userUpdatesColumnMissingValues('1', 'N/A', true);
+      result.current.actions.userUpdatesValueDescription(
+        '1',
+        'N/A',
+        'Highly specific local description'
+      );
+    });
+
+    act(() => {
+      result.current.actions.userAppliesGlobalMissingStatus([
+        { value: 'N/A', description: 'A Broad Global Description' },
+      ]);
+    });
+
+    // Verify the specific local description was successfully overwritten with global one
+    expect(result.current.columns['1'].levels?.['N/A'].description).toBe(
+      'A Broad Global Description'
+    );
+  });
+
+  it('should handle whitespace and empty string missing values', async () => {
+    const result = await setupTest();
+
+    act(() => {
+      result.current.actions.userAppliesGlobalMissingStatus([
+        { value: ' ', description: 'Whitespace Missing' },
+        { value: 'n/a ', description: 'Trailing Space Missing' },
+        { value: ' n/a', description: 'Leading Space Missing' },
+        { value: '', description: 'Empty String Missing' },
+      ]);
+    });
+
+    expect(result.current.columns['1'].missingValues).toEqual([' ', 'n/a ', ' n/a', '']);
+
+    // Verify descriptions applied correctly to the categorical levels
+    expect(result.current.columns['1'].levels?.[' '].description).toBe('Whitespace Missing');
+    expect(result.current.columns['1'].levels?.['n/a '].description).toBe('Trailing Space Missing');
+    expect(result.current.columns['1'].levels?.[' n/a'].description).toBe('Leading Space Missing');
+    expect(result.current.columns['1'].levels?.[''].description).toBe('Empty String Missing');
+  });
+
+  it('should not overwrite existing local level descriptions if description is undefined (untouched)', async () => {
+    const result = await setupTest();
+
+    // Mark a level as missing locally and give it a description
+    act(() => {
+      result.current.actions.userUpdatesColumnMissingValues('1', 'N/A', true);
+      result.current.actions.userUpdatesValueDescription('1', 'N/A', 'Specific local description');
+    });
+
+    act(() => {
+      // Pass value without description (undefined)
+      result.current.actions.userAppliesGlobalMissingStatus([{ value: 'N/A' }]);
+    });
+
+    // Verify the specific local description remains untouched
+    expect(result.current.columns['1'].levels?.['N/A'].description).toBe(
+      'Specific local description'
+    );
+  });
+
+  it('should overwrite existing local level descriptions with empty string if description is explicitly cleared', async () => {
+    const result = await setupTest();
+
+    // Mark a level as missing locally and give it a description
+    act(() => {
+      result.current.actions.userUpdatesColumnMissingValues('1', 'N/A', true);
+      result.current.actions.userUpdatesValueDescription('1', 'N/A', 'Specific local description');
+    });
+
+    act(() => {
+      // Pass value with empty string description
+      result.current.actions.userAppliesGlobalMissingStatus([{ value: 'N/A', description: '' }]);
+    });
+
+    // Verify the specific local description was successfully overwritten with an empty string
+    expect(result.current.columns['1'].levels?.['N/A'].description).toBe('');
+  });
+});
+
+describe('userRemovesGlobalMissingStatus', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const setupTest = async () => {
+    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+      type: 'text/tab-separated-values',
+    });
+
+    mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
+    mockedParseTsvContent.mockReturnValueOnce({
+      headers: ['col1', 'col2'],
+      data: [
+        ['1', 'A'],
+        ['2', 'N/A'],
+        ['N/A', 'B'],
+        ['', ''],
+        [' ', ' '],
+        ['n/a ', 'n/a '],
+        [' n/a', ' n/a'],
+      ],
+    });
+
+    const { result } = renderHook(() => ({
+      actions: useDataActions(),
+      columns: useColumns(),
+    }));
+
+    await act(async () => {
+      result.current.actions.reset();
+      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+    });
+
+    act(() => {
+      result.current.actions.userUpdatesColumnDataType('1', DataType.categorical);
+    });
+
+    return result;
+  };
+
+  it('should explicitly remove a missing value from all columns', async () => {
+    const result = await setupTest();
+
+    act(() => {
+      result.current.actions.userAppliesGlobalMissingStatus([
+        { value: 'N/A', description: 'Not Applicable' },
+      ]);
+    });
+
+    expect(result.current.columns['0'].missingValues).toEqual(['N/A']);
+
+    act(() => {
+      result.current.actions.userRemovesGlobalMissingStatus('N/A');
+    });
+
+    expect(result.current.columns['0'].missingValues).toEqual([]);
+    expect(result.current.columns['1'].missingValues).toEqual([]);
+  });
+
+  it('should strip whitespaces via global remove action', async () => {
+    const result = await setupTest();
+
+    act(() => {
+      result.current.actions.userAppliesGlobalMissingStatus([
+        { value: ' ', description: 'Whitespace Missing' },
+        { value: 'n/a ', description: 'Trailing Space Missing' },
+        { value: ' n/a', description: 'Leading Space Missing' },
+        { value: '', description: 'Empty String Missing' },
+      ]);
+    });
+
+    act(() => {
+      result.current.actions.userRemovesGlobalMissingStatus(' ');
+    });
+
+    expect(result.current.columns['1'].missingValues).toEqual(['n/a ', ' n/a', '']);
   });
 });
 

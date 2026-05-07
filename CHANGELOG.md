@@ -1,3 +1,96 @@
+# v0.6.4 (Tue Apr 21 2026)
+
+#### 🚀 Enhancements
+
+- [ENH] Added version string to navbar [#532](https://github.com/neurobagel/annotation-tool/pull/532) ([@rmanaem](https://github.com/rmanaem))
+
+#### 🏠 Internal
+
+- [REF] Centralize table rendering into unified `ValueTable` base component [#528](https://github.com/neurobagel/annotation-tool/pull/528) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
+# v0.6.3 (Mon Apr 13 2026)
+
+#### 🐛 Bug Fixes
+
+- [FIX] skip Netlify local build to preserve injected secrets [#524](https://github.com/neurobagel/annotation-tool/pull/524) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
+# v0.6.2 (Tue Apr 07 2026)
+
+#### 🚀 Enhancements
+
+- [ENH] Added global missing value flow [#515](https://github.com/neurobagel/annotation-tool/pull/515) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
+# v0.6.1 (Fri Mar 27 2026)
+
+#### 🚀 Enhancements
+
+- [ENH] Enable description editing for missing values [#507](https://github.com/neurobagel/annotation-tool/pull/507) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
+# v0.6.0 (Wed Mar 25 2026)
+
+#### 💥 Breaking Changes
+
+- [MNT] Update e2e tests and remove multi-column measures [#478](https://github.com/neurobagel/annotation-tool/pull/478) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Implement click-to-assign bulk mapping [#465](https://github.com/neurobagel/annotation-tool/pull/465) ([@rmanaem](https://github.com/rmanaem))
+
+#### 🚀 Enhancements
+
+- [ENH] Simplified multi column annotation process [#480](https://github.com/neurobagel/annotation-tool/pull/480) ([@rmanaem](https://github.com/rmanaem) [@surchs](https://github.com/surchs))
+- [ENH] Enhance column annotation selection and responsive layouts [#498](https://github.com/neurobagel/annotation-tool/pull/498) ([@rmanaem](https://github.com/rmanaem) [@surchs](https://github.com/surchs))
+- [ENH] Add tour guide for column annotation page [#492](https://github.com/neurobagel/annotation-tool/pull/492) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Standardize mapping terminology and enhance column annotation workflow [#491](https://github.com/neurobagel/annotation-tool/pull/491) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Enable the UI to show the full standardized term [#488](https://github.com/neurobagel/annotation-tool/pull/488) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Add counter for mapped columns to standardized variables [#484](https://github.com/neurobagel/annotation-tool/pull/484) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Add hide annotated toggle and implement collection fuzzy search [#475](https://github.com/neurobagel/annotation-tool/pull/475) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Tweak Column Annotation Page UI [#471](https://github.com/neurobagel/annotation-tool/pull/471) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Implement bulk data type assignment flow [#462](https://github.com/neurobagel/annotation-tool/pull/462) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Restructure `columnAnnotationCard` component [#461](https://github.com/neurobagel/annotation-tool/pull/461) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Implement Standardized variables list [#460](https://github.com/neurobagel/annotation-tool/pull/460) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Enable multi-select for columns [#447](https://github.com/neurobagel/annotation-tool/pull/447) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Add search filter for columns in Column Annotation view [#434](https://github.com/neurobagel/annotation-tool/pull/434) ([@rmanaem](https://github.com/rmanaem))
+
+#### 🏠 Internal
+
+- [REF] Clean up unused state and standardize component props [#499](https://github.com/neurobagel/annotation-tool/pull/499) ([@rmanaem](https://github.com/rmanaem))
+- [MNT] Add build on release for beta-annotate [#474](https://github.com/neurobagel/annotation-tool/pull/474) ([@surchs](https://github.com/surchs))
+- [REF] Factor out data type toggle into standalone DataTypeToggle component [#419](https://github.com/neurobagel/annotation-tool/pull/419) ([@Tusharjamdade](https://github.com/Tusharjamdade) [@rmanaem](https://github.com/rmanaem))
+
+#### 🏎 Performance Improvements
+
+- [ENH] Address column annotation page performance issues [#501](https://github.com/neurobagel/annotation-tool/pull/501) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 3
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+- Sebastian Urchs ([@surchs](https://github.com/surchs))
+- Tushar Jamdade ([@Tusharjamdade](https://github.com/Tusharjamdade))
+
+---
+
 # v0.5.1 (Sat Feb 21 2026)
 
 #### 🚀 Enhancements

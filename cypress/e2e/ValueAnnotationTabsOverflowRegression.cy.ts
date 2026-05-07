@@ -18,14 +18,17 @@ describe('Value Annotation Tabs Overflow Regression', () => {
     );
     cy.get('[data-cy="next-button"]').click();
 
-    // Annotate many columns as "About" assessment tool
-    for (let i = 9; i <= 23; i += 1) {
-      cy.get(`[data-cy="${i}-column-annotation-card-standardized-variable-dropdown"]`).click();
-      cy.get('ul[role="listbox"] [role="option"]').contains('Assessment Tool').click();
-    }
-    cy.get('[data-cy="next-button"]').click();
+    // Bulk annotate many columns as "About" an assessment tool term
+    // Scroll down to make the cards visible since we use a virtual list
+    cy.get('[data-cy="virtual-column-list"] > div').scrollTo(0, 9 * 160);
+    cy.get('[data-cy="9-column-annotation-card"]').click();
+    cy.get('[data-cy="virtual-column-list"] > div').scrollTo(0, 23 * 160);
 
-    // Multi-Column Measures view
+    cy.get('body').type('{shift}', { release: false });
+    cy.get('[data-cy="23-column-annotation-card"]').click();
+    cy.get('body').type('{shift}', { release: true });
+    cy.get('[data-cy="search-terms-input"]').type('Montreal');
+    cy.get('[data-cy^="collection-term-item-"]').first().click();
     cy.get('[data-cy="next-button"]').click();
 
     // Value Annotation view

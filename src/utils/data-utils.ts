@@ -15,6 +15,7 @@ import {
   VariableType,
   DataType,
 } from './internal_types';
+import { generateAbbreviation } from './util';
 
 export async function fetchAvailableConfigs(): Promise<string[]> {
   try {
@@ -116,18 +117,25 @@ export function convertStandardizedTerms(
       const termsNamespace = vocab.namespace_prefix;
       return vocab.terms.map((term) => {
         const termIdentifier = `${termsNamespace}:${term.id}`;
-        const { id, name, ...restTermFields } = term;
+        const { id, name, abbreviation, ...restTermFields } = term;
 
         const parentVariable = variables.find((v) => v.terms_file === fileName);
         const standardizedVariableId = parentVariable
           ? `${variableNamespacePrefix}:${parentVariable.id}`
           : '';
 
+        const isCollection = parentVariable?.variable_type === VariableType.collection;
+
+        const computedAbbreviation = isCollection
+          ? abbreviation || (name ? generateAbbreviation(name) || name : undefined)
+          : undefined;
+
         return {
           [termIdentifier]: {
             standardizedVariableId,
             id: termIdentifier,
             label: name,
+            abbreviation: computedAbbreviation,
             ...restTermFields,
             collectionCreatedAt: undefined,
           },
@@ -235,18 +243,13 @@ export function buildCategoricalLevels({
   columnData,
   standardizedTerms,
 }: BuildCategoricalLevelsOptions): LevelMap {
-  const missingValuesSet = new Set(column.missingValues ?? []);
-  const initialLevels = Array.from(new Set(column.allValues ?? []))
-    .filter((value) => !missingValuesSet.has(value))
-    .reduce(
-      (acc, value) => ({
-        ...acc,
-        [value]: { description: '', standardizedTerm: '' },
-      }),
-      {} as LevelMap
-    );
+  const initialLevels: LevelMap = {};
+  Array.from(new Set(column.allValues ?? [])).forEach((value) => {
+    initialLevels[value] = { description: '', standardizedTerm: '' };
+  });
 
-  return Object.entries(initialLevels).reduce((acc, [value, level]) => {
+  const finalLevels: LevelMap = {};
+  Object.entries(initialLevels).forEach(([value, level]) => {
     const dictLevel = columnData.Levels?.[value];
     const annotationLevel = columnData.Annotations?.Levels?.[value];
     const standardizedTerm =
@@ -254,14 +257,12 @@ export function buildCategoricalLevels({
         ? annotationLevel.TermURL
         : level.standardizedTerm;
 
-    return {
-      ...acc,
-      [value]: {
-        description: dictLevel?.Description || level.description,
-        standardizedTerm,
-      },
+    finalLevels[value] = {
+      description: dictLevel?.Description || level.description,
+      standardizedTerm,
     };
-  }, {} as LevelMap);
+  });
+  return finalLevels;
 }
 
 export function applyDataTypeToColumn<T extends ColumnDataShape>(
@@ -278,13 +279,11 @@ export function applyDataTypeToColumn<T extends ColumnDataShape>(
     const uniqueValues = Array.from(new Set(allValues));
 
     if (!column.levels) {
-      updatedColumn.levels = uniqueValues.reduce(
-        (acc, value) => ({
-          ...acc,
-          [value]: { description: '', standardizedTerm: '' },
-        }),
-        {} as { [key: string]: { description: string; standardizedTerm: string } }
-      );
+      const newLevels: { [key: string]: { description: string; standardizedTerm: string } } = {};
+      uniqueValues.forEach((value) => {
+        newLevels[value] = { description: '', standardizedTerm: '' };
+      });
+      updatedColumn.levels = newLevels;
     }
 
     delete updatedColumn.units;
@@ -323,7 +322,10 @@ export function applyDataDictionaryToColumns(
     }
 
     if (columnData.Annotations?.MissingValues) {
-      column.missingValues = columnData.Annotations.MissingValues;
+      const uniqueValues = new Set(column.allValues ?? []);
+      column.missingValues = columnData.Annotations.MissingValues.filter((value) =>
+        uniqueValues.has(value)
+      );
     }
 
     let variableType: VariableType | undefined;

@@ -7,7 +7,7 @@ describe('Missing Value Description Regression', () => {
     cy.intercept('GET', '**/raw.githubusercontent.com/**', { forceNetworkError: true });
   });
 
-  it('should reset the description for the level when it is marked missing during a debounced save', () => {
+  it('should preserve the description for the level when it is marked missing during a debounced save', () => {
     cy.visit('http://localhost:5173');
     cy.get('[data-cy="next-button"]').click();
 
@@ -21,9 +21,8 @@ describe('Missing Value Description Regression', () => {
 
     // Column Annotation view
     cy.get('[data-cy="column-annotation-container"]').should('be.visible');
-    cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').type(
-      'sex{downArrow}{enter}'
-    );
+    cy.get('[data-cy="2-column-annotation-card"]').click();
+    cy.get('[data-cy="standardized-variable-item-nb:Sex"]').click();
     cy.get('[data-cy="next-button"]').click();
 
     // Value Annotation view
@@ -38,6 +37,8 @@ describe('Missing Value Description Regression', () => {
     cy.get('[data-cy="2-M-missing-value-yes"]').click();
     cy.tick(501);
     cy.get('[data-cy="2-M-description"]').should('not.contain', 'Saving...');
-    cy.get('[data-cy="2-M-description"] textarea').first().should('have.value', '');
+    cy.get('[data-cy="2-M-description"] textarea')
+      .first()
+      .should('have.value', 'Updated description');
   });
 });

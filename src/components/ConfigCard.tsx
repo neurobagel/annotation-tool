@@ -41,7 +41,6 @@ function ConfigCard({ title, options, value, onChange, isLoading }: ConfigCardPr
                 onChange={(_, newValue) => onChange(newValue)}
                 renderInput={(params) => (
                   <TextField
-                    // eslint-disable-next-line react/jsx-props-no-spreading
                     {...params}
                     variant="outlined"
                     placeholder="Select a configuration option"

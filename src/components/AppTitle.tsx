@@ -19,9 +19,21 @@ function AppTitle({ title, githubUrl, docsUrl }: AppTitleProps) {
       <Toolbar>
         <Box component="img" src={logo} alt="Neurobagel Logo" sx={{ height: 45, width: 'auto' }} />
 
-        <Typography variant="h6" component="h1" sx={{ flexGrow: 1, margin: 1 }}>
-          {title}
-        </Typography>
+        <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+          <Typography variant="h6" component="h1" sx={{ margin: 1 }}>
+            {title}
+          </Typography>
+          <Typography
+            sx={{
+              color: 'text.secondary',
+              fontWeight: 500,
+              fontSize: '0.85rem',
+              fontFamily: 'monospace',
+            }}
+          >
+            v{APP_VERSION || 'beta'}
+          </Typography>
+        </Box>
 
         <Box data-cy="external-links">
           <IconButton
