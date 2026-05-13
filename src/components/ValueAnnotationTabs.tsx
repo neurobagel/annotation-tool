@@ -126,6 +126,7 @@ function ValueAnnotationTabs({
                   columnID={activeColumn.id}
                   units={activeColumn.units}
                   missingValues={activeColumn.missingValues}
+                  allValues={activeColumn.allValues}
                   uniqueValues={activeColumn.uniqueValues}
                   formatId={activeColumn.formatId}
                   formatOptions={activeColumn.formatOptions}

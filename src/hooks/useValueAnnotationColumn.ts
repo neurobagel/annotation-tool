@@ -11,6 +11,7 @@ export interface ActiveValueAnnotationColumn {
   id: string;
   name: string;
   dataType: DataType | null;
+  allValues: string[];
   uniqueValues: string[];
   levels: Record<string, { description: string; standardizedTerm?: string }>;
   missingValues: string[];
@@ -63,6 +64,7 @@ export function useValueAnnotationColumn(
       id: column.id,
       name: column.name ?? column.id,
       dataType,
+      allValues: column.allValues ?? [],
       uniqueValues,
       levels: column.levels ?? {},
       missingValues: column.missingValues ?? [],
