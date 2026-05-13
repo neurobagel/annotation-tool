@@ -201,6 +201,19 @@
           "$ref": "#/$defs/Term",
           "description": "For continuous columns this field is used to describe the format of the raw numerical values in the column. This information is used to transform the column values into the desired format of the standardized data element referenced in the IsAbout attribute."
         },
+        "ValueRange": {
+          "description": "The minimum and maximum values of the continuous column",
+          "properties": {
+            "MinValue": {
+              "type": "number"
+            },
+            "MaxValue": {
+              "type": "number"
+            }
+          },
+          "required": ["MinValue", "MaxValue"],
+          "type": "object"
+        },
         "VariableType": {
           "const": "Continuous",
           "enum": ["Continuous"],

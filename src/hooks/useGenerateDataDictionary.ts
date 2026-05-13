@@ -5,6 +5,7 @@ import {
   useStandardizedTerms,
   useStandardizedVariables,
 } from '../stores/data';
+import { validateContinuousValues } from '../utils/data-utils';
 import {
   Columns,
   DataDictionary,
@@ -133,6 +134,29 @@ export function useGenerateDataDictionary(): DataDictionary {
               entry.Annotations.Format = {
                 TermURL: format.identifier,
                 Label: format.label,
+              };
+            }
+          }
+
+          // Compute min/max for Age columns
+          if (column.dataType === DataType.continuous && standardizedVariable?.name === 'Age') {
+            const validationResult = validateContinuousValues(
+              column.allValues ?? [],
+              column.missingValues ?? [],
+              column.format
+            );
+
+            // If there are any invalid values, the format is considered incorrect
+            // for the dataset as a whole (or the user hasn't designated missing values properly).
+            // In this case, we leave MinValue and MaxValue empty ("cannot be computed").
+            if (
+              validationResult &&
+              validationResult.min !== null &&
+              validationResult.max !== null
+            ) {
+              entry.Annotations.ValueRange = {
+                MinValue: validationResult.min,
+                MaxValue: validationResult.max,
               };
             }
           }
