@@ -3,9 +3,10 @@ import Continuous from '../../src/components/Continuous';
 const baseProps = {
   columnID: '1',
   units: 'some units',
+  allValues: ['1', '2', '3', '4', '5'],
   uniqueValues: ['1', '2', '3', '4', '5'],
   missingValues: [],
-  formatId: 'nb:FromBounded',
+  formatId: 'nb:FromFloat',
   formatOptions: [
     { id: 'nb:FromFloat', label: 'float', examples: ['31.5'] },
     { id: 'nb:FromEuro', label: 'euro', examples: ['31,5'] },
@@ -27,6 +28,7 @@ describe('Continuous', () => {
       <Continuous
         columnID={baseProps.columnID}
         units={baseProps.units}
+        allValues={baseProps.allValues}
         uniqueValues={baseProps.uniqueValues}
         missingValues={baseProps.missingValues}
         formatId={baseProps.formatId}
@@ -42,12 +44,16 @@ describe('Continuous', () => {
     cy.get('[data-cy="1-1-value"]').should('be.visible').and('contain', '1');
     cy.get('[data-cy="1-3-missing-value-button-group"]').should('be.visible');
     cy.get('[data-cy="1-format-dropdown"]').should('be.visible');
+    cy.get('[data-cy="continuous-info-alert"]')
+      .should('be.visible')
+      .and('contain', 'Min = 1, Max = 5');
   });
   it('should render the component correctly for a unannotated column', () => {
     cy.mount(
       <Continuous
         columnID={baseProps.columnID}
         units={baseProps.units}
+        allValues={baseProps.allValues}
         uniqueValues={baseProps.uniqueValues}
         missingValues={baseProps.missingValues}
         formatId={baseProps.formatId}
@@ -70,6 +76,7 @@ describe('Continuous', () => {
       <Continuous
         columnID={baseProps.columnID}
         units={baseProps.units}
+        allValues={baseProps.allValues}
         uniqueValues={baseProps.uniqueValues}
         missingValues={baseProps.missingValues}
         formatId={baseProps.formatId}
@@ -90,6 +97,7 @@ describe('Continuous', () => {
       <Continuous
         columnID={baseProps.columnID}
         units={baseProps.units}
+        allValues={baseProps.allValues}
         uniqueValues={baseProps.uniqueValues}
         missingValues={baseProps.missingValues}
         formatId={baseProps.formatId}
@@ -109,6 +117,7 @@ describe('Continuous', () => {
       <Continuous
         columnID={baseProps.columnID}
         units={baseProps.units}
+        allValues={baseProps.allValues}
         uniqueValues={baseProps.uniqueValues}
         missingValues={baseProps.missingValues}
         formatId={baseProps.formatId}
@@ -119,7 +128,27 @@ describe('Continuous', () => {
         onUpdateFormat={spy}
       />
     );
-    cy.get('[data-cy="1-format-dropdown"]').type('float{downarrow}{enter}');
-    cy.get('@spy').should('have.been.calledWith', '1', 'nb:FromFloat');
+    cy.get('[data-cy="1-format-dropdown"]').type('euro{downarrow}{enter}');
+    cy.get('@spy').should('have.been.calledWith', '1', 'nb:FromEuro');
+  });
+  it('should display warning alert with updated phrasing when there are invalid values', () => {
+    cy.mount(
+      <Continuous
+        columnID={baseProps.columnID}
+        units={baseProps.units}
+        allValues={['1', '2', 'bad_value']}
+        uniqueValues={['1', '2', 'bad_value']}
+        missingValues={[]}
+        formatId="nb:FromFloat"
+        formatOptions={baseProps.formatOptions}
+        showFormat
+        onUpdateUnits={baseProps.onUpdateUnits}
+        onToggleMissingValue={baseProps.onToggleMissingValue}
+        onUpdateFormat={baseProps.onUpdateFormat}
+      />
+    );
+    cy.get('[data-cy="continuous-warning-alert"]').should('be.visible');
+    cy.get('summary').click();
+    cy.get('[data-cy="continuous-warning-alert"]').should('contain', 'bad_value');
   });
 });
