@@ -1,5 +1,7 @@
-import { Alert, Autocomplete, TextField } from '@mui/material';
-import { useMemo } from 'react';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import { Alert, Autocomplete, Button, Collapse, TextField } from '@mui/material';
+import { useMemo, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { FormatOption } from '../hooks/useFormatOptions';
 import { validateContinuousValues } from '../utils/data-utils';
@@ -37,6 +39,8 @@ function Continuous({
   onToggleMissingValue,
   onUpdateFormat,
 }: ContinuousProps) {
+  const [showInvalidValues, setShowInvalidValues] = useState(false);
+
   const validationResult = useMemo(
     () => validateContinuousValues(allValues, missingValues, formatId),
     [allValues, missingValues, formatId]
@@ -106,16 +110,30 @@ function Continuous({
                     maximum values could not be computed. Please ensure the format matches the data,
                     or designate non-standard values as missing.
                   </div>
-                  <details className="text-sm cursor-pointer">
-                    <summary className="font-medium select-none outline-none">
-                      View invalid values
-                    </summary>
-                    <div className="mt-2 font-mono p-2 rounded max-h-32 overflow-y-auto bg-black/5">
-                      {invalidValuesWithIds.map(({ id, val }) => (
-                        <div key={id}>{val}</div>
-                      ))}
-                    </div>
-                  </details>
+                  <div className="mt-2">
+                    <Button
+                      variant="text"
+                      size="small"
+                      onClick={() => setShowInvalidValues((prev) => !prev)}
+                      sx={{
+                        padding: 0,
+                        minWidth: 0,
+                        textTransform: 'none',
+                        fontWeight: 'medium',
+                        '& .MuiButton-startIcon': { marginRight: '2px', marginLeft: '-4px' },
+                      }}
+                      startIcon={showInvalidValues ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+                    >
+                      {showInvalidValues ? 'Hide invalid values' : 'View invalid values'}
+                    </Button>
+                    <Collapse in={showInvalidValues}>
+                      <div className="mt-2 font-mono p-2 rounded max-h-32 overflow-y-auto bg-black/5">
+                        {invalidValuesWithIds.map(({ id, val }) => (
+                          <div key={id}>{val}</div>
+                        ))}
+                      </div>
+                    </Collapse>
+                  </div>
                 </Alert>
               )}
               {validationResult && validationResult.invalidCount === 0 && (

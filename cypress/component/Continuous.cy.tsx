@@ -148,7 +148,7 @@ describe('Continuous', () => {
       />
     );
     cy.get('[data-cy="continuous-warning-alert"]').should('be.visible');
-    cy.get('summary').click();
+    cy.contains('button', 'View invalid values').click();
     cy.get('[data-cy="continuous-warning-alert"]').should('contain', 'bad_value');
   });
 });
