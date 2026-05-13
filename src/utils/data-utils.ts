@@ -17,6 +17,136 @@ import {
 } from './internal_types';
 import { generateAbbreviation } from './util';
 
+export function parseContinuousValue(value: string, formatId: string | undefined): number | null {
+  if (!value || value.trim() === '') return null;
+  const str = value.trim();
+
+  let parsed = NaN;
+  switch (formatId) {
+    case 'nb:FromFloat':
+      parsed = Number(str);
+      if (Number.isNaN(parsed) || str.toLowerCase().includes('0x')) {
+        parsed = NaN;
+      }
+      break;
+    case 'nb:FromInt':
+      if (/^[-+]?\d+$/.test(str)) {
+        parsed = Number(str);
+      } else {
+        parsed = NaN;
+      }
+      break;
+    case 'nb:FromEuro': {
+      // Step 1: Strict Validation
+      // Accept optional negative sign, digits, and an optional comma for decimals. Reject periods.
+      const isValidEuroFormat = /^-?\d*(,\d+)?$/.test(str);
+
+      if (!isValidEuroFormat) {
+        parsed = NaN;
+        break;
+      }
+
+      // Step 2: JavaScript Conversion
+      // JS Number() cannot parse commas, so we translate the valid string to a JS-readable float
+      const jsReadableString = str.replace(',', '.');
+      parsed = Number(jsReadableString);
+      break;
+    }
+    case 'nb:FromBounded': {
+      // Must contain a bounding character (+, <, >, =)
+      if (!/[+<>=]/g.test(str)) {
+        parsed = NaN;
+        break;
+      }
+      // Strip trailing and leading bounding characters
+      const stripped = str.replace(/^[+<>=]+|[+<>=]+$/g, '');
+      // Strictly enforce integers for bounded values
+      if (/^[-+]?\d+$/.test(stripped)) {
+        parsed = Number(stripped);
+      } else {
+        parsed = NaN;
+      }
+      break;
+    }
+    case 'nb:FromRange': {
+      const parts = str.split('-');
+      if (parts.length === 2) {
+        const p0 = parts[0].trim();
+        const p1 = parts[1].trim();
+        if (/^-?\d*(\.\d+)?$/.test(p0) && /^-?\d*(\.\d+)?$/.test(p1)) {
+          parsed = (Number(p0) + Number(p1)) / 2;
+        }
+      }
+      break;
+    }
+    case 'nb:FromISO8601': {
+      const pvalue = str.toUpperCase().startsWith('P')
+        ? str.toUpperCase()
+        : `P${str.toUpperCase()}`;
+      // Basic strict ISO8601 duration regex matching subset of what python's isodate handles
+      const isoRegex =
+        /^P(?:([\d.]+)Y)?(?:([\d.]+)M)?(?:([\d.]+)W)?(?:([\d.]+)D)?(?:T(?:([\d.]+)H)?(?:([\d.]+)M)?(?:([\d.]+)S)?)?$/;
+      const match = pvalue.match(isoRegex);
+      if (match && pvalue !== 'P') {
+        const years = match[1] ? parseFloat(match[1]) : 0;
+        const months = match[2] ? parseFloat(match[2]) : 0;
+        parsed = years + months / 12;
+      }
+      break;
+    }
+    default:
+      // Unrecognized format
+      return null;
+  }
+
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
+export interface ContinuousValidationResult {
+  invalidValues: string[];
+  invalidCount: number;
+  validCount: number;
+  min: number | null;
+  max: number | null;
+}
+
+export function validateContinuousValues(
+  values: string[],
+  missingValues: string[],
+  formatId: string | undefined | null
+): ContinuousValidationResult | null {
+  if (!formatId) return null;
+
+  const validValues: number[] = [];
+  const invalidValuesSet = new Set<string>();
+  let invalidCount = 0;
+
+  values.forEach((val) => {
+    if (missingValues.includes(val)) return;
+
+    const parsed = parseContinuousValue(val, formatId);
+    if (parsed !== null && !Number.isNaN(parsed)) {
+      validValues.push(parsed);
+    } else {
+      invalidValuesSet.add(val);
+      invalidCount += 1;
+    }
+  });
+
+  if (validValues.length === 0 && invalidCount === 0) return null;
+
+  const min = invalidCount === 0 && validValues.length > 0 ? Math.min(...validValues) : null;
+  const max = invalidCount === 0 && validValues.length > 0 ? Math.max(...validValues) : null;
+
+  return {
+    invalidValues: Array.from(invalidValuesSet),
+    invalidCount,
+    validCount: validValues.length,
+    min,
+    max,
+  };
+}
+
 export async function fetchAvailableConfigs(): Promise<string[]> {
   try {
     const response = await axios.get(fetchConfigGitHubURL);

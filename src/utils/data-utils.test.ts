@@ -15,6 +15,8 @@ import {
   buildCategoricalLevels,
   applyDataDictionaryToColumns,
   applyDataTypeToColumn,
+  validateContinuousValues,
+  parseContinuousValue,
 } from './data-utils';
 import {
   Columns,
@@ -1258,5 +1260,121 @@ describe('applyDataTypeToColumn', () => {
     expect(result.levels).toBeDefined();
     expect(Object.keys(result.levels!)).toEqual(['A', '', 'B']);
     expect(result.levels!['']).toEqual({ description: '', standardizedTerm: '' });
+  });
+});
+
+describe('validateContinuousValues', () => {
+  it('should return null if formatId is missing', () => {
+    expect(validateContinuousValues(['25', '30'], [], undefined)).toBeNull();
+    expect(validateContinuousValues(['25', '30'], [], null)).toBeNull();
+  });
+
+  it('should calculate valid results, min, max, and ignore explicitly defined missing values', () => {
+    const values = ['25', 'N/A', '30', '15', '', ' '];
+    const missingValues = ['N/A', '', ' '];
+    const formatId = 'nb:FromFloat';
+
+    const result = validateContinuousValues(values, missingValues, formatId);
+
+    expect(result).not.toBeNull();
+    expect(result!.validCount).toBe(3);
+    expect(result!.invalidCount).toBe(0);
+    expect(result!.invalidValues).toEqual([]);
+    expect(result!.min).toBe(15);
+    expect(result!.max).toBe(30);
+  });
+
+  it('should treat empty strings as invalid if not designated as missing', () => {
+    const values = ['25', '', ' '];
+    const missingValues: string[] = [];
+    const formatId = 'nb:FromFloat';
+
+    const result = validateContinuousValues(values, missingValues, formatId);
+
+    expect(result).not.toBeNull();
+    expect(result!.validCount).toBe(1);
+    expect(result!.invalidCount).toBe(2);
+    expect(result!.invalidValues).toEqual(['', ' ']);
+  });
+
+  it('should capture exact number of invalid values and unique strings', () => {
+    const values = ['25', 'bad', '30', 'bad', 'worse'];
+    const missingValues: string[] = [];
+    const formatId = 'nb:FromFloat';
+
+    const result = validateContinuousValues(values, missingValues, formatId);
+
+    expect(result).not.toBeNull();
+    expect(result!.validCount).toBe(2);
+    expect(result!.invalidCount).toBe(3);
+    expect(result!.invalidValues).toEqual(['bad', 'worse']);
+    // Min and Max are null because invalidCount > 0
+    expect(result!.min).toBeNull();
+    expect(result!.max).toBeNull();
+  });
+
+  it('should return null if no valid or invalid values are present', () => {
+    const values = ['N/A', '', ' '];
+    const missingValues = ['N/A', '', ' '];
+    const formatId = 'nb:FromFloat';
+
+    const result = validateContinuousValues(values, missingValues, formatId);
+
+    expect(result).toBeNull();
+  });
+});
+
+describe('parseContinuousValue', () => {
+  it('should return null for empty or whitespace values', () => {
+    expect(parseContinuousValue('', 'nb:FromFloat')).toBeNull();
+    expect(parseContinuousValue('   ', 'nb:FromInt')).toBeNull();
+  });
+
+  it('should return null for undefined or unrecognized formats', () => {
+    expect(parseContinuousValue('25', undefined)).toBeNull();
+    expect(parseContinuousValue('25', 'nb:UnknownFormat')).toBeNull();
+  });
+
+  it('should parse nb:FromFloat and nb:FromInt', () => {
+    expect(parseContinuousValue('25.5', 'nb:FromFloat')).toBe(25.5);
+    expect(parseContinuousValue('25', 'nb:FromFloat')).toBe(25);
+    expect(parseContinuousValue('25.5', 'nb:FromInt')).toBeNull();
+    expect(parseContinuousValue('25', 'nb:FromInt')).toBe(25);
+    expect(parseContinuousValue('bad', 'nb:FromFloat')).toBeNull();
+    // hex values should be rejected
+    expect(parseContinuousValue('0x1A', 'nb:FromInt')).toBeNull();
+  });
+
+  it('should parse nb:FromEuro', () => {
+    expect(parseContinuousValue('25,5', 'nb:FromEuro')).toBe(25.5);
+    expect(parseContinuousValue('25', 'nb:FromEuro')).toBe(25);
+    expect(parseContinuousValue('25.5', 'nb:FromEuro')).toBeNull();
+    expect(parseContinuousValue('bad', 'nb:FromEuro')).toBeNull();
+  });
+
+  it('should parse nb:FromBounded', () => {
+    expect(parseContinuousValue('+25+', 'nb:FromBounded')).toBe(25);
+    expect(parseContinuousValue('25+', 'nb:FromBounded')).toBe(25);
+    expect(parseContinuousValue('<25', 'nb:FromBounded')).toBe(25);
+    expect(parseContinuousValue('<=25', 'nb:FromBounded')).toBe(25);
+    expect(parseContinuousValue('>25', 'nb:FromBounded')).toBe(25);
+    expect(parseContinuousValue('>=25', 'nb:FromBounded')).toBe(25);
+    expect(parseContinuousValue('25', 'nb:FromBounded')).toBeNull(); // Missing bound character
+    expect(parseContinuousValue('25.5+', 'nb:FromBounded')).toBeNull(); // Decimals not allowed
+    expect(parseContinuousValue('bad', 'nb:FromBounded')).toBeNull();
+  });
+
+  it('should parse nb:FromRange', () => {
+    expect(parseContinuousValue('20 - 30', 'nb:FromRange')).toBe(25);
+    expect(parseContinuousValue('20.5-30.5', 'nb:FromRange')).toBe(25.5);
+    expect(parseContinuousValue('20', 'nb:FromRange')).toBeNull();
+    expect(parseContinuousValue('bad-worse', 'nb:FromRange')).toBeNull();
+  });
+
+  it('should parse nb:FromISO8601', () => {
+    expect(parseContinuousValue('P1Y6M', 'nb:FromISO8601')).toBe(1.5);
+    // Should automatically prepend 'P' if missing
+    expect(parseContinuousValue('1Y6M', 'nb:FromISO8601')).toBe(1.5);
+    expect(parseContinuousValue('bad', 'nb:FromISO8601')).toBeNull();
   });
 });
