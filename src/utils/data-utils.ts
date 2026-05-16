@@ -17,6 +17,12 @@ import {
 } from './internal_types';
 import { generateAbbreviation } from './util';
 
+/**
+ * Parses a string value into a number based on a specified format.
+ * NOTE: Currently, the parsing logic in this function is heavily tailored towards parsing "Age" values
+ * (e.g., handling bounded ages, age ranges, and euro-formatted decimal ages).
+ * While the name is generic, the actual implementation may not be suitable for all types of continuous data without modification.
+ */
 export function parseContinuousValue(value: string, formatId: string | undefined): number | null {
   if (!value || value.trim() === '') return null;
   const str = value.trim();
