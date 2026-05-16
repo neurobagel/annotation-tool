@@ -1348,7 +1348,11 @@ describe('parseContinuousValue', () => {
   it('should parse nb:FromEuro', () => {
     expect(parseContinuousValue('25,5', 'nb:FromEuro')).toBe(25.5);
     expect(parseContinuousValue('25', 'nb:FromEuro')).toBe(25);
+    expect(parseContinuousValue('0,5', 'nb:FromEuro')).toBe(0.5);
+    expect(parseContinuousValue('-0,5', 'nb:FromEuro')).toBe(-0.5);
     expect(parseContinuousValue('25.5', 'nb:FromEuro')).toBeNull();
+    expect(parseContinuousValue('-', 'nb:FromEuro')).toBeNull();
+    expect(parseContinuousValue(',5', 'nb:FromEuro')).toBeNull();
     expect(parseContinuousValue('bad', 'nb:FromEuro')).toBeNull();
   });
 

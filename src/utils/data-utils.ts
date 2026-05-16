@@ -39,7 +39,8 @@ export function parseContinuousValue(value: string, formatId: string | undefined
     case 'nb:FromEuro': {
       // Step 1: Strict Validation
       // Accept optional negative sign, digits, and an optional comma for decimals. Reject periods.
-      const isValidEuroFormat = /^-?\d*(,\d+)?$/.test(str);
+      // We use \d+ to ensure at least one digit is present before a comma (e.g., "0,5" is valid, ",5" is invalid).
+      const isValidEuroFormat = /^-?\d+(,\d+)?$/.test(str);
 
       if (!isValidEuroFormat) {
         parsed = NaN;
