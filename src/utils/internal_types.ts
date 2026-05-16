@@ -123,8 +123,8 @@ export interface DataDictionary {
       };
       MissingValues?: string[];
       ValueRange?: {
-        MinValue?: number;
-        MaxValue?: number;
+        MinValue: number;
+        MaxValue: number;
       };
     };
   };
