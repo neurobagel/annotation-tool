@@ -69,13 +69,14 @@ export function parseContinuousValue(value: string, formatId: string | undefined
       break;
     }
     case 'nb:FromRange': {
-      const parts = str.split('-');
-      if (parts.length === 2) {
-        const p0 = parts[0].trim();
-        const p1 = parts[1].trim();
-        if (/^-?\d*(\.\d+)?$/.test(p0) && /^-?\d*(\.\d+)?$/.test(p1)) {
-          parsed = (Number(p0) + Number(p1)) / 2;
-        }
+      // Use regex to carefully extract two potentially negative numbers separated by a dash.
+      // E.g., "10-20", "-10-20", "-10--20", "10.5 - 20.5"
+      // Match group 1: first number. Match group 2: second number.
+      const match = str.match(/^(-?\d+(?:\.\d+)?|-?\.\d+)\s*-\s*(-?\d+(?:\.\d+)?|-?\.\d+)$/);
+      if (match) {
+        const p0 = match[1];
+        const p1 = match[2];
+        parsed = (Number(p0) + Number(p1)) / 2;
       }
       break;
     }

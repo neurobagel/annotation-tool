@@ -1367,6 +1367,10 @@ describe('parseContinuousValue', () => {
   it('should parse nb:FromRange', () => {
     expect(parseContinuousValue('20 - 30', 'nb:FromRange')).toBe(25);
     expect(parseContinuousValue('20.5-30.5', 'nb:FromRange')).toBe(25.5);
+    expect(parseContinuousValue('-10-20', 'nb:FromRange')).toBe(5);
+    expect(parseContinuousValue('-10--20', 'nb:FromRange')).toBe(-15);
+    expect(parseContinuousValue('10--20', 'nb:FromRange')).toBe(-5);
+    expect(parseContinuousValue('-10.5 - -20.5', 'nb:FromRange')).toBe(-15.5);
     expect(parseContinuousValue('20', 'nb:FromRange')).toBeNull();
     expect(parseContinuousValue('bad-worse', 'nb:FromRange')).toBeNull();
   });
