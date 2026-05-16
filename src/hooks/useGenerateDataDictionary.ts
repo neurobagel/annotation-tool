@@ -140,8 +140,9 @@ export function useGenerateDataDictionary(): DataDictionary {
 
           // Compute min/max for Age columns
           if (column.dataType === DataType.continuous && standardizedVariable?.name === 'Age') {
+            const uniqueValues = Array.from(new Set(column.allValues ?? []));
             const validationResult = validateContinuousValues(
-              column.allValues ?? [],
+              uniqueValues,
               column.missingValues ?? [],
               column.format
             );
@@ -151,6 +152,7 @@ export function useGenerateDataDictionary(): DataDictionary {
             // In this case, we leave MinValue and MaxValue empty ("cannot be computed").
             if (
               validationResult &&
+              validationResult.invalidCount === 0 &&
               validationResult.min !== null &&
               validationResult.max !== null
             ) {

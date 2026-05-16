@@ -1297,8 +1297,8 @@ describe('validateContinuousValues', () => {
     expect(result!.invalidValues).toEqual(['', ' ']);
   });
 
-  it('should capture exact number of invalid values and unique strings', () => {
-    const values = ['25', 'bad', '30', 'bad', 'worse'];
+  it('should process unique strings and return exact counts', () => {
+    const values = ['25', 'bad', '30', 'worse'];
     const missingValues: string[] = [];
     const formatId = 'nb:FromFloat';
 
@@ -1306,11 +1306,11 @@ describe('validateContinuousValues', () => {
 
     expect(result).not.toBeNull();
     expect(result!.validCount).toBe(2);
-    expect(result!.invalidCount).toBe(3);
+    expect(result!.invalidCount).toBe(2);
     expect(result!.invalidValues).toEqual(['bad', 'worse']);
-    // Min and Max are null because invalidCount > 0
-    expect(result!.min).toBeNull();
-    expect(result!.max).toBeNull();
+    // Min and Max are computed from validValues even if invalidCount > 0
+    expect(result!.min).toBe(25);
+    expect(result!.max).toBe(30);
   });
 
   it('should return null if no valid or invalid values are present', () => {

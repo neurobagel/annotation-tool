@@ -76,7 +76,6 @@ describe('useValueAnnotationColumn', () => {
       id: '1',
       name: 'sex',
       dataType: DataType.categorical,
-      allValues: [],
       uniqueValues: ['M', 'F'],
       levels: {
         M: { description: 'Male', standardizedTerm: 'term:male' },

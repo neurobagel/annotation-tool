@@ -3,7 +3,7 @@ import Continuous from '../../src/components/Continuous';
 const baseProps = {
   columnID: '1',
   units: 'some units',
-  allValues: ['1', '2', '3', '4', '5'],
+
   uniqueValues: ['1', '2', '3', '4', '5'],
   missingValues: [],
   formatId: 'nb:FromFloat',
@@ -28,7 +28,6 @@ describe('Continuous', () => {
       <Continuous
         columnID={baseProps.columnID}
         units={baseProps.units}
-        allValues={baseProps.allValues}
         uniqueValues={baseProps.uniqueValues}
         missingValues={baseProps.missingValues}
         formatId={baseProps.formatId}
@@ -53,7 +52,6 @@ describe('Continuous', () => {
       <Continuous
         columnID={baseProps.columnID}
         units={baseProps.units}
-        allValues={baseProps.allValues}
         uniqueValues={baseProps.uniqueValues}
         missingValues={baseProps.missingValues}
         formatId={baseProps.formatId}
@@ -76,7 +74,6 @@ describe('Continuous', () => {
       <Continuous
         columnID={baseProps.columnID}
         units={baseProps.units}
-        allValues={baseProps.allValues}
         uniqueValues={baseProps.uniqueValues}
         missingValues={baseProps.missingValues}
         formatId={baseProps.formatId}
@@ -97,7 +94,6 @@ describe('Continuous', () => {
       <Continuous
         columnID={baseProps.columnID}
         units={baseProps.units}
-        allValues={baseProps.allValues}
         uniqueValues={baseProps.uniqueValues}
         missingValues={baseProps.missingValues}
         formatId={baseProps.formatId}
@@ -117,7 +113,6 @@ describe('Continuous', () => {
       <Continuous
         columnID={baseProps.columnID}
         units={baseProps.units}
-        allValues={baseProps.allValues}
         uniqueValues={baseProps.uniqueValues}
         missingValues={baseProps.missingValues}
         formatId={baseProps.formatId}
@@ -136,7 +131,6 @@ describe('Continuous', () => {
       <Continuous
         columnID={baseProps.columnID}
         units={baseProps.units}
-        allValues={['1', '2', 'bad_value']}
         uniqueValues={['1', '2', 'bad_value']}
         missingValues={[]}
         formatId="nb:FromFloat"

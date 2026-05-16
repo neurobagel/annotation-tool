@@ -126,8 +126,7 @@ export function validateContinuousValues(
   if (!formatId) return null;
 
   const validValues: number[] = [];
-  const invalidValuesSet = new Set<string>();
-  let invalidCount = 0;
+  const invalidValues: string[] = [];
 
   values.forEach((val) => {
     if (missingValues.includes(val)) return;
@@ -136,19 +135,18 @@ export function validateContinuousValues(
     if (parsed !== null && !Number.isNaN(parsed)) {
       validValues.push(parsed);
     } else {
-      invalidValuesSet.add(val);
-      invalidCount += 1;
+      invalidValues.push(val);
     }
   });
 
-  if (validValues.length === 0 && invalidCount === 0) return null;
+  if (validValues.length === 0 && invalidValues.length === 0) return null;
 
-  const min = invalidCount === 0 && validValues.length > 0 ? Math.min(...validValues) : null;
-  const max = invalidCount === 0 && validValues.length > 0 ? Math.max(...validValues) : null;
+  const min = validValues.length > 0 ? Math.min(...validValues) : null;
+  const max = validValues.length > 0 ? Math.max(...validValues) : null;
 
   return {
-    invalidValues: Array.from(invalidValuesSet),
-    invalidCount,
+    invalidValues,
+    invalidCount: invalidValues.length,
     validCount: validValues.length,
     min,
     max,

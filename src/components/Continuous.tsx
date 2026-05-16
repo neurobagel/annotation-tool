@@ -2,7 +2,6 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { Alert, Autocomplete, Button, Collapse, TextField } from '@mui/material';
 import { useMemo, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { FormatOption } from '../hooks/useFormatOptions';
 import { validateContinuousValues } from '../utils/data-utils';
 import DescriptionEditor from './DescriptionEditor';
@@ -11,7 +10,6 @@ import ValueTable from './ValueTable';
 interface ContinuousProps {
   columnID: string;
   units: string;
-  allValues: string[];
   uniqueValues: string[];
   missingValues: string[];
   formatId?: string | null;
@@ -27,12 +25,10 @@ interface ContinuousProps {
 function Continuous({
   columnID,
   units,
-  allValues,
   uniqueValues,
   missingValues,
   formatId = null,
   formatOptions,
-
   showFormat = true,
   showMissingToggle = false,
   onUpdateUnits,
@@ -42,17 +38,8 @@ function Continuous({
   const [showInvalidValues, setShowInvalidValues] = useState(false);
 
   const validationResult = useMemo(
-    () => validateContinuousValues(allValues, missingValues, formatId),
-    [allValues, missingValues, formatId]
-  );
-
-  const invalidValuesWithIds = useMemo(
-    () =>
-      validationResult?.invalidValues.map((val) => ({
-        id: uuidv4(),
-        val,
-      })) || [],
-    [validationResult?.invalidValues]
+    () => validateContinuousValues(uniqueValues, missingValues, formatId),
+    [uniqueValues, missingValues, formatId]
   );
 
   return (
@@ -106,9 +93,9 @@ function Continuous({
               {validationResult && validationResult.invalidCount > 0 && (
                 <Alert severity="warning" data-cy="continuous-warning-alert">
                   <div className="mb-2">
-                    Format parsing failed for {validationResult.invalidCount} value(s). Minimum and
-                    maximum values could not be computed. Please ensure the format matches the data,
-                    or designate non-standard values as missing.
+                    Format parsing failed for {validationResult.invalidCount} unique value(s).
+                    Minimum and maximum values could not be computed. Please ensure the format
+                    matches the data, or designate non-standard values as missing.
                   </div>
                   <div className="mt-2">
                     <Button
@@ -128,8 +115,8 @@ function Continuous({
                     </Button>
                     <Collapse in={showInvalidValues}>
                       <div className="mt-2 font-mono p-2 rounded max-h-32 overflow-y-auto bg-black/5">
-                        {invalidValuesWithIds.map(({ id, val }) => (
-                          <div key={id}>{val}</div>
+                        {validationResult.invalidValues.map((val) => (
+                          <div key={val}>{val}</div>
                         ))}
                       </div>
                     </Collapse>
