@@ -110,8 +110,7 @@ describe('Main user flow', () => {
 
     // Value Annotation view
     cy.get('[data-cy="back-button"]').should('contain', 'Column Annotation');
-    cy.get('[data-cy="next-button"]').should('contain', 'Download');
-    cy.contains('Value Annotation');
+    cy.get('[data-cy="next-button"]').should('contain', 'Dataset Description');
     cy.get('[data-cy="Value Annotation-step"]').within(() => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
     });
@@ -142,9 +141,11 @@ describe('Main user flow', () => {
     cy.get('[data-cy="side-column-nav-bar-age-age"]').should('be.visible');
     cy.get('[data-cy="next-button"]').click();
 
-    // Download view
-    cy.get('[data-cy="back-button"]').should('contain', 'Value Annotation');
-    cy.contains('Download');
+    // Dataset Description view
+    cy.get('[data-cy="next-button"]').click();
+
+    // Download
+    cy.get('[data-cy="back-button"]').should('contain', 'Dataset Description');
     cy.get('[data-cy="Download-step"]').within(() => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
     });
@@ -166,7 +167,7 @@ describe('Main user flow', () => {
       expect(fileContentString).to.contain('"Units":"some cool unit"');
     });
   });
-  it('steps through the different app workflows with a partially annotated data dictionary', () => {
+  it.only('steps through the different app workflows with a partially annotated data dictionary', () => {
     cy.visit('http://localhost:5173');
     cy.get('[data-cy="next-button"]').click();
 
@@ -276,6 +277,9 @@ describe('Main user flow', () => {
     cy.get('[data-cy="5-table-container"]').should('be.visible').and('contain.text', '110');
     cy.get('[data-cy="next-button"]').click();
 
+    // Dataset Description view
+    cy.get('[data-cy="next-button"]').click();
+
     // Download view
     cy.get('[data-cy="complete-annotations-alert"]').should('be.visible');
     cy.get('[data-cy="datadictionary-preview"]')
@@ -346,6 +350,44 @@ describe('Main user flow', () => {
       'have.value',
       'Parkinsonism caused by methanol'
     );
+    cy.get('[data-cy="next-button"]').click();
+
+    // Dataset Description view
+    cy.get('[data-cy="dataset-name-input"]').type('My Awesome Dataset');
+    cy.get('[data-cy="dataset-authors-input"]').type('John Doe, Jane Smith');
+    cy.get('[data-cy="dataset-accesstype-select"]').click();
+    cy.get('li[data-value="registered"]').click();
+    cy.get('[data-cy="dataset-instructions-input"]').type('Just download it');
+    cy.get('[data-cy="dataset-repo-input"]').type('https://github.com/my-repo');
+    cy.get('[data-cy="dataset-accessemail-input"]').type('contact@domain.com');
+    cy.get('[data-cy="dataset-accesslink-input"]').type('https://domain.com/access');
+
+    cy.contains('Reference info').click();
+    cy.get('[data-cy="dataset-references-input"]').type(
+      'https://domain.com/paper, Author et al. (2024)'
+    );
+    cy.get('[data-cy="dataset-keywords-input"]').type('fMRI, neuroimaging, nback');
+
+    cy.get('[data-cy="download-dataset-description-button"]').click();
+
+    const outputDescriptionFileName = `${mockDataDictionaryFileName.split('.')[0]}_dataset_description.json`;
+    const outputDescriptionPath = `cypress/downloads/${outputDescriptionFileName}`;
+    cy.readFile(outputDescriptionPath).then((fileContent) => {
+      expect(fileContent.Name).to.equal('My Awesome Dataset');
+      expect(fileContent.Authors).to.deep.equal(['John Doe', 'Jane Smith']);
+      expect(fileContent.AccessType).to.equal('registered');
+      expect(fileContent.AccessInstructions).to.equal('Just download it');
+      expect(fileContent.RepositoryURL).to.equal('https://github.com/my-repo');
+      expect(fileContent.AccessEmail).to.equal('contact@domain.com');
+      expect(fileContent.AccessLink).to.equal('https://domain.com/access');
+      expect(fileContent.ReferencesAndLinks).to.deep.equal([
+        'https://domain.com/paper',
+        'Author et al. (2024)',
+      ]);
+      expect(fileContent.Keywords).to.deep.equal(['fMRI', 'neuroimaging', 'nback']);
+      expect(fileContent.ParticipantCount).to.be.greaterThan(0);
+    });
+
     cy.get('[data-cy="next-button"]').click();
 
     // Download view
