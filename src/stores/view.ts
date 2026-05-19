@@ -29,6 +29,7 @@ export const getNavigationProps = (currentView: View): NavigationProps => {
     View.Upload,
     View.ColumnAnnotation,
     View.ValueAnnotation,
+    View.DatasetDescription,
     View.Download,
   ];
 

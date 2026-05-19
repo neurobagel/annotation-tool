@@ -4,12 +4,25 @@ export enum View {
   ColumnAnnotation = 'columnAnnotation',
   MultiColumnMeasures = 'multiColumnMeasures',
   ValueAnnotation = 'valueAnnotation',
+  DatasetDescription = 'datasetDescription',
   Download = 'download',
 }
 
 export interface GlobalMissingValue {
   value: string;
   description?: string;
+}
+
+export interface DatasetDescriptionFormState {
+  Name: string;
+  Authors: string;
+  AccessType: string;
+  AccessInstructions: string;
+  RepositoryURL: string;
+  AccessEmail: string;
+  AccessLink: string;
+  ReferencesAndLinks: string;
+  Keywords: string;
 }
 
 export type StepConfig = {
@@ -123,8 +136,8 @@ export interface DataDictionary {
       };
       MissingValues?: string[];
       ValueRange?: {
-        MinValue: number;
-        MaxValue: number;
+        Min?: number;
+        Max?: number;
       };
     };
   };
@@ -145,6 +158,7 @@ export type DataStoreState = {
   config: string;
   configOptions: string[];
   uploadedDataDictionary: UploadedDataDictionaryFile;
+  datasetDescription: DatasetDescriptionFormState;
 };
 
 export type DataStoreActions = {
@@ -184,6 +198,7 @@ export type DataStoreActions = {
     valuesToApply: { value: string; description?: string }[]
   ) => void;
   userRemovesGlobalMissingStatus: (valueToRemove: string) => void;
+  userUpdatesDatasetDescription: (field: keyof DatasetDescriptionFormState, value: string) => void;
   reset: () => void;
 };
 

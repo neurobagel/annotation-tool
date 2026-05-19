@@ -1,6 +1,7 @@
 import { useTheme } from '@mui/material/styles';
 import AppTitle from './components/AppTitle';
 import ColumnAnnotation from './components/ColumnAnnotation';
+import DatasetDescription from './components/DatasetDescription';
 import Download from './components/Download';
 import Landing from './components/Landing';
 import NavStepper from './components/NavStepper';
@@ -34,6 +35,8 @@ function App() {
 
       case View.ValueAnnotation:
         return <ValueAnnotation />;
+      case View.DatasetDescription:
+        return <DatasetDescription />;
       case View.Download:
         return <Download />;
       default:
