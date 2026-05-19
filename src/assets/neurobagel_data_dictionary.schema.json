@@ -204,14 +204,14 @@
         "ValueRange": {
           "description": "The minimum and maximum values of the continuous column",
           "properties": {
-            "MinValue": {
+            "Min": {
               "type": "number"
             },
-            "MaxValue": {
+            "Max": {
               "type": "number"
             }
           },
-          "required": ["MinValue", "MaxValue"],
+          "required": ["Min", "Max"],
           "type": "object"
         },
         "VariableType": {

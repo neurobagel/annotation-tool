@@ -149,7 +149,7 @@ export function useGenerateDataDictionary(): DataDictionary {
 
             // If there are any invalid values, the format is considered incorrect
             // for the dataset as a whole (or the user hasn't designated missing values properly).
-            // In this case, we leave MinValue and MaxValue empty ("cannot be computed").
+            // In this case, we leave Min and Max empty ("cannot be computed").
             if (
               validationResult &&
               validationResult.invalidCount === 0 &&
@@ -157,8 +157,8 @@ export function useGenerateDataDictionary(): DataDictionary {
               validationResult.max !== null
             ) {
               entry.Annotations.ValueRange = {
-                MinValue: validationResult.min,
-                MaxValue: validationResult.max,
+                Min: validationResult.min,
+                Max: validationResult.max,
               };
             }
           }
