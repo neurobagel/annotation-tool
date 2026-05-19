@@ -6,7 +6,7 @@ import {
   useStandardizedTerms,
   useStandardizedVariables,
 } from '../stores/data';
-import { DataType, VariableType } from '../utils/internal_types';
+import { DataDictionary, DataType, VariableType } from '../utils/internal_types';
 import { mockDataDictionaryWithAnnotations } from '../utils/mocks';
 import { useGenerateDataDictionary } from './useGenerateDataDictionary';
 
@@ -304,6 +304,73 @@ describe('useGenerateDataDictionary', () => {
     const entry = result.current.assessment_score;
 
     expect(entry.Annotations?.VariableType).toBe(VariableType.continuous);
+  });
+
+  it('should not compute MinValue and MaxValue for age columns if there are any values that fail to parse with the chosen format', () => {
+    mockedUseColumns.mockReturnValue({
+      '1': {
+        id: '1',
+        name: 'age',
+        allValues: ['A', '20', '25'], // 1 invalid, 2 valid for 'nb:FromFloat'
+        dataType: DataType.continuous,
+        format: 'nb:FromFloat',
+        standardizedVariable: 'nb:Age',
+      },
+    });
+
+    mockedUseStandardizedVariables.mockReturnValue({
+      'nb:Age': {
+        id: 'nb:Age',
+        name: 'Age',
+      },
+    });
+
+    mockedUseStandardizedFormats.mockReturnValue({
+      'nb:FromFloat': {
+        standardizedVariableId: 'nb:Age',
+        identifier: 'nb:FromFloat',
+        label: 'float',
+      },
+    });
+
+    const { result } = renderHook(() => useGenerateDataDictionary());
+    const entry = result.current.age as DataDictionary[string];
+
+    expect(entry.Annotations?.ValueRange).toBeUndefined();
+  });
+
+  it('should correctly compute MinValue and MaxValue for age columns if all active values parse successfully', () => {
+    mockedUseColumns.mockReturnValue({
+      '1': {
+        id: '1',
+        name: 'age',
+        allValues: ['20', '25'], // 0 invalid, 2 valid for 'nb:FromFloat'
+        dataType: DataType.continuous,
+        format: 'nb:FromFloat',
+        standardizedVariable: 'nb:Age',
+      },
+    });
+
+    mockedUseStandardizedVariables.mockReturnValue({
+      'nb:Age': {
+        id: 'nb:Age',
+        name: 'Age',
+      },
+    });
+
+    mockedUseStandardizedFormats.mockReturnValue({
+      'nb:FromFloat': {
+        standardizedVariableId: 'nb:Age',
+        identifier: 'nb:FromFloat',
+        label: 'float',
+      },
+    });
+
+    const { result } = renderHook(() => useGenerateDataDictionary());
+    const entry = result.current.age as DataDictionary[string];
+
+    expect(entry.Annotations?.ValueRange?.MinValue).toBe(20);
+    expect(entry.Annotations?.ValueRange?.MaxValue).toBe(25);
   });
   it('should match legacy getDataDictionary output for a fully annotated dataset', () => {
     mockedUseColumns.mockReturnValue({

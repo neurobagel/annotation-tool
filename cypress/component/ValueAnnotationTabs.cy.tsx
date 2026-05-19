@@ -17,6 +17,7 @@ const columnData: Record<string, ActiveValueAnnotationColumn> = {
     id: '1',
     name: 'age',
     dataType: DataType.continuous,
+
     uniqueValues: ['25', '30', '35'],
     levels: {},
     missingValues: [],
@@ -35,6 +36,7 @@ const columnData: Record<string, ActiveValueAnnotationColumn> = {
     id: '2',
     name: 'sex',
     dataType: DataType.categorical,
+
     uniqueValues: ['M', 'F', 'N/A'],
     levels: {
       M: { description: 'Male', standardizedTerm: 'term:male' },

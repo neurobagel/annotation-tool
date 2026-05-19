@@ -17,6 +17,142 @@ import {
 } from './internal_types';
 import { generateAbbreviation } from './util';
 
+/**
+ * Parses a string value into a number based on a specified format.
+ * NOTE: Currently, the parsing logic in this function is heavily tailored towards parsing "Age" values
+ * (e.g., handling bounded ages, age ranges, and euro-formatted decimal ages).
+ * While the name is generic, the actual implementation may not be suitable for all types of continuous data without modification.
+ */
+export function parseContinuousValue(value: string, formatId: string | undefined): number | null {
+  if (!value || value.trim() === '') return null;
+  const str = value.trim();
+
+  let parsed = NaN;
+  switch (formatId) {
+    case 'nb:FromFloat':
+      parsed = Number(str);
+      if (Number.isNaN(parsed) || str.toLowerCase().includes('0x')) {
+        parsed = NaN;
+      }
+      break;
+    case 'nb:FromInt':
+      if (/^[-+]?\d+$/.test(str)) {
+        parsed = Number(str);
+      } else {
+        parsed = NaN;
+      }
+      break;
+    case 'nb:FromEuro': {
+      // Step 1: Strict Validation
+      // Accept optional negative sign, digits, and an optional comma for decimals. Reject periods.
+      // We use \d+ to ensure at least one digit is present before a comma (e.g., "0,5" is valid, ",5" is invalid).
+      const isValidEuroFormat = /^-?\d+(,\d+)?$/.test(str);
+
+      if (!isValidEuroFormat) {
+        parsed = NaN;
+        break;
+      }
+
+      // Step 2: JavaScript Conversion
+      // JS Number() cannot parse commas, so we translate the valid string to a JS-readable float
+      const jsReadableString = str.replace(',', '.');
+      parsed = Number(jsReadableString);
+      break;
+    }
+    case 'nb:FromBounded': {
+      // Must contain a bounding character (+, <, >, =)
+      if (!/[+<>=]/g.test(str)) {
+        parsed = NaN;
+        break;
+      }
+      // Strip trailing and leading bounding characters
+      const stripped = str.replace(/^[+<>=]+|[+<>=]+$/g, '');
+      // Strictly enforce integers for bounded values
+      if (/^[-+]?\d+$/.test(stripped)) {
+        parsed = Number(stripped);
+      } else {
+        parsed = NaN;
+      }
+      break;
+    }
+    case 'nb:FromRange': {
+      // Use regex to carefully extract two potentially negative numbers separated by a dash.
+      // E.g., "10-20", "-10-20", "-10--20", "10.5 - 20.5"
+      // Match group 1: first number. Match group 2: second number.
+      const match = str.match(/^(-?\d+(?:\.\d+)?|-?\.\d+)\s*-\s*(-?\d+(?:\.\d+)?|-?\.\d+)$/);
+      if (match) {
+        const p0 = match[1];
+        const p1 = match[2];
+        parsed = (Number(p0) + Number(p1)) / 2;
+      }
+      break;
+    }
+    case 'nb:FromISO8601': {
+      const pvalue = str.toUpperCase().startsWith('P')
+        ? str.toUpperCase()
+        : `P${str.toUpperCase()}`;
+      // Basic strict ISO8601 duration regex matching subset of what python's isodate handles
+      const isoRegex =
+        /^P(?:([\d.]+)Y)?(?:([\d.]+)M)?(?:([\d.]+)W)?(?:([\d.]+)D)?(?:T(?:([\d.]+)H)?(?:([\d.]+)M)?(?:([\d.]+)S)?)?$/;
+      const match = pvalue.match(isoRegex);
+      if (match && pvalue !== 'P') {
+        const years = match[1] ? parseFloat(match[1]) : 0;
+        const months = match[2] ? parseFloat(match[2]) : 0;
+        parsed = years + months / 12;
+      }
+      break;
+    }
+    default:
+      // Unrecognized format
+      return null;
+  }
+
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
+export interface ContinuousValidationResult {
+  invalidValues: string[];
+  invalidCount: number;
+  validCount: number;
+  min: number | null;
+  max: number | null;
+}
+
+export function validateContinuousValues(
+  values: string[],
+  missingValues: string[],
+  formatId: string | undefined | null
+): ContinuousValidationResult | null {
+  if (!formatId) return null;
+
+  const validValues: number[] = [];
+  const invalidValues: string[] = [];
+
+  values.forEach((val) => {
+    if (missingValues.includes(val)) return;
+
+    const parsed = parseContinuousValue(val, formatId);
+    if (parsed !== null && !Number.isNaN(parsed)) {
+      validValues.push(parsed);
+    } else {
+      invalidValues.push(val);
+    }
+  });
+
+  if (validValues.length === 0 && invalidValues.length === 0) return null;
+
+  const min = validValues.length > 0 ? Math.min(...validValues) : null;
+  const max = validValues.length > 0 ? Math.max(...validValues) : null;
+
+  return {
+    invalidValues,
+    invalidCount: invalidValues.length,
+    validCount: validValues.length,
+    min,
+    max,
+  };
+}
+
 export async function fetchAvailableConfigs(): Promise<string[]> {
   try {
     const response = await axios.get(fetchConfigGitHubURL);

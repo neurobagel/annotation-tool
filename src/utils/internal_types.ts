@@ -122,6 +122,10 @@ export interface DataDictionary {
         Label: string;
       };
       MissingValues?: string[];
+      ValueRange?: {
+        MinValue: number;
+        MaxValue: number;
+      };
     };
   };
 }
