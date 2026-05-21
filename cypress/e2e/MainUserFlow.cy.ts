@@ -368,7 +368,11 @@ describe('Main user flow', () => {
     );
     cy.get('[data-cy="dataset-keywords-input"]').type('fMRI, neuroimaging, nback');
 
-    cy.get('[data-cy="download-dataset-description-button"]').click();
+    cy.get('[data-cy="next-button"]').click();
+
+    // Download view
+    cy.get('[data-cy="complete-annotations-alert"]').should('be.visible');
+    cy.get('[data-cy="download-datadictionary-button"]').click();
 
     const outputDescriptionFileName = `${mockDataDictionaryFileName.split('.')[0]}_dataset_description.json`;
     const outputDescriptionPath = `cypress/downloads/${outputDescriptionFileName}`;
@@ -387,12 +391,6 @@ describe('Main user flow', () => {
       expect(fileContent.Keywords).to.deep.equal(['fMRI', 'neuroimaging', 'nback']);
       expect(fileContent.ParticipantCount).to.be.greaterThan(0);
     });
-
-    cy.get('[data-cy="next-button"]').click();
-
-    // Download view
-    cy.get('[data-cy="complete-annotations-alert"]').should('be.visible');
-    cy.get('[data-cy="download-datadictionary-button"]').click();
 
     cy.readFile(outputPath).then((fileContent) => {
       expect(fileContent.participant_id.Description).to.equal('A participant ID');

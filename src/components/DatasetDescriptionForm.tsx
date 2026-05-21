@@ -8,46 +8,40 @@ import {
   AccordionSummary,
   AccordionDetails,
 } from '@mui/material';
-import { useState } from 'react';
+import { useDatasetDescriptionValidation } from '../hooks/useDatasetDescriptionValidation';
 import { useDatasetDescription, useDataActions } from '../stores/data';
 import { DatasetDescriptionFormState } from '../utils/internal_types';
-import { isValidUrl, emailRegex } from '../utils/util';
 
 const ACCESS_TYPES = ['public', 'registered', 'restricted'];
+
+function ArrayPreviewDisplay({ value, dataCy }: { value: string; dataCy: string }) {
+  if (value.trim() === '') return null;
+
+  const arr = value
+    .split(',')
+    .map((v) => v.trim())
+    .filter((v) => v !== '');
+
+  if (arr.length === 0) return null;
+
+  return (
+    <Box className="bg-gray-100 p-2 rounded text-xs font-mono text-gray-700" data-cy={dataCy}>
+      {`[${arr.map((item) => JSON.stringify(item)).join(', ')}]`}
+    </Box>
+  );
+}
 
 function DatasetDescriptionForm() {
   const datasetDescription = useDatasetDescription();
   const { userUpdatesDatasetDescription } = useDataActions();
 
-  const [showAuthorsPreview, setShowAuthorsPreview] = useState(true);
-  const [showReferencesPreview, setShowReferencesPreview] = useState(true);
-  const [showKeywordsPreview, setShowKeywordsPreview] = useState(true);
-
-  const parseCommaSeparated = (val: string) =>
-    val
-      .split(',')
-      .map((v) => v.trim())
-      .filter((v) => v !== '');
-
-  const formatArrayPreview = (arr: string[]) =>
-    `[${arr.map((item) => JSON.stringify(item)).join(', ')}]`;
+  const { isNameInvalid, isRepoUrlInvalid, isAccessEmailInvalid, isAccessLinkInvalid } =
+    useDatasetDescriptionValidation();
 
   const handleChange =
     (field: keyof DatasetDescriptionFormState) => (event: React.ChangeEvent<HTMLInputElement>) => {
       userUpdatesDatasetDescription(field, event.target.value);
     };
-
-  // Validation logic
-  const isNameInvalid = datasetDescription.Name.trim() === '';
-  const isRepoUrlInvalid =
-    datasetDescription.RepositoryURL.trim() !== '' &&
-    !isValidUrl(datasetDescription.RepositoryURL.trim());
-  const isAccessEmailInvalid =
-    datasetDescription.AccessEmail.trim() !== '' &&
-    !emailRegex.test(datasetDescription.AccessEmail.trim());
-  const isAccessLinkInvalid =
-    datasetDescription.AccessLink.trim() !== '' &&
-    !isValidUrl(datasetDescription.AccessLink.trim());
 
   return (
     <Box className="flex flex-col gap-4 mb-6 w-full max-w-2xl" data-cy="dataset-description-form">
@@ -78,44 +72,16 @@ function DatasetDescriptionForm() {
           label="Authors"
           value={datasetDescription.Authors as string}
           onChange={handleChange('Authors')}
-          helperText={
-            <Box component="span" className="flex justify-between w-full">
-              <span>Enter a comma-separated list of authors</span>
-              <Box
-                component="button"
-                type="button"
-                onClick={() => setShowAuthorsPreview(!showAuthorsPreview)}
-                sx={{
-                  typography: 'caption',
-                  color: 'primary.main',
-                  cursor: 'pointer',
-                  background: 'none',
-                  border: 'none',
-                  p: 0,
-                  ml: 1,
-                }}
-                data-cy="authors-preview-toggle"
-              >
-                {showAuthorsPreview ? 'Hide Preview' : 'Show Preview'}
-              </Box>
-            </Box>
-          }
-          slotProps={{
-            formHelperText: { component: 'div' } as React.HTMLAttributes<HTMLDivElement>,
-          }}
+          helperText="Enter a comma-separated list of authors"
           fullWidth
           size="small"
           placeholder="e.g. John Doe, Jane Smith"
           data-cy="dataset-authors-input"
         />
-        {showAuthorsPreview && (datasetDescription.Authors as string).trim() !== '' && (
-          <Box
-            className="bg-gray-100 p-2 rounded text-xs font-mono text-gray-700"
-            data-cy="authors-preview"
-          >
-            {formatArrayPreview(parseCommaSeparated(datasetDescription.Authors as string))}
-          </Box>
-        )}
+        <ArrayPreviewDisplay
+          value={datasetDescription.Authors as string}
+          dataCy="authors-preview"
+        />
       </Box>
 
       <Box className="flex flex-col gap-2">
@@ -210,91 +176,32 @@ function DatasetDescriptionForm() {
                 label="References and Links"
                 value={datasetDescription.ReferencesAndLinks as string}
                 onChange={handleChange('ReferencesAndLinks')}
-                helperText={
-                  <Box component="span" className="flex justify-between w-full">
-                    <span>Enter a comma-separated list of URLs or citations</span>
-                    <Box
-                      component="button"
-                      type="button"
-                      onClick={() => setShowReferencesPreview(!showReferencesPreview)}
-                      sx={{
-                        typography: 'caption',
-                        color: 'primary.main',
-                        cursor: 'pointer',
-                        background: 'none',
-                        border: 'none',
-                        p: 0,
-                        ml: 1,
-                      }}
-                      data-cy="references-preview-toggle"
-                    >
-                      {showReferencesPreview ? 'Hide Preview' : 'Show Preview'}
-                    </Box>
-                  </Box>
-                }
-                slotProps={{
-                  formHelperText: { component: 'div' } as React.HTMLAttributes<HTMLDivElement>,
-                }}
+                helperText="Enter a comma-separated list of URLs or citations"
                 fullWidth
                 size="small"
                 placeholder="e.g. https://domain.com/paper, Author et al. (2024)"
                 data-cy="dataset-references-input"
               />
-              {showReferencesPreview &&
-                (datasetDescription.ReferencesAndLinks as string).trim() !== '' && (
-                  <Box
-                    className="bg-gray-100 p-2 rounded text-xs font-mono text-gray-700"
-                    data-cy="references-preview"
-                  >
-                    {formatArrayPreview(
-                      parseCommaSeparated(datasetDescription.ReferencesAndLinks as string)
-                    )}
-                  </Box>
-                )}
+              <ArrayPreviewDisplay
+                value={datasetDescription.ReferencesAndLinks as string}
+                dataCy="references-preview"
+              />
             </Box>
             <Box className="flex flex-col gap-1">
               <TextField
                 label="Keywords"
                 value={datasetDescription.Keywords as string}
                 onChange={handleChange('Keywords')}
-                helperText={
-                  <Box component="span" className="flex justify-between w-full">
-                    <span>Enter a comma-separated list of keywords</span>
-                    <Box
-                      component="button"
-                      type="button"
-                      onClick={() => setShowKeywordsPreview(!showKeywordsPreview)}
-                      sx={{
-                        typography: 'caption',
-                        color: 'primary.main',
-                        cursor: 'pointer',
-                        background: 'none',
-                        border: 'none',
-                        p: 0,
-                        ml: 1,
-                      }}
-                      data-cy="keywords-preview-toggle"
-                    >
-                      {showKeywordsPreview ? 'Hide Preview' : 'Show Preview'}
-                    </Box>
-                  </Box>
-                }
-                slotProps={{
-                  formHelperText: { component: 'div' } as React.HTMLAttributes<HTMLDivElement>,
-                }}
+                helperText="Enter a comma-separated list of keywords"
                 fullWidth
                 size="small"
                 placeholder="e.g. fMRI, neuroimaging, nback"
                 data-cy="dataset-keywords-input"
               />
-              {showKeywordsPreview && (datasetDescription.Keywords as string).trim() !== '' && (
-                <Box
-                  className="bg-gray-100 p-2 rounded text-xs font-mono text-gray-700"
-                  data-cy="keywords-preview"
-                >
-                  {formatArrayPreview(parseCommaSeparated(datasetDescription.Keywords as string))}
-                </Box>
-              )}
+              <ArrayPreviewDisplay
+                value={datasetDescription.Keywords as string}
+                dataCy="keywords-preview"
+              />
             </Box>
           </AccordionDetails>
         </Accordion>

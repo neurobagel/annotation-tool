@@ -15,7 +15,9 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import emoji from '../assets/download-emoji.png';
+import { useDatasetDescriptionValidation } from '../hooks/useDatasetDescriptionValidation';
 import { useGenerateDataDictionary } from '../hooks/useGenerateDataDictionary';
+import { useGenerateDatasetDescription } from '../hooks/useGenerateDatasetDescription';
 import { useSchemaValidation } from '../hooks/useSchemaValidation';
 import { useDataActions, useUploadedDataTableFileName, useConfig } from '../stores/data';
 import useViewStore from '../stores/view';
@@ -34,21 +36,41 @@ function Download() {
   const setCurrentView = useViewStore((state) => state.setCurrentView);
 
   const dataDictionary = useGenerateDataDictionary();
+  const datasetDescription = useGenerateDatasetDescription();
+  const { isFormInvalid } = useDatasetDescriptionValidation();
   const { schemaValid, schemaErrors } = useSchemaValidation(dataDictionary);
 
   const handleDownload = () => {
-    const blob = new Blob([JSON.stringify(dataDictionary, null, 2)], {
+    // Download Data Dictionary
+    const dataDictionaryBlob = new Blob([JSON.stringify(dataDictionary, null, 2)], {
       type: 'application/json;charset=utf-8',
     });
 
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${uploadedDataTableFileName?.slice(0, -4)}_annotated.json`;
-    document.body.appendChild(a);
-    a.click();
-    URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+    const dataDictionaryUrl = URL.createObjectURL(dataDictionaryBlob);
+    const dataDictionaryAnchor = document.createElement('a');
+    dataDictionaryAnchor.href = dataDictionaryUrl;
+    dataDictionaryAnchor.download = `${uploadedDataTableFileName?.slice(0, -4)}_annotated.json`;
+    document.body.appendChild(dataDictionaryAnchor);
+    dataDictionaryAnchor.click();
+    URL.revokeObjectURL(dataDictionaryUrl);
+    document.body.removeChild(dataDictionaryAnchor);
+
+    // Download Dataset Description (if valid)
+    if (datasetDescription) {
+      setTimeout(() => {
+        const datasetDescriptionBlob = new Blob([JSON.stringify(datasetDescription, null, 2)], {
+          type: 'application/json;charset=utf-8',
+        });
+        const datasetDescriptionUrl = URL.createObjectURL(datasetDescriptionBlob);
+        const datasetDescriptionAnchor = document.createElement('a');
+        datasetDescriptionAnchor.href = datasetDescriptionUrl;
+        datasetDescriptionAnchor.download = `${uploadedDataTableFileName?.slice(0, -4) || 'dataset'}_dataset_description.json`;
+        document.body.appendChild(datasetDescriptionAnchor);
+        datasetDescriptionAnchor.click();
+        URL.revokeObjectURL(datasetDescriptionUrl);
+        document.body.removeChild(datasetDescriptionAnchor);
+      }, 100);
+    }
   };
 
   const handleAnnotatingNewDataset = () => {
@@ -246,6 +268,19 @@ function Download() {
           />
         ) : null}
 
+        {isFormInvalid && (
+          <Alert
+            severity="info"
+            className="mb-4 w-full max-w-2xl"
+            data-cy="dataset-description-invalid-alert"
+          >
+            <Typography variant="body2">
+              The Dataset Description form is incomplete. Only the Data Dictionary will be
+              downloaded.
+            </Typography>
+          </Alert>
+        )}
+
         <div className="flex gap-4">
           <Button
             data-cy="download-datadictionary-button"
@@ -255,7 +290,7 @@ function Download() {
             onClick={handleDownload}
             endIcon={<DownloadIcon />}
           >
-            Download Data Dictionary
+            {isFormInvalid ? 'Download Data Dictionary' : 'Download All Files'}
           </Button>
         </div>
       </div>
