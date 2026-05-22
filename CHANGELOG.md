@@ -1,3 +1,20 @@
+# v0.7.0 (Fri May 22 2026)
+
+#### 🚀 Enhancements
+
+- [ENH] Enable creating dataset description [#553](https://github.com/neurobagel/annotation-tool/pull/553) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Validate continuous values' format [#551](https://github.com/neurobagel/annotation-tool/pull/551) ([@rmanaem](https://github.com/rmanaem))
+
+#### 🏎 Performance Improvements
+
+- [ENH] Virtualize the value level annotation table [#534](https://github.com/neurobagel/annotation-tool/pull/534) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.6.4 (Tue Apr 21 2026)
 
 #### 🚀 Enhancements
