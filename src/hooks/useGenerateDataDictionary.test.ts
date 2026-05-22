@@ -306,7 +306,7 @@ describe('useGenerateDataDictionary', () => {
     expect(entry.Annotations?.VariableType).toBe(VariableType.continuous);
   });
 
-  it('should not compute MinValue and MaxValue for age columns if there are any values that fail to parse with the chosen format', () => {
+  it('should not compute Min and Max for age columns if there are any values that fail to parse with the chosen format', () => {
     mockedUseColumns.mockReturnValue({
       '1': {
         id: '1',
@@ -339,7 +339,7 @@ describe('useGenerateDataDictionary', () => {
     expect(entry.Annotations?.ValueRange).toBeUndefined();
   });
 
-  it('should correctly compute MinValue and MaxValue for age columns if all active values parse successfully', () => {
+  it('should correctly compute Min and Max for age columns if all active values parse successfully', () => {
     mockedUseColumns.mockReturnValue({
       '1': {
         id: '1',
@@ -369,8 +369,8 @@ describe('useGenerateDataDictionary', () => {
     const { result } = renderHook(() => useGenerateDataDictionary());
     const entry = result.current.age as DataDictionary[string];
 
-    expect(entry.Annotations?.ValueRange?.MinValue).toBe(20);
-    expect(entry.Annotations?.ValueRange?.MaxValue).toBe(25);
+    expect(entry.Annotations?.ValueRange?.Min).toBe(20);
+    expect(entry.Annotations?.ValueRange?.Max).toBe(25);
   });
   it('should match legacy getDataDictionary output for a fully annotated dataset', () => {
     mockedUseColumns.mockReturnValue({

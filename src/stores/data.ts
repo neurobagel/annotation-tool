@@ -33,6 +33,17 @@ const initialState = {
     fileName: '',
     dataDictionary: {},
   },
+  datasetDescription: {
+    Name: '',
+    Authors: '',
+    AccessType: '',
+    AccessInstructions: '',
+    RepositoryURL: '',
+    AccessEmail: '',
+    AccessLink: '',
+    ReferencesAndLinks: '',
+    Keywords: '',
+  },
 };
 
 const useDataStore = create<DataStore>()((set, get) => ({
@@ -433,6 +444,14 @@ const useDataStore = create<DataStore>()((set, get) => ({
       }));
     },
 
+    userUpdatesDatasetDescription(field, value) {
+      set((state) => ({
+        datasetDescription: produce(state.datasetDescription, (draft) => {
+          draft[field] = value;
+        }),
+      }));
+    },
+
     userUpdatesColumnFormat(columnID, formatId) {
       set((state) => ({
         columns: produce(state.columns, (draft) => {
@@ -467,6 +486,7 @@ export const useUploadedDataDictionary = () =>
 export const useIsConfigLoading = () => useDataStore((state) => state.isConfigLoading);
 export const useConfig = () => useDataStore((state) => state.config);
 export const useConfigOptions = () => useDataStore((state) => state.configOptions);
+export const useDatasetDescription = () => useDataStore((state) => state.datasetDescription);
 export const useDataActions = () => useDataStore((state) => state.actions);
 
 // Export the raw store for testing purposes
