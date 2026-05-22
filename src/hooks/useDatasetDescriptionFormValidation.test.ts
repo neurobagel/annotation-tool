@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useDatasetDescription } from '../stores/data';
-import { useDatasetDescriptionValidation } from './useDatasetDescriptionValidation';
+import { useDatasetDescriptionFormValidation } from './useDatasetDescriptionFormValidation';
 
 vi.mock('../stores/data', () => ({
   useDatasetDescription: vi.fn(),
@@ -9,7 +9,7 @@ vi.mock('../stores/data', () => ({
 
 const mockedUseDatasetDescription = vi.mocked(useDatasetDescription);
 
-describe('useDatasetDescriptionValidation', () => {
+describe('useDatasetDescriptionFormValidation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -27,11 +27,11 @@ describe('useDatasetDescriptionValidation', () => {
       AccessLink: '',
     });
 
-    const { result } = renderHook(() => useDatasetDescriptionValidation());
-    expect(result.current.isNameInvalid).toBe(false);
-    expect(result.current.isRepoUrlInvalid).toBe(false);
-    expect(result.current.isAccessEmailInvalid).toBe(false);
-    expect(result.current.isAccessLinkInvalid).toBe(false);
+    const { result } = renderHook(() => useDatasetDescriptionFormValidation());
+    expect(result.current.datasetDescriptionFormValidation.Name).toBe(false);
+    expect(result.current.datasetDescriptionFormValidation.RepositoryURL).toBe(false);
+    expect(result.current.datasetDescriptionFormValidation.AccessEmail).toBe(false);
+    expect(result.current.datasetDescriptionFormValidation.AccessLink).toBe(false);
     expect(result.current.isFormInvalid).toBe(false);
   });
 
@@ -48,8 +48,8 @@ describe('useDatasetDescriptionValidation', () => {
       AccessLink: '',
     });
 
-    const { result } = renderHook(() => useDatasetDescriptionValidation());
-    expect(result.current.isNameInvalid).toBe(true);
+    const { result } = renderHook(() => useDatasetDescriptionFormValidation());
+    expect(result.current.datasetDescriptionFormValidation.Name).toBe(true);
     expect(result.current.isFormInvalid).toBe(true);
   });
 
@@ -66,8 +66,8 @@ describe('useDatasetDescriptionValidation', () => {
       AccessLink: '',
     });
 
-    const { result } = renderHook(() => useDatasetDescriptionValidation());
-    expect(result.current.isRepoUrlInvalid).toBe(true);
+    const { result } = renderHook(() => useDatasetDescriptionFormValidation());
+    expect(result.current.datasetDescriptionFormValidation.RepositoryURL).toBe(true);
     expect(result.current.isFormInvalid).toBe(true);
   });
 
@@ -84,8 +84,8 @@ describe('useDatasetDescriptionValidation', () => {
       AccessLink: '',
     });
 
-    const { result } = renderHook(() => useDatasetDescriptionValidation());
-    expect(result.current.isAccessEmailInvalid).toBe(true);
+    const { result } = renderHook(() => useDatasetDescriptionFormValidation());
+    expect(result.current.datasetDescriptionFormValidation.AccessEmail).toBe(true);
     expect(result.current.isFormInvalid).toBe(true);
   });
 
@@ -102,8 +102,8 @@ describe('useDatasetDescriptionValidation', () => {
       AccessLink: 'not-a-url-either',
     });
 
-    const { result } = renderHook(() => useDatasetDescriptionValidation());
-    expect(result.current.isAccessLinkInvalid).toBe(true);
+    const { result } = renderHook(() => useDatasetDescriptionFormValidation());
+    expect(result.current.datasetDescriptionFormValidation.AccessLink).toBe(true);
     expect(result.current.isFormInvalid).toBe(true);
   });
 
@@ -120,7 +120,7 @@ describe('useDatasetDescriptionValidation', () => {
       AccessLink: 'https://example.com/access',
     });
 
-    const { result } = renderHook(() => useDatasetDescriptionValidation());
+    const { result } = renderHook(() => useDatasetDescriptionFormValidation());
     expect(result.current.isFormInvalid).toBe(false);
   });
 });

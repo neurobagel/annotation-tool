@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
 import { useDatasetDescription, useColumns, useStandardizedVariables } from '../stores/data';
-import { useDatasetDescriptionValidation } from './useDatasetDescriptionValidation';
+import { useDatasetDescriptionFormValidation } from './useDatasetDescriptionFormValidation';
 
 export function useGenerateDatasetDescription() {
   const datasetDescription = useDatasetDescription();
   const columns = useColumns();
   const standardizedVariables = useStandardizedVariables();
-  const { isFormInvalid } = useDatasetDescriptionValidation();
+  const { isFormInvalid } = useDatasetDescriptionFormValidation();
 
   const participantCount = useMemo(() => {
     let count = 0;

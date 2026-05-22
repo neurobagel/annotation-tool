@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useColumns, useDatasetDescription, useStandardizedVariables } from '../stores/data';
 import { DataType, VariableType } from '../utils/internal_types';
-import { useDatasetDescriptionValidation } from './useDatasetDescriptionValidation';
+import { useDatasetDescriptionFormValidation } from './useDatasetDescriptionFormValidation';
 import { useGenerateDatasetDescription } from './useGenerateDatasetDescription';
 
 vi.mock('../stores/data', () => ({
@@ -11,35 +11,39 @@ vi.mock('../stores/data', () => ({
   useStandardizedVariables: vi.fn(),
 }));
 
-vi.mock('./useDatasetDescriptionValidation', () => ({
-  useDatasetDescriptionValidation: vi.fn(),
+vi.mock('./useDatasetDescriptionFormValidation', () => ({
+  useDatasetDescriptionFormValidation: vi.fn(),
 }));
 
 const mockedUseDatasetDescription = vi.mocked(useDatasetDescription);
 const mockedUseColumns = vi.mocked(useColumns);
 const mockedUseStandardizedVariables = vi.mocked(useStandardizedVariables);
-const mockedUseDatasetDescriptionValidation = vi.mocked(useDatasetDescriptionValidation);
+const mockedUseDatasetDescriptionFormValidation = vi.mocked(useDatasetDescriptionFormValidation);
 
 describe('useGenerateDatasetDescription', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockedUseColumns.mockReturnValue({});
     mockedUseStandardizedVariables.mockReturnValue({});
-    mockedUseDatasetDescriptionValidation.mockReturnValue({
-      isNameInvalid: false,
-      isRepoUrlInvalid: false,
-      isAccessEmailInvalid: false,
-      isAccessLinkInvalid: false,
+    mockedUseDatasetDescriptionFormValidation.mockReturnValue({
+      datasetDescriptionFormValidation: {
+        Name: false,
+        RepositoryURL: false,
+        AccessEmail: false,
+        AccessLink: false,
+      },
       isFormInvalid: false,
     });
   });
 
   it('should return null when the form is invalid', () => {
-    mockedUseDatasetDescriptionValidation.mockReturnValue({
-      isNameInvalid: true,
-      isRepoUrlInvalid: false,
-      isAccessEmailInvalid: false,
-      isAccessLinkInvalid: false,
+    mockedUseDatasetDescriptionFormValidation.mockReturnValue({
+      datasetDescriptionFormValidation: {
+        Name: true,
+        RepositoryURL: false,
+        AccessEmail: false,
+        AccessLink: false,
+      },
       isFormInvalid: true,
     });
 

@@ -8,7 +8,7 @@ import {
   AccordionSummary,
   AccordionDetails,
 } from '@mui/material';
-import { useDatasetDescriptionValidation } from '../hooks/useDatasetDescriptionValidation';
+import { useDatasetDescriptionFormValidation } from '../hooks/useDatasetDescriptionFormValidation';
 import { useDatasetDescription, useDataActions } from '../stores/data';
 import { DatasetDescriptionFormState } from '../utils/internal_types';
 
@@ -35,8 +35,7 @@ function DatasetDescriptionForm() {
   const datasetDescription = useDatasetDescription();
   const { userUpdatesDatasetDescription } = useDataActions();
 
-  const { isNameInvalid, isRepoUrlInvalid, isAccessEmailInvalid, isAccessLinkInvalid } =
-    useDatasetDescriptionValidation();
+  const { datasetDescriptionFormValidation } = useDatasetDescriptionFormValidation();
 
   const handleChange =
     (field: keyof DatasetDescriptionFormState) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,8 +58,10 @@ function DatasetDescriptionForm() {
         required
         value={datasetDescription.Name}
         onChange={handleChange('Name')}
-        error={isNameInvalid}
-        helperText={isNameInvalid ? 'Name is required and cannot be blank' : ''}
+        error={datasetDescriptionFormValidation.Name}
+        helperText={
+          datasetDescriptionFormValidation.Name ? 'Name is required and cannot be blank' : ''
+        }
         fullWidth
         size="small"
         placeholder="e.g. My Awesome Dataset"
@@ -129,8 +130,12 @@ function DatasetDescriptionForm() {
               label="Repository URL"
               value={datasetDescription.RepositoryURL}
               onChange={handleChange('RepositoryURL')}
-              error={isRepoUrlInvalid}
-              helperText={isRepoUrlInvalid ? 'Must be a valid HTTP/HTTPS URL' : ''}
+              error={datasetDescriptionFormValidation.RepositoryURL}
+              helperText={
+                datasetDescriptionFormValidation.RepositoryURL
+                  ? 'Must be a valid HTTP/HTTPS URL'
+                  : ''
+              }
               fullWidth
               size="small"
               placeholder="e.g. https://github.com/my-repo"
@@ -140,8 +145,10 @@ function DatasetDescriptionForm() {
               label="Access Email"
               value={datasetDescription.AccessEmail}
               onChange={handleChange('AccessEmail')}
-              error={isAccessEmailInvalid}
-              helperText={isAccessEmailInvalid ? 'Must be a valid email address' : ''}
+              error={datasetDescriptionFormValidation.AccessEmail}
+              helperText={
+                datasetDescriptionFormValidation.AccessEmail ? 'Must be a valid email address' : ''
+              }
               fullWidth
               size="small"
               placeholder="e.g. contact@domain.com"
@@ -151,8 +158,10 @@ function DatasetDescriptionForm() {
               label="Access Link"
               value={datasetDescription.AccessLink}
               onChange={handleChange('AccessLink')}
-              error={isAccessLinkInvalid}
-              helperText={isAccessLinkInvalid ? 'Must be a valid HTTP/HTTPS URL' : ''}
+              error={datasetDescriptionFormValidation.AccessLink}
+              helperText={
+                datasetDescriptionFormValidation.AccessLink ? 'Must be a valid HTTP/HTTPS URL' : ''
+              }
               fullWidth
               size="small"
               placeholder="e.g. https://domain.com/access"

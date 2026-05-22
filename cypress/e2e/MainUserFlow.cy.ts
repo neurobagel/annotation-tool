@@ -373,6 +373,7 @@ describe('Main user flow', () => {
     // Download view
     cy.get('[data-cy="complete-annotations-alert"]').should('be.visible');
     cy.get('[data-cy="download-datadictionary-button"]').click();
+    cy.get('[data-cy="download-datasetdescription-button"]').click();
 
     const outputDescriptionFileName = `${mockDataDictionaryFileName.split('.')[0]}_dataset_description.json`;
     const outputDescriptionPath = `cypress/downloads/${outputDescriptionFileName}`;

@@ -1,7 +1,7 @@
 import { useDatasetDescription } from '../stores/data';
 import { isValidUrl, emailRegex } from '../utils/util';
 
-export function useDatasetDescriptionValidation() {
+export function useDatasetDescriptionFormValidation() {
   const datasetDescription = useDatasetDescription();
 
   const isNameInvalid = datasetDescription.Name.trim() === '';
@@ -19,10 +19,12 @@ export function useDatasetDescriptionValidation() {
     isNameInvalid || isRepoUrlInvalid || isAccessEmailInvalid || isAccessLinkInvalid;
 
   return {
-    isNameInvalid,
-    isRepoUrlInvalid,
-    isAccessEmailInvalid,
-    isAccessLinkInvalid,
+    datasetDescriptionFormValidation: {
+      Name: isNameInvalid,
+      RepositoryURL: isRepoUrlInvalid,
+      AccessEmail: isAccessEmailInvalid,
+      AccessLink: isAccessLinkInvalid,
+    },
     isFormInvalid,
   };
 }
