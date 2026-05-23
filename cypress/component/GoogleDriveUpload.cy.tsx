@@ -5,6 +5,7 @@ const testProps = {
   open: true,
   onClose: () => {},
   dataDictionary: {},
+  datasetDescription: null,
   appsScriptUrl: 'https://somecoolurl.com/exec',
   config: 'some-config',
 };
@@ -25,6 +26,7 @@ describe('GoogleDriveUpload', () => {
         open={testProps.open}
         onClose={testProps.onClose}
         dataDictionary={testProps.dataDictionary}
+        datasetDescription={testProps.datasetDescription}
         appsScriptUrl={testProps.appsScriptUrl}
         config={testProps.config}
       />
@@ -50,6 +52,7 @@ describe('GoogleDriveUpload', () => {
         open={testProps.open}
         onClose={testProps.onClose}
         dataDictionary={testProps.dataDictionary}
+        datasetDescription={testProps.datasetDescription}
         appsScriptUrl=""
         config={testProps.config}
       />
@@ -73,6 +76,7 @@ describe('GoogleDriveUpload', () => {
           open={testProps.open}
           onClose={testProps.onClose}
           dataDictionary={testProps.dataDictionary}
+          datasetDescription={testProps.datasetDescription}
           appsScriptUrl={testProps.appsScriptUrl}
           config={testProps.config}
         />
@@ -291,6 +295,7 @@ describe('GoogleDriveUpload', () => {
             </button>
             <GoogleDriveUpload
               dataDictionary={testProps.dataDictionary}
+              datasetDescription={testProps.datasetDescription}
               appsScriptUrl={testProps.appsScriptUrl}
               open={open}
               onClose={() => setOpen(false)}

@@ -18,12 +18,13 @@ import {
   Collapse,
 } from '@mui/material';
 import { useState, useEffect, useCallback } from 'react';
-import { DataDictionary } from '../utils/internal_types';
+import { DataDictionary, DatasetDescription } from '../utils/internal_types';
 
 interface GoogleDriveUploadProps {
   open: boolean;
   onClose: () => void;
   dataDictionary: DataDictionary;
+  datasetDescription: DatasetDescription | null;
   appsScriptUrl?: string;
   config: string;
 }
@@ -49,6 +50,7 @@ const getTimestampSuffix = () =>
 const createUploadPayload = ({
   filename,
   dataDictionary,
+  datasetDescription,
   notes,
   reuploadReason,
   name,
@@ -59,6 +61,7 @@ const createUploadPayload = ({
 }: {
   filename: string;
   dataDictionary: DataDictionary;
+  datasetDescription: DatasetDescription | null;
   notes: string;
   reuploadReason: string;
   name: string;
@@ -67,7 +70,12 @@ const createUploadPayload = ({
   password?: string;
   forceOverwrite: boolean;
 }) => {
-  const fileContent = JSON.stringify(dataDictionary, null, 2);
+  const dataDictionaryContent = JSON.stringify(dataDictionary, null, 2);
+
+  const datasetDescriptionFilename = filename.replace('.json', '_dataset_description.json');
+  const datasetDescriptionContent = datasetDescription
+    ? JSON.stringify(datasetDescription, null, 2)
+    : null;
 
   let commentsContent;
   const hasNotes = notes && notes.trim().length > 0;
@@ -98,13 +106,26 @@ ${notes}`;
   }
 
   return {
-    filename,
-    content: fileContent,
-    description: `Uploaded by ${name} (${email}). Notes: ${notes}`,
     folderName: site,
+    password,
     commentsContent,
     checkExists: !forceOverwrite,
-    password,
+    files: [
+      {
+        filename,
+        content: dataDictionaryContent,
+        description: `Data dictionary uploaded by ${name} (${email}). Notes: ${notes}`,
+      },
+      ...(datasetDescriptionContent
+        ? [
+            {
+              filename: datasetDescriptionFilename,
+              content: datasetDescriptionContent,
+              description: `Dataset description uploaded by ${name} (${email}).`,
+            },
+          ]
+        : []),
+    ],
   };
 };
 
@@ -123,6 +144,7 @@ function GoogleDriveUpload({
   open,
   onClose,
   dataDictionary,
+  datasetDescription,
   appsScriptUrl = import.meta.env.NB_GOOGLE_APPS_SCRIPT_URL,
   config,
 }: GoogleDriveUploadProps) {
@@ -220,6 +242,7 @@ function GoogleDriveUpload({
       const payload = createUploadPayload({
         filename,
         dataDictionary,
+        datasetDescription,
         notes: formData.notes,
         reuploadReason: formData.reuploadReason,
         name: formData.name,
@@ -390,13 +413,13 @@ function GoogleDriveUpload({
             <ul className="list-disc pl-5">
               <li>
                 <Typography variant="body2">
-                  Only the data dictionary (.json) will be uploaded. Your tabular data remains
-                  local.
+                  The data dictionary and dataset description (if complete) will be uploaded. Your
+                  tabular data remains local.
                 </Typography>
               </li>
               <li>
                 <Typography variant="body2">
-                  The file will be uploaded to a private Google Drive folder for the ENIGMA-PD
+                  The files will be uploaded to a private Google Drive folder for the ENIGMA-PD
                   community.
                 </Typography>
               </li>
