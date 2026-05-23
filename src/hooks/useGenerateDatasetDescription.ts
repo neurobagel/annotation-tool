@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
 import { useDatasetDescription, useColumns, useStandardizedVariables } from '../stores/data';
+import { DatasetDescription } from '../utils/internal_types';
 import { useDatasetDescriptionFormValidation } from './useDatasetDescriptionFormValidation';
 
-export function useGenerateDatasetDescription() {
+export function useGenerateDatasetDescription(): DatasetDescription | null {
   const datasetDescription = useDatasetDescription();
   const columns = useColumns();
   const standardizedVariables = useStandardizedVariables();
@@ -29,26 +30,38 @@ export function useGenerateDatasetDescription() {
       return null;
     }
 
-    const finalDesc: Record<string, string | number | string[]> = {};
-    const listFields = ['Authors', 'ReferencesAndLinks', 'Keywords'];
+    const finalDesc: DatasetDescription = {
+      Name: datasetDescription.Name.trim(),
+    };
 
-    Object.entries(datasetDescription).forEach(([k, v]) => {
-      if (listFields.includes(k) && typeof v === 'string') {
-        const parsedList = v
-          .split(',')
-          .map((s) => s.trim())
-          .filter((s) => s !== '');
-        if (parsedList.length > 0) {
-          finalDesc[k] = parsedList;
-        }
-      } else if (Array.isArray(v)) {
-        if (v.length > 0) {
-          finalDesc[k] = v;
-        }
-      } else if (typeof v === 'string' && v.trim() !== '') {
-        finalDesc[k] = v.trim();
-      }
-    });
+    const parseList = (str?: string) => {
+      if (!str) return undefined;
+      const parsed = str
+        .split(',')
+        .map((s) => s.trim())
+        .filter((s) => s !== '');
+      return parsed.length > 0 ? parsed : undefined;
+    };
+
+    const authors = parseList(datasetDescription.Authors);
+    if (authors) finalDesc.Authors = authors;
+
+    const references = parseList(datasetDescription.ReferencesAndLinks);
+    if (references) finalDesc.ReferencesAndLinks = references;
+
+    const keywords = parseList(datasetDescription.Keywords);
+    if (keywords) finalDesc.Keywords = keywords;
+
+    if (datasetDescription.AccessType?.trim())
+      finalDesc.AccessType = datasetDescription.AccessType.trim();
+    if (datasetDescription.AccessInstructions?.trim())
+      finalDesc.AccessInstructions = datasetDescription.AccessInstructions.trim();
+    if (datasetDescription.RepositoryURL?.trim())
+      finalDesc.RepositoryURL = datasetDescription.RepositoryURL.trim();
+    if (datasetDescription.AccessEmail?.trim())
+      finalDesc.AccessEmail = datasetDescription.AccessEmail.trim();
+    if (datasetDescription.AccessLink?.trim())
+      finalDesc.AccessLink = datasetDescription.AccessLink.trim();
 
     if (participantCount > 0) {
       finalDesc.ParticipantCount = participantCount;
