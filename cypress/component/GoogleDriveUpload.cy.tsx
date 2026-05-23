@@ -140,15 +140,6 @@ describe('GoogleDriveUpload', () => {
         ParticipantCount: 42,
       };
 
-      cy.intercept('POST', '**/exec', (req) => {
-        const body = JSON.parse(req.body);
-        if (body.action !== 'getSites') {
-          req.reply({
-            body: { status: 'success', fileId: '12345' },
-          });
-        }
-      }).as('createDualFile');
-
       cy.mount(
         <GoogleDriveUpload
           open={testProps.open}
@@ -161,6 +152,15 @@ describe('GoogleDriveUpload', () => {
       );
 
       cy.wait('@getSites');
+
+      cy.intercept('POST', '**/exec', (req) => {
+        const body = JSON.parse(req.body);
+        if (body.action !== 'getSites') {
+          req.reply({
+            body: { status: 'success', fileId: '12345' },
+          });
+        }
+      }).as('createDualFile');
 
       cy.get('[data-cy="dataset-name-input"]').type('DualFileDataset');
       cy.get('[data-cy="password-input"]').type('correctPass');
