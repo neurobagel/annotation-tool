@@ -227,7 +227,9 @@ describe('GoogleDriveUpload', () => {
       cy.wait('@createFile');
 
       cy.get('[data-cy="overwrite-confirm-button"]').should('be.visible');
-      cy.get('[data-cy="new-filename-preview"]').should('be.visible').and('contain', 'conflict');
+      cy.get('[data-cy="new-dataset-name-preview"]')
+        .should('be.visible')
+        .and('contain', 'conflict');
 
       cy.get('[data-cy="overwrite-confirm-button"]').click();
       cy.wait('@createFile').then((interception) => {
@@ -262,7 +264,7 @@ describe('GoogleDriveUpload', () => {
 
       cy.wait('@createFileConflict');
 
-      cy.get('[data-cy="new-filename-preview"]').should('contain', '_20260210_120000');
+      cy.get('[data-cy="new-dataset-name-preview"]').should('contain', '_20260210_120000');
     });
 
     it('should use custom suffix when provided', () => {
@@ -291,7 +293,7 @@ describe('GoogleDriveUpload', () => {
       cy.wait('@createFileCustom');
 
       cy.get('[data-cy="custom-suffix-input"]').type('v2');
-      cy.get('[data-cy="new-filename-preview"]').should('contain', '_v2');
+      cy.get('[data-cy="new-dataset-name-preview"]').should('contain', '_v2');
       cy.get('[data-cy="overwrite-confirm-button"]').click();
 
       cy.wait('@createFileCustom').then((interception) => {

@@ -117,6 +117,6 @@ describe('Download', () => {
       );
     cy.get('[data-cy="upload-drive-button"]')
       .should('be.visible')
-      .and('contain', 'Upload Data Dictionary to ENIGMA-PD');
+      .and('contain', 'Upload Dataset Information to ENIGMA-PD');
   });
 });

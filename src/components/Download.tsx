@@ -244,7 +244,7 @@ function Download() {
                 className="mt-4"
                 data-cy="upload-drive-button"
               >
-                Upload Data Dictionary to {config}
+                Upload Dataset Information to {config}
               </Button>
             </div>
             <Divider className="my-6 w-full max-w-2xl" />
