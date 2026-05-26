@@ -1,3 +1,15 @@
+# v0.7.1 (Tue May 26 2026)
+
+#### 🚀 Enhancements
+
+- [ENH] Enable dataset description file Upload to E-PD GDrive [#557](https://github.com/neurobagel/annotation-tool/pull/557) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.7.0 (Fri May 22 2026)
 
 #### 🚀 Enhancements
