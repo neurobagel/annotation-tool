@@ -72,7 +72,9 @@ const createUploadPayload = ({
 }) => {
   const dataDictionaryContent = JSON.stringify(dataDictionary, null, 2);
 
-  const datasetDescriptionFilename = datasetName.replace('.json', '_dataset_description.json');
+  const datasetDescriptionFilename = datasetName
+    .replace('_annotated', '')
+    .replace('.json', '_dataset_description.json');
   const datasetDescriptionContent = datasetDescription
     ? JSON.stringify(datasetDescription, null, 2)
     : null;
@@ -235,7 +237,7 @@ function GoogleDriveUpload({
     const datasetSanitized = formData.datasetName
       ? formData.datasetName.replace(/[^a-z0-9]/gi, '_')
       : 'dataset';
-    return `${siteSanitized}_${datasetSanitized}.json`;
+    return `${siteSanitized}_${datasetSanitized}_annotated.json`;
   };
 
   const handleUpload = async (forceOverwrite = false, overrideDatasetName?: string) => {
