@@ -229,12 +229,10 @@ function Download() {
                 }}
               >
                 <Typography variant="subtitle2">
-                  Only the data dictionary will be uploaded to the ENIGMA-PD community drive
+                  The data dictionary and dataset description (if complete) will be uploaded to the
+                  ENIGMA-PD community drive
                 </Typography>
-                <Typography variant="subtitle2">
-                  Refer to the &quot;Data Dictionary&quot; preview section above to see the exact
-                  content being uploaded.
-                </Typography>
+                <Typography variant="subtitle2">Your tabular data remains local.</Typography>
               </Alert>
 
               <Button
@@ -246,7 +244,7 @@ function Download() {
                 className="mt-4"
                 data-cy="upload-drive-button"
               >
-                Upload Data Dictionary to {config}
+                Upload Dataset Information to {config}
               </Button>
             </div>
             <Divider className="my-6 w-full max-w-2xl" />
@@ -319,6 +317,7 @@ function Download() {
         open={uploadDialogOpen}
         onClose={() => setUploadDialogOpen(false)}
         dataDictionary={dataDictionary}
+        datasetDescription={datasetDescription}
         config={config}
       />
     </div>

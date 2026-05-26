@@ -25,6 +25,19 @@ export interface DatasetDescriptionFormState {
   Keywords: string;
 }
 
+export interface DatasetDescription {
+  Name: string;
+  Authors?: string[];
+  AccessType?: string;
+  AccessInstructions?: string;
+  RepositoryURL?: string;
+  AccessEmail?: string;
+  AccessLink?: string;
+  ReferencesAndLinks?: string[];
+  Keywords?: string[];
+  ParticipantCount?: number;
+}
+
 export type StepConfig = {
   label: string;
   view: View;

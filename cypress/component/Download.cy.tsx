@@ -111,9 +111,12 @@ describe('Download', () => {
 
     cy.get('[data-cy="upload-info-alert"]')
       .should('be.visible')
-      .and('contain', 'Only the data dictionary will be uploaded to the ENIGMA-PD community drive');
+      .and(
+        'contain',
+        'The data dictionary and dataset description (if complete) will be uploaded to the ENIGMA-PD community drive'
+      );
     cy.get('[data-cy="upload-drive-button"]')
       .should('be.visible')
-      .and('contain', 'Upload Data Dictionary to ENIGMA-PD');
+      .and('contain', 'Upload Dataset Information to ENIGMA-PD');
   });
 });
