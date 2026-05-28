@@ -1,5 +1,5 @@
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
-import { Button, Card, CardHeader, CardContent, Collapse } from '@mui/material';
+import { Button, Card, CardHeader, CardContent, Collapse, Snackbar, Alert } from '@mui/material';
 import { useRef, useState } from 'react';
 import FileUploader from './FileUploader';
 
@@ -38,12 +38,39 @@ function UploadCard({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
   const isFileUploaded = uploadedFileName !== null;
+
+  const validateAndUpload = (file: File) => {
+    if (file.name.endsWith('.json') || file.type === 'application/json') {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          JSON.parse(e.target?.result as string);
+          setAlertOpen(false);
+          onFileUpload(file);
+        } catch (error) {
+          setErrorMessage('Invalid JSON file uploaded. Please check the file for syntax errors.');
+          setAlertOpen(true);
+
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
+        }
+      };
+      reader.readAsText(file);
+    } else {
+      setAlertOpen(false);
+      onFileUpload(file);
+    }
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const uploadedFile = event.target.files?.[0];
     if (uploadedFile) {
-      onFileUpload(uploadedFile);
+      validateAndUpload(uploadedFile);
     }
   };
 
@@ -51,7 +78,7 @@ function UploadCard({
     event.preventDefault();
     const droppedFile = event.dataTransfer.files?.[0];
     if (droppedFile) {
-      onFileUpload(droppedFile);
+      validateAndUpload(droppedFile);
     }
   };
 
@@ -65,6 +92,10 @@ function UploadCard({
 
   const handleClickToUpload = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleCloseAlert = () => {
+    setAlertOpen(false);
   };
 
   return (
@@ -107,6 +138,17 @@ function UploadCard({
       <Collapse in={isPreviewOpen} timeout="auto" unmountOnExit>
         {isFileUploaded && previewComponent}
       </Collapse>
+
+      <Snackbar
+        open={alertOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseAlert}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseAlert} severity="error" sx={{ width: '100%' }}>
+          {errorMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }
