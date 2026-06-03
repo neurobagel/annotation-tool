@@ -31,15 +31,14 @@ type AnnotationLevels = NonNullable<NonNullable<DataDictionary[string]['Annotati
 const buildColumnLevelsDictionary = (
   levels: ColumnLevels | null | undefined
 ): DataDictionaryLevels =>
-  Object.entries(levels ?? {}).reduce<DataDictionaryLevels>(
-    (acc, [levelValue, levelData]) => ({
-      ...acc,
-      [levelValue]: {
+  Object.fromEntries(
+    Object.entries(levels ?? {}).map(([levelValue, levelData]) => [
+      levelValue,
+      {
         Description: levelData.description ?? '',
         ...(levelData.standardizedTerm ? { TermURL: levelData.standardizedTerm } : {}),
       },
-    }),
-    {}
+    ])
   );
 
 const buildAnnotationLevelsDictionary = (
@@ -47,21 +46,115 @@ const buildAnnotationLevelsDictionary = (
   standardizedTerms: StandardizedTerms,
   missingValues: string[] = []
 ): AnnotationLevels =>
-  Object.entries(levels ?? {})
-    // Missing values are excluded from the Annotations.Levels dictionary because they do not
-    // represent valid categorical levels for standardized terminology mapping. Instead, they
-    // are included in Annotations.MissingValues.
-    .filter(([levelValue]) => !missingValues.includes(levelValue))
-    .reduce<AnnotationLevels>((acc, [levelValue, levelData]) => {
-      const term = standardizedTerms[levelData.standardizedTerm];
-      return {
-        ...acc,
-        [levelValue]:
+  Object.fromEntries(
+    Object.entries(levels ?? {})
+      // Missing values are excluded from the Annotations.Levels dictionary because they do not
+      // represent valid categorical levels for standardized terminology mapping. Instead, they
+      // are included in Annotations.MissingValues.
+      .filter(([levelValue]) => !missingValues.includes(levelValue))
+      .map(([levelValue, levelData]) => {
+        const term = standardizedTerms[levelData.standardizedTerm];
+        return [
+          levelValue,
           term?.id && term.label
             ? { TermURL: term.id, Label: term.label }
             : ({} as { TermURL: string; Label: string }),
-      };
-    }, {});
+        ];
+      })
+  );
+
+export function buildColumnEntry(
+  column: Columns[string],
+  standardizedVariables: ReturnType<typeof useStandardizedVariables>,
+  standardizedTerms: StandardizedTerms,
+  standardizedFormats: ReturnType<typeof useStandardizedFormats>
+): DataDictionary[string] {
+  const entry: DataDictionary[string] = {
+    Description: column.description ?? '',
+  };
+
+  if (column.dataType === DataType.categorical && column.levels) {
+    entry.Levels = buildColumnLevelsDictionary(column.levels);
+  }
+
+  if (column.dataType === DataType.continuous && column.units !== undefined) {
+    entry.Units = column.units ?? '';
+  }
+
+  if (column.standardizedVariable) {
+    const standardizedVariable = standardizedVariables[column.standardizedVariable];
+    const resolvedVariableType =
+      standardizedVariable?.variable_type ?? mapDataTypeToVariableType(column.dataType);
+
+    entry.Annotations = {
+      IsAbout: {
+        TermURL: standardizedVariable?.id ?? column.standardizedVariable,
+        Label: standardizedVariable?.name ?? column.standardizedVariable,
+      },
+      VariableType: resolvedVariableType,
+    };
+
+    if (
+      column.dataType === DataType.categorical &&
+      column.levels &&
+      resolvedVariableType !== VariableType.collection
+    ) {
+      entry.Annotations.Levels = buildAnnotationLevelsDictionary(
+        column.levels,
+        standardizedTerms,
+        column.missingValues
+      );
+    }
+
+    if (column.isPartOf) {
+      const partOfTerm = standardizedTerms[column.isPartOf];
+      if (partOfTerm) {
+        entry.Annotations.IsPartOf = {
+          TermURL: partOfTerm.id,
+          Label: partOfTerm.label,
+        };
+      }
+    }
+
+    if (column.missingValues && column.missingValues.length > 0) {
+      entry.Annotations.MissingValues = column.missingValues;
+    }
+
+    if (column.dataType === DataType.continuous && column.format) {
+      const format = standardizedFormats[column.format];
+      if (format) {
+        entry.Annotations.Format = {
+          TermURL: format.identifier,
+          Label: format.label,
+        };
+      }
+    }
+
+    // Compute min/max for Age columns
+    if (column.dataType === DataType.continuous && standardizedVariable?.name === 'Age') {
+      const uniqueValues = Array.from(new Set(column.allValues ?? []));
+      const validationResult = validateContinuousValues(
+        uniqueValues,
+        column.missingValues ?? [],
+        column.format
+      );
+
+      if (
+        validationResult &&
+        validationResult.invalidCount === 0 &&
+        validationResult.min !== null &&
+        validationResult.max !== null
+      ) {
+        entry.Annotations.ValueRange = {
+          Min: validationResult.min,
+          Max: validationResult.max,
+        };
+      }
+    }
+  }
+
+  return entry;
+}
 
 export function useGenerateDataDictionary(): DataDictionary {
   const columns = useColumns();
@@ -71,104 +164,14 @@ export function useGenerateDataDictionary(): DataDictionary {
 
   return useMemo(
     () =>
-      Object.values(columns).reduce<DataDictionary>((dictionary, column) => {
-        if (!column?.name) {
-          return dictionary;
-        }
-
-        const key = column.name;
-        const entry: DataDictionary[string] = {
-          Description: column.description ?? '',
-        };
-
-        if (column.dataType === DataType.categorical && column.levels) {
-          entry.Levels = buildColumnLevelsDictionary(column.levels);
-        }
-
-        if (column.dataType === DataType.continuous && column.units !== undefined) {
-          entry.Units = column.units ?? '';
-        }
-
-        if (column.standardizedVariable) {
-          const standardizedVariable = standardizedVariables[column.standardizedVariable];
-          const resolvedVariableType =
-            standardizedVariable?.variable_type ?? mapDataTypeToVariableType(column.dataType);
-
-          entry.Annotations = {
-            IsAbout: {
-              TermURL: standardizedVariable?.id ?? column.standardizedVariable,
-              Label: standardizedVariable?.name ?? column.standardizedVariable,
-            },
-            VariableType: resolvedVariableType,
-          };
-
-          if (
-            column.dataType === DataType.categorical &&
-            column.levels &&
-            resolvedVariableType !== VariableType.collection
-          ) {
-            entry.Annotations.Levels = buildAnnotationLevelsDictionary(
-              column.levels,
-              standardizedTerms,
-              column.missingValues
-            );
-          }
-
-          if (column.isPartOf) {
-            const partOfTerm = standardizedTerms[column.isPartOf];
-            if (partOfTerm) {
-              entry.Annotations.IsPartOf = {
-                TermURL: partOfTerm.id,
-                Label: partOfTerm.label,
-              };
-            }
-          }
-
-          if (column.missingValues && column.missingValues.length > 0) {
-            entry.Annotations.MissingValues = column.missingValues;
-          }
-
-          if (column.dataType === DataType.continuous && column.format) {
-            const format = standardizedFormats[column.format];
-            if (format) {
-              entry.Annotations.Format = {
-                TermURL: format.identifier,
-                Label: format.label,
-              };
-            }
-          }
-
-          // Compute min/max for Age columns
-          if (column.dataType === DataType.continuous && standardizedVariable?.name === 'Age') {
-            const uniqueValues = Array.from(new Set(column.allValues ?? []));
-            const validationResult = validateContinuousValues(
-              uniqueValues,
-              column.missingValues ?? [],
-              column.format
-            );
-
-            // If there are any invalid values, the format is considered incorrect
-            // for the dataset as a whole (or the user hasn't designated missing values properly).
-            // In this case, we leave Min and Max empty ("cannot be computed").
-            if (
-              validationResult &&
-              validationResult.invalidCount === 0 &&
-              validationResult.min !== null &&
-              validationResult.max !== null
-            ) {
-              entry.Annotations.ValueRange = {
-                Min: validationResult.min,
-                Max: validationResult.max,
-              };
-            }
-          }
-        }
-
-        return {
-          ...dictionary,
-          [key]: entry,
-        };
-      }, {}),
+      Object.fromEntries(
+        Object.values(columns)
+          .filter((column) => column?.name)
+          .map((column) => [
+            column.name,
+            buildColumnEntry(column, standardizedVariables, standardizedTerms, standardizedFormats),
+          ])
+      ),
     [columns, standardizedFormats, standardizedTerms, standardizedVariables]
   );
 }
