@@ -305,7 +305,7 @@ describe('GoogleDriveUpload', () => {
       cy.get('[data-cy="upload-success-alert"]').should('be.visible');
     });
 
-    it('should apply suffix to both data dictionary and dataset description filenames on conflict', () => {
+    it('should determine filename from the manually entered dataset name in the GDrive upload form if mismatch exists with dataset description', () => {
       const mockDatasetDescription = {
         Name: 'Conflict Dataset',
         ParticipantCount: 42,
