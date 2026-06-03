@@ -1,9 +1,32 @@
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import { Typography, Collapse, List, ListItem, IconButton } from '@mui/material';
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
+import {
+  Typography,
+  Collapse,
+  List,
+  ListItem,
+  IconButton,
+  SvgIcon,
+  type SvgIconProps,
+} from '@mui/material';
 import { capitalize } from 'lodash';
 import { useMemo, useState } from 'react';
 import type { ColumnGroupColumn } from '~/hooks/useValueAnnotationColumns';
+
+function IncompleteArcIcon(props: SvgIconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path
+        d="M12 3A9 9 0 1 1 3 12"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+    </SvgIcon>
+  );
+}
 
 interface MultiColumnGroup {
   label: string;
@@ -21,6 +44,7 @@ interface ColumnTypeCollapseProps {
   dataType?: 'Categorical' | 'Continuous' | null;
   isMultiColumnMeasure?: boolean;
   groupedColumns?: MultiColumnGroup[];
+  schemaErrors: string[];
 }
 
 const ColumnTypeCollapseDefaultProps = {
@@ -47,11 +71,31 @@ function ColumnTypeCollapse({
   dataType = null,
   isMultiColumnMeasure = false,
   groupedColumns = [],
+  schemaErrors,
 }: ColumnTypeCollapseProps) {
   const [showColumns, setShowColumns] = useState<boolean>(true);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
 
   const labelToDisplay = label.toLocaleLowerCase();
+
+  const columnCompleteness = useMemo(
+    () =>
+      Object.fromEntries(
+        columns.map((entry) => {
+          // The schema uses column.name as the key in the data dictionary.
+          // If it's missing, it falls back to the internal column ID.
+          const dictionaryKey = entry.column.name || entry.id;
+          // The column is assumed annotated if it does not appear in the schema errors.
+          return [entry.id, !schemaErrors.includes(dictionaryKey)];
+        })
+      ),
+    [columns, schemaErrors]
+  );
+
+  const isCategoryComplete = useMemo(
+    () => columns.every((entry) => columnCompleteness[entry.id]),
+    [columns, columnCompleteness]
+  );
 
   const groupedColumnEntries = useMemo(() => {
     if (!isMultiColumnMeasure) {
@@ -81,6 +125,17 @@ function ColumnTypeCollapse({
       columns: groupColumns,
     }));
   }, [columns, groupedColumns, isMultiColumnMeasure]);
+
+  const groupCompleteness = useMemo(
+    () =>
+      Object.fromEntries(
+        groupedColumnEntries.map((group) => [
+          group.label,
+          group.columns.every((entry) => columnCompleteness[entry.id]),
+        ])
+      ),
+    [groupedColumnEntries, columnCompleteness]
+  );
 
   const handleSelect = () => {
     if (columns.length > 0) {
@@ -116,8 +171,8 @@ function ColumnTypeCollapse({
 
   if (isMultiColumnMeasure) {
     return (
-      <div data-cy={`side-column-nav-bar-${labelToDisplay}`}>
-        <div className="flex items-center">
+      <div className="w-full" data-cy={`side-column-nav-bar-${labelToDisplay}`}>
+        <div className="flex items-center hover:bg-gray-50 transition-colors duration-150 py-1">
           <IconButton
             data-cy={`side-column-nav-bar-${labelToDisplay}-toggle-button`}
             size="small"
@@ -129,6 +184,152 @@ function ColumnTypeCollapse({
           >
             {showColumns ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
           </IconButton>
+          <div className="flex items-center justify-between flex-grow pr-2">
+            <Typography
+              data-cy={`side-column-nav-bar-${labelToDisplay}-select-button`}
+              onClick={handleSelect}
+              sx={{
+                flexGrow: 1,
+                cursor: 'pointer',
+                fontWeight:
+                  selectedColumnId && columns.some((entry) => entry.id === selectedColumnId)
+                    ? 'bold'
+                    : 'normal',
+                color:
+                  selectedColumnId && columns.some((entry) => entry.id === selectedColumnId)
+                    ? 'primary.main'
+                    : '',
+                '&:hover': {
+                  color: 'primary.main',
+                },
+              }}
+            >
+              {capitalize(labelToDisplay)}
+            </Typography>
+            {isCategoryComplete ? (
+              <CheckRoundedIcon
+                data-cy={`category-complete-icon-${labelToDisplay}`}
+                sx={{ fontSize: 18, color: 'success.main', ml: 1 }}
+              />
+            ) : (
+              <IncompleteArcIcon
+                data-cy={`category-incomplete-icon-${labelToDisplay}`}
+                sx={{ fontSize: 18, color: 'text.secondary', opacity: 0.6, ml: 1 }}
+              />
+            )}
+          </div>
+        </div>
+        <Collapse in={showColumns}>
+          <List sx={{ pl: 2 }} className="space-y-3">
+            {groupedColumnEntries.map(({ label: groupName, columns: groupColumns }) => {
+              const isGroupExpanded = expandedGroups[groupName] || false;
+              const isGroupSelected = groupColumns.some((entry) => entry.id === selectedColumnId);
+
+              return (
+                <div key={`${labelToDisplay}-${groupName}`}>
+                  <div className="flex items-center hover:bg-gray-50 transition-colors duration-150 py-0.5">
+                    <IconButton
+                      data-cy={`side-column-nav-bar-${labelToDisplay}-${groupName}-toggle-button`}
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleGroupToggle(groupName);
+                      }}
+                      sx={{
+                        marginRight: '4px',
+                      }}
+                    >
+                      {isGroupExpanded ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+                    </IconButton>
+                    <div className="flex items-center justify-between flex-grow pr-2">
+                      <Typography
+                        onClick={() => handleGroupSelect(groupColumns)}
+                        data-cy={`side-column-nav-bar-${labelToDisplay}-${groupName}`}
+                        sx={{
+                          cursor: 'pointer',
+                          fontWeight: isGroupSelected ? 'bold' : 'normal',
+                          color: isGroupSelected ? 'primary.main' : '',
+                          '&:hover': {
+                            color: 'primary.main',
+                          },
+                        }}
+                      >
+                        {groupName}
+                      </Typography>
+                      {groupCompleteness[groupName] ? (
+                        <CheckRoundedIcon
+                          data-cy={`group-complete-icon-${groupName}`}
+                          sx={{ fontSize: 16, color: 'success.main', ml: 1 }}
+                        />
+                      ) : (
+                        <IncompleteArcIcon
+                          data-cy={`group-incomplete-icon-${groupName}`}
+                          sx={{ fontSize: 16, color: 'text.secondary', opacity: 0.6, ml: 1 }}
+                        />
+                      )}
+                    </div>
+                  </div>
+                  <Collapse in={isGroupExpanded}>
+                    <List sx={{ pl: 4 }}>
+                      {groupColumns.map((entry) => {
+                        const isComplete = columnCompleteness[entry.id] ?? false;
+                        return (
+                          <ListItem
+                            data-cy={`side-column-nav-bar-${labelToDisplay}-${groupName}-${entry.column.name}`}
+                            key={entry.id}
+                            divider
+                            sx={{
+                              pl: 4,
+                              py: 1,
+                              pr: 1, // Add right padding to match parent
+                              color: 'text.secondary',
+                              fontWeight: entry.id === selectedColumnId ? 'bold' : 'normal',
+                              '&:hover': { backgroundColor: 'action.hover' },
+                            }}
+                          >
+                            <Typography sx={{ flexGrow: 1, fontSize: '0.9rem' }}>
+                              {entry.column.name || entry.id}
+                            </Typography>
+                            {isComplete ? (
+                              <CheckRoundedIcon
+                                data-cy={`column-complete-icon-${entry.id}`}
+                                sx={{ fontSize: 14, color: 'success.main', ml: 1 }}
+                              />
+                            ) : (
+                              <IncompleteArcIcon
+                                data-cy={`column-incomplete-icon-${entry.id}`}
+                                sx={{ fontSize: 14, color: 'text.secondary', opacity: 0.6, ml: 1 }}
+                              />
+                            )}
+                          </ListItem>
+                        );
+                      })}
+                    </List>
+                  </Collapse>
+                </div>
+              );
+            })}
+          </List>
+        </Collapse>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full" data-cy={`side-column-nav-bar-${labelToDisplay}`}>
+      <div className="flex items-center hover:bg-gray-50 transition-colors duration-150 py-1">
+        <IconButton
+          data-cy={`side-column-nav-bar-${labelToDisplay}-toggle-button`}
+          size="small"
+          onClick={() => setShowColumns(!showColumns)}
+          sx={{
+            marginRight: '4px',
+            color: 'primary.main',
+          }}
+        >
+          {showColumns ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+        </IconButton>
+        <div className="flex items-center justify-between flex-grow pr-2">
           <Typography
             data-cy={`side-column-nav-bar-${labelToDisplay}-select-button`}
             onClick={handleSelect}
@@ -150,125 +351,54 @@ function ColumnTypeCollapse({
           >
             {capitalize(labelToDisplay)}
           </Typography>
+          {isCategoryComplete ? (
+            <CheckRoundedIcon
+              data-cy={`category-complete-icon-${labelToDisplay}`}
+              sx={{ fontSize: 18, color: 'success.main', ml: 1 }}
+            />
+          ) : (
+            <IncompleteArcIcon
+              data-cy={`category-incomplete-icon-${labelToDisplay}`}
+              sx={{ fontSize: 18, color: 'text.secondary', opacity: 0.6, ml: 1 }}
+            />
+          )}
         </div>
-        <Collapse in={showColumns}>
-          <List sx={{ pl: 2 }} className="space-y-3">
-            {groupedColumnEntries.map(({ label: groupName, columns: groupColumns }) => {
-              const isGroupExpanded = expandedGroups[groupName] || false;
-              const isGroupSelected = groupColumns.some((entry) => entry.id === selectedColumnId);
-
-              return (
-                <div key={`${labelToDisplay}-${groupName}`}>
-                  <div className="flex items-center">
-                    <IconButton
-                      data-cy={`side-column-nav-bar-${labelToDisplay}-${groupName}-toggle-button`}
-                      size="small"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleGroupToggle(groupName);
-                      }}
-                      sx={{
-                        marginRight: '4px',
-                      }}
-                    >
-                      {isGroupExpanded ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
-                    </IconButton>
-                    <Typography
-                      onClick={() => handleGroupSelect(groupColumns)}
-                      data-cy={`side-column-nav-bar-${labelToDisplay}-${groupName}`}
-                      sx={{
-                        cursor: 'pointer',
-                        fontWeight: isGroupSelected ? 'bold' : 'normal',
-                        color: isGroupSelected ? 'primary.main' : '',
-                        '&:hover': {
-                          color: 'primary.main',
-                        },
-                      }}
-                    >
-                      {groupName}
-                    </Typography>
-                  </div>
-                  <Collapse in={isGroupExpanded}>
-                    <List sx={{ pl: 4 }}>
-                      {groupColumns.map((entry) => (
-                        <ListItem
-                          data-cy={`side-column-nav-bar-${labelToDisplay}-${groupName}-${entry.column.name}`}
-                          key={entry.id}
-                          divider
-                          sx={{
-                            pl: 4,
-                            py: 1,
-                            color: 'text.secondary',
-                            fontWeight: entry.id === selectedColumnId ? 'bold' : 'normal',
-                          }}
-                        >
-                          <Typography>{entry.column.name || entry.id}</Typography>
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Collapse>
-                </div>
-              );
-            })}
-          </List>
-        </Collapse>
-      </div>
-    );
-  }
-
-  return (
-    <div data-cy={`side-column-nav-bar-${labelToDisplay}`}>
-      <div className="flex items-center">
-        <IconButton
-          data-cy={`side-column-nav-bar-${labelToDisplay}-toggle-button`}
-          size="small"
-          onClick={() => setShowColumns(!showColumns)}
-          sx={{
-            marginRight: '4px',
-            color: 'primary.main',
-          }}
-        >
-          {showColumns ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
-        </IconButton>
-        <Typography
-          data-cy={`side-column-nav-bar-${labelToDisplay}-select-button`}
-          onClick={handleSelect}
-          sx={{
-            flexGrow: 1,
-            cursor: 'pointer',
-            fontWeight:
-              selectedColumnId && columns.some((entry) => entry.id === selectedColumnId)
-                ? 'bold'
-                : 'normal',
-            color:
-              selectedColumnId && columns.some((entry) => entry.id === selectedColumnId)
-                ? 'primary.main'
-                : '',
-            '&:hover': {
-              color: 'primary.main',
-            },
-          }}
-        >
-          {capitalize(labelToDisplay)}
-        </Typography>
       </div>
       <Collapse in={showColumns}>
         <List sx={{ pl: 4 }}>
-          {columns.map((entry) => (
-            <ListItem
-              data-cy={`side-column-nav-bar-${labelToDisplay}-${entry.column.name}`}
-              key={entry.id}
-              divider
-              sx={{
-                pl: 4,
-                py: 1,
-                color: 'text.secondary',
-                fontWeight: entry.id === selectedColumnId ? 'bold' : 'normal',
-              }}
-            >
-              <Typography>{entry.column.name || entry.id}</Typography>
-            </ListItem>
-          ))}
+          {columns.map((entry) => {
+            const isComplete = columnCompleteness[entry.id] ?? false;
+            return (
+              <ListItem
+                data-cy={`side-column-nav-bar-${labelToDisplay}-${entry.column.name}`}
+                key={entry.id}
+                divider
+                sx={{
+                  pl: 4,
+                  py: 1,
+                  pr: 1, // Add right padding to match parent
+                  color: 'text.secondary',
+                  fontWeight: entry.id === selectedColumnId ? 'bold' : 'normal',
+                  '&:hover': { backgroundColor: 'action.hover' },
+                }}
+              >
+                <Typography sx={{ flexGrow: 1, fontSize: '0.9rem' }}>
+                  {entry.column.name || entry.id}
+                </Typography>
+                {isComplete ? (
+                  <CheckRoundedIcon
+                    data-cy={`column-complete-icon-${entry.id}`}
+                    sx={{ fontSize: 16, color: 'success.main', ml: 1 }}
+                  />
+                ) : (
+                  <IncompleteArcIcon
+                    data-cy={`column-incomplete-icon-${entry.id}`}
+                    sx={{ fontSize: 16, color: 'text.secondary', opacity: 0.6, ml: 1 }}
+                  />
+                )}
+              </ListItem>
+            );
+          })}
         </List>
       </Collapse>
     </div>

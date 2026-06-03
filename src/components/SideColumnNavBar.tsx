@@ -1,4 +1,6 @@
 import { List, Paper, ListItem, ListItemButton, ListItemText } from '@mui/material';
+import { useGenerateDataDictionary } from '~/hooks/useGenerateDataDictionary';
+import { useSchemaValidation } from '~/hooks/useSchemaValidation';
 import type { UnannotatedColumnGroup } from '~/hooks/useValueAnnotationColumns';
 import type {
   ValueAnnotationNavAnnotatedGroup,
@@ -20,10 +22,12 @@ function AnnotatedColumnGroupCollapse({
   group,
   onSelect,
   selectedColumnId,
+  schemaErrors,
 }: {
   group: ValueAnnotationNavAnnotatedGroup;
   onSelect: SideColumnNavBarProps['onSelect'];
   selectedColumnId: string | null;
+  schemaErrors: string[];
 }) {
   return (
     <ColumnTypeCollapse
@@ -34,6 +38,7 @@ function AnnotatedColumnGroupCollapse({
       selectedColumnId={selectedColumnId}
       isMultiColumnMeasure={group.isMultiColumnMeasure}
       groupedColumns={group.groupedColumns}
+      schemaErrors={schemaErrors}
     />
   );
 }
@@ -42,10 +47,12 @@ function UnannotatedColumnGroupCollapse({
   group,
   onSelect,
   selectedColumnId,
+  schemaErrors,
 }: {
   group: UnannotatedColumnGroup;
   onSelect: SideColumnNavBarProps['onSelect'];
   selectedColumnId: string | null;
+  schemaErrors: string[];
 }) {
   let label = 'other';
   let dataType: 'Categorical' | 'Continuous' | null = null;
@@ -61,6 +68,7 @@ function UnannotatedColumnGroupCollapse({
       columns={group.columns}
       onSelect={onSelect}
       selectedColumnId={selectedColumnId}
+      schemaErrors={schemaErrors}
     />
   );
 }
@@ -71,6 +79,9 @@ function SideColumnNavBar({
   onSelect,
   selectedColumnId,
 }: SideColumnNavBarProps) {
+  const dataDictionary = useGenerateDataDictionary();
+  const { schemaErrors } = useSchemaValidation(dataDictionary);
+
   return (
     <Paper
       className="w-full max-w-80 p-4 overflow-y-auto"
@@ -99,6 +110,7 @@ function SideColumnNavBar({
                 group={group}
                 selectedColumnId={selectedColumnId}
                 onSelect={onSelect}
+                schemaErrors={schemaErrors}
               />
             </ListItem>
           ))}
@@ -113,6 +125,7 @@ function SideColumnNavBar({
                 group={group}
                 onSelect={onSelect}
                 selectedColumnId={selectedColumnId}
+                schemaErrors={schemaErrors}
               />
             </ListItem>
           ))}

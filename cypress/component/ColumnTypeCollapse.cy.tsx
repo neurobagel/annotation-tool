@@ -7,7 +7,7 @@ const baseColumns: ColumnGroupColumn[] = [
     id: '1',
     column: {
       id: '1',
-      name: 'participant_id',
+      name: 'weight',
       allValues: [],
       dataType: DataType.continuous,
     },
@@ -55,12 +55,13 @@ describe('ColumnTypeCollapse', () => {
         columns={baseColumns}
         onSelect={() => {}}
         selectedColumnId="1"
+        schemaErrors={[]}
       />
     );
 
-    cy.get('[data-cy="side-column-nav-bar-continuous"]').should('contain', 'participant_id');
+    cy.get('[data-cy="side-column-nav-bar-continuous"]').should('contain', 'weight');
     cy.get('[data-cy="side-column-nav-bar-continuous-toggle-button"]').click();
-    cy.get('[data-cy="side-column-nav-bar-continuous-participant_id"]').should('not.be.visible');
+    cy.get('[data-cy="side-column-nav-bar-continuous-weight"]').should('not.be.visible');
   });
 
   it('should render multi-column grouped variables', () => {
@@ -81,13 +82,20 @@ describe('ColumnTypeCollapse', () => {
             columns: [groupedColumns[1]],
           },
         ]}
+        schemaErrors={[]}
       />
     );
 
     cy.get('[data-cy="side-column-nav-bar-assessment tool"]').should('contain', 'assessment_score');
-    cy.get('[data-cy="side-column-nav-bar-assessment tool-Subscale A-toggle-button"]').click();
+
     cy.get('[data-cy="side-column-nav-bar-assessment tool-Subscale A-assessment_score"]').should(
       'not.be.visible'
+    );
+
+    cy.get('[data-cy="side-column-nav-bar-assessment tool-Subscale A-toggle-button"]').click();
+
+    cy.get('[data-cy="side-column-nav-bar-assessment tool-Subscale A-assessment_score"]').should(
+      'be.visible'
     );
   });
 
@@ -100,6 +108,7 @@ describe('ColumnTypeCollapse', () => {
         columns={baseColumns}
         onSelect={spy}
         selectedColumnId="1"
+        schemaErrors={[]}
       />
     );
 
@@ -107,6 +116,119 @@ describe('ColumnTypeCollapse', () => {
     cy.get('@onSelect').should('have.been.calledWith', {
       columnIDs: ['1', '2'],
       dataType: 'Continuous',
+    });
+  });
+
+  describe('Completeness Visualization', () => {
+    it('should show incomplete icons for completely incomplete categories', () => {
+      cy.mount(
+        <ColumnTypeCollapse
+          label="continuous"
+          dataType="Continuous"
+          columns={baseColumns}
+          onSelect={() => {}}
+          selectedColumnId="1"
+          schemaErrors={['weight', 'age']}
+        />
+      );
+
+      cy.get('[data-cy="side-column-nav-bar-continuous-toggle-button"]').click();
+
+      cy.get('[data-cy="column-incomplete-icon-1"]').should('be.visible');
+      cy.get('[data-cy="column-incomplete-icon-2"]').should('be.visible');
+      cy.get('[data-cy="column-complete-icon-1"]').should('not.exist');
+      cy.get('[data-cy="column-complete-icon-2"]').should('not.exist');
+
+      cy.get('[data-cy="category-incomplete-icon-continuous"]').should('be.visible');
+      cy.get('[data-cy="category-complete-icon-continuous"]').should('not.exist');
+    });
+
+    it('should show complete icons for fully complete categories', () => {
+      cy.mount(
+        <ColumnTypeCollapse
+          label="continuous"
+          dataType="Continuous"
+          columns={baseColumns}
+          onSelect={() => {}}
+          selectedColumnId="1"
+          schemaErrors={[]}
+        />
+      );
+
+      cy.get('[data-cy="side-column-nav-bar-continuous-toggle-button"]').click();
+
+      cy.get('[data-cy="column-complete-icon-1"]').should('be.visible');
+      cy.get('[data-cy="column-complete-icon-2"]').should('be.visible');
+      cy.get('[data-cy="column-incomplete-icon-1"]').should('not.exist');
+      cy.get('[data-cy="column-incomplete-icon-2"]').should('not.exist');
+
+      cy.get('[data-cy="category-complete-icon-continuous"]').should('be.visible');
+      cy.get('[data-cy="category-incomplete-icon-continuous"]').should('not.exist');
+    });
+
+    it('should show mixed icons for partially complete categories', () => {
+      cy.mount(
+        <ColumnTypeCollapse
+          label="continuous"
+          dataType="Continuous"
+          columns={baseColumns}
+          onSelect={() => {}}
+          selectedColumnId="1"
+          schemaErrors={['weight']}
+        />
+      );
+
+      cy.get('[data-cy="side-column-nav-bar-continuous-toggle-button"]').click();
+
+      cy.get('[data-cy="column-incomplete-icon-1"]').should('be.visible');
+      cy.get('[data-cy="column-complete-icon-1"]').should('not.exist');
+
+      cy.get('[data-cy="column-complete-icon-2"]').should('be.visible');
+      cy.get('[data-cy="column-incomplete-icon-2"]').should('not.exist');
+
+      cy.get('[data-cy="category-incomplete-icon-continuous"]').should('be.visible');
+      cy.get('[data-cy="category-complete-icon-continuous"]').should('not.exist');
+    });
+
+    it('should handle nested completeness for multi-column measures', () => {
+      cy.mount(
+        <ColumnTypeCollapse
+          label="assessment tool"
+          columns={groupedColumns}
+          onSelect={() => {}}
+          selectedColumnId="3"
+          isMultiColumnMeasure
+          groupedColumns={[
+            {
+              label: 'Subscale A',
+              columns: [groupedColumns[0]],
+            },
+            {
+              label: 'Subscale B',
+              columns: [groupedColumns[1]],
+            },
+          ]}
+          schemaErrors={['assessment_score']}
+        />
+      );
+
+      cy.get('[data-cy="category-incomplete-icon-assessment tool"]').should('be.visible');
+
+      cy.get('[data-cy="group-incomplete-icon-Subscale A"]').should('be.visible');
+      cy.get('[data-cy="group-complete-icon-Subscale A"]').should('not.exist');
+
+      cy.get('[data-cy="group-complete-icon-Subscale B"]').should('be.visible');
+      cy.get('[data-cy="group-incomplete-icon-Subscale B"]').should('not.exist');
+
+      cy.get('[data-cy="side-column-nav-bar-assessment tool-Subscale A-toggle-button"]').click({
+        force: true,
+      });
+      cy.get('[data-cy="column-incomplete-icon-3"]').should('be.visible');
+
+      cy.get('[data-cy="side-column-nav-bar-assessment tool-Subscale B-toggle-button"]').click({
+        force: true,
+      });
+      cy.get('[data-cy="column-complete-icon-4"]').should('be.visible');
     });
   });
 });
