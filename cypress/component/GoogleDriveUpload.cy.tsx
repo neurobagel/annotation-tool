@@ -126,7 +126,7 @@ describe('GoogleDriveUpload', () => {
         const { body } = interception.request;
         // If body is string (text/plain), parse it. If object, use as is.
         const parsed = typeof body === 'string' ? JSON.parse(body) : body;
-        expect(parsed.files[0].filename).to.contain('SuccessDataset');
+        expect(parsed.files[0].filename).to.contain('SuccessDataset_annotated.json');
         expect(parsed.checkExists).to.equal(true);
       });
 
@@ -172,7 +172,7 @@ describe('GoogleDriveUpload', () => {
 
         expect(parsed.files).to.have.length(2);
 
-        expect(parsed.files[0].filename).to.contain('DualFileDataset.json');
+        expect(parsed.files[0].filename).to.contain('DualFileDataset_annotated.json');
 
         expect(parsed.files[1].filename).to.contain('DualFileDataset_dataset_description.json');
         const descriptionContent = JSON.parse(parsed.files[1].content);
@@ -236,8 +236,7 @@ describe('GoogleDriveUpload', () => {
         const { body } = interception.request;
         const parsedBody = typeof body === 'string' ? JSON.parse(body) : body;
         expect(parsedBody.checkExists).to.equal(false);
-        // Not end without prefix
-        expect(parsedBody.files[0].filename).to.not.equal('conflict.json');
+        expect(parsedBody.files[0].filename).to.not.equal('conflict_annotated.json');
       });
 
       cy.get('[data-cy="upload-success-alert"]').should('be.visible');
@@ -304,6 +303,65 @@ describe('GoogleDriveUpload', () => {
       });
 
       cy.get('[data-cy="upload-success-alert"]').should('be.visible');
+    });
+
+    it('should determine filename from the manually entered dataset name in the GDrive upload form if mismatch exists with dataset description', () => {
+      const mockDatasetDescription = {
+        Name: 'Conflict Dataset',
+        ParticipantCount: 42,
+      };
+
+      cy.mount(
+        <GoogleDriveUpload
+          open={testProps.open}
+          onClose={testProps.onClose}
+          dataDictionary={testProps.dataDictionary}
+          datasetDescription={mockDatasetDescription}
+          appsScriptUrl={testProps.appsScriptUrl}
+          config={testProps.config}
+        />
+      );
+
+      cy.wait('@getSites');
+
+      let conflictHit = false;
+      cy.intercept('POST', '**/exec', (req) => {
+        const body = JSON.parse(req.body);
+        if (body.action !== 'getSites') {
+          if (!conflictHit) {
+            conflictHit = true;
+            req.reply({
+              body: { status: 'conflict' },
+            });
+          } else {
+            req.reply({
+              body: { status: 'success', fileId: '12345' },
+            });
+          }
+        }
+      }).as('createDualFileConflict');
+
+      cy.get('[data-cy="dataset-name-input"]').clear();
+      cy.get('[data-cy="dataset-name-input"]').type('ConflictDualFile');
+      cy.get('[data-cy="password-input"]').type('pass');
+      cy.get('[data-cy="upload-button"]').click();
+
+      cy.wait('@createDualFileConflict');
+
+      cy.get('[data-cy="custom-suffix-input"]').type('v2');
+      cy.get('[data-cy="overwrite-confirm-button"]').click();
+
+      cy.wait('@createDualFileConflict').then((interception) => {
+        const { body } = interception.request;
+        const parsed = typeof body === 'string' ? JSON.parse(body) : body;
+
+        expect(parsed.files).to.have.length(2);
+
+        expect(parsed.files[0].filename).to.equal('SiteA_ConflictDualFile_annotated_v2.json');
+        expect(parsed.files[1].filename).to.equal(
+          'SiteA_ConflictDualFile_v2_dataset_description.json'
+        );
+      });
     });
 
     it('should only show info icon in initial state', () => {
