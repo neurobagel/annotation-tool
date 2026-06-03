@@ -1,3 +1,15 @@
+# v0.7.2 (Wed Jun 03 2026)
+
+#### 🏠 Internal
+
+- [FIX] Align data dictionary filenames with tool expectations [#559](https://github.com/neurobagel/annotation-tool/pull/559) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.7.1 (Tue May 26 2026)
 
 #### 🚀 Enhancements
