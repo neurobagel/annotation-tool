@@ -57,9 +57,8 @@ function DatasetDescriptionForm() {
       </Typography>
       <Typography variant="body2" className="text-gray-600 mb-4">
         The information you enter into this form will be available to download as a
-        dataset_description.json file on the next page. For more. Fill out this metadata to generate
-        a Neurobagel-compliant dataset_description.json file. For more information about each
-        dataset description field, see the{' '}
+        dataset_description.json file on the next page. For more information about each dataset
+        description field, see the{' '}
         <Link
           href="https://neurobagel.org/user_guide/dataset_description/#dataset-description-fields"
           target="_blank"
