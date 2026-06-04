@@ -56,15 +56,16 @@ function DatasetDescriptionForm() {
         Dataset Description
       </Typography>
       <Typography variant="body2" className="text-gray-600 mb-4">
-        This information is what people will see when they first discover your dataset. Fill out
-        this metadata to generate a Neurobagel-compliant dataset_description.json file. For more
-        information about each dataset description field, see the{' '}
+        The information you enter into this form will be available to download as a
+        dataset_description.json file on the next page. For more. Fill out this metadata to generate
+        a Neurobagel-compliant dataset_description.json file. For more information about each
+        dataset description field, see the{' '}
         <Link
           href="https://neurobagel.org/user_guide/dataset_description/#dataset-description-fields"
           target="_blank"
           rel="noreferrer"
         >
-          docs
+          user guide
         </Link>
         .
       </Typography>
@@ -116,8 +117,8 @@ function DatasetDescriptionForm() {
           <AccordionDetails className="flex flex-col gap-4 pt-4">
             <Typography variant="body2" className="text-gray-600 mb-2">
               Provide details on how others can access or request the raw dataset. This information
-              is only intended to describe the dataset’s access conditions and will not have any
-              effect on actual data availability or user permissions.
+              will be shown to researchers who discover your data and has no effect on the
+              visibility or access restrictions of your data.
             </Typography>
             <TextField
               select
