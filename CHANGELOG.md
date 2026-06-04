@@ -1,3 +1,15 @@
+# v0.7.3 (Thu Jun 04 2026)
+
+#### 🚀 Enhancements
+
+- [ENH] Add context on dataset description fields [#567](https://github.com/neurobagel/annotation-tool/pull/567) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.7.2 (Wed Jun 03 2026)
 
 #### 🏠 Internal

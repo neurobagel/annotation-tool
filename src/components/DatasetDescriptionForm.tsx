@@ -7,12 +7,20 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Link,
+  Tooltip,
 } from '@mui/material';
 import { useDatasetDescriptionFormValidation } from '../hooks/useDatasetDescriptionFormValidation';
 import { useDatasetDescription, useDataActions } from '../stores/data';
 import { DatasetDescriptionFormState } from '../utils/internal_types';
 
 const ACCESS_TYPES = ['public', 'registered', 'restricted'];
+const ACCESS_TYPE_TOOLTIPS: Record<string, string> = {
+  public: 'Immediately accessible without registration, authentication, or approval.',
+  registered:
+    'Requires authentication or agreement to basic terms of use, but no formal application or review.',
+  restricted: 'Requires formal approval or review of a data access request.',
+};
 
 function ArrayPreviewDisplay({ value, dataCy }: { value: string; dataCy: string }) {
   if (value.trim() === '') return null;
@@ -48,8 +56,18 @@ function DatasetDescriptionForm() {
         Dataset Description
       </Typography>
       <Typography variant="body2" className="text-gray-600 mb-4">
-        This information is what people will see when they first discover your dataset. Fill out
-        this metadata to generate a Neurobagel-compliant dataset_description.json file.
+        The information you enter into this form will be available to download as a
+        dataset_description.json file on the next page. For more. Fill out this metadata to generate
+        a Neurobagel-compliant dataset_description.json file. For more information about each
+        dataset description field, see the{' '}
+        <Link
+          href="https://neurobagel.org/user_guide/dataset_description/#dataset-description-fields"
+          target="_blank"
+          rel="noreferrer"
+        >
+          user guide
+        </Link>
+        .
       </Typography>
 
       <TextField
@@ -97,8 +115,10 @@ function DatasetDescriptionForm() {
             </Typography>
           </AccordionSummary>
           <AccordionDetails className="flex flex-col gap-4 pt-4">
-            <Typography variant="body2" className="text-gray-600">
-              Provide details on how others can access or request this dataset.
+            <Typography variant="body2" className="text-gray-600 mb-2">
+              Provide details on how others can access or request the raw dataset. This information
+              will be shown to researchers who discover your data and has no effect on the
+              visibility or access restrictions of your data.
             </Typography>
             <TextField
               select
@@ -111,7 +131,9 @@ function DatasetDescriptionForm() {
             >
               {ACCESS_TYPES.map((type) => (
                 <MenuItem key={type} value={type}>
-                  {type}
+                  <Tooltip title={ACCESS_TYPE_TOOLTIPS[type]} placement="right" arrow>
+                    <span className="w-full block">{type}</span>
+                  </Tooltip>
                 </MenuItem>
               ))}
             </TextField>
@@ -178,7 +200,8 @@ function DatasetDescriptionForm() {
           </AccordionSummary>
           <AccordionDetails className="flex flex-col gap-4 pt-4">
             <Typography variant="body2" className="text-gray-600">
-              Add links, related papers, and keywords to help others evaluate your dataset.
+              Add links, relevant papers, and keywords to help others better understand your
+              dataset.
             </Typography>
             <Box className="flex flex-col gap-1">
               <TextField
