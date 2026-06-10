@@ -1,3 +1,15 @@
+# v0.7.5 (Wed Jun 10 2026)
+
+#### 🚀 Enhancements
+
+- [ENH] Implement status indicator for each variable/column in Value annotation [#566](https://github.com/neurobagel/annotation-tool/pull/566) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.7.4 (Thu Jun 04 2026)
 
 #### 🚀 Enhancements
