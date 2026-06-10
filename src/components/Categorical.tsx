@@ -73,6 +73,7 @@ const CategoricalVirtualListbox = forwardRef<HTMLDivElement, React.HTMLAttribute
     );
   }
 );
+CategoricalVirtualListbox.displayName = 'CategoricalVirtualListbox';
 
 function Categorical({
   columnID,
