@@ -41,8 +41,8 @@ describe('useColumnsMetadata', () => {
     const { result } = renderHook(() => useColumnsMetadata(['1', '2']));
 
     expect(result.current).toEqual({
-      '1': { id: '1', name: 'age', dataType: DataType.continuous, isMultiColumnMeasure: false },
-      '2': { id: '2', name: 'sex', dataType: DataType.categorical, isMultiColumnMeasure: true },
+      '1': { id: '1', name: 'age', dataType: DataType.continuous, isCollection: false },
+      '2': { id: '2', name: 'sex', dataType: DataType.categorical, isCollection: true },
     });
   });
 
@@ -54,7 +54,7 @@ describe('useColumnsMetadata', () => {
     const { result } = renderHook(() => useColumnsMetadata(['1', 'missing']));
 
     expect(result.current).toEqual({
-      '1': { id: '1', name: 'age', dataType: DataType.continuous, isMultiColumnMeasure: false },
+      '1': { id: '1', name: 'age', dataType: DataType.continuous, isCollection: false },
     });
   });
 });
