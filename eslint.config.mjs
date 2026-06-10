@@ -37,25 +37,12 @@ export default tseslint.config(
       ...reactHooksPlugin.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'react/react-in-jsx-scope': 'off',
-      'react/require-default-props': 'off',
       'tsdoc/syntax': 'warn',
       /* 
       @typescript-eslint/no-unused-vars is turned off since eslint wasn't picking up on using `_` for unused variables
       which is the solution that we've been using for it.
       */
       '@typescript-eslint/no-unused-vars': 'off',
-      /*
-      The no-param-reassign rule prevents direct assignment to function parameters. 
-      However, in the context of Immer, this rule can be safely ignored because 
-      Immer is designed to handle mutations to the draft object in a controlled way.
-      */
-      'no-param-reassign': [
-        'error',
-        {
-          props: true,
-          ignorePropertyModificationsFor: ['draft'],
-        },
-      ],
     },
     settings: {
       react: {
