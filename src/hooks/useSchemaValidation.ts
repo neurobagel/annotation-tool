@@ -3,10 +3,11 @@ import { useMemo } from 'react';
 import schema from '../assets/neurobagel_data_dictionary.schema.json';
 import { DataDictionary } from '../utils/internal_types';
 
+const ajv = new Ajv({ allErrors: true });
+const validate = ajv.compile(schema);
+
 export function useSchemaValidation(dataDictionary: DataDictionary) {
   return useMemo(() => {
-    const ajv = new Ajv({ allErrors: true });
-    const validate = ajv.compile(schema);
     const isValid = validate(dataDictionary);
 
     if (!isValid) {

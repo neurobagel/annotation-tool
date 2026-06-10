@@ -1,9 +1,9 @@
 import { useColumns, useStandardizedVariables } from '../stores/data';
-import { DataType, Columns, StandardizedVariables, VariableType } from '../utils/internal_types';
+import { DataType, Column, StandardizedVariables, VariableType } from '../utils/internal_types';
 
 export interface ColumnGroupColumn {
   id: string;
-  column: Columns[string];
+  column: Column;
 }
 
 export interface AnnotatedColumnGroup {

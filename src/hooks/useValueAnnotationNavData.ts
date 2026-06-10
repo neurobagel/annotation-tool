@@ -5,7 +5,7 @@ import { useAnnotatedVariables } from './useAnnotatedVariables';
 import type { ColumnGroupColumn, UnannotatedColumnGroup } from './useValueAnnotationColumns';
 import { useValueAnnotationColumns } from './useValueAnnotationColumns';
 
-interface MultiColumnGroupedColumns {
+interface CollectionGroupedColumns {
   label: string;
   columns: ColumnGroupColumn[];
 }
@@ -14,8 +14,8 @@ export interface ValueAnnotationNavAnnotatedGroup {
   standardizedVariableId: string;
   label: string;
   columns: ColumnGroupColumn[];
-  isMultiColumnMeasure: boolean;
-  groupedColumns: MultiColumnGroupedColumns[];
+  isCollection: boolean;
+  groupedColumns: CollectionGroupedColumns[];
 }
 
 export interface ValueAnnotationNavData {
@@ -23,11 +23,11 @@ export interface ValueAnnotationNavData {
   unannotatedGroups: UnannotatedColumnGroup[];
 }
 
-const buildMultiColumnGroups = (
+const buildCollectionGroups = (
   columns: ColumnGroupColumn[],
   standardizedTerms: StandardizedTerms
-): MultiColumnGroupedColumns[] => {
-  const grouped = columns.reduce<Record<string, MultiColumnGroupedColumns>>((acc, entry) => {
+): CollectionGroupedColumns[] => {
+  const grouped = columns.reduce<Record<string, CollectionGroupedColumns>>((acc, entry) => {
     const termId =
       typeof entry.column.isPartOf === 'string' && entry.column.isPartOf.length > 0
         ? entry.column.isPartOf
@@ -67,19 +67,19 @@ export function useValueAnnotationNavData(): ValueAnnotationNavData {
   return useMemo(() => {
     const multiColumnFlags: Record<string, boolean> = {};
     annotatedVariables.forEach((variableGroup) => {
-      multiColumnFlags[variableGroup.standardizedVariableId] = variableGroup.isMultiColumnMeasure;
+      multiColumnFlags[variableGroup.standardizedVariableId] = variableGroup.isCollection;
     });
 
     const annotatedGroups = annotatedColumnGroups.map<ValueAnnotationNavAnnotatedGroup>((group) => {
-      const isMultiColumnMeasure = multiColumnFlags[group.standardizedVariableId] ?? false;
+      const isCollection = multiColumnFlags[group.standardizedVariableId] ?? false;
 
-      const groupedColumns = isMultiColumnMeasure
-        ? buildMultiColumnGroups(group.columns, standardizedTerms)
+      const groupedColumns = isCollection
+        ? buildCollectionGroups(group.columns, standardizedTerms)
         : [];
 
       return {
         ...group,
-        isMultiColumnMeasure,
+        isCollection,
         groupedColumns,
       };
     });
