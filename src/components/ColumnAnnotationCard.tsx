@@ -73,7 +73,6 @@ function ColumnAnnotationCard({
     // We intentionally omit these keyboard/focus handlers so the card itself doesn't
     // become a tab stop, allowing users to naturally tab through the interactive elements
     // *inside* the card instead.
-    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus, jsx-a11y/role-supports-aria-props
     <div
       role="button"
       aria-selected={selected}

@@ -44,16 +44,17 @@ function DescriptionEditor({
     statusTimeoutRef.current = setTimeout(() => setSaveStatus('idle'), 1500);
   }, 500);
 
+  const [prevDescription, setPrevDescription] = useState<string | null>(description);
+  const [prevDisabled, setPrevDisabled] = useState(disabled);
+
   // Reset component state when the prop changes (e.g., missing toggle).
-  useEffect(() => {
+  if (description !== prevDescription || disabled !== prevDisabled) {
+    setPrevDescription(description);
+    setPrevDisabled(disabled);
     setEditedDescription(description);
     debouncedSave.cancel();
-    if (statusTimeoutRef.current) {
-      clearTimeout(statusTimeoutRef.current);
-      statusTimeoutRef.current = null;
-    }
     setSaveStatus('idle');
-  }, [description, disabled, debouncedSave]);
+  }
 
   // Flush any pending save on unmount so fast column switches don't drop edits.
   useEffect(
@@ -76,6 +77,12 @@ function DescriptionEditor({
     if (disabled) {
       return;
     }
+
+    if (statusTimeoutRef.current) {
+      clearTimeout(statusTimeoutRef.current);
+      statusTimeoutRef.current = null;
+    }
+
     setSaveStatus('saving');
     debouncedSave(newValue);
   };
