@@ -1,6 +1,6 @@
-import Ajv from 'ajv';
 import Download from '../../src/components/Download';
 import { useDataStore } from '../../src/stores/data';
+import { DataType, VariableType } from '../../src/utils/internal_types';
 import {
   mockDataDictionaryWithNoDescription,
   mockDataDictionaryWithAnnotations,
@@ -10,11 +10,6 @@ import {
   mockStandardizedTerms,
   mockStandardizedFormats,
 } from '../../src/utils/mocks';
-
-interface ValidateFunction {
-  (data: unknown): boolean;
-  errors?: { instancePath: string }[];
-}
 
 describe('Download', () => {
   beforeEach(() => {
@@ -53,12 +48,34 @@ describe('Download', () => {
   });
 
   it('should render the component correctly when the data dictionary is invalid', () => {
-    // Create a stub validation function that always returns false (invalid)
-    const validateStub = cy.stub().returns(false) as ValidateFunction;
-    // Add mock validation errors to the stub
-    validateStub.errors = [{ instancePath: '/column1' }, { instancePath: '/column2' }];
-    // Stub Ajv.prototype.compile to return our custom validation function
-    cy.stub(Ajv.prototype, 'compile').callsFake(() => validateStub);
+    // We mock the state to trigger a schema validation error natively (e.g., passing an invalid URI)
+    // because Ajv compiles at module load time, making cy.stub() ineffective here.
+    useDataStore.setState((state) => ({
+      ...state,
+      columns: {
+        column1: {
+          id: 'column1',
+          name: 'column1',
+          allValues: [],
+          description: '',
+          dataType: DataType.continuous,
+          standardizedVariable: 'nb:InvalidVariable',
+        },
+      },
+      standardizedVariables: {
+        'nb:InvalidVariable': {
+          id: 'not_a_valid_uri_format',
+          name: 'Invalid',
+          variable_type: VariableType.continuous,
+          required: false,
+          description: 'An invalid variable mapping',
+          is_multi_column_measure: false,
+          can_have_multiple_columns: false,
+        },
+      },
+      standardizedTerms: {},
+      standardizedFormats: {},
+    }));
 
     cy.mount(<Download />);
 

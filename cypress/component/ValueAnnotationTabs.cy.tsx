@@ -8,8 +8,8 @@ import { DataType } from '../../src/utils/internal_types';
 const columnOrder = ['1', '2'];
 
 const columnsMeta: Record<string, ValueAnnotationTabMetadata> = {
-  '1': { id: '1', name: 'age', dataType: DataType.continuous, isMultiColumnMeasure: false },
-  '2': { id: '2', name: 'sex', dataType: DataType.categorical, isMultiColumnMeasure: false },
+  '1': { id: '1', name: 'age', dataType: DataType.continuous, isCollection: false },
+  '2': { id: '2', name: 'sex', dataType: DataType.categorical, isCollection: false },
 };
 
 const columnData: Record<string, ActiveValueAnnotationColumn> = {

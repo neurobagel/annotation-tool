@@ -40,11 +40,11 @@ describe('useAnnotatedVariables', () => {
       (group) => group.standardizedVariableId === 'nb:Assessment'
     );
     expect(assessmentGroup?.columnIds).toEqual(['1', '2']);
-    expect(assessmentGroup?.isMultiColumnMeasure).toBe(true);
+    expect(assessmentGroup?.isCollection).toBe(true);
 
     const ageGroup = result.current.find((group) => group.standardizedVariableId === 'nb:Age');
     expect(ageGroup?.columnIds).toEqual(['3']);
-    expect(ageGroup?.isMultiColumnMeasure).toBe(false);
+    expect(ageGroup?.isCollection).toBe(false);
   });
 
   it('should return empty array when no columns are annotated', () => {
