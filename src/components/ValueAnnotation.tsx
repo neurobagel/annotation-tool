@@ -45,7 +45,7 @@ function ValueAnnotation() {
     if (!metadata) {
       return false;
     }
-    return !metadata.dataType && !metadata.isMultiColumnMeasure;
+    return !metadata.dataType && !metadata.isCollection;
   });
   const activeColumn = useValueAnnotationColumn(activeColumnId);
 

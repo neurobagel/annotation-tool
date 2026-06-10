@@ -36,7 +36,7 @@ function AnnotatedColumnGroupCollapse({
       columns={group.columns}
       onSelect={onSelect}
       selectedColumnId={selectedColumnId}
-      isMultiColumnMeasure={group.isMultiColumnMeasure}
+      isCollection={group.isCollection}
       groupedColumns={group.groupedColumns}
       schemaErrors={schemaErrors}
     />

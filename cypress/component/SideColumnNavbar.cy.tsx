@@ -18,7 +18,7 @@ const annotatedGroups: ValueAnnotationNavAnnotatedGroup[] = [
         },
       },
     ],
-    isMultiColumnMeasure: false,
+    isCollection: false,
     groupedColumns: [],
   },
   {
@@ -46,7 +46,7 @@ const annotatedGroups: ValueAnnotationNavAnnotatedGroup[] = [
         },
       },
     ],
-    isMultiColumnMeasure: true,
+    isCollection: true,
     groupedColumns: [
       {
         label: 'Previous IQ assessment by pronunciation',

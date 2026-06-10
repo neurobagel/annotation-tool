@@ -47,7 +47,7 @@ const groupedColumns: ColumnGroupColumn[] = [
 ];
 
 describe('ColumnTypeCollapse', () => {
-  it('should render non-multi-column groups and toggles visibility', () => {
+  it('should render non-collection groups and toggles visibility', () => {
     cy.mount(
       <ColumnTypeCollapse
         label="continuous"
@@ -64,14 +64,14 @@ describe('ColumnTypeCollapse', () => {
     cy.get('[data-cy="side-column-nav-bar-continuous-weight"]').should('not.be.visible');
   });
 
-  it('should render multi-column grouped variables', () => {
+  it('should render collection groups', () => {
     cy.mount(
       <ColumnTypeCollapse
         label="assessment tool"
         columns={groupedColumns}
         onSelect={() => {}}
         selectedColumnId="3"
-        isMultiColumnMeasure
+        isCollection
         groupedColumns={[
           {
             label: 'Subscale A',
@@ -132,8 +132,6 @@ describe('ColumnTypeCollapse', () => {
         />
       );
 
-      cy.get('[data-cy="side-column-nav-bar-continuous-toggle-button"]').click();
-
       cy.get('[data-cy="column-incomplete-icon-1"]').should('be.visible');
       cy.get('[data-cy="column-incomplete-icon-2"]').should('be.visible');
       cy.get('[data-cy="column-complete-icon-1"]').should('not.exist');
@@ -155,8 +153,6 @@ describe('ColumnTypeCollapse', () => {
         />
       );
 
-      cy.get('[data-cy="side-column-nav-bar-continuous-toggle-button"]').click();
-
       cy.get('[data-cy="column-complete-icon-1"]').should('be.visible');
       cy.get('[data-cy="column-complete-icon-2"]').should('be.visible');
       cy.get('[data-cy="column-incomplete-icon-1"]').should('not.exist');
@@ -166,7 +162,7 @@ describe('ColumnTypeCollapse', () => {
       cy.get('[data-cy="category-incomplete-icon-continuous"]').should('not.exist');
     });
 
-    it('should show mixed icons for partially complete categories', () => {
+    it('should show the appropriate icons for complete and partially complete categories', () => {
       cy.mount(
         <ColumnTypeCollapse
           label="continuous"
@@ -178,8 +174,6 @@ describe('ColumnTypeCollapse', () => {
         />
       );
 
-      cy.get('[data-cy="side-column-nav-bar-continuous-toggle-button"]').click();
-
       cy.get('[data-cy="column-incomplete-icon-1"]').should('be.visible');
       cy.get('[data-cy="column-complete-icon-1"]').should('not.exist');
 
@@ -190,14 +184,14 @@ describe('ColumnTypeCollapse', () => {
       cy.get('[data-cy="category-complete-icon-continuous"]').should('not.exist');
     });
 
-    it('should handle nested completeness for multi-column measures', () => {
+    it('should handle nested completeness for collection groups', () => {
       cy.mount(
         <ColumnTypeCollapse
           label="assessment tool"
           columns={groupedColumns}
           onSelect={() => {}}
           selectedColumnId="3"
-          isMultiColumnMeasure
+          isCollection
           groupedColumns={[
             {
               label: 'Subscale A',

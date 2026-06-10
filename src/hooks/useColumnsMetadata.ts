@@ -6,7 +6,7 @@ export interface ColumnMetadataSummary {
   id: string;
   name: string;
   dataType: DataType | null;
-  isMultiColumnMeasure: boolean;
+  isCollection: boolean;
 }
 
 /**
@@ -23,7 +23,7 @@ export function useColumnsMetadata(columnIds: string[]): Record<string, ColumnMe
       const column = columns[columnId];
       if (column) {
         const standardizedVariableId = column.standardizedVariable ?? null;
-        const isMultiColumnMeasure = standardizedVariableId
+        const isCollection = standardizedVariableId
           ? Boolean(standardizedVariables[standardizedVariableId]?.is_multi_column_measure)
           : false;
 
@@ -31,7 +31,7 @@ export function useColumnsMetadata(columnIds: string[]): Record<string, ColumnMe
           id: columnId,
           name: column.name || columnId,
           dataType: column.dataType ?? null,
-          isMultiColumnMeasure,
+          isCollection,
         };
       }
     });

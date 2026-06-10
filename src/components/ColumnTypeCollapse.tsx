@@ -28,7 +28,7 @@ function IncompleteArcIcon(props: SvgIconProps) {
   );
 }
 
-interface MultiColumnGroup {
+interface CollectionGroup {
   label: string;
   columns: ColumnGroupColumn[];
 }
@@ -42,14 +42,14 @@ interface ColumnTypeCollapseProps {
   }) => void;
   selectedColumnId: string | null;
   dataType?: 'Categorical' | 'Continuous' | null;
-  isMultiColumnMeasure?: boolean;
-  groupedColumns?: MultiColumnGroup[];
+  isCollection?: boolean;
+  groupedColumns?: CollectionGroup[];
   schemaErrors: string[];
 }
 
 const ColumnTypeCollapseDefaultProps = {
   dataType: null,
-  isMultiColumnMeasure: false,
+  isCollection: false,
   groupedColumns: [],
 };
 
@@ -69,7 +69,7 @@ function ColumnTypeCollapse({
   onSelect,
   selectedColumnId,
   dataType = null,
-  isMultiColumnMeasure = false,
+  isCollection = false,
   groupedColumns = [],
   schemaErrors,
 }: ColumnTypeCollapseProps) {
@@ -98,7 +98,7 @@ function ColumnTypeCollapse({
   );
 
   const groupedColumnEntries = useMemo(() => {
-    if (!isMultiColumnMeasure) {
+    if (!isCollection) {
       return [];
     }
 
@@ -124,7 +124,7 @@ function ColumnTypeCollapse({
       label: groupLabel || 'Ungrouped',
       columns: groupColumns,
     }));
-  }, [columns, groupedColumns, isMultiColumnMeasure]);
+  }, [columns, groupedColumns, isCollection]);
 
   const groupCompleteness = useMemo(
     () =>
@@ -139,7 +139,7 @@ function ColumnTypeCollapse({
 
   const handleSelect = () => {
     if (columns.length > 0) {
-      if (isMultiColumnMeasure && groupedColumnEntries.length > 0) {
+      if (isCollection && groupedColumnEntries.length > 0) {
         const firstGroup = groupedColumnEntries[0];
         onSelect({
           columnIDs: firstGroup.columns.map((entry) => entry.id),
@@ -169,7 +169,7 @@ function ColumnTypeCollapse({
     }));
   };
 
-  if (isMultiColumnMeasure) {
+  if (isCollection) {
     return (
       <div className="w-full" data-cy={`side-column-nav-bar-${labelToDisplay}`}>
         <div className="flex items-center hover:bg-gray-50 transition-colors duration-150 py-1">

@@ -7,6 +7,7 @@ import {
 } from '../stores/data';
 import { validateContinuousValues } from '../utils/data-utils';
 import {
+  Column,
   Columns,
   DataDictionary,
   DataType,
@@ -63,8 +64,22 @@ const buildAnnotationLevelsDictionary = (
       })
   );
 
+/**
+ * Constructs a DataDictionary entry for a single column.
+ *
+ * Transforms the internal column representation into the BIDS-compliant
+ * neurobagel data dictionary format. It maps metadata (description,
+ * units, categorical levels) and populates semantic annotations (IsAbout, IsPartOf,
+ * term URIs, missing values, and calculated value ranges for continuous variables like age).
+ *
+ * @param column - The internal column object to process.
+ * @param standardizedVariables - Map of all available standardized variables.
+ * @param standardizedTerms - Map of all available standardized terms.
+ * @param standardizedFormats - Map of all available standardized formats.
+ * @returns A formatted data dictionary entry representing the column's annotations.
+ */
 export function buildColumnEntry(
-  column: Columns[string],
+  column: Column,
   standardizedVariables: ReturnType<typeof useStandardizedVariables>,
   standardizedTerms: StandardizedTerms,
   standardizedFormats: ReturnType<typeof useStandardizedFormats>
