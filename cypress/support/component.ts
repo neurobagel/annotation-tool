@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-/* eslint-disable import/no-extraneous-dependencies */
 // ***********************************************************
 // This example support/component.ts is processed and
 // loaded automatically before your test files.
