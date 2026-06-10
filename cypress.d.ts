@@ -1,5 +1,5 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { mount } from 'cypress/react';
-import type { MountReturn } from 'cypress/react';
 
 declare global {
   namespace Cypress {
