@@ -1,3 +1,15 @@
+# v0.7.4 (Thu Jun 04 2026)
+
+#### 🚀 Enhancements
+
+- [FIX] Fix typo on dataset description page [#568](https://github.com/neurobagel/annotation-tool/pull/568) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.7.3 (Thu Jun 04 2026)
 
 #### 🚀 Enhancements
