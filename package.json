@@ -46,7 +46,6 @@
     "@eslint/compat": "^2.1.0",
     "@eslint/js": "^9.39.4",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
-    "@stylistic/eslint-plugin": "^2.13.0",
     "@testing-library/react": "^16.3.1",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/natural-compare-lite": "^1.4.2",
