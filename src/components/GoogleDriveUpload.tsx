@@ -222,7 +222,9 @@ function GoogleDriveUpload({
               setFormData((prev) => ({ ...prev, site: result.sites[0] }));
             }
             setShowSiteSuccess(true);
-            setTimeout(() => setShowSiteSuccess(false), 2000);
+            setTimeout(() => {
+              if (!ignore) setShowSiteSuccess(false);
+            }, 2000);
           } else {
             throw new Error(result.message || 'Failed to load sites from Google Drive.');
           }

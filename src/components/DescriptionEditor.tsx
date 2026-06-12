@@ -56,6 +56,13 @@ function DescriptionEditor({
     setSaveStatus('idle');
   }
 
+  useEffect(() => {
+    if (statusTimeoutRef.current) {
+      clearTimeout(statusTimeoutRef.current);
+      statusTimeoutRef.current = null;
+    }
+  }, [columnID]);
+
   // Flush any pending save on unmount so fast column switches don't drop edits.
   useEffect(
     () => () => {
