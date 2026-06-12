@@ -17,7 +17,7 @@ import {
   IconButton,
   Collapse,
 } from '@mui/material';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { DataDictionary, DatasetDescription } from '../utils/internal_types';
 
 interface GoogleDriveUploadProps {
@@ -161,20 +161,28 @@ function GoogleDriveUpload({
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
 
-  useEffect(() => {
+  const [prevOpen, setPrevOpen] = useState(open);
+
+  const hasAppsScriptUrl = !!appsScriptUrl;
+
+  if (open !== prevOpen) {
+    setPrevOpen(open);
     if (open) {
       setFormData((prev) => ({
         ...prev,
         datasetName: prev.datasetName || (datasetDescription?.Name as string) || '',
       }));
+      if (hasAppsScriptUrl) {
+        setLoadingSites(true);
+        setShowSiteSuccess(false);
+        setError(null);
+      }
     }
-  }, [open, datasetDescription?.Name]);
+  }
 
   const [finalDatasetName, setFinalDatasetName] = useState('');
   const [suggestedSuffix, setSuggestedSuffix] = useState('');
   const [showConfirmOverwrite, setShowConfirmOverwrite] = useState(false);
-
-  const hasAppsScriptUrl = !!appsScriptUrl;
 
   const handleClose = () => {
     onClose();
@@ -190,47 +198,60 @@ function GoogleDriveUpload({
     }, 300);
   };
 
-  const fetchSites = useCallback(async () => {
-    setLoadingSites(true);
-    setShowSiteSuccess(false);
-    setError(null);
-
-    try {
-      const response = await fetch(appsScriptUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'getSites' }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch site names: ${response.status} ${response.statusText}`);
-      }
-
-      const result = await response.json();
-
-      if (result.status === 'success' && Array.isArray(result.sites)) {
-        setSites(result.sites);
-        if (result.sites.length > 0) {
-          setFormData((prev) => ({ ...prev, site: result.sites[0] }));
-        }
-        setShowSiteSuccess(true);
-        setTimeout(() => setShowSiteSuccess(false), 2000);
-      } else {
-        throw new Error(result.message || 'Failed to load sites from Google Drive.');
-      }
-    } catch (fetchErr) {
-      const message = fetchErr instanceof Error ? fetchErr.message : 'Unknown error loading sites';
-      setError(message);
-    } finally {
-      setLoadingSites(false);
-    }
-  }, [appsScriptUrl]);
-
   useEffect(() => {
+    let ignore = false;
+
+    async function fetchSites() {
+      try {
+        const response = await fetch(appsScriptUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'getSites' }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch site names: ${response.status} ${response.statusText}`);
+        }
+
+        const result = await response.json();
+
+        if (!ignore) {
+          if (result.status === 'success' && Array.isArray(result.sites)) {
+            setSites(result.sites);
+            if (result.sites.length > 0) {
+              setFormData((prev) => ({ ...prev, site: result.sites[0] }));
+            }
+            setShowSiteSuccess(true);
+            setTimeout(() => {
+              if (!ignore) setShowSiteSuccess(false);
+            }, 2000);
+          } else {
+            throw new Error(result.message || 'Failed to load sites from Google Drive.');
+          }
+        }
+      } catch (fetchErr) {
+        if (!ignore) {
+          const message =
+            fetchErr instanceof Error ? fetchErr.message : 'Unknown error loading sites';
+          setError(message);
+        }
+      } finally {
+        if (!ignore) {
+          setLoadingSites(false);
+        }
+      }
+    }
+
     if (open && hasAppsScriptUrl) {
+      // The loading states are already set during render,
+      // so this just kicks off the async network request
       fetchSites();
     }
-  }, [open, hasAppsScriptUrl, fetchSites]);
+
+    return () => {
+      ignore = true;
+    };
+  }, [open, hasAppsScriptUrl, appsScriptUrl]);
 
   const generateDatasetName = () => {
     const siteSanitized = formData.site.replace(/[^a-z0-9]/gi, '_');

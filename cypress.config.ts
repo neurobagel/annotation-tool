@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import codeCoverageTask from '@cypress/code-coverage/task';
 import { defineConfig } from 'cypress';
 

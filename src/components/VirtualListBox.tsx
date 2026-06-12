@@ -46,4 +46,6 @@ const VirtualListbox = forwardRef<HTMLDivElement, VirtualListboxProps>((props, r
   );
 });
 
+VirtualListbox.displayName = 'VirtualListbox';
+
 export default VirtualListbox;
