@@ -30,6 +30,12 @@ describe('Main user flow', () => {
     // Using click here triggers a check for whether the element is covered by another element
     cy.get('[data-cy="nav-stepper"]').click();
 
+    // Functionally verify that the navigation container is sticky:
+    // Scroll to the top of this tall page and click the container without scrolling.
+    // If the element is not sticky (e.g. pushed to the bottom of the long page), this will fail.
+    cy.scrollTo('top');
+    cy.get('[data-cy="navigation-buttons-container"]').click({ scrollBehavior: false });
+
     // Wait for config skeleton to disappear and dropdown to be ready
     cy.get('[data-cy="config-card-dropdown"]', { timeout: 10000 }).should('be.visible');
     cy.get('[data-config-loading="false"]').should('exist');
@@ -167,7 +173,7 @@ describe('Main user flow', () => {
       expect(fileContentString).to.contain('"Units":"some cool unit"');
     });
   });
-  it.only('steps through the different app workflows with a partially annotated data dictionary', () => {
+  it('steps through the different app workflows with a partially annotated data dictionary', () => {
     cy.visit('http://localhost:5173');
     cy.get('[data-cy="next-button"]').click();
 
