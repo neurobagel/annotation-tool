@@ -21,13 +21,13 @@ import { mount } from 'cypress/react';
 
 // Import styles
 import '../../src/index.css';
-import useSessionStore from '../../src/stores/session';
+import useLocalStore from '../../src/stores/local';
 import './commands';
 
 // Globally disable the Tour Guide overlay in component tests by default
-// Component tests can explicitly opt-in by calling useSessionStore.setState({ hasSeenColumnAnnotationTour: false })
+// Component tests can explicitly opt-in by calling useLocalStore.setState({ hasSeenColumnAnnotationTour: false })
 beforeEach(() => {
-  useSessionStore.setState({ hasSeenColumnAnnotationTour: true });
+  useLocalStore.setState({ hasSeenColumnAnnotationTour: true });
 });
 
 // Augment the Cypress namespace to include type definitions for
