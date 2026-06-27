@@ -18,7 +18,7 @@ function TestComponent({
   tooltip,
 }: {
   defaultExpanded: boolean;
-  tooltip?: string;
+  tooltip: string;
 }) {
   return (
     <ExpandableSection title="some title" defaultExpanded={defaultExpanded} tooltip={tooltip}>
@@ -36,7 +36,7 @@ function TestComponent({
 
 describe('ColumnTypeCollapse', () => {
   it('renders the component correctly', () => {
-    cy.mount(<TestComponent defaultExpanded />);
+    cy.mount(<TestComponent defaultExpanded tooltip="" />);
     cy.get('[data-cy="side-column-nav-bar-some title"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-some title-toggle-button"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-subject id"]').should('be.visible');
@@ -44,7 +44,7 @@ describe('ColumnTypeCollapse', () => {
     cy.get('[data-cy="side-column-nav-bar-subject id"]').should('not.be.visible');
   });
   it('renders the component correctly when defaultExpanded is false', () => {
-    cy.mount(<TestComponent defaultExpanded={false} />);
+    cy.mount(<TestComponent defaultExpanded={false} tooltip="" />);
     cy.get('[data-cy="side-column-nav-bar-subject id"]').should('not.be.visible');
   });
 

@@ -8,12 +8,11 @@ interface ExpandableSectionProps {
   title: string;
   children: React.ReactNode;
   defaultExpanded?: boolean;
-  tooltip?: string;
+  tooltip: string;
 }
 
 const ExpandableSectionDefaultProps = {
   defaultExpanded: true,
-  tooltip: undefined,
 };
 
 function ExpandableSection({
@@ -37,13 +36,9 @@ function ExpandableSection({
         onClick={() => setExpanded(!expanded)}
         startIcon={expanded ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
       >
-        {tooltip ? (
-          <Tooltip title={tooltip} placement="right" arrow>
-            {typography}
-          </Tooltip>
-        ) : (
-          typography
-        )}
+        <Tooltip title={tooltip} placement="right" arrow>
+          {typography}
+        </Tooltip>
       </Button>
       <Collapse in={expanded}>{children}</Collapse>
     </>

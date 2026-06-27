@@ -88,7 +88,7 @@ function SideColumnNavBar({
       elevation={3}
       data-cy="side-column-nav-bar"
     >
-      <ExpandableSection title="Global Operations" defaultExpanded>
+      <ExpandableSection title="Global Operations" defaultExpanded tooltip="">
         <List>
           <ListItem disablePadding sx={{ paddingLeft: 2 }}>
             <ListItemButton
