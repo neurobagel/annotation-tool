@@ -13,9 +13,15 @@ const mockColumnGroup: ColumnGroupColumn[] = [
   },
 ];
 
-function TestComponent({ defaultExpanded }: { defaultExpanded: boolean }) {
+function TestComponent({
+  defaultExpanded,
+  tooltip,
+}: {
+  defaultExpanded: boolean;
+  tooltip?: string;
+}) {
   return (
-    <ExpandableSection title="some title" defaultExpanded={defaultExpanded}>
+    <ExpandableSection title="some title" defaultExpanded={defaultExpanded} tooltip={tooltip}>
       <ColumnTypeCollapse
         label="subject id"
         dataType="Continuous"
@@ -40,5 +46,11 @@ describe('ColumnTypeCollapse', () => {
   it('renders the component correctly when defaultExpanded is false', () => {
     cy.mount(<TestComponent defaultExpanded={false} />);
     cy.get('[data-cy="side-column-nav-bar-subject id"]').should('not.be.visible');
+  });
+
+  it('renders a tooltip when tooltip prop is provided', () => {
+    cy.mount(<TestComponent defaultExpanded tooltip="This is a test tooltip" />);
+    cy.get('[data-cy="side-column-nav-bar-some title"]').trigger('mouseover');
+    cy.get('.MuiTooltip-tooltip').should('contain', 'This is a test tooltip');
   });
 });
