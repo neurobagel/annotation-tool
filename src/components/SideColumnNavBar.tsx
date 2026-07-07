@@ -104,7 +104,7 @@ function SideColumnNavBar({
 
       <ExpandableSection
         title="annotated"
-        tooltip="Columns that have been mapped to a standard variable"
+        tooltip="Columns that have been mapped to a standardized variable"
       >
         <List>
           {annotatedGroups.map((group) => (
@@ -123,7 +123,7 @@ function SideColumnNavBar({
       <ExpandableSection
         title="unannotated"
         defaultExpanded={false}
-        tooltip="Columns that have not been mapped to a standard variable"
+        tooltip="Columns that have not been mapped to a standardized variable"
       >
         <List>
           {unannotatedGroups.map((group) => (
