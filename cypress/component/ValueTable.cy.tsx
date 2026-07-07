@@ -143,4 +143,29 @@ describe('ValueTable', () => {
     cy.get('[data-cy="1-22-missing-value-yes"]').click();
     cy.get('@spy').should('have.been.calledWith', '1', '22', true);
   });
+
+  it('should display string values with whitespaces and newlines as raw strings', () => {
+    cy.mount(
+      <ValueTable
+        columnID="ws-test"
+        uniqueValues={['', ' ', 'word ', 'end\n', 'end\r', 'end\r\n']}
+        missingValues={[]}
+        showMissingToggle={true}
+      />
+    );
+
+    const rowValue = (rowIdx: number) =>
+      cy
+        .get(`[data-cy="ws-test-value-table-element"] .MuiTableRow-root`)
+        .eq(rowIdx + 1)
+        .find('.MuiTableCell-root')
+        .eq(0);
+
+    rowValue(0).should('have.text', '""');
+    rowValue(1).should('have.text', '" "');
+    rowValue(2).should('have.text', '"end\\n"');
+    rowValue(3).should('have.text', '"end\\r"');
+    rowValue(4).should('have.text', '"end\\r\\n"');
+    rowValue(5).should('have.text', '"word "');
+  });
 });
