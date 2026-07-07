@@ -50,7 +50,8 @@ describe('ColumnTypeCollapse', () => {
 
   it('renders a tooltip when tooltip prop is provided', () => {
     cy.mount(<TestComponent defaultExpanded tooltip="This is a test tooltip" />);
-    cy.get('[data-cy="side-column-nav-bar-some title"]').trigger('mouseover');
+    cy.get('[data-cy="side-column-nav-bar-some title-info-icon"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-some title-toggle-button"]').trigger('mouseover');
     cy.get('.MuiTooltip-tooltip').should('contain', 'This is a test tooltip');
   });
 });

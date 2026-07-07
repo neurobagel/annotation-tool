@@ -1,6 +1,7 @@
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import { Typography, Collapse, Button, Tooltip } from '@mui/material';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { Typography, Collapse, Button, Tooltip, Box } from '@mui/material';
 import { capitalize } from 'lodash';
 import { useState } from 'react';
 
@@ -24,22 +25,31 @@ function ExpandableSection({
   const [expanded, setExpanded] = useState<boolean>(defaultExpanded);
 
   const typography = (
-    <Typography data-cy={`side-column-nav-bar-${title}`}>{capitalize(title)}</Typography>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Typography data-cy={`side-column-nav-bar-${title}`}>{capitalize(title)}</Typography>
+      {tooltip && (
+        <InfoOutlinedIcon
+          sx={{ fontSize: '1rem' }}
+          color="action"
+          data-cy={`side-column-nav-bar-${title}-info-icon`}
+        />
+      )}
+    </Box>
   );
 
   return (
     <>
-      <Button
-        data-cy={`side-column-nav-bar-${title}-toggle-button`}
-        className="justify-start pl-0"
-        fullWidth
-        onClick={() => setExpanded(!expanded)}
-        startIcon={expanded ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
-      >
-        <Tooltip title={tooltip} placement="right" arrow>
+      <Tooltip title={tooltip} placement="right" arrow>
+        <Button
+          data-cy={`side-column-nav-bar-${title}-toggle-button`}
+          className="justify-start pl-0"
+          fullWidth
+          onClick={() => setExpanded(!expanded)}
+          startIcon={expanded ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+        >
           {typography}
-        </Tooltip>
-      </Button>
+        </Button>
+      </Tooltip>
       <Collapse in={expanded}>{children}</Collapse>
     </>
   );
