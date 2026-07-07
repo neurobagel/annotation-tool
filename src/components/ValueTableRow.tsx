@@ -56,7 +56,7 @@ export default function ValueTableRow({
           textOverflow: 'ellipsis',
         }}
       >
-        {value}
+        {JSON.stringify(value)}
       </TableCell>
       {renderExtraTableCells && renderExtraTableCells(value, index)}
       {showMissingToggle && onToggleMissingValue && (
