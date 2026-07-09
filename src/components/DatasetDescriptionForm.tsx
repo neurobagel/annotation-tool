@@ -13,6 +13,7 @@ import {
 import { useDatasetDescriptionFormValidation } from '../hooks/useDatasetDescriptionFormValidation';
 import { useDatasetDescription, useDataActions } from '../stores/data';
 import { DatasetDescriptionFormState } from '../utils/internal_types';
+import { RepeatableField, ArrayPreviewDisplay } from './RepeatableField';
 
 const ACCESS_TYPES = ['public', 'registered', 'restricted'];
 const ACCESS_TYPE_TOOLTIPS: Record<string, string> = {
@@ -21,23 +22,6 @@ const ACCESS_TYPE_TOOLTIPS: Record<string, string> = {
     'Requires authentication or agreement to basic terms of use, but no formal application or review.',
   restricted: 'Requires formal approval or review of a data access request.',
 };
-
-function ArrayPreviewDisplay({ value, dataCy }: { value: string; dataCy: string }) {
-  if (value.trim() === '') return null;
-
-  const arr = value
-    .split(',')
-    .map((v) => v.trim())
-    .filter((v) => v !== '');
-
-  if (arr.length === 0) return null;
-
-  return (
-    <Box className="bg-gray-100 p-2 rounded text-xs font-mono text-gray-700" data-cy={dataCy}>
-      {`[${arr.map((item) => JSON.stringify(item)).join(', ')}]`}
-    </Box>
-  );
-}
 
 function DatasetDescriptionForm() {
   const datasetDescription = useDatasetDescription();
@@ -87,20 +71,14 @@ function DatasetDescriptionForm() {
       />
 
       <Box className="flex flex-col gap-1">
-        <TextField
-          label="Authors"
-          value={datasetDescription.Authors as string}
-          onChange={handleChange('Authors')}
-          helperText="Enter a comma-separated list of authors"
-          fullWidth
-          size="small"
-          placeholder="e.g. John Doe, Jane Smith"
-          data-cy="dataset-authors-input"
+        <RepeatableField
+          itemLabel="Author"
+          values={datasetDescription.Authors}
+          onChange={(newValues) => userUpdatesDatasetDescription('Authors', newValues)}
+          placeholder="e.g. John Doe"
+          dataCy="dataset-authors"
         />
-        <ArrayPreviewDisplay
-          value={datasetDescription.Authors as string}
-          dataCy="authors-preview"
-        />
+        <ArrayPreviewDisplay values={datasetDescription.Authors} dataCy="authors-preview" />
       </Box>
 
       <Box className="flex flex-col gap-2">
@@ -204,36 +182,29 @@ function DatasetDescriptionForm() {
               dataset.
             </Typography>
             <Box className="flex flex-col gap-1">
-              <TextField
-                label="References and Links"
-                value={datasetDescription.ReferencesAndLinks as string}
-                onChange={handleChange('ReferencesAndLinks')}
-                helperText="Enter a comma-separated list of URLs or citations"
-                fullWidth
-                size="small"
-                placeholder="e.g. https://domain.com/paper, Author et al. (2024)"
-                data-cy="dataset-references-input"
+              <RepeatableField
+                itemLabel="Reference or Link"
+                values={datasetDescription.ReferencesAndLinks}
+                onChange={(newValues) =>
+                  userUpdatesDatasetDescription('ReferencesAndLinks', newValues)
+                }
+                placeholder="e.g. https://domain.com/paper or Author et al. (2024)"
+                dataCy="dataset-references"
               />
               <ArrayPreviewDisplay
-                value={datasetDescription.ReferencesAndLinks as string}
+                values={datasetDescription.ReferencesAndLinks}
                 dataCy="references-preview"
               />
             </Box>
             <Box className="flex flex-col gap-1">
-              <TextField
-                label="Keywords"
-                value={datasetDescription.Keywords as string}
-                onChange={handleChange('Keywords')}
-                helperText="Enter a comma-separated list of keywords"
-                fullWidth
-                size="small"
-                placeholder="e.g. fMRI, neuroimaging, nback"
-                data-cy="dataset-keywords-input"
+              <RepeatableField
+                itemLabel="Keyword"
+                values={datasetDescription.Keywords}
+                onChange={(newValues) => userUpdatesDatasetDescription('Keywords', newValues)}
+                placeholder="e.g. fMRI"
+                dataCy="dataset-keywords"
               />
-              <ArrayPreviewDisplay
-                value={datasetDescription.Keywords as string}
-                dataCy="keywords-preview"
-              />
+              <ArrayPreviewDisplay values={datasetDescription.Keywords} dataCy="keywords-preview" />
             </Box>
           </AccordionDetails>
         </Accordion>

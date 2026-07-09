@@ -62,20 +62,38 @@ describe('DatasetDescriptionForm', () => {
     );
   });
 
-  it('handles comma-separated array fields and conditionally renders previews', () => {
-    cy.get('[data-cy="dataset-authors-input"] input').type('Author One, Author Two');
+  it('handles repeatable array fields', () => {
+    // Authors
+    cy.get('[data-cy="dataset-authors-input-0"] input').type('Author One');
+    cy.get('[data-cy="dataset-authors-add"]').click();
+    cy.get('[data-cy="dataset-authors-input-1"] input').type('Author Two');
+    cy.get('[data-cy="dataset-authors-input-0"] input').should('have.value', 'Author One');
+    cy.get('[data-cy="dataset-authors-input-1"] input').should('have.value', 'Author Two');
     cy.get('[data-cy="authors-preview"]').should('contain.text', '["Author One", "Author Two"]');
 
+    cy.get('[data-cy="dataset-authors-remove-0"]').click();
+    cy.get('[data-cy="dataset-authors-input-0"] input').should('have.value', 'Author Two');
+    cy.get('[data-cy="dataset-authors-input-1"]').should('not.exist');
+    cy.get('[data-cy="authors-preview"]').should('contain.text', '["Author Two"]');
+
+    // References
     cy.contains('Reference info').click();
-    cy.get('[data-cy="dataset-references-input"] input').type(
-      'http://paper.com,  http://repo.com '
-    );
+    cy.get('[data-cy="dataset-references-input-0"] input').type('http://paper.com');
+    cy.get('[data-cy="dataset-references-add"]').click();
+    cy.get('[data-cy="dataset-references-input-1"] input').type('http://repo.com');
+    cy.get('[data-cy="dataset-references-input-0"] input').should('have.value', 'http://paper.com');
+    cy.get('[data-cy="dataset-references-input-1"] input').should('have.value', 'http://repo.com');
     cy.get('[data-cy="references-preview"]').should(
       'contain.text',
       '["http://paper.com", "http://repo.com"]'
     );
 
-    cy.get('[data-cy="dataset-keywords-input"] input').type('fmri , neuroimaging');
+    // Keywords
+    cy.get('[data-cy="dataset-keywords-input-0"] input').type('fmri');
+    cy.get('[data-cy="dataset-keywords-add"]').click();
+    cy.get('[data-cy="dataset-keywords-input-1"] input').type('neuroimaging');
+    cy.get('[data-cy="dataset-keywords-input-0"] input').should('have.value', 'fmri');
+    cy.get('[data-cy="dataset-keywords-input-1"] input').should('have.value', 'neuroimaging');
     cy.get('[data-cy="keywords-preview"]').should('contain.text', '["fmri", "neuroimaging"]');
   });
 });
