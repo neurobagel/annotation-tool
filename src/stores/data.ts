@@ -35,14 +35,14 @@ const initialState = {
   },
   datasetDescription: {
     Name: '',
-    Authors: '',
+    Authors: [''],
     AccessType: '',
     AccessInstructions: '',
     RepositoryURL: '',
     AccessEmail: '',
     AccessLink: '',
-    ReferencesAndLinks: '',
-    Keywords: '',
+    ReferencesAndLinks: [''],
+    Keywords: [''],
   },
 };
 
