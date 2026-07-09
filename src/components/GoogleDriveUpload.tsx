@@ -495,7 +495,7 @@ function GoogleDriveUpload({
           }}
         >
           <MenuItem value="" disabled sx={{ display: 'none' }}>
-            <span className="text-gray-500">No site selected</span>
+            <span className="text-gray-500">Please select a site</span>
           </MenuItem>
           {sites.map((option) => (
             <MenuItem key={option} value={option}>
