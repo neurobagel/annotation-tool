@@ -231,3 +231,27 @@ export interface StandardizedVariableItem {
   can_have_multiple_columns?: boolean;
   terms?: StandardizedTermItem[];
 }
+
+export interface GoogleDriveUploadFormState {
+  site: string;
+  name: string;
+  email: string;
+  datasetName: string;
+  notes: string;
+  password: string;
+  reuploadReason: string;
+  customSuffix: string;
+}
+
+export interface GoogleDriveUploadPayload {
+  datasetName: string;
+  dataDictionary: DataDictionary;
+  datasetDescription: DatasetDescription | null;
+  notes: string;
+  reuploadReason: string;
+  name: string;
+  email: string;
+  site: string;
+  password?: string;
+  forceOverwrite: boolean;
+}
