@@ -22,7 +22,7 @@ const newConfig = {
 const newAssessmentTerms = [
   {
     namespace_prefix: 'new',
-    namespace_url: 'https://new.org/pd/terms/',
+    namespace_url: 'https://domain.com/pd/terms/',
     vocabulary_name: 'new Assessments',
     version: '1.0.0',
     terms: [
