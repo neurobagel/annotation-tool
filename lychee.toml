@@ -21,16 +21,13 @@ exclude = [
     'https?://(www\.)?old\.com',
     'https?://mygithub\.com',
     'https?://somecoolurl\.com',
-    'https://this-is-a-totally-fake-domain-that-does-not-exist\.com',
     
     # Non-resolvable or automated bot links
     'neurobagel-bot\[bot\]',
     
-    # Mock Neurobagel APIs and endpoints used in constants/mocks
+    # Mock Neurobagel APIs, endpoints, and template literals used in constants/mocks
     'http://neurobagel\.org/vocab/',
     'http://ncithesaurus\.nci\.nih\.gov/',
     'http://snomed\.info/sct/',
-    'https://raw\.githubusercontent\.com/neurobagel/communities/main/configs/New',
-    'https://raw\.githubusercontent\.com/neurobagel/communities/main/configs/\$',
-    'https://raw\.githubusercontent\.com/neurobagel/communities/main/configs/$'
+    'https://raw\.githubusercontent\.com/neurobagel/communities/main/configs/New'
 ]
