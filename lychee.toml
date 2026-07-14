@@ -28,6 +28,9 @@ exclude = [
     
     # Mock Neurobagel APIs and endpoints used in constants/mocks
     'http://neurobagel\.org/vocab/',
+    'http://ncithesaurus\.nci\.nih\.gov/',
+    'http://snomed\.info/sct/',
     'https://raw\.githubusercontent\.com/neurobagel/communities/main/configs/New',
-    'https://raw\.githubusercontent\.com/neurobagel/communities/main/configs/\$'
+    'https://raw\.githubusercontent\.com/neurobagel/communities/main/configs/\$',
+    'https://raw\.githubusercontent\.com/neurobagel/communities/main/configs/$'
 ]
