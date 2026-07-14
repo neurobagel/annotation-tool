@@ -85,4 +85,4 @@ jobs:
         uses: lycheeverse/lychee-action@v2
         with:
           fail: true
-          args: --verbose --no-progress '**/*.md' '**/*.html' '**/*.ts' '**/*.tsx' --exclude-path 'node_modules' --exclude-path 'dist' --exclude-path 'coverage' --exclude '^http://localhost'
+          args: --verbose --no-progress '**/*.md' '**/*.html' '**/*.ts' '**/*.tsx'

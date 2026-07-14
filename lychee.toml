@@ -1,0 +1,33 @@
+# lychee.toml
+
+# Exclude these directories from being checked
+exclude_path = [
+    "node_modules",
+    "dist",
+    "coverage"
+]
+
+# Exclude URLs matching these regex patterns
+exclude = [
+    # Localhost and local development
+    '^http://localhost',
+    
+    # Template literal variables in source code (e.g., ${configName} or $%7BconfigName%7D)
+    '\$\{.*\}',
+    '\$%7B.*%7D',
+    
+    # Mock domains used in tests
+    'https?://(www\.)?domain\.com',
+    'https?://(www\.)?old\.com',
+    'https?://mygithub\.com',
+    'https?://somecoolurl\.com',
+    'https://this-is-a-totally-fake-domain-that-does-not-exist\.com',
+    
+    # Non-resolvable or automated bot links
+    'neurobagel-bot\[bot\]',
+    
+    # Mock Neurobagel APIs and endpoints used in constants/mocks
+    'http://neurobagel\.org/vocab/',
+    'https://raw\.githubusercontent\.com/neurobagel/communities/main/configs/New',
+    'https://raw\.githubusercontent\.com/neurobagel/communities/main/configs/\$'
+]
