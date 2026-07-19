@@ -42,7 +42,7 @@ const initialState = {
     AccessEmail: '',
     AccessLink: '',
     ReferencesAndLinks: [''],
-    Keywords: [''],
+    Keywords: ['', '', '', '', ''],
   },
 };
 
