@@ -218,9 +218,6 @@ function GoogleDriveUpload({
         if (!ignore) {
           if (result.status === 'success' && Array.isArray(result.sites)) {
             setSites(result.sites);
-            if (result.sites.length > 0) {
-              setFormData((prev) => ({ ...prev, site: result.sites[0] }));
-            }
             setShowSiteSuccess(true);
             setTimeout(() => {
               if (!ignore) setShowSiteSuccess(false);
@@ -478,10 +475,13 @@ function GoogleDriveUpload({
           value={formData.site}
           onChange={(e) => setFormData({ ...formData, site: e.target.value })}
           fullWidth
+          required
           disabled={loadingSites}
           data-cy="site-select"
           helperText={loadingSites ? 'Fetching sites from Google Drive...' : ''}
           slotProps={{
+            select: { displayEmpty: true },
+            inputLabel: { shrink: true },
             input: {
               endAdornment: (
                 <InputAdornment position="end" sx={{ marginRight: 2 }}>
@@ -494,6 +494,9 @@ function GoogleDriveUpload({
             },
           }}
         >
+          <MenuItem value="" disabled sx={{ display: 'none' }}>
+            <span className="text-gray-500">Please select a site</span>
+          </MenuItem>
           {sites.map((option) => (
             <MenuItem key={option} value={option}>
               {option}
@@ -608,7 +611,7 @@ function GoogleDriveUpload({
             onClick={() => handleUpload(false)}
             variant="contained"
             color="primary"
-            disabled={uploading || !formData.datasetName || !formData.password}
+            disabled={uploading || !formData.site || !formData.datasetName || !formData.password}
             data-cy="upload-button"
           >
             {uploading ? 'Uploading...' : 'Upload'}
