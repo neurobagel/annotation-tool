@@ -40,9 +40,7 @@ function NavStepper({ currentView }: { currentView: View }) {
           const isDisabled = !isDataTableUploaded && index > 0;
           const tooltipMessage = isDisabled ? 'Please upload a data table first' : '';
 
-          if (index < activeStep) {
-            stepColor = theme.palette.primary.light;
-          } else if (index === activeStep) {
+          if (index === activeStep) {
             stepColor = theme.palette.primary.main;
           }
 
