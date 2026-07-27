@@ -14,9 +14,22 @@
 // ***********************************************************
 // Import commands.js using ES2015 syntax:
 // cypress/support/e2e.js
-// eslint-disable-next-line import/no-extraneous-dependencies
 import '@cypress/code-coverage/support';
 import './commands';
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
+
+beforeEach(() => {
+  // Globally mock the session storage to prevent the Column Annotation Tour from breaking existing E2E tests.
+  // Tests that explicitly need to test the tour (like ColumnAnnotationTour.cy.ts) can simply set the
+  // `SHOW_COLUMN_ANNOTATION_TOUR` env variable to `true` to disable the mock and allow the tour to run.
+  cy.on('window:before:load', (win) => {
+    if (!Cypress.env('SHOW_COLUMN_ANNOTATION_TOUR')) {
+      win.sessionStorage.setItem(
+        'session',
+        JSON.stringify({ state: { hasSeenColumnAnnotationTour: true }, version: 0 })
+      );
+    }
+  });
+});

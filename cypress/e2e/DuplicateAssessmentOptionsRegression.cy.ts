@@ -50,17 +50,9 @@ describe('Duplicate Assessment Options Regression', () => {
     cy.get('[data-cy="next-button"]').click();
 
     // Column Annotation view
-    cy.get('[data-cy="0-column-annotation-card-standardized-variable-dropdown"]').click();
-    cy.get('ul[role="listbox"] [role="option"]').contains('Assessment Tool').click();
-    cy.get('[data-cy="next-button"]').click();
+    cy.get('[data-cy="search-terms-input"]').type('Same');
 
-    // Multi-Column Measures view
-    cy.get('[data-cy="add-term-card-button"]').click();
-    cy.get('[data-cy="multi-column-measures-card-0-title-dropdown"]').click();
-    cy.get('[data-cy="multi-column-measures-card-0-title-dropdown"]').type('Same');
-
-    cy.get('ul[role="listbox"]')
-      .find('.MuiAutocomplete-option')
+    cy.get('[data-cy^="collection-term-item-"]')
       .filter((_, el) => el.textContent?.includes('Same Name'))
       .should('have.length', 2);
   });

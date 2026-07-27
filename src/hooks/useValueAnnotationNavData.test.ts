@@ -81,7 +81,7 @@ describe('useValueAnnotationNavData', () => {
           name: 'Assessment',
         },
         columnIds: ['1', '2'],
-        isMultiColumnMeasure: true,
+        isCollection: true,
       },
     ]);
 
@@ -109,7 +109,7 @@ describe('useValueAnnotationNavData', () => {
             column: expect.objectContaining({ name: 'error' }),
           },
         ],
-        isMultiColumnMeasure: true,
+        isCollection: true,
         groupedColumns: [
           {
             label: 'Subscale A',

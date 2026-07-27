@@ -101,19 +101,9 @@ describe('Config Change Regression', () => {
     });
     cy.get('[data-cy="next-button"]').click();
 
-    // Column Annotation view - Annotate a column as Assessment Tool with the default Neurobagel config
+    // Column Annotation view - verify old term is present in the standardized variable list
     cy.get('[data-cy="column-annotation-container"]').should('be.visible');
-    cy.get('[data-cy="4-column-annotation-card-standardized-variable-dropdown"]').type(
-      'assessment{downArrow}{enter}'
-    );
-    cy.get('[data-cy="next-button"]').click();
-
-    // Multi-Column Measures view - Move to Multi-Column Measures, then backtrack to the Upload view to change configs
-    cy.get('[data-cy="multi-column-measures-tab-Assessment Tool"]').should('be.visible');
-    cy.get('[data-cy="add-term-card-button"]').click();
-    cy.get('[data-cy="multi-column-measures-card-0-title-dropdown"]').click();
-    cy.get('ul[role="listbox"]').should('contain', 'Old Name');
-    cy.get('[data-cy="back-button"]').click();
+    cy.get('[data-cy="collection-item-nb:Assessment"]').should('contain', 'Old Name');
     cy.get('[data-cy="back-button"]').click();
 
     // Upload view - Change to "New" config and wait for its vocab to load
@@ -123,16 +113,10 @@ describe('Config Change Regression', () => {
     // Re-run annotation using the new config to ensure we see the refreshed vocab
     cy.get('[data-cy="next-button"]').click();
     cy.get('[data-cy="column-annotation-container"]').should('be.visible');
-    cy.get('[data-cy="4-column-annotation-card-standardized-variable-dropdown"]').type(
-      'Assessment{downArrow}{enter}'
-    );
-    cy.get('[data-cy="next-button"]').click();
 
     // New assessment terms from "New" should replace the Neurobagel list
-    cy.get('[data-cy="multi-column-measures-tab-Assessment Tool"]').should('be.visible');
-    cy.get('[data-cy="add-term-card-button"]').click();
-    cy.get('[data-cy="multi-column-measures-card-0-title-dropdown"]').click();
-    cy.get('ul[role="listbox"]').should('contain', 'New Name');
-    cy.get('ul[role="listbox"]').should('not.contain', 'Old Name');
+    cy.get('[data-cy="collection-item-new:Assessment"]').should('be.visible');
+    cy.get('[data-cy="collection-item-new:Assessment"]').should('contain', 'New Name');
+    cy.get('[data-cy="collection-item-new:Assessment"]').should('not.contain', 'Old Name');
   });
 });

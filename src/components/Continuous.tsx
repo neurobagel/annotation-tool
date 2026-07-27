@@ -1,20 +1,11 @@
-import {
-  Autocomplete,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-} from '@mui/material';
-import { useState } from 'react';
-import { FormatOption } from '~/hooks/useFormatOptions';
-import { useSortedValues } from '../hooks/useSortedValues';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import { Alert, Autocomplete, Button, Collapse, TextField } from '@mui/material';
+import { useMemo, useState } from 'react';
+import { FormatOption } from '../hooks/useFormatOptions';
+import { validateContinuousValues } from '../utils/data-utils';
 import DescriptionEditor from './DescriptionEditor';
-import MissingValueGroupButton from './MissingValueGroupButton';
-import SortCell from './SortCell';
+import ValueTable from './ValueTable';
 
 interface ContinuousProps {
   columnID: string;
@@ -23,20 +14,13 @@ interface ContinuousProps {
   missingValues: string[];
   formatId?: string | null;
   formatOptions: FormatOption[];
-  showUnits?: boolean;
+
   showFormat?: boolean;
   showMissingToggle?: boolean;
   onUpdateUnits: (columnID: string, units: string) => void;
   onToggleMissingValue: (columnID: string, value: string, isMissing: boolean) => void;
   onUpdateFormat: (columnID: string, formatId: string | null) => void;
 }
-
-const defaultProps = {
-  formatId: null,
-  showUnits: true,
-  showFormat: true,
-  showMissingToggle: false,
-};
 
 function Continuous({
   columnID,
@@ -45,138 +29,111 @@ function Continuous({
   missingValues,
   formatId = null,
   formatOptions,
-  showUnits = true,
   showFormat = true,
   showMissingToggle = false,
   onUpdateUnits,
   onToggleMissingValue,
   onUpdateFormat,
 }: ContinuousProps) {
-  const [sortBy, setSortBy] = useState<'value' | 'missing'>('value');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [showInvalidValues, setShowInvalidValues] = useState(false);
 
-  const { visibleValues } = useSortedValues(uniqueValues, missingValues, sortBy, sortDir);
+  const validationResult = useMemo(
+    () => validateContinuousValues(uniqueValues, missingValues, formatId),
+    [uniqueValues, missingValues, formatId]
+  );
 
   return (
-    <Paper elevation={3} className="h-full shadow-lg" data-cy={`${columnID}-continuous`}>
-      <div className="flex h-full">
-        <div className="w-3/5 flex flex-col">
-          <TableContainer
-            id={`${columnID}-table-container`}
-            className="flex-1 overflow-auto"
-            style={{ maxHeight: '500px' }}
-            data-cy={`${columnID}-continuous-table`}
-          >
-            <Table stickyHeader>
-              <TableHead>
-                <TableRow className="bg-blue-50">
-                  <SortCell
-                    label="Value"
-                    sortDir={sortDir}
-                    onToggle={() => {
-                      if (sortBy === 'value') {
-                        setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
-                      } else {
-                        setSortBy('value');
-                        setSortDir('asc');
-                      }
-                    }}
-                    width={showMissingToggle ? '60%' : undefined}
-                    isActive={sortBy === 'value'}
-                    dataCy={`${columnID}-sort-values-button`}
-                  />
-                  {showMissingToggle && (
-                    <SortCell
-                      label="Treat as missing value"
-                      sortDir={sortDir}
-                      onToggle={() => {
-                        if (sortBy === 'missing') {
-                          setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
-                        } else {
-                          setSortBy('missing');
-                          setSortDir('asc');
-                        }
-                      }}
-                      width="40%"
-                      isActive={sortBy === 'missing'}
-                      dataCy={`${columnID}-sort-status-button`}
-                    />
-                  )}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {visibleValues.map((value, index) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <TableRow key={`${columnID}-${value}-${index}`}>
-                    <TableCell align="left" data-cy={`${columnID}-${value}-${index}-value`}>
-                      {value}
-                    </TableCell>
-                    {showMissingToggle && (
-                      <TableCell align="center">
-                        <MissingValueGroupButton
-                          // eslint-disable-next-line react/no-array-index-key
-                          key={`${columnID}-${value}-${index}-missingbutton`}
-                          value={value}
-                          columnId={columnID}
-                          missingValues={missingValues}
-                          onToggleMissingValue={onToggleMissingValue}
-                        />
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </div>
-
-        <div className="w-2/5 p-4 space-y-4">
-          {showUnits && (
-            <DescriptionEditor
-              key={`${columnID}-units`}
-              label="Units"
-              columnID={columnID}
-              description={units}
-              onDescriptionChange={(id, newUnits) => {
-                onUpdateUnits(id, newUnits || '');
-              }}
-            />
-          )}
+    <ValueTable
+      columnID={columnID}
+      uniqueValues={uniqueValues}
+      missingValues={missingValues}
+      showMissingToggle={showMissingToggle}
+      onToggleMissingValue={onToggleMissingValue}
+      dataCy={`${columnID}-continuous`}
+      tableClassName="min-w-full"
+      rightSidebarContent={
+        <div className="flex flex-col gap-4">
+          <DescriptionEditor
+            key={`${columnID}-units`}
+            label="Units"
+            columnID={columnID}
+            description={units}
+            onDescriptionChange={(id, newUnits) => {
+              onUpdateUnits(id, newUnits || '');
+            }}
+          />
 
           {showFormat && (
-            <Autocomplete
-              data-cy={`${columnID}-format-dropdown`}
-              options={formatOptions}
-              getOptionLabel={(option) => option.label}
-              renderOption={(props, option) => (
-                // eslint-disable-next-line react/jsx-props-no-spreading
-                <li {...props}>
-                  <div>
-                    <div>{option.label}</div>
-                    {option.examples && (
-                      <div className="text-xs text-gray-500">
-                        Examples: {option.examples.join(', ')}
-                      </div>
-                    )}
+            <div className="flex flex-col gap-2">
+              <Autocomplete
+                data-cy={`${columnID}-format-dropdown`}
+                options={formatOptions}
+                getOptionLabel={(option) => option.label}
+                renderOption={(props, option) => (
+                  <li {...props}>
+                    <div>
+                      <div>{option.label}</div>
+                      {option.examples && (
+                        <div className="text-xs text-gray-500">
+                          Examples: {option.examples.join(', ')}
+                        </div>
+                      )}
+                    </div>
+                  </li>
+                )}
+                value={formatOptions.find((opt) => opt.id === formatId) || null}
+                onChange={(_, newValue) => {
+                  onUpdateFormat(columnID, newValue?.id ?? null);
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Format" variant="outlined" fullWidth />
+                )}
+              />
+
+              {validationResult && validationResult.invalidCount > 0 && (
+                <Alert severity="warning" data-cy="continuous-warning-alert">
+                  <div className="mb-2">
+                    Format parsing failed for {validationResult.invalidCount} unique value(s).
+                    Minimum and maximum values could not be computed. Please ensure the format
+                    matches the data, or designate non-standard values as missing.
                   </div>
-                </li>
+                  <div className="mt-2">
+                    <Button
+                      variant="text"
+                      size="small"
+                      onClick={() => setShowInvalidValues((prev) => !prev)}
+                      sx={{
+                        padding: 0,
+                        minWidth: 0,
+                        textTransform: 'none',
+                        fontWeight: 'medium',
+                        '& .MuiButton-startIcon': { marginRight: '2px', marginLeft: '-4px' },
+                      }}
+                      startIcon={showInvalidValues ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+                    >
+                      {showInvalidValues ? 'Hide invalid values' : 'View invalid values'}
+                    </Button>
+                    <Collapse in={showInvalidValues}>
+                      <div className="mt-2 font-mono p-2 rounded max-h-32 overflow-y-auto bg-black/5">
+                        {validationResult.invalidValues.map((val) => (
+                          <div key={val}>{val}</div>
+                        ))}
+                      </div>
+                    </Collapse>
+                  </div>
+                </Alert>
               )}
-              value={formatOptions.find((opt) => opt.id === formatId) || null}
-              onChange={(_, newValue) => {
-                onUpdateFormat(columnID, newValue?.id ?? null);
-              }}
-              renderInput={(params) => (
-                // eslint-disable-next-line react/jsx-props-no-spreading
-                <TextField {...params} label="Format" variant="outlined" fullWidth />
+              {validationResult && validationResult.invalidCount === 0 && (
+                <Alert severity="info" data-cy="continuous-info-alert">
+                  Min = {validationResult.min}, Max = {validationResult.max}
+                </Alert>
               )}
-            />
+            </div>
           )}
         </div>
-      </div>
-    </Paper>
+      }
+    />
   );
 }
-
-Continuous.defaultProps = defaultProps;
 
 export default Continuous;

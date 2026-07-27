@@ -5,6 +5,7 @@ const testProps = {
   open: true,
   onClose: () => {},
   dataDictionary: {},
+  datasetDescription: null,
   appsScriptUrl: 'https://somecoolurl.com/exec',
   config: 'some-config',
 };
@@ -25,6 +26,7 @@ describe('GoogleDriveUpload', () => {
         open={testProps.open}
         onClose={testProps.onClose}
         dataDictionary={testProps.dataDictionary}
+        datasetDescription={testProps.datasetDescription}
         appsScriptUrl={testProps.appsScriptUrl}
         config={testProps.config}
       />
@@ -50,6 +52,7 @@ describe('GoogleDriveUpload', () => {
         open={testProps.open}
         onClose={testProps.onClose}
         dataDictionary={testProps.dataDictionary}
+        datasetDescription={testProps.datasetDescription}
         appsScriptUrl=""
         config={testProps.config}
       />
@@ -73,6 +76,7 @@ describe('GoogleDriveUpload', () => {
           open={testProps.open}
           onClose={testProps.onClose}
           dataDictionary={testProps.dataDictionary}
+          datasetDescription={testProps.datasetDescription}
           appsScriptUrl={testProps.appsScriptUrl}
           config={testProps.config}
         />
@@ -96,6 +100,10 @@ describe('GoogleDriveUpload', () => {
     it('should enable upload button only when required fields are filled', () => {
       cy.get('[data-cy="upload-button"]').should('be.disabled');
 
+      cy.get('[data-cy="site-select"]').click();
+      cy.get('[role="listbox"]').contains('SiteA').click();
+      cy.get('[data-cy="upload-button"]').should('be.disabled');
+
       cy.get('[data-cy="dataset-name-input"]').type('MyDataset');
       cy.get('[data-cy="upload-button"]').should('be.disabled');
 
@@ -114,6 +122,8 @@ describe('GoogleDriveUpload', () => {
         }
       }).as('createFile');
 
+      cy.get('[data-cy="site-select"]').click();
+      cy.get('[role="listbox"]').contains('SiteA').click();
       cy.get('[data-cy="dataset-name-input"]').type('SuccessDataset');
       cy.get('[data-cy="password-input"]').type('correctPass');
       cy.get('[data-cy="upload-button"]').click();
@@ -122,12 +132,61 @@ describe('GoogleDriveUpload', () => {
         const { body } = interception.request;
         // If body is string (text/plain), parse it. If object, use as is.
         const parsed = typeof body === 'string' ? JSON.parse(body) : body;
-        expect(parsed.filename).to.contain('SuccessDataset');
+        expect(parsed.files[0].filename).to.contain('SuccessDataset_annotated.json');
         expect(parsed.checkExists).to.equal(true);
       });
 
       cy.get('[data-cy="upload-success-alert"]').should('be.visible');
       cy.get('[data-cy="open-drive-file-button"]').should('be.visible');
+    });
+
+    it('should upload dual-files when dataset description is provided', () => {
+      const mockDatasetDescription = {
+        Name: 'Test Dataset',
+        ParticipantCount: 42,
+      };
+
+      cy.mount(
+        <GoogleDriveUpload
+          open={testProps.open}
+          onClose={testProps.onClose}
+          dataDictionary={testProps.dataDictionary}
+          datasetDescription={mockDatasetDescription}
+          appsScriptUrl={testProps.appsScriptUrl}
+          config={testProps.config}
+        />
+      );
+
+      cy.wait('@getSites');
+
+      cy.intercept('POST', '**/exec', (req) => {
+        const body = JSON.parse(req.body);
+        if (body.action !== 'getSites') {
+          req.reply({
+            body: { status: 'success', fileId: '12345' },
+          });
+        }
+      }).as('createDualFile');
+
+      cy.get('[data-cy="site-select"]').click();
+      cy.get('[role="listbox"]').contains('SiteA').click();
+      cy.get('[data-cy="dataset-name-input"]').type('DualFileDataset');
+      cy.get('[data-cy="password-input"]').type('correctPass');
+      cy.get('[data-cy="upload-button"]').click();
+
+      cy.wait('@createDualFile').then((interception) => {
+        const { body } = interception.request;
+        const parsed = typeof body === 'string' ? JSON.parse(body) : body;
+
+        expect(parsed.files).to.have.length(2);
+
+        expect(parsed.files[0].filename).to.contain('DualFileDataset_annotated.json');
+
+        expect(parsed.files[1].filename).to.contain('DualFileDataset_dataset_description.json');
+        const descriptionContent = JSON.parse(parsed.files[1].content);
+        expect(descriptionContent.Name).to.equal('Test Dataset');
+        expect(descriptionContent.ParticipantCount).to.equal(42);
+      });
     });
 
     it('should handle auth failure', () => {
@@ -140,6 +199,8 @@ describe('GoogleDriveUpload', () => {
         }
       }).as('createFile');
 
+      cy.get('[data-cy="site-select"]').click();
+      cy.get('[role="listbox"]').contains('SiteA').click();
       cy.get('[data-cy="dataset-name-input"]').type('AuthFailDataset');
       cy.get('[data-cy="password-input"]').type('wrong');
       cy.get('[data-cy="upload-button"]').click();
@@ -169,6 +230,8 @@ describe('GoogleDriveUpload', () => {
           }
         }
       }).as('createFile');
+      cy.get('[data-cy="site-select"]').click();
+      cy.get('[role="listbox"]').contains('SiteA').click();
       cy.get('[data-cy="dataset-name-input"]').type('conflict');
       cy.get('[data-cy="password-input"]').type('correctPass');
       cy.get('[data-cy="upload-button"]').click();
@@ -176,15 +239,16 @@ describe('GoogleDriveUpload', () => {
       cy.wait('@createFile');
 
       cy.get('[data-cy="overwrite-confirm-button"]').should('be.visible');
-      cy.get('[data-cy="new-filename-preview"]').should('be.visible').and('contain', 'conflict');
+      cy.get('[data-cy="new-dataset-name-preview"]')
+        .should('be.visible')
+        .and('contain', 'conflict');
 
       cy.get('[data-cy="overwrite-confirm-button"]').click();
       cy.wait('@createFile').then((interception) => {
         const { body } = interception.request;
         const parsedBody = typeof body === 'string' ? JSON.parse(body) : body;
         expect(parsedBody.checkExists).to.equal(false);
-        // Not end without prefix
-        expect(parsedBody.filename).to.not.equal('conflict.json');
+        expect(parsedBody.files[0].filename).to.not.equal('conflict_annotated.json');
       });
 
       cy.get('[data-cy="upload-success-alert"]').should('be.visible');
@@ -205,13 +269,16 @@ describe('GoogleDriveUpload', () => {
         }
       }).as('createFileConflict');
 
+      cy.get('[data-cy="site-select"]').click();
+      cy.get('[role="listbox"]').contains('SiteA').click();
+      cy.tick(500);
       cy.get('[data-cy="dataset-name-input"]').type('TimestampTest');
       cy.get('[data-cy="password-input"]').type('pass');
       cy.get('[data-cy="upload-button"]').click();
 
       cy.wait('@createFileConflict');
 
-      cy.get('[data-cy="new-filename-preview"]').should('contain', '_20260210_120000');
+      cy.get('[data-cy="new-dataset-name-preview"]').should('contain', '_20260210_120000');
     });
 
     it('should use custom suffix when provided', () => {
@@ -233,6 +300,8 @@ describe('GoogleDriveUpload', () => {
         }
       }).as('createFileCustom');
 
+      cy.get('[data-cy="site-select"]').click();
+      cy.get('[role="listbox"]').contains('SiteA').click();
       cy.get('[data-cy="dataset-name-input"]').type('CustomSuffixTest');
       cy.get('[data-cy="password-input"]').type('pass');
       cy.get('[data-cy="upload-button"]').click();
@@ -240,17 +309,78 @@ describe('GoogleDriveUpload', () => {
       cy.wait('@createFileCustom');
 
       cy.get('[data-cy="custom-suffix-input"]').type('v2');
-      cy.get('[data-cy="new-filename-preview"]').should('contain', '_v2');
+      cy.get('[data-cy="new-dataset-name-preview"]').should('contain', '_v2');
       cy.get('[data-cy="overwrite-confirm-button"]').click();
 
       cy.wait('@createFileCustom').then((interception) => {
         const { body } = interception.request;
         const parsedBody = typeof body === 'string' ? JSON.parse(body) : body;
         expect(parsedBody.checkExists).to.equal(false);
-        expect(parsedBody.filename).to.contain('_v2.json');
+        expect(parsedBody.files[0].filename).to.contain('_v2.json');
       });
 
       cy.get('[data-cy="upload-success-alert"]').should('be.visible');
+    });
+
+    it('should determine filename from the manually entered dataset name in the GDrive upload form if mismatch exists with dataset description', () => {
+      const mockDatasetDescription = {
+        Name: 'Conflict Dataset',
+        ParticipantCount: 42,
+      };
+
+      cy.mount(
+        <GoogleDriveUpload
+          open={testProps.open}
+          onClose={testProps.onClose}
+          dataDictionary={testProps.dataDictionary}
+          datasetDescription={mockDatasetDescription}
+          appsScriptUrl={testProps.appsScriptUrl}
+          config={testProps.config}
+        />
+      );
+
+      cy.wait('@getSites');
+
+      let conflictHit = false;
+      cy.intercept('POST', '**/exec', (req) => {
+        const body = JSON.parse(req.body);
+        if (body.action !== 'getSites') {
+          if (!conflictHit) {
+            conflictHit = true;
+            req.reply({
+              body: { status: 'conflict' },
+            });
+          } else {
+            req.reply({
+              body: { status: 'success', fileId: '12345' },
+            });
+          }
+        }
+      }).as('createDualFileConflict');
+
+      cy.get('[data-cy="site-select"]').click();
+      cy.get('[role="listbox"]').contains('SiteA').click();
+      cy.get('[data-cy="dataset-name-input"]').clear();
+      cy.get('[data-cy="dataset-name-input"]').type('ConflictDualFile');
+      cy.get('[data-cy="password-input"]').type('pass');
+      cy.get('[data-cy="upload-button"]').click();
+
+      cy.wait('@createDualFileConflict');
+
+      cy.get('[data-cy="custom-suffix-input"]').type('v2');
+      cy.get('[data-cy="overwrite-confirm-button"]').click();
+
+      cy.wait('@createDualFileConflict').then((interception) => {
+        const { body } = interception.request;
+        const parsed = typeof body === 'string' ? JSON.parse(body) : body;
+
+        expect(parsed.files).to.have.length(2);
+
+        expect(parsed.files[0].filename).to.equal('SiteA_ConflictDualFile_annotated_v2.json');
+        expect(parsed.files[1].filename).to.equal(
+          'SiteA_ConflictDualFile_v2_dataset_description.json'
+        );
+      });
     });
 
     it('should only show info icon in initial state', () => {
@@ -264,6 +394,8 @@ describe('GoogleDriveUpload', () => {
         }
       }).as('uploadSuccess');
 
+      cy.get('[data-cy="site-select"]').click();
+      cy.get('[role="listbox"]').contains('SiteA').click();
       cy.get('[data-cy="dataset-name-input"]').type('InfoIconTest');
       cy.get('[data-cy="password-input"]').type('pass');
       cy.get('[data-cy="upload-button"]').click();
@@ -291,6 +423,7 @@ describe('GoogleDriveUpload', () => {
             </button>
             <GoogleDriveUpload
               dataDictionary={testProps.dataDictionary}
+              datasetDescription={testProps.datasetDescription}
               appsScriptUrl={testProps.appsScriptUrl}
               open={open}
               onClose={() => setOpen(false)}

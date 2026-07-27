@@ -22,6 +22,7 @@ function TestComponent({ defaultExpanded }: { defaultExpanded: boolean }) {
         columns={mockColumnGroup}
         onSelect={() => {}}
         selectedColumnId="1"
+        schemaErrors={[]}
       />
     </ExpandableSection>
   );
