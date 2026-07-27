@@ -42,7 +42,34 @@ describe('UploadCard', () => {
 
     cy.get('[data-cy="some-title-datatable"]').should('be.visible');
   });
-  it('should show an error alert when an invalid JSON file is uploaded', () => {
+  it('should not render preview button if no file is uploaded.', () => {
+    cy.mount(
+      <UploadCard
+        id={props.id}
+        title={props.title}
+        FileUploaderDisplayText={props.FileUploaderDisplayText}
+        allowedFileType={props.allowedFileType}
+        uploadedFileName={''}
+        onFileUpload={props.onFileUpload}
+        previewComponent={props.previewComponent}
+      />
+    );
+    cy.get('[data-cy="someid-toggle-preview-button"]').should('not.exist');
+
+    cy.mount(
+      <UploadCard
+        id={props.id}
+        title={props.title}
+        FileUploaderDisplayText={props.FileUploaderDisplayText}
+        allowedFileType={props.allowedFileType}
+        uploadedFileName={null}
+        onFileUpload={props.onFileUpload}
+        previewComponent={props.previewComponent}
+      />
+    );
+    cy.get('[data-cy="someid-toggle-preview-button"]').should('not.exist');
+  });
+  it('should show an error alert and hide the preview button when an invalid JSON file is uploaded', () => {
     cy.get('input[type="file"]').selectFile(
       {
         contents: Cypress.Buffer.from('{"invalidJson": '),
@@ -52,8 +79,12 @@ describe('UploadCard', () => {
       { force: true }
     );
 
-    cy.contains('Invalid JSON file uploaded. Please check the file for syntax errors.').should(
-      'be.visible'
-    );
+    cy.get('[data-cy="someid-upload-text"]')
+      .should('be.visible')
+      .and('contain', 'Invalid JSON file uploaded. Please check the file for syntax errors.')
+      .and('have.css', 'color', 'rgb(211, 47, 47)');
+    cy.get('[data-cy="someid-error-icon"]').should('be.visible');
+    cy.get('[data-cy="someid-upload-area"]').should('have.css', 'border-color', 'rgb(211, 47, 47)');
+    cy.get('[data-cy="someid-toggle-preview-button"]').should('not.exist');
   });
 });
