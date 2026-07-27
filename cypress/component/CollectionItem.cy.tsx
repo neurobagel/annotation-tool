@@ -9,6 +9,7 @@ const mockVariable: StandardizedVariableItem = {
     {
       id: 'nb:termOne',
       label: 'Stroop Color-Word Test',
+      description: 'A psychological test of our mental vitality and flexibility.',
     },
     {
       id: 'nb:termTwo',
@@ -209,5 +210,30 @@ describe('CollectionItem', () => {
       .and('contain', '6');
 
     cy.get('[data-cy="mapped-count-badge-term-nb:termThree"]').should('not.exist');
+  });
+
+  it('should display a tooltip with the term description if it exists, and no tooltip if not', () => {
+    cy.mount(
+      <CollectionItem
+        variable={props.variable}
+        onTermSelect={props.onTermSelect}
+        totalCollectionMappedCount={0}
+        mappedTermCounts={{}}
+      />
+    );
+
+    // termOne has a description, so the Tooltip is enabled
+    cy.get('[data-cy="collection-term-item-nb:termOne"]').should('not.have.attr', 'title');
+    cy.get('[data-cy="collection-term-item-nb:termOne"]').trigger('mouseover');
+    cy.get('.MuiTooltip-tooltip')
+      .should('be.visible')
+      .and('contain.text', 'A psychological test of our mental vitality and flexibility.');
+    cy.get('[data-cy="collection-term-item-nb:termOne"]').trigger('mouseout');
+
+    // termTwo has NO description, so the Tooltip is disabled and there is no native title fallback
+    cy.get('[data-cy="collection-term-item-nb:termTwo"]').should('not.have.attr', 'title');
+    // Ensure MUI tooltip doesn't appear for termTwo
+    cy.get('[data-cy="collection-term-item-nb:termTwo"]').trigger('mouseover');
+    cy.get('.MuiTooltip-tooltip').should('not.exist');
   });
 });
