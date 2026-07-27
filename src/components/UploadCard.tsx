@@ -1,5 +1,5 @@
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
-import { Button, Card, CardHeader, CardContent, Collapse, Snackbar, Alert } from '@mui/material';
+import { Button, Card, CardHeader, CardContent, Collapse } from '@mui/material';
 import { useRef, useState } from 'react';
 import FileUploader from './FileUploader';
 
@@ -38,10 +38,10 @@ function UploadCard({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
-  const [alertOpen, setAlertOpen] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const isFileUploaded = uploadedFileName !== null;
+  const isFileUploaded = uploadedFileName !== null && uploadedFileName !== '';
 
   const validateAndUpload = (file: File) => {
     if (file.name.endsWith('.json') || file.type === 'application/json') {
@@ -49,11 +49,12 @@ function UploadCard({
       reader.onload = (e) => {
         try {
           JSON.parse(e.target?.result as string);
-          setAlertOpen(false);
+          setHasError(false);
+          setErrorMessage('');
           onFileUpload(file);
         } catch (error) {
           setErrorMessage('Invalid JSON file uploaded. Please check the file for syntax errors.');
-          setAlertOpen(true);
+          setHasError(true);
 
           if (fileInputRef.current) {
             fileInputRef.current.value = '';
@@ -62,7 +63,8 @@ function UploadCard({
       };
       reader.readAsText(file);
     } else {
-      setAlertOpen(false);
+      setHasError(false);
+      setErrorMessage('');
       onFileUpload(file);
     }
   };
@@ -94,10 +96,6 @@ function UploadCard({
     fileInputRef.current?.click();
   };
 
-  const handleCloseAlert = () => {
-    setAlertOpen(false);
-  };
-
   return (
     <div className="mx-auto w-full max-w-[1024px] rounded-3xl shadow-lg">
       <Card
@@ -118,9 +116,11 @@ function UploadCard({
             disabled={diableFileUploader}
             tooltipContent={FileUploaderToolTipContent}
             uploadedFileName={uploadedFileName}
+            hasError={hasError}
+            errorMessage={errorMessage}
           />
 
-          {isFileUploaded && (
+          {!hasError && isFileUploaded && (
             <div className="mt-4">
               <Button
                 data-cy={`${id}-toggle-preview-button`}
@@ -136,19 +136,8 @@ function UploadCard({
       </Card>
 
       <Collapse in={isPreviewOpen} timeout="auto" unmountOnExit>
-        {isFileUploaded && previewComponent}
+        {!hasError && isFileUploaded && previewComponent}
       </Collapse>
-
-      <Snackbar
-        open={alertOpen}
-        autoHideDuration={6000}
-        onClose={handleCloseAlert}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert onClose={handleCloseAlert} severity="error" sx={{ width: '100%' }}>
-          {errorMessage}
-        </Alert>
-      </Snackbar>
     </div>
   );
 }
