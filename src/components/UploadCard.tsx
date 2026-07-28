@@ -44,10 +44,7 @@ function UploadCard({
   const isFileUploaded = uploadedFileName !== null && uploadedFileName !== '';
 
   const validateAndUpload = (file: File) => {
-    const expectsJson = allowedFileType.toLowerCase().includes('json');
-
-    // Only validate JSON for uploaders that are configured to accept JSON files.
-    if (!expectsJson) {
+    if (!allowedFileType.toLowerCase().includes('json')) {
       setHasError(false);
       setErrorMessage('');
       onFileUpload(file);

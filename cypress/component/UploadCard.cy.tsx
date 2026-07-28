@@ -42,7 +42,7 @@ describe('UploadCard', () => {
 
     cy.get('[data-cy="some-title-datatable"]').should('be.visible');
   });
-  it('should not render preview button if no file is uploaded.', () => {
+  it('should not render preview button if uploadedFileName prop is null or empty string.', () => {
     cy.mount(
       <UploadCard
         id={props.id}
@@ -69,7 +69,18 @@ describe('UploadCard', () => {
     );
     cy.get('[data-cy="someid-toggle-preview-button"]').should('not.exist');
   });
-  it('should show an error alert and hide the preview button when an invalid JSON file is uploaded', () => {
+  it('should show an error message and hide the preview button when an invalid JSON file is uploaded', () => {
+    cy.mount(
+      <UploadCard
+        id={props.id}
+        title={props.title}
+        FileUploaderDisplayText={props.FileUploaderDisplayText}
+        allowedFileType=".json"
+        uploadedFileName=""
+        onFileUpload={props.onFileUpload}
+        previewComponent={props.previewComponent}
+      />
+    );
     cy.get('input[type="file"]').selectFile(
       {
         contents: Cypress.Buffer.from('{"invalidJson": '),
