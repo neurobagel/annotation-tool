@@ -359,12 +359,12 @@ describe('Main user flow', () => {
     cy.get('li[data-value="registered"]').click();
     cy.get('[data-cy="dataset-instructions-input"]').type('Just download it');
     cy.get('[data-cy="dataset-repo-input"]').type('https://github.com/my-repo');
-    cy.get('[data-cy="dataset-accessemail-input"]').type('contact@domain.com');
-    cy.get('[data-cy="dataset-accesslink-input"]').type('https://domain.com/access');
+    cy.get('[data-cy="dataset-accessemail-input"]').type('contact@example.com');
+    cy.get('[data-cy="dataset-accesslink-input"]').type('https://example.com/access');
 
     cy.contains('Reference info').click();
     cy.get('[data-cy="dataset-references-input"]').type(
-      'https://domain.com/paper, Author et al. (2024)'
+      'https://example.com/paper, Author et al. (2024)'
     );
     cy.get('[data-cy="dataset-keywords-input"]').type('fMRI, neuroimaging, nback');
 
@@ -383,10 +383,10 @@ describe('Main user flow', () => {
       expect(fileContent.AccessType).to.equal('registered');
       expect(fileContent.AccessInstructions).to.equal('Just download it');
       expect(fileContent.RepositoryURL).to.equal('https://github.com/my-repo');
-      expect(fileContent.AccessEmail).to.equal('contact@domain.com');
-      expect(fileContent.AccessLink).to.equal('https://domain.com/access');
+      expect(fileContent.AccessEmail).to.equal('contact@example.com');
+      expect(fileContent.AccessLink).to.equal('https://example.com/access');
       expect(fileContent.ReferencesAndLinks).to.deep.equal([
-        'https://domain.com/paper',
+        'https://example.com/paper',
         'Author et al. (2024)',
       ]);
       expect(fileContent.Keywords).to.deep.equal(['fMRI', 'neuroimaging', 'nback']);
