@@ -78,14 +78,20 @@ describe('DatasetDescriptionForm', () => {
 
     // References
     cy.contains('Reference info').click();
-    cy.get('[data-cy="dataset-references-input-0"] input').type('http://paper.com');
+    cy.get('[data-cy="dataset-references-input-0"] input').type('https://example.com/paper');
     cy.get('[data-cy="dataset-references-add"]').click();
-    cy.get('[data-cy="dataset-references-input-1"] input').type('http://repo.com');
-    cy.get('[data-cy="dataset-references-input-0"] input').should('have.value', 'http://paper.com');
-    cy.get('[data-cy="dataset-references-input-1"] input').should('have.value', 'http://repo.com');
+    cy.get('[data-cy="dataset-references-input-1"] input').type('https://example.com/repo');
+    cy.get('[data-cy="dataset-references-input-0"] input').should(
+      'have.value',
+      'https://example.com/paper'
+    );
+    cy.get('[data-cy="dataset-references-input-1"] input').should(
+      'have.value',
+      'https://example.com/repo'
+    );
     cy.get('[data-cy="references-preview"]').should(
       'contain.text',
-      '["http://paper.com", "http://repo.com"]'
+      '["https://example.com/paper", "https://example.com/repo"]'
     );
 
     // Keywords

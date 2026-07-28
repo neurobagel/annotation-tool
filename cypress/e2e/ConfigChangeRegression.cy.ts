@@ -6,7 +6,7 @@ import { mockDataTableFilePath } from '../support/testConstants';
 const oldAssessmentTerms = [
   {
     namespace_prefix: 'neurobagel',
-    namespace_url: 'https://old.com/asse/terms/',
+    namespace_url: 'https://example.com/old/asse/terms/',
     vocabulary_name: 'Neurobagel Assessments',
     version: '1.0.0',
     terms: [{ id: 'old_id', name: 'Old Name' }],
@@ -22,7 +22,7 @@ const newConfig = {
 const newAssessmentTerms = [
   {
     namespace_prefix: 'new',
-    namespace_url: 'https://new.org/pd/terms/',
+    namespace_url: 'https://example.com/pd/terms/',
     vocabulary_name: 'new Assessments',
     version: '1.0.0',
     terms: [

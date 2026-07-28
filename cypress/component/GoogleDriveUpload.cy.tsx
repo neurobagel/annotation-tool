@@ -6,7 +6,7 @@ const testProps = {
   onClose: () => {},
   dataDictionary: {},
   datasetDescription: null,
-  appsScriptUrl: 'https://somecoolurl.com/exec',
+  appsScriptUrl: 'https://example.com/exec',
   config: 'some-config',
 };
 

@@ -151,7 +151,7 @@ function DatasetDescriptionForm() {
               }
               fullWidth
               size="small"
-              placeholder="e.g. contact@domain.com"
+              placeholder="e.g. contact@example.com"
               data-cy="dataset-accessemail-input"
             />
             <TextField
@@ -164,7 +164,7 @@ function DatasetDescriptionForm() {
               }
               fullWidth
               size="small"
-              placeholder="e.g. https://domain.com/access"
+              placeholder="e.g. https://example.com/access"
               data-cy="dataset-accesslink-input"
             />
           </AccordionDetails>
@@ -188,7 +188,7 @@ function DatasetDescriptionForm() {
                 onChange={(newValues) =>
                   userUpdatesDatasetDescription('ReferencesAndLinks', newValues)
                 }
-                placeholder="e.g. https://domain.com/paper or Author et al. (2024)"
+                placeholder="e.g. https://example.com/paper or Author et al. (2024)"
                 dataCy="dataset-references"
               />
               <ArrayPreviewDisplay
