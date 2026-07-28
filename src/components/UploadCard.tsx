@@ -44,29 +44,46 @@ function UploadCard({
   const isFileUploaded = uploadedFileName !== null && uploadedFileName !== '';
 
   const validateAndUpload = (file: File) => {
-    if (file.name.endsWith('.json') || file.type === 'application/json') {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          JSON.parse(e.target?.result as string);
-          setHasError(false);
-          setErrorMessage('');
-          onFileUpload(file);
-        } catch (error) {
-          setErrorMessage('Invalid JSON file uploaded. Please check the file for syntax errors.');
-          setHasError(true);
+    const expectsJson = allowedFileType.toLowerCase().includes('json');
 
-          if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-          }
-        }
-      };
-      reader.readAsText(file);
-    } else {
+    // Only validate JSON for uploaders that are configured to accept JSON files.
+    if (!expectsJson) {
       setHasError(false);
       setErrorMessage('');
       onFileUpload(file);
+      return;
     }
+
+    const reader = new FileReader();
+
+    const setReadError = (message: string) => {
+      setErrorMessage(message);
+      setHasError(true);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+
+    reader.onload = (e) => {
+      const contents = e.target?.result;
+      if (typeof contents !== 'string') {
+        setReadError('Unable to read the selected file. Please try again.');
+        return;
+      }
+
+      try {
+        JSON.parse(contents);
+        setHasError(false);
+        setErrorMessage('');
+        onFileUpload(file);
+      } catch {
+        setReadError('Invalid JSON file uploaded. Please check the file for syntax errors.');
+      }
+    };
+
+    reader.onerror = () => {
+      setReadError('Unable to read the selected file. Please try again.');
+    };
+
+    reader.readAsText(file);
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
