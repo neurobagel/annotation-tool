@@ -38,12 +38,55 @@ function UploadCard({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
-  const isFileUploaded = uploadedFileName !== null;
+  const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const isFileUploaded = uploadedFileName !== null && uploadedFileName !== '';
+
+  const validateAndUpload = (file: File) => {
+    if (!allowedFileType.toLowerCase().includes('json')) {
+      setHasError(false);
+      setErrorMessage('');
+      onFileUpload(file);
+      return;
+    }
+
+    const reader = new FileReader();
+
+    const setReadError = (message: string) => {
+      setErrorMessage(message);
+      setHasError(true);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+
+    reader.onload = (e) => {
+      const contents = e.target?.result;
+      if (typeof contents !== 'string') {
+        setReadError('Unable to read the selected file. Please try again.');
+        return;
+      }
+
+      try {
+        JSON.parse(contents);
+        setHasError(false);
+        setErrorMessage('');
+        onFileUpload(file);
+      } catch {
+        setReadError('Invalid JSON file uploaded. Please check the file for syntax errors.');
+      }
+    };
+
+    reader.onerror = () => {
+      setReadError('Unable to read the selected file. Please try again.');
+    };
+
+    reader.readAsText(file);
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const uploadedFile = event.target.files?.[0];
     if (uploadedFile) {
-      onFileUpload(uploadedFile);
+      validateAndUpload(uploadedFile);
     }
   };
 
@@ -51,7 +94,7 @@ function UploadCard({
     event.preventDefault();
     const droppedFile = event.dataTransfer.files?.[0];
     if (droppedFile) {
-      onFileUpload(droppedFile);
+      validateAndUpload(droppedFile);
     }
   };
 
@@ -87,9 +130,11 @@ function UploadCard({
             disabled={diableFileUploader}
             tooltipContent={FileUploaderToolTipContent}
             uploadedFileName={uploadedFileName}
+            hasError={hasError}
+            errorMessage={errorMessage}
           />
 
-          {isFileUploaded && (
+          {!hasError && isFileUploaded && (
             <div className="mt-4">
               <Button
                 data-cy={`${id}-toggle-preview-button`}
@@ -105,7 +150,7 @@ function UploadCard({
       </Card>
 
       <Collapse in={isPreviewOpen} timeout="auto" unmountOnExit>
-        {isFileUploaded && previewComponent}
+        {!hasError && isFileUploaded && previewComponent}
       </Collapse>
     </div>
   );
