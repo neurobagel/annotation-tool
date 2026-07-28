@@ -68,11 +68,11 @@ describe('DatasetDescriptionForm', () => {
 
     cy.contains('Reference info').click();
     cy.get('[data-cy="dataset-references-input"] input').type(
-      'https://domain.com/paper,  https://domain.com/repo '
+      'https://example.com/paper,  https://example.com/repo '
     );
     cy.get('[data-cy="references-preview"]').should(
       'contain.text',
-      '["https://domain.com/paper", "https://domain.com/repo"]'
+      '["https://example.com/paper", "https://example.com/repo"]'
     );
 
     cy.get('[data-cy="dataset-keywords-input"] input').type('fmri , neuroimaging');

@@ -3,8 +3,8 @@ import AppTitle from '../../src/components/AppTitle';
 
 const props = {
   title: 'Neurobagel Annotation Tool',
-  githubUrl: 'https://mygithub.com',
-  docsUrl: 'https://mydocs.com',
+  githubUrl: 'https://example.com/github',
+  docsUrl: 'https://example.com/docs',
 };
 
 describe('App Title', () => {
