@@ -23,7 +23,7 @@ const injectAnalytics = () => ({
   },
 });
 
-// https://vitejs.dev/config/
+// https://vite.dev/config/
 export default defineConfig({
   define: {
     APP_VERSION: JSON.stringify(pkg.version),
