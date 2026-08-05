@@ -171,7 +171,11 @@ function DatasetDescriptionForm() {
         </Accordion>
 
         <Accordion variant="outlined" className="shadow-none border border-gray-300">
-          <AccordionSummary expandIcon={<ExpandMoreIcon />} className="bg-gray-50 min-h-0 h-10">
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            className="bg-gray-50 min-h-0 h-10"
+            data-cy="reference-info-accordion"
+          >
             <Typography className="font-medium text-gray-700 text-sm uppercase tracking-wider">
               Reference info
             </Typography>

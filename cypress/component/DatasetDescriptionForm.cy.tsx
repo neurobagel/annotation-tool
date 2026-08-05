@@ -7,12 +7,12 @@ describe('DatasetDescriptionForm', () => {
     cy.mount(<DatasetDescriptionForm />);
   });
 
-  it('renders the form correctly', () => {
+  it('should render the form correctly', () => {
     cy.get('[data-cy="dataset-description-form"]').should('exist');
     cy.get('[data-cy="dataset-name-input"]').should('exist');
   });
 
-  it('validates the Name field', () => {
+  it('should validate the Name field', () => {
     cy.get('[data-cy="dataset-name-input"] input').should('have.value', '');
     cy.get('[data-cy="dataset-name-input"]').contains('Name is required');
 
@@ -24,7 +24,7 @@ describe('DatasetDescriptionForm', () => {
     cy.get('[data-cy="dataset-name-input"]').contains('Name is required');
   });
 
-  it('validates the RepositoryURL and AccessLink fields', () => {
+  it('should validate the RepositoryURL and AccessLink fields', () => {
     const invalidUrl = 'invalid-url';
     const validUrl = 'https://example.com';
 
@@ -47,7 +47,7 @@ describe('DatasetDescriptionForm', () => {
     );
   });
 
-  it('validates the AccessEmail field', () => {
+  it('should validate the AccessEmail field', () => {
     const invalidEmail = 'invalid-email';
     const validEmail = 'test@example.com';
 
@@ -62,44 +62,40 @@ describe('DatasetDescriptionForm', () => {
     );
   });
 
-  it('handles repeatable array fields', () => {
-    // Authors
+  it('should fire the userUpdatesDatasetDescription action with the appropriate payload when the Authors field is updated', () => {
+    cy.window().then(() => {
+      cy.spy(useDataStore.getState().actions, 'userUpdatesDatasetDescription').as('updateAction');
+    });
+
     cy.get('[data-cy="dataset-authors-input-0"] input').type('Author One');
-    cy.get('[data-cy="dataset-authors-add"]').click();
-    cy.get('[data-cy="dataset-authors-input-1"] input').type('Author Two');
-    cy.get('[data-cy="dataset-authors-input-0"] input').should('have.value', 'Author One');
-    cy.get('[data-cy="dataset-authors-input-1"] input').should('have.value', 'Author Two');
-    cy.get('[data-cy="authors-preview"]').should('contain.text', '["Author One", "Author Two"]');
+    cy.get('[data-cy="authors-preview"]').should('contain.text', '["Author One"]');
+    cy.get('@updateAction').should('have.been.calledWith', 'Authors', ['Author One']);
+  });
 
-    cy.get('[data-cy="dataset-authors-remove-0"]').click();
-    cy.get('[data-cy="dataset-authors-input-0"] input').should('have.value', 'Author Two');
-    cy.get('[data-cy="dataset-authors-input-1"]').should('not.exist');
-    cy.get('[data-cy="authors-preview"]').should('contain.text', '["Author Two"]');
+  it('should fire the userUpdatesDatasetDescription action with the appropriate payload when the References field is updated', () => {
+    cy.window().then(() => {
+      cy.spy(useDataStore.getState().actions, 'userUpdatesDatasetDescription').as('updateAction');
+    });
 
-    // References
-    cy.contains('Reference info').click();
+    cy.get('[data-cy="reference-info-accordion"]').click();
     cy.get('[data-cy="dataset-references-input-0"] input').type('https://example.com/paper');
-    cy.get('[data-cy="dataset-references-add"]').click();
-    cy.get('[data-cy="dataset-references-input-1"] input').type('https://example.com/repo');
-    cy.get('[data-cy="dataset-references-input-0"] input').should(
-      'have.value',
-      'https://example.com/paper'
-    );
-    cy.get('[data-cy="dataset-references-input-1"] input').should(
-      'have.value',
-      'https://example.com/repo'
-    );
     cy.get('[data-cy="references-preview"]').should(
       'contain.text',
-      '["https://example.com/paper", "https://example.com/repo"]'
+      '["https://example.com/paper"]'
     );
+    cy.get('@updateAction').should('have.been.calledWith', 'ReferencesAndLinks', [
+      'https://example.com/paper',
+    ]);
+  });
 
-    // Keywords
+  it('should fire the userUpdatesDatasetDescription action with the appropriate payload when the Keywords field is updated', () => {
+    cy.window().then(() => {
+      cy.spy(useDataStore.getState().actions, 'userUpdatesDatasetDescription').as('updateAction');
+    });
+
+    cy.get('[data-cy="reference-info-accordion"]').click();
     cy.get('[data-cy="dataset-keywords-input-0"] input').type('fmri');
-    cy.get('[data-cy="dataset-keywords-add"]').click();
-    cy.get('[data-cy="dataset-keywords-input-1"] input').type('neuroimaging');
-    cy.get('[data-cy="dataset-keywords-input-0"] input').should('have.value', 'fmri');
-    cy.get('[data-cy="dataset-keywords-input-1"] input').should('have.value', 'neuroimaging');
-    cy.get('[data-cy="keywords-preview"]').should('contain.text', '["fmri", "neuroimaging"]');
+    cy.get('[data-cy="keywords-preview"]').should('contain.text', '["fmri"]');
+    cy.get('@updateAction').should('have.been.calledWith', 'Keywords', ['fmri', '', '', '', '']);
   });
 });
