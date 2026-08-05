@@ -30,6 +30,12 @@ describe('Main user flow', () => {
     // Using click here triggers a check for whether the element is covered by another element
     cy.get('[data-cy="nav-stepper"]').click();
 
+    // Functionally verify that the navigation container is sticky:
+    // Scroll to the top of this tall page and click the container without scrolling.
+    // If the element is not sticky (e.g. pushed to the bottom of the long page), this will fail.
+    cy.scrollTo('top');
+    cy.get('[data-cy="navigation-buttons-container"]').click({ scrollBehavior: false });
+
     // Wait for config skeleton to disappear and dropdown to be ready
     cy.get('[data-cy="config-card-dropdown"]', { timeout: 10000 }).should('be.visible');
     cy.get('[data-config-loading="false"]').should('exist');
@@ -42,6 +48,14 @@ describe('Main user flow', () => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
     });
 
+    cy.get('[data-cy="Column Annotation-step"]')
+      .contains('span', 'Column Annotation')
+      .trigger('mouseover');
+    cy.get('.MuiTooltip-tooltip').should('contain', 'Please upload a data table first');
+    cy.get('[data-cy="Column Annotation-step"]')
+      .contains('span', 'Column Annotation')
+      .trigger('mouseout');
+
     cy.get('[data-cy="datadictionary-upload-input"]').should('be.disabled');
     cy.get('[data-cy="datatable-upload-input"]').selectFile(mockDataTableFilePath, {
       force: true,
@@ -53,7 +67,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="datatable-toggle-preview-button"]').click();
 
     cy.get('[data-cy="datadictionary-upload-input"]').should('not.be.disabled');
-    cy.get('[data-cy="next-button"]').click();
+    cy.get('[data-cy="Column Annotation-step"]').click();
 
     // Column Annotation view
     cy.get('[data-cy="back-button"]').should('contain', 'Upload');
@@ -106,7 +120,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="4-column-annotation-card"]').click();
     cy.get('[data-cy="standardized-variable-item-nb:Diagnosis"]').click();
 
-    cy.get('[data-cy="next-button"]').click();
+    cy.get('[data-cy="Value Annotation-step"]').click();
 
     // Value Annotation view
     cy.get('[data-cy="back-button"]').should('contain', 'Column Annotation');
@@ -139,10 +153,10 @@ describe('Main user flow', () => {
       .and('contain', 'F');
     cy.get('[data-cy="side-column-nav-bar-other"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-age-age"]').should('be.visible');
-    cy.get('[data-cy="next-button"]').click();
+    cy.get('[data-cy="Dataset Description-step"]').click();
 
     // Dataset Description view
-    cy.get('[data-cy="next-button"]').click();
+    cy.get('[data-cy="Download-step"]').click();
 
     // Download
     cy.get('[data-cy="back-button"]').should('contain', 'Dataset Description');
@@ -167,7 +181,7 @@ describe('Main user flow', () => {
       expect(fileContentString).to.contain('"Units":"some cool unit"');
     });
   });
-  it.only('steps through the different app workflows with a partially annotated data dictionary', () => {
+  it('steps through the different app workflows with a partially annotated data dictionary', () => {
     cy.visit('http://localhost:5173');
     cy.get('[data-cy="next-button"]').click();
 
@@ -354,19 +368,25 @@ describe('Main user flow', () => {
 
     // Dataset Description view
     cy.get('[data-cy="dataset-name-input"]').type('My Awesome Dataset');
-    cy.get('[data-cy="dataset-authors-input"]').type('John Doe, Jane Smith');
+    cy.get('[data-cy="dataset-authors-input-0"] input').type('John Doe');
+    cy.get('[data-cy="dataset-authors-add"]').click();
+    cy.get('[data-cy="dataset-authors-input-1"] input').type('Jane Smith');
     cy.get('[data-cy="dataset-accesstype-select"]').click();
     cy.get('li[data-value="registered"]').click();
     cy.get('[data-cy="dataset-instructions-input"]').type('Just download it');
     cy.get('[data-cy="dataset-repo-input"]').type('https://github.com/my-repo');
-    cy.get('[data-cy="dataset-accessemail-input"]').type('contact@domain.com');
-    cy.get('[data-cy="dataset-accesslink-input"]').type('https://domain.com/access');
+    cy.get('[data-cy="dataset-accessemail-input"]').type('contact@example.com');
+    cy.get('[data-cy="dataset-accesslink-input"]').type('https://example.com/access');
 
     cy.contains('Reference info').click();
-    cy.get('[data-cy="dataset-references-input"]').type(
-      'https://domain.com/paper, Author et al. (2024)'
-    );
-    cy.get('[data-cy="dataset-keywords-input"]').type('fMRI, neuroimaging, nback');
+    cy.get('[data-cy="dataset-references-input-0"] input').type('https://example.com/paper');
+    cy.get('[data-cy="dataset-references-add"]').click();
+    cy.get('[data-cy="dataset-references-input-1"] input').type('Author et al. (2024)');
+    cy.get('[data-cy="dataset-keywords-input-0"] input').type('fMRI');
+    cy.get('[data-cy="dataset-keywords-add"]').click();
+    cy.get('[data-cy="dataset-keywords-input-1"] input').type('neuroimaging');
+    cy.get('[data-cy="dataset-keywords-add"]').click();
+    cy.get('[data-cy="dataset-keywords-input-2"] input').type('nback');
 
     cy.get('[data-cy="next-button"]').click();
 
@@ -383,10 +403,10 @@ describe('Main user flow', () => {
       expect(fileContent.AccessType).to.equal('registered');
       expect(fileContent.AccessInstructions).to.equal('Just download it');
       expect(fileContent.RepositoryURL).to.equal('https://github.com/my-repo');
-      expect(fileContent.AccessEmail).to.equal('contact@domain.com');
-      expect(fileContent.AccessLink).to.equal('https://domain.com/access');
+      expect(fileContent.AccessEmail).to.equal('contact@example.com');
+      expect(fileContent.AccessLink).to.equal('https://example.com/access');
       expect(fileContent.ReferencesAndLinks).to.deep.equal([
-        'https://domain.com/paper',
+        'https://example.com/paper',
         'Author et al. (2024)',
       ]);
       expect(fileContent.Keywords).to.deep.equal(['fMRI', 'neuroimaging', 'nback']);

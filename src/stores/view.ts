@@ -52,10 +52,10 @@ export const getNavigationProps = (currentView: View): NavigationProps => {
   let backLabel;
   if (backView) {
     if (backView === View.Landing) {
-      backLabel = 'Back to Landing';
+      backLabel = 'Previous: Landing';
     } else {
       const step = steps.find((s) => s.view === backView);
-      backLabel = step ? `Back to ${step.label}` : undefined;
+      backLabel = step ? `Previous: ${step.label}` : undefined;
     }
   }
 
