@@ -9,15 +9,19 @@ export default function VisibleWhitespace({ value }: VisibleWhitespaceProps) {
   const showFormattingMarks = useContext(FormattingMarksContext);
 
   if (typeof value !== 'string') {
-    return <span>{JSON.stringify(value)}</span>;
+    return <span data-cy="visible-whitespace">{JSON.stringify(value)}</span>;
   }
 
   if (!showFormattingMarks) {
-    return <span>{value}</span>;
+    return <span data-cy="visible-whitespace">{value}</span>;
   }
 
   if (value === '') {
-    return <span className="whitespace-pre-wrap font-mono">&quot;&quot;</span>;
+    return (
+      <span data-cy="visible-whitespace" className="whitespace-pre-wrap font-mono">
+        &quot;&quot;
+      </span>
+    );
   }
 
   const visuallyFormatted = value
@@ -26,5 +30,9 @@ export default function VisibleWhitespace({ value }: VisibleWhitespaceProps) {
     .replace(/\n/g, '¶\n')
     .replace(/\r/g, '¤');
 
-  return <span className="whitespace-pre-wrap font-mono">{visuallyFormatted}</span>;
+  return (
+    <span data-cy="visible-whitespace" className="whitespace-pre-wrap font-mono">
+      {visuallyFormatted}
+    </span>
+  );
 }
