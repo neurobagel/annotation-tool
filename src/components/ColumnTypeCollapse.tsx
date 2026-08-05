@@ -13,6 +13,7 @@ import {
 import { capitalize } from 'lodash';
 import { useMemo, useState } from 'react';
 import type { ColumnGroupColumn } from '~/hooks/useValueAnnotationColumns';
+import VisibleWhitespace from './VisibleWhitespace';
 
 function IncompleteArcIcon(props: SvgIconProps) {
   return (
@@ -288,7 +289,7 @@ function ColumnTypeCollapse({
                             }}
                           >
                             <Typography sx={{ flexGrow: 1, fontSize: '0.9rem' }}>
-                              {JSON.stringify(entry.column.name ?? entry.id)}
+                              <VisibleWhitespace value={entry.column.name ?? entry.id} />
                             </Typography>
                             {isComplete ? (
                               <CheckRoundedIcon
@@ -383,7 +384,7 @@ function ColumnTypeCollapse({
                 }}
               >
                 <Typography sx={{ flexGrow: 1, fontSize: '0.9rem' }}>
-                  {JSON.stringify(entry.column.name ?? entry.id)}
+                  <VisibleWhitespace value={entry.column.name ?? entry.id} />
                 </Typography>
                 {isComplete ? (
                   <CheckRoundedIcon
