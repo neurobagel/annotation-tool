@@ -42,6 +42,14 @@ describe('Main user flow', () => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
     });
 
+    cy.get('[data-cy="Column Annotation-step"]')
+      .contains('span', 'Column Annotation')
+      .trigger('mouseover');
+    cy.get('.MuiTooltip-tooltip').should('contain', 'Please upload a data table first');
+    cy.get('[data-cy="Column Annotation-step"]')
+      .contains('span', 'Column Annotation')
+      .trigger('mouseout');
+
     cy.get('[data-cy="datadictionary-upload-input"]').should('be.disabled');
     cy.get('[data-cy="datatable-upload-input"]').selectFile(mockDataTableFilePath, {
       force: true,
@@ -53,7 +61,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="datatable-toggle-preview-button"]').click();
 
     cy.get('[data-cy="datadictionary-upload-input"]').should('not.be.disabled');
-    cy.get('[data-cy="next-button"]').click();
+    cy.get('[data-cy="Column Annotation-step"]').click();
 
     // Column Annotation view
     cy.get('[data-cy="back-button"]').should('contain', 'Upload');
@@ -106,7 +114,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="4-column-annotation-card"]').click();
     cy.get('[data-cy="standardized-variable-item-nb:Diagnosis"]').click();
 
-    cy.get('[data-cy="next-button"]').click();
+    cy.get('[data-cy="Value Annotation-step"]').click();
 
     // Value Annotation view
     cy.get('[data-cy="back-button"]').should('contain', 'Column Annotation');
@@ -139,10 +147,10 @@ describe('Main user flow', () => {
       .and('contain', 'F');
     cy.get('[data-cy="side-column-nav-bar-other"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-age-age"]').should('be.visible');
-    cy.get('[data-cy="next-button"]').click();
+    cy.get('[data-cy="Dataset Description-step"]').click();
 
     // Dataset Description view
-    cy.get('[data-cy="next-button"]').click();
+    cy.get('[data-cy="Download-step"]').click();
 
     // Download
     cy.get('[data-cy="back-button"]').should('contain', 'Dataset Description');
@@ -167,7 +175,7 @@ describe('Main user flow', () => {
       expect(fileContentString).to.contain('"Units":"some cool unit"');
     });
   });
-  it.only('steps through the different app workflows with a partially annotated data dictionary', () => {
+  it('steps through the different app workflows with a partially annotated data dictionary', () => {
     cy.visit('http://localhost:5173');
     cy.get('[data-cy="next-button"]').click();
 
