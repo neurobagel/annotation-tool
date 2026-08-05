@@ -6,7 +6,7 @@ const testProps = {
   onClose: () => {},
   dataDictionary: {},
   datasetDescription: null,
-  appsScriptUrl: 'https://somecoolurl.com/exec',
+  appsScriptUrl: 'https://example.com/exec',
   config: 'some-config',
 };
 
@@ -100,6 +100,10 @@ describe('GoogleDriveUpload', () => {
     it('should enable upload button only when required fields are filled', () => {
       cy.get('[data-cy="upload-button"]').should('be.disabled');
 
+      cy.get('[data-cy="site-select"]').click();
+      cy.get('[role="listbox"]').contains('SiteA').click();
+      cy.get('[data-cy="upload-button"]').should('be.disabled');
+
       cy.get('[data-cy="dataset-name-input"]').type('MyDataset');
       cy.get('[data-cy="upload-button"]').should('be.disabled');
 
@@ -118,6 +122,8 @@ describe('GoogleDriveUpload', () => {
         }
       }).as('createFile');
 
+      cy.get('[data-cy="site-select"]').click();
+      cy.get('[role="listbox"]').contains('SiteA').click();
       cy.get('[data-cy="dataset-name-input"]').type('SuccessDataset');
       cy.get('[data-cy="password-input"]').type('correctPass');
       cy.get('[data-cy="upload-button"]').click();
@@ -162,6 +168,8 @@ describe('GoogleDriveUpload', () => {
         }
       }).as('createDualFile');
 
+      cy.get('[data-cy="site-select"]').click();
+      cy.get('[role="listbox"]').contains('SiteA').click();
       cy.get('[data-cy="dataset-name-input"]').type('DualFileDataset');
       cy.get('[data-cy="password-input"]').type('correctPass');
       cy.get('[data-cy="upload-button"]').click();
@@ -191,6 +199,8 @@ describe('GoogleDriveUpload', () => {
         }
       }).as('createFile');
 
+      cy.get('[data-cy="site-select"]').click();
+      cy.get('[role="listbox"]').contains('SiteA').click();
       cy.get('[data-cy="dataset-name-input"]').type('AuthFailDataset');
       cy.get('[data-cy="password-input"]').type('wrong');
       cy.get('[data-cy="upload-button"]').click();
@@ -220,6 +230,8 @@ describe('GoogleDriveUpload', () => {
           }
         }
       }).as('createFile');
+      cy.get('[data-cy="site-select"]').click();
+      cy.get('[role="listbox"]').contains('SiteA').click();
       cy.get('[data-cy="dataset-name-input"]').type('conflict');
       cy.get('[data-cy="password-input"]').type('correctPass');
       cy.get('[data-cy="upload-button"]').click();
@@ -257,6 +269,9 @@ describe('GoogleDriveUpload', () => {
         }
       }).as('createFileConflict');
 
+      cy.get('[data-cy="site-select"]').click();
+      cy.get('[role="listbox"]').contains('SiteA').click();
+      cy.tick(500);
       cy.get('[data-cy="dataset-name-input"]').type('TimestampTest');
       cy.get('[data-cy="password-input"]').type('pass');
       cy.get('[data-cy="upload-button"]').click();
@@ -285,6 +300,8 @@ describe('GoogleDriveUpload', () => {
         }
       }).as('createFileCustom');
 
+      cy.get('[data-cy="site-select"]').click();
+      cy.get('[role="listbox"]').contains('SiteA').click();
       cy.get('[data-cy="dataset-name-input"]').type('CustomSuffixTest');
       cy.get('[data-cy="password-input"]').type('pass');
       cy.get('[data-cy="upload-button"]').click();
@@ -341,6 +358,8 @@ describe('GoogleDriveUpload', () => {
         }
       }).as('createDualFileConflict');
 
+      cy.get('[data-cy="site-select"]').click();
+      cy.get('[role="listbox"]').contains('SiteA').click();
       cy.get('[data-cy="dataset-name-input"]').clear();
       cy.get('[data-cy="dataset-name-input"]').type('ConflictDualFile');
       cy.get('[data-cy="password-input"]').type('pass');
@@ -375,6 +394,8 @@ describe('GoogleDriveUpload', () => {
         }
       }).as('uploadSuccess');
 
+      cy.get('[data-cy="site-select"]').click();
+      cy.get('[role="listbox"]').contains('SiteA').click();
       cy.get('[data-cy="dataset-name-input"]').type('InfoIconTest');
       cy.get('[data-cy="password-input"]').type('pass');
       cy.get('[data-cy="upload-button"]').click();
