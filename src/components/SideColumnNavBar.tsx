@@ -88,7 +88,7 @@ function SideColumnNavBar({
       elevation={3}
       data-cy="side-column-nav-bar"
     >
-      <ExpandableSection title="Global Operations" defaultExpanded>
+      <ExpandableSection title="Global Operations" defaultExpanded tooltip="">
         <List>
           <ListItem disablePadding sx={{ paddingLeft: 2 }}>
             <ListItemButton
@@ -102,7 +102,10 @@ function SideColumnNavBar({
         </List>
       </ExpandableSection>
 
-      <ExpandableSection title="annotated">
+      <ExpandableSection
+        title="annotated"
+        tooltip="Columns that have been mapped to a standardized variable"
+      >
         <List>
           {annotatedGroups.map((group) => (
             <ListItem key={group.standardizedVariableId} sx={{ paddingLeft: 2 }}>
@@ -117,7 +120,11 @@ function SideColumnNavBar({
         </List>
       </ExpandableSection>
 
-      <ExpandableSection title="unannotated" defaultExpanded={false}>
+      <ExpandableSection
+        title="unannotated"
+        defaultExpanded={false}
+        tooltip="Columns that have not been mapped to a standardized variable"
+      >
         <List>
           {unannotatedGroups.map((group) => (
             <ListItem key={`unannotated-${group.key}`} sx={{ paddingLeft: 2 }}>
