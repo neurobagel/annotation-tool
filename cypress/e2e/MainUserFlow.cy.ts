@@ -362,7 +362,9 @@ describe('Main user flow', () => {
 
     // Dataset Description view
     cy.get('[data-cy="dataset-name-input"]').type('My Awesome Dataset');
-    cy.get('[data-cy="dataset-authors-input"]').type('John Doe, Jane Smith');
+    cy.get('[data-cy="dataset-authors-input-0"] input').type('John Doe');
+    cy.get('[data-cy="dataset-authors-add"]').click();
+    cy.get('[data-cy="dataset-authors-input-1"] input').type('Jane Smith');
     cy.get('[data-cy="dataset-accesstype-select"]').click();
     cy.get('li[data-value="registered"]').click();
     cy.get('[data-cy="dataset-instructions-input"]').type('Just download it');
@@ -371,10 +373,14 @@ describe('Main user flow', () => {
     cy.get('[data-cy="dataset-accesslink-input"]').type('https://example.com/access');
 
     cy.contains('Reference info').click();
-    cy.get('[data-cy="dataset-references-input"]').type(
-      'https://example.com/paper, Author et al. (2024)'
-    );
-    cy.get('[data-cy="dataset-keywords-input"]').type('fMRI, neuroimaging, nback');
+    cy.get('[data-cy="dataset-references-input-0"] input').type('https://example.com/paper');
+    cy.get('[data-cy="dataset-references-add"]').click();
+    cy.get('[data-cy="dataset-references-input-1"] input').type('Author et al. (2024)');
+    cy.get('[data-cy="dataset-keywords-input-0"] input').type('fMRI');
+    cy.get('[data-cy="dataset-keywords-add"]').click();
+    cy.get('[data-cy="dataset-keywords-input-1"] input').type('neuroimaging');
+    cy.get('[data-cy="dataset-keywords-add"]').click();
+    cy.get('[data-cy="dataset-keywords-input-2"] input').type('nback');
 
     cy.get('[data-cy="next-button"]').click();
 
