@@ -173,7 +173,7 @@ function DatasetDescriptionForm() {
               }
               fullWidth
               size="small"
-              placeholder="e.g. contact@domain.com"
+              placeholder="e.g. contact@example.com"
               data-cy="dataset-accessemail-input"
             />
             <TextField
@@ -186,7 +186,7 @@ function DatasetDescriptionForm() {
               }
               fullWidth
               size="small"
-              placeholder="e.g. https://domain.com/access"
+              placeholder="e.g. https://example.com/access"
               data-cy="dataset-accesslink-input"
             />
           </AccordionDetails>
@@ -211,7 +211,7 @@ function DatasetDescriptionForm() {
                 helperText="Enter a comma-separated list of URLs or citations"
                 fullWidth
                 size="small"
-                placeholder="e.g. https://domain.com/paper, Author et al. (2024)"
+                placeholder="e.g. https://example.com/paper, Author et al. (2024)"
                 data-cy="dataset-references-input"
               />
               <ArrayPreviewDisplay
