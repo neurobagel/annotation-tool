@@ -39,7 +39,7 @@ function DataTablePreview({ dataTable }: { dataTable: DataTable }) {
                   align="left"
                   sx={{ fontWeight: 'bold', color: 'primary.main' }}
                 >
-                  {JSON.stringify(header)}
+                  {header}
                 </TableCell>
               ))}
             </TableRow>
@@ -53,7 +53,7 @@ function DataTablePreview({ dataTable }: { dataTable: DataTable }) {
                     const cellId = uuidv4();
                     return (
                       <TableCell key={cellId} align="left">
-                        {JSON.stringify(cell)}
+                        {cell as React.ReactNode}
                       </TableCell>
                     );
                   })}

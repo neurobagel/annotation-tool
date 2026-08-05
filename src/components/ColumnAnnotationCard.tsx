@@ -91,12 +91,8 @@ function ColumnAnnotationCard({
           selected ? 'bg-blue-100/50 border-blue-200' : 'bg-gray-50 border-gray-200'
         }`}
       >
-        <Typography
-          variant="subtitle2"
-          className="font-bold text-gray-900 truncate"
-          title={JSON.stringify(name)}
-        >
-          {JSON.stringify(name)}
+        <Typography variant="subtitle2" className="font-bold text-gray-900 truncate" title={name}>
+          {name}
         </Typography>
       </div>
 
