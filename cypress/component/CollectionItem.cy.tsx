@@ -212,7 +212,7 @@ describe('CollectionItem', () => {
     cy.get('[data-cy="mapped-count-badge-term-nb:termThree"]').should('not.exist');
   });
 
-  it('should display a tooltip with the term description if it exists', () => {
+  it('should display a tooltip if the term description exists', () => {
     cy.mount(
       <CollectionItem
         variable={props.variable}
