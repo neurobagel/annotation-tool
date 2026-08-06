@@ -34,22 +34,19 @@ export function useGenerateDatasetDescription(): DatasetDescription | null {
       Name: datasetDescription.Name.trim(),
     };
 
-    const parseList = (str?: string) => {
-      if (!str) return undefined;
-      const parsed = str
-        .split(',')
-        .map((s) => s.trim())
-        .filter((s) => s !== '');
-      return parsed.length > 0 ? parsed : undefined;
+    const cleanList = (arr?: string[]) => {
+      if (!arr) return undefined;
+      const cleaned = arr.map((s) => s.trim()).filter((s) => s !== '');
+      return cleaned.length > 0 ? cleaned : undefined;
     };
 
-    const authors = parseList(datasetDescription.Authors);
+    const authors = cleanList(datasetDescription.Authors);
     if (authors) finalDesc.Authors = authors;
 
-    const references = parseList(datasetDescription.ReferencesAndLinks);
+    const references = cleanList(datasetDescription.ReferencesAndLinks);
     if (references) finalDesc.ReferencesAndLinks = references;
 
-    const keywords = parseList(datasetDescription.Keywords);
+    const keywords = cleanList(datasetDescription.Keywords);
     if (keywords) finalDesc.Keywords = keywords;
 
     if (datasetDescription.AccessType?.trim())
