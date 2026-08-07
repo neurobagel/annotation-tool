@@ -53,7 +53,7 @@ function DataTablePreview({ dataTable }: { dataTable: DataTable }) {
                     const cellId = uuidv4();
                     return (
                       <TableCell key={cellId} align="left">
-                        {cell}
+                        {cell as React.ReactNode}
                       </TableCell>
                     );
                   })}

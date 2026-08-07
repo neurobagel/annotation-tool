@@ -29,7 +29,7 @@ export function useColumnsMetadata(columnIds: string[]): Record<string, ColumnMe
 
         metadata[columnId] = {
           id: columnId,
-          name: column.name || columnId,
+          name: column.name ?? columnId,
           dataType: column.dataType ?? null,
           isCollection,
         };

@@ -2,6 +2,7 @@ import { TableCell, TableRow } from '@mui/material';
 import React from 'react';
 import type { RowComponentProps } from 'react-window';
 import MissingValueGroupButton from './MissingValueGroupButton';
+import VisibleWhitespace from './VisibleWhitespace';
 
 export interface ValueTableRowData {
   visibleValues: string[];
@@ -56,7 +57,7 @@ export default function ValueTableRow({
           textOverflow: 'ellipsis',
         }}
       >
-        {value}
+        <VisibleWhitespace value={value} />
       </TableCell>
       {renderExtraTableCells && renderExtraTableCells(value, index)}
       {showMissingToggle && onToggleMissingValue && (

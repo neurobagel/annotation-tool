@@ -13,6 +13,7 @@ import {
 import { capitalize } from 'lodash';
 import { useMemo, useState } from 'react';
 import type { ColumnGroupColumn } from '~/hooks/useValueAnnotationColumns';
+import VisibleWhitespace from './VisibleWhitespace';
 
 function IncompleteArcIcon(props: SvgIconProps) {
   return (
@@ -84,7 +85,7 @@ function ColumnTypeCollapse({
         columns.map((entry) => {
           // The schema uses column.name as the key in the data dictionary.
           // If it's missing, it falls back to the internal column ID.
-          const dictionaryKey = entry.column.name || entry.id;
+          const dictionaryKey = entry.column.name ?? entry.id;
           // The column is assumed annotated if it does not appear in the schema errors.
           return [entry.id, !schemaErrors.includes(dictionaryKey)];
         })
@@ -275,7 +276,7 @@ function ColumnTypeCollapse({
                         const isComplete = columnCompleteness[entry.id] ?? false;
                         return (
                           <ListItem
-                            data-cy={`side-column-nav-bar-${labelToDisplay}-${groupName}-${entry.column.name}`}
+                            data-cy={`side-column-nav-bar-${labelToDisplay}-${groupName}-${JSON.stringify(entry.column.name ?? entry.id).slice(1, -1)}`}
                             key={entry.id}
                             divider
                             sx={{
@@ -288,7 +289,7 @@ function ColumnTypeCollapse({
                             }}
                           >
                             <Typography sx={{ flexGrow: 1, fontSize: '0.9rem' }}>
-                              {entry.column.name || entry.id}
+                              <VisibleWhitespace value={entry.column.name ?? entry.id} />
                             </Typography>
                             {isComplete ? (
                               <CheckRoundedIcon
@@ -370,7 +371,7 @@ function ColumnTypeCollapse({
             const isComplete = columnCompleteness[entry.id] ?? false;
             return (
               <ListItem
-                data-cy={`side-column-nav-bar-${labelToDisplay}-${entry.column.name}`}
+                data-cy={`side-column-nav-bar-${labelToDisplay}-${JSON.stringify(entry.column.name ?? entry.id).slice(1, -1)}`}
                 key={entry.id}
                 divider
                 sx={{
@@ -383,7 +384,7 @@ function ColumnTypeCollapse({
                 }}
               >
                 <Typography sx={{ flexGrow: 1, fontSize: '0.9rem' }}>
-                  {entry.column.name || entry.id}
+                  <VisibleWhitespace value={entry.column.name ?? entry.id} />
                 </Typography>
                 {isComplete ? (
                   <CheckRoundedIcon

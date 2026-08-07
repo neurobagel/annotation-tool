@@ -62,7 +62,7 @@ function ValueAnnotationTabs({
               <Tab
                 key={columnId}
                 value={columnId}
-                label={column.name || columnId}
+                label={column.name ?? columnId}
                 data-cy={`${columnId}-tab`}
               />
             );
@@ -96,7 +96,7 @@ function ValueAnnotationTabs({
             <Tab
               key={columnId}
               value={columnId}
-              label={column.name || columnId}
+              label={column.name ?? columnId}
               data-cy={`${columnId}-tab`}
             />
           );
