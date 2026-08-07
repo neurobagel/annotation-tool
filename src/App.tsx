@@ -49,7 +49,7 @@ function App() {
 
   return (
     <div
-      className="flex flex-col overflow-x-hidden"
+      className="flex flex-col overflow-x-hidden pb-24"
       style={{
         minHeight: `calc(100vh - ${appBarHeight}px)`,
         marginTop: appBarHeight,
@@ -69,7 +69,7 @@ function App() {
       {content}
 
       {currentView !== View.Landing && (
-        <div className="mt-auto">
+        <div data-cy="navigation-buttons-container" className="fixed bottom-0 left-0 right-0">
           <NavigationButton
             disableNext={disableUploadNextButton}
             backView={backView}
