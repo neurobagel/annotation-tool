@@ -8,6 +8,7 @@ import {
   ListItem,
   IconButton,
   SvgIcon,
+  Tooltip,
   type SvgIconProps,
 } from '@mui/material';
 import { capitalize } from 'lodash';
@@ -241,21 +242,27 @@ function ColumnTypeCollapse({
                     >
                       {isGroupExpanded ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
                     </IconButton>
-                    <div className="flex items-center justify-between flex-grow pr-2">
-                      <Typography
-                        onClick={() => handleGroupSelect(groupColumns)}
-                        data-cy={`side-column-nav-bar-${labelToDisplay}-${groupName}`}
-                        sx={{
-                          cursor: 'pointer',
-                          fontWeight: isGroupSelected ? 'bold' : 'normal',
-                          color: isGroupSelected ? 'primary.main' : '',
-                          '&:hover': {
-                            color: 'primary.main',
-                          },
-                        }}
-                      >
-                        {groupName}
-                      </Typography>
+                    <div className="flex items-center justify-between flex-grow pr-2 min-w-0">
+                      <Tooltip title={groupName} placement="right">
+                        <Typography
+                          onClick={() => handleGroupSelect(groupColumns)}
+                          data-cy={`side-column-nav-bar-${labelToDisplay}-${groupName}`}
+                          sx={{
+                            cursor: 'pointer',
+                            fontWeight: isGroupSelected ? 'bold' : 'normal',
+                            color: isGroupSelected ? 'primary.main' : '',
+                            '&:hover': {
+                              color: 'primary.main',
+                            },
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            minWidth: 0,
+                          }}
+                        >
+                          {groupName}
+                        </Typography>
+                      </Tooltip>
                       {groupCompleteness[groupName] ? (
                         <CheckRoundedIcon
                           data-cy={`group-complete-icon-${groupName}`}
