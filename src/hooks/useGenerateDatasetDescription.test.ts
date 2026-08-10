@@ -54,11 +54,11 @@ describe('useGenerateDatasetDescription', () => {
   it('should remove empty strings and correctly parse comma-separated lists', () => {
     mockedUseDatasetDescription.mockReturnValue({
       Name: 'Valid Name',
-      Authors: 'Author A, Author B, ',
+      Authors: ['Author A', 'Author B', ''],
       AccessType: '',
       AccessInstructions: '',
-      ReferencesAndLinks: 'link1,link2',
-      Keywords: 'key1, key2',
+      ReferencesAndLinks: ['link1', 'link2'],
+      Keywords: ['key1', 'key2'],
       RepositoryURL: '',
       AccessEmail: '',
       AccessLink: '',
@@ -76,11 +76,11 @@ describe('useGenerateDatasetDescription', () => {
   it('should calculate ParticipantCount from the Participant ID column', () => {
     mockedUseDatasetDescription.mockReturnValue({
       Name: 'Participant Test',
-      Authors: '',
+      Authors: [''],
       AccessType: '',
       AccessInstructions: '',
-      ReferencesAndLinks: '',
-      Keywords: '',
+      ReferencesAndLinks: [''],
+      Keywords: [''],
       RepositoryURL: '',
       AccessEmail: '',
       AccessLink: '',
@@ -112,11 +112,11 @@ describe('useGenerateDatasetDescription', () => {
   it('should not include ParticipantCount if there is no Participant ID column or no participants', () => {
     mockedUseDatasetDescription.mockReturnValue({
       Name: 'No Participants',
-      Authors: '',
+      Authors: [''],
       AccessType: '',
       AccessInstructions: '',
-      ReferencesAndLinks: '',
-      Keywords: '',
+      ReferencesAndLinks: [''],
+      Keywords: [''],
       RepositoryURL: '',
       AccessEmail: '',
       AccessLink: '',
