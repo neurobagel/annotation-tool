@@ -58,7 +58,7 @@ function FileUploader({
   } else if (isFileSelected) {
     uploadAreaClasses += 'cursor-pointer bg-blue-50/30 border-solid p-4';
   } else {
-    uploadAreaClasses += 'cursor-pointer border-dashed p-8 ';
+    uploadAreaClasses += 'cursor-pointer border-dashed p-6 ';
     if (!hasError) {
       uploadAreaClasses += 'border-gray-300 hover:border-primary-main';
     }
@@ -126,7 +126,7 @@ function FileUploader({
               />
             ) : (
               <CloudUpload
-                className="mb-4 text-4xl"
+                className="mb-1 text-4xl"
                 sx={{
                   color: disabled ? theme.palette.grey[400] : theme.palette.primary.main,
                 }}
@@ -135,7 +135,7 @@ function FileUploader({
             <Typography
               data-cy={`${id}-upload-text`}
               variant="body1"
-              className="mb-2"
+              className="mb-1"
               sx={{ color: hasError ? theme.palette.error.main : theme.palette.text.primary }}
             >
               {hasError ? errorMessage : displayText}
