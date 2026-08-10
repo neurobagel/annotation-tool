@@ -8,8 +8,8 @@ import { DataType } from '../../src/utils/internal_types';
 const columnOrder = ['1', '2'];
 
 const columnsMeta: Record<string, ValueAnnotationTabMetadata> = {
-  '1': { id: '1', name: 'age', dataType: DataType.continuous, isMultiColumnMeasure: false },
-  '2': { id: '2', name: 'sex', dataType: DataType.categorical, isMultiColumnMeasure: false },
+  '1': { id: '1', name: 'age', dataType: DataType.continuous, isCollection: false },
+  '2': { id: '2', name: 'sex', dataType: DataType.categorical, isCollection: false },
 };
 
 const columnData: Record<string, ActiveValueAnnotationColumn> = {
@@ -17,6 +17,7 @@ const columnData: Record<string, ActiveValueAnnotationColumn> = {
     id: '1',
     name: 'age',
     dataType: DataType.continuous,
+
     uniqueValues: ['25', '30', '35'],
     levels: {},
     missingValues: [],
@@ -30,12 +31,12 @@ const columnData: Record<string, ActiveValueAnnotationColumn> = {
     showStandardizedTerm: false,
     showMissingToggle: true,
     showFormat: true,
-    showUnits: true,
   },
   '2': {
     id: '2',
     name: 'sex',
     dataType: DataType.categorical,
+
     uniqueValues: ['M', 'F', 'N/A'],
     levels: {
       M: { description: 'Male', standardizedTerm: 'term:male' },
@@ -52,7 +53,6 @@ const columnData: Record<string, ActiveValueAnnotationColumn> = {
     showStandardizedTerm: true,
     showMissingToggle: true,
     showFormat: false,
-    showUnits: true,
   },
 };
 

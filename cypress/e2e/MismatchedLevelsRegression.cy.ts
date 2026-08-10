@@ -60,10 +60,8 @@ describe('Mismatched Levels Regression', () => {
     // Ensure diagnosis is categorical and mapped
     cy.get('[data-cy="1-column-annotation-card"]').should('be.visible');
     cy.get('[data-cy="1-column-annotation-card-data-type"]').should('contain', 'Categorical');
-    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"] input').should(
-      'have.value',
-      'Diagnosis'
-    );
+    cy.get('[data-cy="1-column-annotation-card"]').click();
+    cy.get('[data-cy="standardized-variable-item-nb:Diagnosis"]').click();
     cy.get('[data-cy="next-button"]').click();
 
     // Assign terms to data table values
@@ -75,6 +73,9 @@ describe('Mismatched Levels Regression', () => {
 
     cy.get('[data-cy="1-hc-term-dropdown"]').type('Healthy Control{downArrow}{enter}');
     cy.get('[data-cy="1-hc-term-dropdown"] input').should('have.value', 'Healthy Control');
+    cy.get('[data-cy="next-button"]').click();
+
+    // Dataset Description view
     cy.get('[data-cy="next-button"]').click();
 
     // Confirm the preview reflects data table values

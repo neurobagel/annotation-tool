@@ -17,13 +17,14 @@ import {
   IconButton,
   Collapse,
 } from '@mui/material';
-import { useState, useEffect, useCallback } from 'react';
-import { DataDictionary } from '../utils/internal_types';
+import { useState, useEffect } from 'react';
+import { DataDictionary, DatasetDescription } from '../utils/internal_types';
 
 interface GoogleDriveUploadProps {
   open: boolean;
   onClose: () => void;
   dataDictionary: DataDictionary;
+  datasetDescription: DatasetDescription | null;
   appsScriptUrl?: string;
   config: string;
 }
@@ -47,8 +48,9 @@ const getTimestampSuffix = () =>
   new Date().toISOString().replace(/[-:]/g, '').replace('T', '_').split('.')[0];
 
 const createUploadPayload = ({
-  filename,
+  datasetName,
   dataDictionary,
+  datasetDescription,
   notes,
   reuploadReason,
   name,
@@ -57,8 +59,9 @@ const createUploadPayload = ({
   password,
   forceOverwrite,
 }: {
-  filename: string;
+  datasetName: string;
   dataDictionary: DataDictionary;
+  datasetDescription: DatasetDescription | null;
   notes: string;
   reuploadReason: string;
   name: string;
@@ -67,7 +70,14 @@ const createUploadPayload = ({
   password?: string;
   forceOverwrite: boolean;
 }) => {
-  const fileContent = JSON.stringify(dataDictionary, null, 2);
+  const dataDictionaryContent = JSON.stringify(dataDictionary, null, 2);
+
+  const datasetDescriptionFilename = datasetName
+    .replace('_annotated', '')
+    .replace('.json', '_dataset_description.json');
+  const datasetDescriptionContent = datasetDescription
+    ? JSON.stringify(datasetDescription, null, 2)
+    : null;
 
   let commentsContent;
   const hasNotes = notes && notes.trim().length > 0;
@@ -98,13 +108,26 @@ ${notes}`;
   }
 
   return {
-    filename,
-    content: fileContent,
-    description: `Uploaded by ${name} (${email}). Notes: ${notes}`,
     folderName: site,
+    password,
     commentsContent,
     checkExists: !forceOverwrite,
-    password,
+    files: [
+      {
+        filename: datasetName,
+        content: dataDictionaryContent,
+        description: `Data dictionary uploaded by ${name} (${email}). Notes: ${notes}`,
+      },
+      ...(datasetDescriptionContent
+        ? [
+            {
+              filename: datasetDescriptionFilename,
+              content: datasetDescriptionContent,
+              description: `Dataset description uploaded by ${name} (${email}).`,
+            },
+          ]
+        : []),
+    ],
   };
 };
 
@@ -123,6 +146,7 @@ function GoogleDriveUpload({
   open,
   onClose,
   dataDictionary,
+  datasetDescription,
   appsScriptUrl = import.meta.env.NB_GOOGLE_APPS_SCRIPT_URL,
   config,
 }: GoogleDriveUploadProps) {
@@ -136,11 +160,29 @@ function GoogleDriveUpload({
   const [uploading, setUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
-  const [showConfirmOverwrite, setShowConfirmOverwrite] = useState(false);
-  const [finalFilename, setFinalFilename] = useState('');
-  const [suggestedSuffix, setSuggestedSuffix] = useState('');
+
+  const [prevOpen, setPrevOpen] = useState(open);
 
   const hasAppsScriptUrl = !!appsScriptUrl;
+
+  if (open !== prevOpen) {
+    setPrevOpen(open);
+    if (open) {
+      setFormData((prev) => ({
+        ...prev,
+        datasetName: prev.datasetName || (datasetDescription?.Name as string) || '',
+      }));
+      if (hasAppsScriptUrl) {
+        setLoadingSites(true);
+        setShowSiteSuccess(false);
+        setError(null);
+      }
+    }
+  }
+
+  const [finalDatasetName, setFinalDatasetName] = useState('');
+  const [suggestedSuffix, setSuggestedSuffix] = useState('');
+  const [showConfirmOverwrite, setShowConfirmOverwrite] = useState(false);
 
   const handleClose = () => {
     onClose();
@@ -149,64 +191,74 @@ function GoogleDriveUpload({
       setUploadSuccess(false);
       setUploadedUrl(null);
       setShowConfirmOverwrite(false);
-      setFinalFilename('');
+      setFinalDatasetName('');
       setSuggestedSuffix('');
       setError(null);
       setFormData(initialFormState);
     }, 300);
   };
 
-  const fetchSites = useCallback(async () => {
-    setLoadingSites(true);
-    setShowSiteSuccess(false);
-    setError(null);
-
-    try {
-      const response = await fetch(appsScriptUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'getSites' }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch site names: ${response.status} ${response.statusText}`);
-      }
-
-      const result = await response.json();
-
-      if (result.status === 'success' && Array.isArray(result.sites)) {
-        setSites(result.sites);
-        if (result.sites.length > 0) {
-          setFormData((prev) => ({ ...prev, site: result.sites[0] }));
-        }
-        setShowSiteSuccess(true);
-        setTimeout(() => setShowSiteSuccess(false), 2000);
-      } else {
-        throw new Error(result.message || 'Failed to load sites from Google Drive.');
-      }
-    } catch (fetchErr) {
-      const message = fetchErr instanceof Error ? fetchErr.message : 'Unknown error loading sites';
-      setError(message);
-    } finally {
-      setLoadingSites(false);
-    }
-  }, [appsScriptUrl]);
-
   useEffect(() => {
+    let ignore = false;
+
+    async function fetchSites() {
+      try {
+        const response = await fetch(appsScriptUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'getSites' }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch site names: ${response.status} ${response.statusText}`);
+        }
+
+        const result = await response.json();
+
+        if (!ignore) {
+          if (result.status === 'success' && Array.isArray(result.sites)) {
+            setSites(result.sites);
+            setShowSiteSuccess(true);
+            setTimeout(() => {
+              if (!ignore) setShowSiteSuccess(false);
+            }, 2000);
+          } else {
+            throw new Error(result.message || 'Failed to load sites from Google Drive.');
+          }
+        }
+      } catch (fetchErr) {
+        if (!ignore) {
+          const message =
+            fetchErr instanceof Error ? fetchErr.message : 'Unknown error loading sites';
+          setError(message);
+        }
+      } finally {
+        if (!ignore) {
+          setLoadingSites(false);
+        }
+      }
+    }
+
     if (open && hasAppsScriptUrl) {
+      // The loading states are already set during render,
+      // so this just kicks off the async network request
       fetchSites();
     }
-  }, [open, hasAppsScriptUrl, fetchSites]);
 
-  const generateFilename = () => {
+    return () => {
+      ignore = true;
+    };
+  }, [open, hasAppsScriptUrl, appsScriptUrl]);
+
+  const generateDatasetName = () => {
     const siteSanitized = formData.site.replace(/[^a-z0-9]/gi, '_');
     const datasetSanitized = formData.datasetName
       ? formData.datasetName.replace(/[^a-z0-9]/gi, '_')
       : 'dataset';
-    return `${siteSanitized}_${datasetSanitized}.json`;
+    return `${siteSanitized}_${datasetSanitized}_annotated.json`;
   };
 
-  const handleUpload = async (forceOverwrite = false, overrideFilename?: string) => {
+  const handleUpload = async (forceOverwrite = false, overrideDatasetName?: string) => {
     if (!hasAppsScriptUrl) {
       setError('Google Apps Script URL not configured.');
       return;
@@ -216,10 +268,11 @@ function GoogleDriveUpload({
     setError(null);
 
     try {
-      const filename = overrideFilename || generateFilename();
+      const datasetName = overrideDatasetName || generateDatasetName();
       const payload = createUploadPayload({
-        filename,
+        datasetName,
         dataDictionary,
+        datasetDescription,
         notes: formData.notes,
         reuploadReason: formData.reuploadReason,
         name: formData.name,
@@ -252,10 +305,10 @@ function GoogleDriveUpload({
           setUploadedUrl(previewUrl);
         }
         // If we didn't have an override filename, it means we used the generated one.
-        if (!overrideFilename) {
-          setFinalFilename(generateFilename());
+        if (!overrideDatasetName) {
+          setFinalDatasetName(generateDatasetName());
         } else {
-          setFinalFilename(overrideFilename);
+          setFinalDatasetName(overrideDatasetName);
         }
       } else if (result.status === 'conflict') {
         setSuggestedSuffix(getTimestampSuffix());
@@ -278,8 +331,8 @@ function GoogleDriveUpload({
       return (
         <div className="flex flex-col gap-4">
           <Alert severity="success" data-cy="upload-success-alert">
-            Successfully uploaded <strong>{finalFilename || generateFilename()}</strong> to Google
-            Drive!
+            Successfully uploaded <strong>{finalDatasetName || generateDatasetName()}</strong> to
+            Google Drive!
           </Alert>
           {uploadedUrl && (
             <Button
@@ -314,18 +367,18 @@ function GoogleDriveUpload({
       return (
         <div className="flex flex-col gap-4 pt-2">
           <Alert severity="warning">
-            A file named <strong>{generateFilename()}</strong> already exists in{' '}
+            A dataset named <strong>{generateDatasetName()}</strong> already exists in{' '}
             <strong>{formData.site}</strong>.
             <br />
             <br />
             We will save this as a new version to avoid overwriting the existing file.
           </Alert>
 
-          <Typography variant="body2" data-cy="new-filename-preview">
+          <Typography variant="body2" data-cy="new-dataset-name-preview">
             The new file will be named:
             <br />
             <strong>
-              {generateFilename().replace(
+              {generateDatasetName().replace(
                 '.json',
                 `_${formData.customSuffix || suggestedSuffix}.json`
               )}
@@ -390,13 +443,13 @@ function GoogleDriveUpload({
             <ul className="list-disc pl-5">
               <li>
                 <Typography variant="body2">
-                  Only the data dictionary (.json) will be uploaded. Your tabular data remains
-                  local.
+                  The data dictionary and dataset description (if complete) will be uploaded. Your
+                  tabular data remains local.
                 </Typography>
               </li>
               <li>
                 <Typography variant="body2">
-                  The file will be uploaded to a private Google Drive folder for the ENIGMA-PD
+                  The files will be uploaded to a private Google Drive folder for the ENIGMA-PD
                   community.
                 </Typography>
               </li>
@@ -422,10 +475,13 @@ function GoogleDriveUpload({
           value={formData.site}
           onChange={(e) => setFormData({ ...formData, site: e.target.value })}
           fullWidth
+          required
           disabled={loadingSites}
           data-cy="site-select"
           helperText={loadingSites ? 'Fetching sites from Google Drive...' : ''}
           slotProps={{
+            select: { displayEmpty: true },
+            inputLabel: { shrink: true },
             input: {
               endAdornment: (
                 <InputAdornment position="end" sx={{ marginRight: 2 }}>
@@ -438,6 +494,9 @@ function GoogleDriveUpload({
             },
           }}
         >
+          <MenuItem value="" disabled sx={{ display: 'none' }}>
+            <span className="text-gray-500">Please select a site</span>
+          </MenuItem>
           {sites.map((option) => (
             <MenuItem key={option} value={option}>
               {option}
@@ -467,13 +526,13 @@ function GoogleDriveUpload({
 
         <div
           className="mt-2 p-3 bg-gray-50 rounded border border-gray-200"
-          data-cy="filename-preview"
+          data-cy="dataset-name-preview"
         >
           <Typography variant="caption" className="block text-gray-500 uppercase tracking-wide">
-            Filename Preview
+            Dataset Name Preview
           </Typography>
           <Typography variant="body2" className="font-mono text-gray-800">
-            {generateFilename()}
+            {generateDatasetName()}
           </Typography>
         </div>
 
@@ -552,7 +611,7 @@ function GoogleDriveUpload({
             onClick={() => handleUpload(false)}
             variant="contained"
             color="primary"
-            disabled={uploading || !formData.datasetName || !formData.password}
+            disabled={uploading || !formData.site || !formData.datasetName || !formData.password}
             data-cy="upload-button"
           >
             {uploading ? 'Uploading...' : 'Upload'}
@@ -561,12 +620,12 @@ function GoogleDriveUpload({
         {hasAppsScriptUrl && !uploadSuccess && showConfirmOverwrite && (
           <Button
             onClick={() => {
-              const baseName = generateFilename().replace('.json', '');
+              const baseName = generateDatasetName().replace('.json', '');
               const suffix = formData.customSuffix || suggestedSuffix;
-              const newFilename = `${baseName}_${suffix}.json`;
+              const newDatasetName = `${baseName}_${suffix}.json`;
               // Do NOT close dialog or reset state here, just call upload
               // setShowConfirmOverwrite(false); // REMOVED
-              handleUpload(true, newFilename);
+              handleUpload(true, newDatasetName);
             }}
             color="primary"
             variant="contained"
