@@ -13,9 +13,15 @@ const mockColumnGroup: ColumnGroupColumn[] = [
   },
 ];
 
-function TestComponent({ defaultExpanded }: { defaultExpanded: boolean }) {
+function TestComponent({
+  defaultExpanded,
+  tooltip,
+}: {
+  defaultExpanded: boolean;
+  tooltip: string;
+}) {
   return (
-    <ExpandableSection title="some title" defaultExpanded={defaultExpanded}>
+    <ExpandableSection title="some title" defaultExpanded={defaultExpanded} tooltip={tooltip}>
       <ColumnTypeCollapse
         label="subject id"
         dataType="Continuous"
@@ -30,7 +36,7 @@ function TestComponent({ defaultExpanded }: { defaultExpanded: boolean }) {
 
 describe('ColumnTypeCollapse', () => {
   it('renders the component correctly', () => {
-    cy.mount(<TestComponent defaultExpanded />);
+    cy.mount(<TestComponent defaultExpanded tooltip="" />);
     cy.get('[data-cy="side-column-nav-bar-some title"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-some title-toggle-button"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-subject id"]').should('be.visible');
@@ -38,7 +44,14 @@ describe('ColumnTypeCollapse', () => {
     cy.get('[data-cy="side-column-nav-bar-subject id"]').should('not.be.visible');
   });
   it('renders the component correctly when defaultExpanded is false', () => {
-    cy.mount(<TestComponent defaultExpanded={false} />);
+    cy.mount(<TestComponent defaultExpanded={false} tooltip="" />);
     cy.get('[data-cy="side-column-nav-bar-subject id"]').should('not.be.visible');
+  });
+
+  it('renders a tooltip when tooltip prop is provided', () => {
+    cy.mount(<TestComponent defaultExpanded tooltip="This is a test tooltip" />);
+    cy.get('[data-cy="side-column-nav-bar-some title-info-icon"]').should('be.visible');
+    cy.get('[data-cy="side-column-nav-bar-some title-toggle-button"]').trigger('mouseover');
+    cy.get('.MuiTooltip-tooltip').should('contain', 'This is a test tooltip');
   });
 });
