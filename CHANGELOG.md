@@ -1,3 +1,80 @@
+# v0.7.5 (Wed Jun 10 2026)
+
+#### 🚀 Enhancements
+
+- [ENH] Implement status indicator for each variable/column in Value annotation [#566](https://github.com/neurobagel/annotation-tool/pull/566) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
+# v0.7.4 (Thu Jun 04 2026)
+
+#### 🚀 Enhancements
+
+- [FIX] Fix typo on dataset description page [#568](https://github.com/neurobagel/annotation-tool/pull/568) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
+# v0.7.3 (Thu Jun 04 2026)
+
+#### 🚀 Enhancements
+
+- [ENH] Add context on dataset description fields [#567](https://github.com/neurobagel/annotation-tool/pull/567) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
+# v0.7.2 (Wed Jun 03 2026)
+
+#### 🏠 Internal
+
+- [FIX] Align data dictionary filenames with tool expectations [#559](https://github.com/neurobagel/annotation-tool/pull/559) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
+# v0.7.1 (Tue May 26 2026)
+
+#### 🚀 Enhancements
+
+- [ENH] Enable dataset description file Upload to E-PD GDrive [#557](https://github.com/neurobagel/annotation-tool/pull/557) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
+# v0.7.0 (Fri May 22 2026)
+
+#### 🚀 Enhancements
+
+- [ENH] Enable creating dataset description [#553](https://github.com/neurobagel/annotation-tool/pull/553) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Validate continuous values' format [#551](https://github.com/neurobagel/annotation-tool/pull/551) ([@rmanaem](https://github.com/rmanaem))
+
+#### 🏎 Performance Improvements
+
+- [ENH] Virtualize the value level annotation table [#534](https://github.com/neurobagel/annotation-tool/pull/534) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.6.4 (Tue Apr 21 2026)
 
 #### 🚀 Enhancements

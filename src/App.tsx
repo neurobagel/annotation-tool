@@ -1,6 +1,7 @@
 import { useTheme } from '@mui/material/styles';
 import AppTitle from './components/AppTitle';
 import ColumnAnnotation from './components/ColumnAnnotation';
+import DatasetDescription from './components/DatasetDescription';
 import Download from './components/Download';
 import Landing from './components/Landing';
 import NavStepper from './components/NavStepper';
@@ -34,6 +35,8 @@ function App() {
 
       case View.ValueAnnotation:
         return <ValueAnnotation />;
+      case View.DatasetDescription:
+        return <DatasetDescription />;
       case View.Download:
         return <Download />;
       default:
@@ -46,7 +49,7 @@ function App() {
 
   return (
     <div
-      className="flex flex-col overflow-x-hidden"
+      className="flex flex-col overflow-x-hidden pb-24"
       style={{
         minHeight: `calc(100vh - ${appBarHeight}px)`,
         marginTop: appBarHeight,
@@ -66,7 +69,7 @@ function App() {
       {content}
 
       {currentView !== View.Landing && (
-        <div className="mt-auto">
+        <div data-cy="navigation-buttons-container" className="fixed bottom-0 left-0 right-0">
           <NavigationButton
             disableNext={disableUploadNextButton}
             backView={backView}

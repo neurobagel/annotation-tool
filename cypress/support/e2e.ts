@@ -10,11 +10,10 @@
 // 'supportFile' configuration option.
 //
 // You can read more here:
-// https://on.cypress.io/configuration
+// https://docs.cypress.io/app/references/configuration
 // ***********************************************************
 // Import commands.js using ES2015 syntax:
 // cypress/support/e2e.js
-// eslint-disable-next-line import/no-extraneous-dependencies
 import '@cypress/code-coverage/support';
 import './commands';
 

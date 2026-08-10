@@ -75,6 +75,9 @@ describe('Mismatched Levels Regression', () => {
     cy.get('[data-cy="1-hc-term-dropdown"] input').should('have.value', 'Healthy Control');
     cy.get('[data-cy="next-button"]').click();
 
+    // Dataset Description view
+    cy.get('[data-cy="next-button"]').click();
+
     // Confirm the preview reflects data table values
     cy.get('[data-cy="datadictionary-preview"]').should('be.visible');
     cy.get('[data-cy="datadictionary-preview"]').should('contain', 'pd');

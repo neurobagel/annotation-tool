@@ -129,6 +129,9 @@ describe('Legacy Annotation Tool Compatibility', () => {
 
     cy.get('[data-cy="next-button"]').click();
 
+    // Dataset Description view
+    cy.get('[data-cy="next-button"]').click();
+
     // Download view
     cy.get('[data-cy="complete-annotations-alert"]').should('be.visible');
   });

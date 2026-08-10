@@ -4,6 +4,7 @@ export interface TermOption {
   id: string;
   label: string;
   abbreviation?: string;
+  description?: string;
 }
 
 /**
@@ -18,6 +19,7 @@ export function useTermOptions(variableId: string): TermOption[] {
       id: term.id,
       label: term.label,
       abbreviation: term.abbreviation,
+      description: term.description,
     }));
 }
 

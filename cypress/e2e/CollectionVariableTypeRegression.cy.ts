@@ -23,6 +23,9 @@ describe('Regression tests for collection variable type', () => {
     // Value Annotation view
     cy.get('[data-cy="next-button"]').click();
 
+    // Dataset Description view
+    cy.get('[data-cy="next-button"]').click();
+
     // Download view
     cy.get('[data-cy="download-datadictionary-button"]').click();
 
@@ -43,6 +46,9 @@ describe('Regression tests for collection variable type', () => {
     cy.get('[data-cy="next-button"]').click();
 
     // Value Annotation view
+    cy.get('[data-cy="next-button"]').click();
+
+    // Dataset Description view
     cy.get('[data-cy="next-button"]').click();
 
     // Download view
@@ -72,6 +78,9 @@ describe('Regression tests for collection variable type', () => {
     // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(5000);
     cy.get('[data-cy="2-N/A-missing-value-yes"]').click();
+    cy.get('[data-cy="next-button"]').click();
+
+    // Dataset Description view
     cy.get('[data-cy="next-button"]').click();
 
     // Download view

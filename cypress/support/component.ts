@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-/* eslint-disable import/no-extraneous-dependencies */
 // ***********************************************************
 // This example support/component.ts is processed and
 // loaded automatically before your test files.
@@ -12,11 +11,11 @@
 // 'supportFile' configuration option.
 //
 // You can read more here:
-// https://on.cypress.io/configuration
+// https://docs.cypress.io/app/references/configuration
 // ***********************************************************
 // Import commands.js using ES2015 syntax:
 import '@cypress/code-coverage/support';
-import { mount } from 'cypress/react18';
+import { mount } from 'cypress/react';
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 

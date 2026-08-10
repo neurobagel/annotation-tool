@@ -13,3 +13,17 @@ export function generateAbbreviation(label: string): string {
   }
   return label;
 }
+
+// URL validation uses the browser's native WHATWG URL parser (the exact same standard rust-url implements)
+export const isValidUrl = (string: string) => {
+  try {
+    const url = new URL(string);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch (_) {
+    return false;
+  }
+};
+
+// Email regex corresponds to the HTML5 specification (approximates the RFC 5322 standard used by Pydantic's email-validator)
+export const emailRegex =
+  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;

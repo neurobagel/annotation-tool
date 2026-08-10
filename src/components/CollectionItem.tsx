@@ -1,6 +1,14 @@
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
-import { Typography, TextField, IconButton, InputAdornment, Box, Divider } from '@mui/material';
+import {
+  Typography,
+  TextField,
+  IconButton,
+  InputAdornment,
+  Box,
+  Divider,
+  Tooltip,
+} from '@mui/material';
 import { matchSorter, rankings } from 'match-sorter';
 import { useState, useMemo } from 'react';
 import { StandardizedVariableItem } from '~/utils/internal_types';
@@ -123,30 +131,53 @@ function CollectionItem({
 
                 return (
                   <div key={term.id} style={style}>
-                    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus */}
-                    <div
-                      role="button"
-                      className="flex items-center w-full px-3 py-2.5 cursor-pointer transition-colors hover:bg-gray-100 text-gray-800"
-                      onClick={() => onTermSelect(term.id)}
-                      title={displayString}
-                      data-cy={`collection-term-item-${term.id}`}
+                    <Tooltip
+                      title={term.description}
+                      placement="left"
+                      enterDelay={400}
+                      arrow
+                      slotProps={{
+                        tooltip: {
+                          sx: { fontSize: '16px' },
+                        },
+                      }}
+                      disableHoverListener={!term.description}
+                      disableFocusListener={!term.description}
+                      disableTouchListener={!term.description}
                     >
-                      <div className="flex items-center justify-between w-full">
-                        <Typography variant="body2" className="break-words whitespace-normal pr-2">
-                          {displayString}
-                        </Typography>
-                        {mappedTermCounts[term.id] > 0 && (
-                          <Box
-                            component="span"
-                            sx={{ bgcolor: 'primary.main', color: 'primary.contrastText' }}
-                            className="flex-shrink-0 ml-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium"
-                            data-cy={`mapped-count-badge-term-${term.id}`}
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        className="flex items-center w-full px-3 py-2.5 cursor-pointer transition-colors hover:bg-gray-100 text-gray-800"
+                        onClick={() => onTermSelect(term.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            onTermSelect(term.id);
+                          }
+                        }}
+                        data-cy={`collection-term-item-${term.id}`}
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <Typography
+                            variant="body2"
+                            className="break-words whitespace-normal pr-2"
                           >
-                            {mappedTermCounts[term.id]}
-                          </Box>
-                        )}
+                            {displayString}
+                          </Typography>
+                          {mappedTermCounts[term.id] > 0 && (
+                            <Box
+                              component="span"
+                              sx={{ bgcolor: 'primary.main', color: 'primary.contrastText' }}
+                              className="flex-shrink-0 ml-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium"
+                              data-cy={`mapped-count-badge-term-${term.id}`}
+                            >
+                              {mappedTermCounts[term.id]}
+                            </Box>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    </Tooltip>
                     {term !== filteredTerms[filteredTerms.length - 1] && <Divider />}
                   </div>
                 );

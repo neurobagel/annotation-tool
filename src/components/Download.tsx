@@ -15,7 +15,9 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import emoji from '../assets/download-emoji.png';
+import { useDatasetDescriptionFormValidation } from '../hooks/useDatasetDescriptionFormValidation';
 import { useGenerateDataDictionary } from '../hooks/useGenerateDataDictionary';
+import { useGenerateDatasetDescription } from '../hooks/useGenerateDatasetDescription';
 import { useSchemaValidation } from '../hooks/useSchemaValidation';
 import { useDataActions, useUploadedDataTableFileName, useConfig } from '../stores/data';
 import useViewStore from '../stores/view';
@@ -34,21 +36,39 @@ function Download() {
   const setCurrentView = useViewStore((state) => state.setCurrentView);
 
   const dataDictionary = useGenerateDataDictionary();
+  const datasetDescription = useGenerateDatasetDescription();
+  const { isFormInvalid } = useDatasetDescriptionFormValidation();
   const { schemaValid, schemaErrors } = useSchemaValidation(dataDictionary);
 
-  const handleDownload = () => {
-    const blob = new Blob([JSON.stringify(dataDictionary, null, 2)], {
+  const handleDownloadDataDictionary = () => {
+    const dataDictionaryBlob = new Blob([JSON.stringify(dataDictionary, null, 2)], {
       type: 'application/json;charset=utf-8',
     });
 
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${uploadedDataTableFileName?.slice(0, -4)}_annotated.json`;
-    document.body.appendChild(a);
-    a.click();
-    URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+    const dataDictionaryUrl = URL.createObjectURL(dataDictionaryBlob);
+    const dataDictionaryAnchor = document.createElement('a');
+    dataDictionaryAnchor.href = dataDictionaryUrl;
+    dataDictionaryAnchor.download = `${uploadedDataTableFileName?.slice(0, -4)}_annotated.json`;
+    document.body.appendChild(dataDictionaryAnchor);
+    dataDictionaryAnchor.click();
+    URL.revokeObjectURL(dataDictionaryUrl);
+    document.body.removeChild(dataDictionaryAnchor);
+  };
+
+  const handleDownloadDatasetDescription = () => {
+    if (datasetDescription) {
+      const datasetDescriptionBlob = new Blob([JSON.stringify(datasetDescription, null, 2)], {
+        type: 'application/json;charset=utf-8',
+      });
+      const datasetDescriptionUrl = URL.createObjectURL(datasetDescriptionBlob);
+      const datasetDescriptionAnchor = document.createElement('a');
+      datasetDescriptionAnchor.href = datasetDescriptionUrl;
+      datasetDescriptionAnchor.download = `${uploadedDataTableFileName?.slice(0, -4) || 'dataset'}_dataset_description.json`;
+      document.body.appendChild(datasetDescriptionAnchor);
+      datasetDescriptionAnchor.click();
+      URL.revokeObjectURL(datasetDescriptionUrl);
+      document.body.removeChild(datasetDescriptionAnchor);
+    }
   };
 
   const handleAnnotatingNewDataset = () => {
@@ -209,12 +229,10 @@ function Download() {
                 }}
               >
                 <Typography variant="subtitle2">
-                  Only the data dictionary will be uploaded to the ENIGMA-PD community drive
+                  The data dictionary and dataset description (if complete) will be uploaded to the
+                  ENIGMA-PD community drive
                 </Typography>
-                <Typography variant="subtitle2">
-                  Refer to the &quot;Data Dictionary&quot; preview section above to see the exact
-                  content being uploaded.
-                </Typography>
+                <Typography variant="subtitle2">Your tabular data remains local.</Typography>
               </Alert>
 
               <Button
@@ -226,7 +244,7 @@ function Download() {
                 className="mt-4"
                 data-cy="upload-drive-button"
               >
-                Upload Data Dictionary to {config}
+                Upload Dataset Information to {config}
               </Button>
             </div>
             <Divider className="my-6 w-full max-w-2xl" />
@@ -246,17 +264,41 @@ function Download() {
           />
         ) : null}
 
+        {isFormInvalid && (
+          <Alert
+            severity="info"
+            className="mb-4 w-full max-w-2xl"
+            data-cy="dataset-description-invalid-alert"
+          >
+            <Typography variant="body2">
+              The Dataset Description form is incomplete. Only the Data Dictionary can be
+              downloaded.
+            </Typography>
+          </Alert>
+        )}
+
         <div className="flex gap-4">
           <Button
             data-cy="download-datadictionary-button"
             variant="contained"
             color={schemaValid ? 'success' : 'warning'}
             disabled={!schemaValid && !forceAllowDownload}
-            onClick={handleDownload}
+            onClick={handleDownloadDataDictionary}
             endIcon={<DownloadIcon />}
           >
             Download Data Dictionary
           </Button>
+          {!isFormInvalid && (
+            <Button
+              data-cy="download-datasetdescription-button"
+              variant="contained"
+              color="success"
+              onClick={handleDownloadDatasetDescription}
+              endIcon={<DownloadIcon />}
+            >
+              Download Dataset Description
+            </Button>
+          )}
         </div>
       </div>
 
@@ -275,6 +317,7 @@ function Download() {
         open={uploadDialogOpen}
         onClose={() => setUploadDialogOpen(false)}
         dataDictionary={dataDictionary}
+        datasetDescription={datasetDescription}
         config={config}
       />
     </div>

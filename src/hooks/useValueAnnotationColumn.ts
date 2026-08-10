@@ -42,7 +42,7 @@ export function useValueAnnotationColumn(
     : null;
   const termOptions = useTermOptions(standardizedVariableId ?? '');
   const formatOptions = useFormatOptions(standardizedVariableId ?? '');
-  const isMultiColumnMeasure = Boolean(standardizedVariable?.is_multi_column_measure);
+  const isCollection = Boolean(standardizedVariable?.is_multi_column_measure);
 
   return useMemo(() => {
     if (!column) {
@@ -53,7 +53,7 @@ export function useValueAnnotationColumn(
     const showStandardizedTerm =
       dataType === DataType.categorical &&
       Boolean(standardizedVariableId) &&
-      !isMultiColumnMeasure &&
+      !isCollection &&
       termOptions.length > 0;
 
     const showFormat = dataType === DataType.continuous && formatOptions.length > 0;
@@ -74,14 +74,7 @@ export function useValueAnnotationColumn(
       showMissingToggle,
       showFormat,
     };
-  }, [
-    column,
-    formatOptions,
-    isMultiColumnMeasure,
-    standardizedVariableId,
-    termOptions,
-    uniqueValues,
-  ]);
+  }, [column, formatOptions, isCollection, standardizedVariableId, termOptions, uniqueValues]);
 }
 
 export default useValueAnnotationColumn;
