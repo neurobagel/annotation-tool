@@ -15,14 +15,14 @@ export interface GlobalMissingValue {
 
 export interface DatasetDescriptionFormState {
   Name: string;
-  Authors: string;
+  Authors: string[];
   AccessType: string;
   AccessInstructions: string;
   RepositoryURL: string;
   AccessEmail: string;
   AccessLink: string;
-  ReferencesAndLinks: string;
-  Keywords: string;
+  ReferencesAndLinks: string[];
+  Keywords: string[];
 }
 
 export interface DatasetDescription {
@@ -211,7 +211,12 @@ export type DataStoreActions = {
     valuesToApply: { value: string; description?: string }[]
   ) => void;
   userRemovesGlobalMissingStatus: (valueToRemove: string) => void;
-  userUpdatesDatasetDescription: (field: keyof DatasetDescriptionFormState, value: string) => void;
+  // Using a generic to strictly tie the value type to the specific field being updated,
+  // preventing TypeScript errors without needing 'as any' in the store implementation.
+  userUpdatesDatasetDescription: <K extends keyof DatasetDescriptionFormState>(
+    field: K,
+    value: DatasetDescriptionFormState[K]
+  ) => void;
   reset: () => void;
 };
 
@@ -223,6 +228,7 @@ export interface StandardizedTermItem {
   id: string;
   label: string;
   abbreviation?: string;
+  description?: string;
 }
 
 export interface StandardizedVariableItem {

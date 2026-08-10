@@ -17,11 +17,11 @@ describe('useDatasetDescriptionFormValidation', () => {
   it('should return valid when all fields are correct or empty (except Name)', () => {
     mockedUseDatasetDescription.mockReturnValue({
       Name: 'Valid Name',
-      Authors: '',
+      Authors: [''],
       AccessType: '',
       AccessInstructions: '',
-      ReferencesAndLinks: '',
-      Keywords: '',
+      ReferencesAndLinks: [''],
+      Keywords: [''],
       RepositoryURL: '',
       AccessEmail: '',
       AccessLink: '',
@@ -38,11 +38,11 @@ describe('useDatasetDescriptionFormValidation', () => {
   it('should return isNameInvalid=true when Name is empty or whitespace', () => {
     mockedUseDatasetDescription.mockReturnValue({
       Name: '   ',
-      Authors: '',
+      Authors: [''],
       AccessType: '',
       AccessInstructions: '',
-      ReferencesAndLinks: '',
-      Keywords: '',
+      ReferencesAndLinks: [''],
+      Keywords: [''],
       RepositoryURL: '',
       AccessEmail: '',
       AccessLink: '',
@@ -56,11 +56,11 @@ describe('useDatasetDescriptionFormValidation', () => {
   it('should return isRepoUrlInvalid=true when RepositoryURL is an invalid URL', () => {
     mockedUseDatasetDescription.mockReturnValue({
       Name: 'Test Name',
-      Authors: '',
+      Authors: [''],
       AccessType: '',
       AccessInstructions: '',
-      ReferencesAndLinks: '',
-      Keywords: '',
+      ReferencesAndLinks: [''],
+      Keywords: [''],
       RepositoryURL: 'not-a-url',
       AccessEmail: '',
       AccessLink: '',
@@ -74,11 +74,11 @@ describe('useDatasetDescriptionFormValidation', () => {
   it('should return isAccessEmailInvalid=true when AccessEmail is an invalid email', () => {
     mockedUseDatasetDescription.mockReturnValue({
       Name: 'Test Name',
-      Authors: '',
+      Authors: [''],
       AccessType: '',
       AccessInstructions: '',
-      ReferencesAndLinks: '',
-      Keywords: '',
+      ReferencesAndLinks: [''],
+      Keywords: [''],
       RepositoryURL: '',
       AccessEmail: 'invalid-email',
       AccessLink: '',
@@ -92,11 +92,11 @@ describe('useDatasetDescriptionFormValidation', () => {
   it('should return isAccessLinkInvalid=true when AccessLink is an invalid URL', () => {
     mockedUseDatasetDescription.mockReturnValue({
       Name: 'Test Name',
-      Authors: '',
+      Authors: [''],
       AccessType: '',
       AccessInstructions: '',
-      ReferencesAndLinks: '',
-      Keywords: '',
+      ReferencesAndLinks: [''],
+      Keywords: [''],
       RepositoryURL: '',
       AccessEmail: '',
       AccessLink: 'not-a-url-either',
@@ -110,11 +110,11 @@ describe('useDatasetDescriptionFormValidation', () => {
   it('should validate correctly when all fields have valid values', () => {
     mockedUseDatasetDescription.mockReturnValue({
       Name: 'Test Name',
-      Authors: '',
+      Authors: [''],
       AccessType: '',
       AccessInstructions: '',
-      ReferencesAndLinks: '',
-      Keywords: '',
+      ReferencesAndLinks: [''],
+      Keywords: [''],
       RepositoryURL: 'https://github.com/test',
       AccessEmail: 'test@example.com',
       AccessLink: 'https://example.com/access',

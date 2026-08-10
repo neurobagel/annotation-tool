@@ -20,6 +20,7 @@ export function useStandardizedVariableItems() {
         id: term.id,
         label: term.label,
         abbreviation: term.abbreviation,
+        description: term.description,
       });
     });
 
