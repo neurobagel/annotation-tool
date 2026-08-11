@@ -5,7 +5,7 @@ export interface AnnotatedVariableGroup {
   standardizedVariableId: string;
   standardizedVariable: StandardizedVariable;
   columnIds: string[];
-  isMultiColumnMeasure: boolean;
+  isCollection: boolean;
 }
 
 /**
@@ -33,7 +33,7 @@ export function useAnnotatedVariables(): AnnotatedVariableGroup[] {
             standardizedVariableId,
             standardizedVariable: variable,
             columnIds: [columnId],
-            isMultiColumnMeasure: Boolean(variable.is_multi_column_measure),
+            isCollection: Boolean(variable.is_multi_column_measure),
           };
 
       return {

@@ -1,23 +1,28 @@
-/* eslint-disable react/no-unstable-nested-components */
-// We need to disable this rule because the MUI Stepper API requires us to pass a component
-// to the `slots.stepIcon` prop, and defining a simple function inline is the most
-// straightforward way to achieve this. The performance impact is minimal in this case.
-import { Stepper, Step, StepLabel, StepConnector, useTheme, SvgIcon } from '@mui/material';
+import { Stepper, Step, StepLabel, StepConnector, useTheme, SvgIcon, Tooltip } from '@mui/material';
+import { useUploadedDataTableFileName } from '../stores/data';
+import useViewStore from '../stores/view';
 import { steps } from '../utils/constants';
 import { View } from '../utils/internal_types';
 
 function NavStepper({ currentView }: { currentView: View }) {
   const theme = useTheme();
-  let activeStep = steps.findIndex((step) => step.view === currentView);
-  if (currentView === View.MultiColumnMeasures) {
-    activeStep = steps.findIndex((step) => step.view === View.ColumnAnnotation);
-  }
+  const activeStep = steps.findIndex((step) => step.view === currentView);
+  const setCurrentView = useViewStore((state) => state.setCurrentView);
+  const isDataTableUploaded = useUploadedDataTableFileName() !== null;
+
+  const handleStepClick = (stepIndex: number, stepView: View) => {
+    if (!isDataTableUploaded && stepIndex > 0) {
+      return;
+    }
+    setCurrentView(stepView);
+  };
 
   return (
     <div className="w-full p-4">
       <Stepper
         activeStep={activeStep}
         alternativeLabel
+        nonLinear
         connector={<StepConnector sx={{ top: 20 }} />}
         data-cy="nav-stepper"
         sx={{
@@ -32,29 +37,40 @@ function NavStepper({ currentView }: { currentView: View }) {
       >
         {steps.map((step, index) => {
           let stepColor = '#9CA3AF';
+          const isDisabled = !isDataTableUploaded && index > 0;
+          const tooltipMessage = isDisabled ? 'Please upload a data table first' : '';
 
-          if (index < activeStep) {
-            stepColor = theme.palette.primary.light;
-          } else if (index === activeStep) {
+          if (index === activeStep) {
             stepColor = theme.palette.primary.main;
           }
 
           return (
             <Step key={step.label} data-cy={`${step.label}-step`}>
               <StepLabel
+                onClick={() => handleStepClick(index, step.view)}
+                sx={{
+                  '& .MuiStepLabel-label': {
+                    cursor: 'pointer',
+                  },
+                }}
                 slots={{
                   stepIcon: () => (
-                    <SvgIcon
-                      component={step.icon} // Wrap the icon in SvgIcon
-                      sx={{
-                        fontSize: 32,
-                        color: stepColor,
-                      }}
-                    />
+                    <Tooltip title={tooltipMessage} arrow placement="top">
+                      <SvgIcon
+                        component={step.icon} // Wrap the icon in SvgIcon
+                        sx={{
+                          fontSize: 32,
+                          color: stepColor,
+                          cursor: 'pointer',
+                        }}
+                      />
+                    </Tooltip>
                   ),
                 }}
               >
-                {step.label}
+                <Tooltip title={tooltipMessage} arrow placement="top">
+                  <span>{step.label}</span>
+                </Tooltip>
               </StepLabel>
             </Step>
           );

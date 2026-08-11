@@ -4,7 +4,38 @@ export enum View {
   ColumnAnnotation = 'columnAnnotation',
   MultiColumnMeasures = 'multiColumnMeasures',
   ValueAnnotation = 'valueAnnotation',
+  DatasetDescription = 'datasetDescription',
   Download = 'download',
+}
+
+export interface GlobalMissingValue {
+  value: string;
+  description?: string;
+}
+
+export interface DatasetDescriptionFormState {
+  Name: string;
+  Authors: string[];
+  AccessType: string;
+  AccessInstructions: string;
+  RepositoryURL: string;
+  AccessEmail: string;
+  AccessLink: string;
+  ReferencesAndLinks: string[];
+  Keywords: string[];
+}
+
+export interface DatasetDescription {
+  Name: string;
+  Authors?: string[];
+  AccessType?: string;
+  AccessInstructions?: string;
+  RepositoryURL?: string;
+  AccessEmail?: string;
+  AccessLink?: string;
+  ReferencesAndLinks?: string[];
+  Keywords?: string[];
+  ParticipantCount?: number;
 }
 
 export type StepConfig = {
@@ -29,7 +60,7 @@ export interface DataTable {
   [key: string]: string[];
 }
 
-interface Column {
+export interface Column {
   id: string;
   name: string;
   allValues: string[]; // because we want to show the datable preview
@@ -117,6 +148,10 @@ export interface DataDictionary {
         Label: string;
       };
       MissingValues?: string[];
+      ValueRange?: {
+        Min?: number;
+        Max?: number;
+      };
     };
   };
 }
@@ -136,6 +171,7 @@ export type DataStoreState = {
   config: string;
   configOptions: string[];
   uploadedDataDictionary: UploadedDataDictionaryFile;
+  datasetDescription: DatasetDescriptionFormState;
 };
 
 export type DataStoreActions = {
@@ -146,11 +182,20 @@ export type DataStoreActions = {
   userUploadsDataDictionaryFile: (dataDictionaryFile: File) => Promise<void>;
   userUpdatesColumnDescription: (columnID: string, description: string | null) => void;
   userUpdatesColumnDataType: (columnID: string, dataType: DataType | null) => void;
+  userUpdatesMultipleColumnDataTypes: (columnIDs: string[], dataType: DataType | null) => void;
   userUpdatesColumnStandardizedVariable: (
     columnID: string,
     standardizedVariableId: string | null
   ) => void;
+  userUpdatesMultipleColumnStandardizedVariables: (
+    columnIDs: string[],
+    standardizedVariableId: string | null
+  ) => void;
   userUpdatesColumnToCollectionMapping: (columnID: string, termId: string | null) => void;
+  userUpdatesMultipleColumnToCollectionMappings: (
+    columnIDs: string[],
+    termId: string | null
+  ) => void;
   userCreatesCollection: (termId: string) => void;
   userDeletesCollection: (termId: string) => void;
   userUpdatesValueDescription: (columnID: string, value: string, description: string) => void;
@@ -162,9 +207,33 @@ export type DataStoreActions = {
   userUpdatesColumnUnits: (columnID: string, units: string) => void;
   userUpdatesColumnFormat: (columnID: string, formatId: string | null) => void;
   userUpdatesColumnMissingValues: (columnID: string, value: string, isMissing: boolean) => void;
+  userAppliesGlobalMissingStatus: (
+    valuesToApply: { value: string; description?: string }[]
+  ) => void;
+  userRemovesGlobalMissingStatus: (valueToRemove: string) => void;
+  // Using a generic to strictly tie the value type to the specific field being updated,
+  // preventing TypeScript errors without needing 'as any' in the store implementation.
+  userUpdatesDatasetDescription: <K extends keyof DatasetDescriptionFormState>(
+    field: K,
+    value: DatasetDescriptionFormState[K]
+  ) => void;
   reset: () => void;
 };
 
 export type DataStore = DataStoreState & {
   actions: DataStoreActions;
 };
+
+export interface StandardizedTermItem {
+  id: string;
+  label: string;
+  abbreviation?: string;
+  description?: string;
+}
+
+export interface StandardizedVariableItem {
+  id: string;
+  label: string;
+  can_have_multiple_columns?: boolean;
+  terms?: StandardizedTermItem[];
+}

@@ -55,8 +55,8 @@ function Upload({ disableConfig }: UploadProps) {
 
   return (
     <div className="flex flex-col items-center gap-8" data-config-loading={isConfigLoading}>
-      <div className="w-full max-w-[1024px]">
-        <Instruction title="Upload" className="mb-2">
+      <div className="w-full max-w-[1024px] -mb-4">
+        <Instruction title="Upload">
           <UploadInstructions />
         </Instruction>
       </div>

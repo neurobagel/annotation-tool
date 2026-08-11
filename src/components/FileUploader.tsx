@@ -1,4 +1,4 @@
-import { CloudUpload, InsertDriveFile } from '@mui/icons-material';
+import { CloudUpload, InsertDriveFile, ErrorOutline } from '@mui/icons-material';
 import { Card, Typography, useTheme, Tooltip } from '@mui/material';
 
 /*
@@ -9,6 +9,8 @@ const defaultProps = {
   disabled: false,
   tooltipContent: 'Uploading is disabled',
   uploadedFileName: null,
+  hasError: false,
+  errorMessage: '',
 };
 
 function FileUploader({
@@ -23,6 +25,8 @@ function FileUploader({
   disabled,
   tooltipContent,
   uploadedFileName,
+  hasError,
+  errorMessage,
 }: {
   id: string;
   displayText: string;
@@ -35,6 +39,8 @@ function FileUploader({
   disabled?: boolean;
   tooltipContent?: string;
   uploadedFileName?: string | null;
+  hasError?: boolean;
+  errorMessage?: string;
 }) {
   const theme = useTheme();
 
@@ -43,17 +49,19 @@ function FileUploader({
   const handleDrag = disabled ? () => {} : handleDrop;
   const handleDragOverEvent = disabled ? () => {} : handleDragOver;
 
-  const isFileSelected = !!uploadedFileName;
+  const isFileSelected = !!uploadedFileName && !hasError;
 
   let uploadAreaClasses = 'mx-auto max-w-[768px] rounded-3xl border-2 transition-all ';
 
   if (disabled) {
-    uploadAreaClasses += 'cursor-not-allowed border-gray-200 bg-gray-100 border-dashed p-8';
+    uploadAreaClasses += 'cursor-not-allowed border-gray-200 bg-gray-100 border-dashed p-6';
   } else if (isFileSelected) {
-    uploadAreaClasses += 'cursor-pointer bg-blue-50/30 border-solid p-6';
+    uploadAreaClasses += 'cursor-pointer bg-blue-50/30 border-solid p-4';
   } else {
-    uploadAreaClasses +=
-      'hover:border-primary-main cursor-pointer border-gray-300 border-dashed p-8';
+    uploadAreaClasses += 'cursor-pointer border-dashed p-6 ';
+    if (!hasError) {
+      uploadAreaClasses += 'border-gray-300 hover:border-primary-main';
+    }
   }
 
   return (
@@ -69,16 +77,25 @@ function FileUploader({
         onDrop={handleDrag}
         onDragOver={handleDragOverEvent}
         sx={{
-          borderColor: isFileSelected && !disabled ? theme.palette.primary.main : undefined,
+          borderColor:
+            isFileSelected && !disabled
+              ? theme.palette.primary.main
+              : hasError && !disabled
+                ? theme.palette.error.main
+                : undefined,
           '&:hover': {
-            borderColor: disabled ? theme.palette.grey[400] : theme.palette.primary.main,
+            borderColor: disabled
+              ? theme.palette.grey[400]
+              : hasError
+                ? theme.palette.error.main
+                : theme.palette.primary.main,
             backgroundColor: isFileSelected && !disabled ? theme.palette.action.hover : undefined,
           },
         }}
       >
         {isFileSelected ? (
           <div className="flex flex-col items-center justify-center">
-            <InsertDriveFile className="mb-2 text-4xl" sx={{ color: theme.palette.primary.main }} />
+            <InsertDriveFile className="mb-1 text-3xl" sx={{ color: theme.palette.primary.main }} />
             <Typography
               data-cy={`${id}-uploaded-file-name`}
               variant="h6"
@@ -101,18 +118,31 @@ function FileUploader({
           </div>
         ) : (
           <>
-            <CloudUpload
-              className="mb-4 text-4xl"
-              sx={{
-                color: disabled ? theme.palette.grey[400] : theme.palette.primary.main,
-              }}
-            />
-            <Typography variant="body1" className="mb-2" sx={{ color: theme.palette.text.primary }}>
-              {displayText}
+            {hasError ? (
+              <ErrorOutline
+                className="mb-4 text-4xl"
+                sx={{ color: theme.palette.error.main }}
+                data-cy={`${id}-error-icon`}
+              />
+            ) : (
+              <CloudUpload
+                className="mb-1 text-4xl"
+                sx={{
+                  color: disabled ? theme.palette.grey[400] : theme.palette.primary.main,
+                }}
+              />
+            )}
+            <Typography
+              data-cy={`${id}-upload-text`}
+              variant="body1"
+              className="mb-1"
+              sx={{ color: hasError ? theme.palette.error.main : theme.palette.text.primary }}
+            >
+              {hasError ? errorMessage : displayText}
             </Typography>
             <Typography
               variant="body2"
-              className="mb-4"
+              className="mb-2"
               sx={{ color: theme.palette.text.secondary }}
             >
               <span

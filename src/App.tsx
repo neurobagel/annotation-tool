@@ -1,23 +1,19 @@
 import { useTheme } from '@mui/material/styles';
-import { useEffect } from 'react';
 import AppTitle from './components/AppTitle';
 import ColumnAnnotation from './components/ColumnAnnotation';
+import DatasetDescription from './components/DatasetDescription';
 import Download from './components/Download';
 import Landing from './components/Landing';
-import MultiColumnMeasures from './components/MultiColumnMeasures';
 import NavStepper from './components/NavStepper';
 import NavigationButton from './components/NavigationButton';
 import Upload from './components/Upload';
 import ValueAnnotation from './components/ValueAnnotation';
-import { useHasMultiColumnMeasures } from './hooks/useHasMultiColumnMeasures';
 import { useUploadedDataTableFileName } from './stores/data';
 import useViewStore, { getNavigationProps } from './stores/view';
 import { View } from './utils/internal_types';
 
 function App() {
   const currentView = useViewStore((state) => state.currentView);
-  const setCurrentView = useViewStore((state) => state.setCurrentView);
-  const hasMultiColumnMeasures = useHasMultiColumnMeasures();
 
   const disableUploadNextButton = useUploadedDataTableFileName() == null;
 
@@ -26,16 +22,7 @@ function App() {
 
   const disableConfig = (import.meta.env.NB_DISABLE_CONFIG ?? 'true').toLowerCase() === 'true';
 
-  const { backView, nextView, backLabel, nextLabel, className } = getNavigationProps(
-    currentView,
-    hasMultiColumnMeasures
-  );
-
-  useEffect(() => {
-    if (currentView === View.MultiColumnMeasures && !hasMultiColumnMeasures) {
-      setCurrentView(View.ColumnAnnotation);
-    }
-  }, [currentView, hasMultiColumnMeasures, setCurrentView]);
+  const { backView, nextView, backLabel, nextLabel, className } = getNavigationProps(currentView);
 
   const determineView = () => {
     switch (currentView) {
@@ -45,10 +32,11 @@ function App() {
         return <Upload disableConfig={disableConfig} />;
       case View.ColumnAnnotation:
         return <ColumnAnnotation />;
-      case View.MultiColumnMeasures:
-        return <MultiColumnMeasures />;
+
       case View.ValueAnnotation:
         return <ValueAnnotation />;
+      case View.DatasetDescription:
+        return <DatasetDescription />;
       case View.Download:
         return <Download />;
       default:
@@ -61,7 +49,7 @@ function App() {
 
   return (
     <div
-      className="flex flex-col overflow-x-hidden"
+      className="flex flex-col overflow-x-hidden pb-24"
       style={{
         minHeight: `calc(100vh - ${appBarHeight}px)`,
         marginTop: appBarHeight,
@@ -81,7 +69,7 @@ function App() {
       {content}
 
       {currentView !== View.Landing && (
-        <div className="mt-auto">
+        <div data-cy="navigation-buttons-container" className="fixed bottom-0 left-0 right-0">
           <NavigationButton
             disableNext={disableUploadNextButton}
             backView={backView}

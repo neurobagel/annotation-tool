@@ -42,6 +42,14 @@ describe('Main user flow', () => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
     });
 
+    cy.get('[data-cy="Column Annotation-step"]')
+      .contains('span', 'Column Annotation')
+      .trigger('mouseover');
+    cy.get('.MuiTooltip-tooltip').should('contain', 'Please upload a data table first');
+    cy.get('[data-cy="Column Annotation-step"]')
+      .contains('span', 'Column Annotation')
+      .trigger('mouseout');
+
     cy.get('[data-cy="datadictionary-upload-input"]').should('be.disabled');
     cy.get('[data-cy="datatable-upload-input"]').selectFile(mockDataTableFilePath, {
       force: true,
@@ -53,7 +61,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="datatable-toggle-preview-button"]').click();
 
     cy.get('[data-cy="datadictionary-upload-input"]').should('not.be.disabled');
-    cy.get('[data-cy="next-button"]').click();
+    cy.get('[data-cy="Column Annotation-step"]').click();
 
     // Column Annotation view
     cy.get('[data-cy="back-button"]').should('contain', 'Upload');
@@ -65,65 +73,52 @@ describe('Main user flow', () => {
     cy.get('[data-cy="column-annotation-container"]').should('be.visible');
     cy.get('[data-cy="0-column-annotation-card"]').should('be.visible');
     cy.get('[data-cy="1-column-annotation-card"]').should('be.visible');
-    cy.get('[data-cy="0-column-annotation-card-data-type-continuous-button"]').click();
+    cy.get('[data-cy="0-column-annotation-card"]').click();
+    cy.get('[data-cy="bulk-assign-continuous"]').click();
     cy.get('[data-cy="0-description"]').scrollIntoView();
     cy.get('[data-cy="0-description"]').should('be.visible');
     cy.get('[data-cy="0-description"]').type('A participant ID');
     cy.get('[data-cy="1-description"]').should('be.visible');
     cy.get('[data-cy="1-description"]').type('some cool new description');
-    // Test that a single column standardized variable like "age" will be disabled once mapped to a column
-    cy.get('[data-cy="0-column-annotation-card-standardized-variable-dropdown"]').click();
-    cy.focused().type('age');
-    cy.get('ul[role="listbox"]')
-      .last()
-      .within(() => {
-        cy.get('[role="option"]').contains('Age').click();
-      });
-    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').click();
-    cy.get('ul[role="listbox"]')
-      .last()
-      .within(() => {
-        cy.get('[role="option"]').contains('Age').should('have.attr', 'aria-disabled', 'true');
-      });
-
-    // Switch the column assignment to another variable and assert that age is now enabled again
-    cy.get('[data-cy="0-column-annotation-card-standardized-variable-dropdown"]').click();
-    cy.focused().type('{selectAll}{backspace}participant');
-    cy.get('ul[role="listbox"]')
-      .last()
-      .within(() => {
-        cy.get('[role="option"]').contains('Participant ID').click();
-      });
-    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').click();
-    cy.get('ul[role="listbox"]')
-      .last()
-      .within(() => {
-        cy.get('[role="option"]').contains('Age').should('not.have.attr', 'aria-disabled', 'true');
-      });
-    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').type(
-      'age{downArrow}{enter}'
+    // Test that a single column standardized variable like "age" will be disabled when multiple columns are selected
+    cy.get('[data-cy="0-column-annotation-card"]').click();
+    cy.get('[data-cy="1-column-annotation-card"]').click({ shiftKey: true });
+    cy.get('[data-cy="standardized-variable-item-nb:Age"]').should(
+      'have.attr',
+      'aria-disabled',
+      'true'
     );
+
+    // Assign ParticipantID to column 0 and Age to column 1
+    cy.get('[data-cy="0-column-annotation-card"]').click();
+    cy.get('[data-cy="standardized-variable-item-nb:ParticipantID"]').click();
+
+    cy.get('[data-cy="1-column-annotation-card"]').click();
+    cy.get('[data-cy="standardized-variable-item-nb:Age"]')
+      .invoke('attr', 'aria-disabled')
+      .should('eq', 'false');
+    cy.get('[data-cy="standardized-variable-item-nb:Age"]').click();
+
     // Scroll to make the 3rd column annotation card visible
     cy.get('[data-cy="2-column-annotation-card"]').scrollIntoView();
-    cy.get('[data-cy="2-column-annotation-card-standardized-variable-dropdown"]').type(
-      'sex{downArrow}{enter}'
-    );
+    cy.get('[data-cy="2-column-annotation-card"]').click();
+    cy.get('[data-cy="standardized-variable-item-nb:Sex"]').click();
+
     // Scroll to make the 4th column annotation card visible
     cy.get('[data-cy="3-column-annotation-card"]').scrollIntoView();
-    cy.get('[data-cy="3-column-annotation-card-data-type-categorical-button"]').click();
+    cy.get('[data-cy="3-column-annotation-card"]').click();
+    cy.get('[data-cy="bulk-assign-categorical"]').click();
 
     // Scroll to make the 5th column annotation card visible
-    cy.get('[data-cy="4-column-annotation-card-data-type-categorical-button"]').click();
-    cy.get('[data-cy="4-column-annotation-card-standardized-variable-dropdown"]').type(
-      'diag{downArrow}{enter}'
-    );
+    cy.get('[data-cy="4-column-annotation-card"]').scrollIntoView();
+    cy.get('[data-cy="4-column-annotation-card"]').click();
+    cy.get('[data-cy="standardized-variable-item-nb:Diagnosis"]').click();
 
-    cy.get('[data-cy="next-button"]').click();
+    cy.get('[data-cy="Value Annotation-step"]').click();
 
     // Value Annotation view
     cy.get('[data-cy="back-button"]').should('contain', 'Column Annotation');
-    cy.get('[data-cy="next-button"]').should('contain', 'Download');
-    cy.contains('Value Annotation');
+    cy.get('[data-cy="next-button"]').should('contain', 'Dataset Description');
     cy.get('[data-cy="Value Annotation-step"]').within(() => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
     });
@@ -152,11 +147,13 @@ describe('Main user flow', () => {
       .and('contain', 'F');
     cy.get('[data-cy="side-column-nav-bar-other"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-age-age"]').should('be.visible');
-    cy.get('[data-cy="next-button"]').click();
+    cy.get('[data-cy="Dataset Description-step"]').click();
 
-    // Download view
-    cy.get('[data-cy="back-button"]').should('contain', 'Value Annotation');
-    cy.contains('Download');
+    // Dataset Description view
+    cy.get('[data-cy="Download-step"]').click();
+
+    // Download
+    cy.get('[data-cy="back-button"]').should('contain', 'Dataset Description');
     cy.get('[data-cy="Download-step"]').within(() => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
     });
@@ -211,9 +208,8 @@ describe('Main user flow', () => {
     cy.get('[data-cy="next-button"]').click();
 
     // Column Annotation view
-    cy.get('[data-cy="0-column-annotation-card-standardized-variable-dropdown"]').type(
-      'participant ID{downArrow}{enter}'
-    );
+    cy.get('[data-cy="0-column-annotation-card"]').click();
+    cy.get('[data-cy="standardized-variable-item-nb:ParticipantID"]').click();
     cy.get('[data-cy="1-description"]').should('be.visible');
     cy.get('[data-cy="1-description"] textarea').first().clear();
     cy.get('[data-cy="1-description"]').type('Age of the participant');
@@ -222,43 +218,20 @@ describe('Main user flow', () => {
 
     // Scroll to access the 4th and 5th column annotation cards
     cy.get('[data-cy="3-column-annotation-card"]').scrollIntoView();
-    cy.get('[data-cy="3-column-annotation-card-standardized-variable-dropdown"]').type(
-      'diagnosis{downArrow}{enter}'
-    );
+    cy.get('[data-cy="3-column-annotation-card"]').click();
+    cy.get('[data-cy="standardized-variable-item-nb:Diagnosis"]').click();
+
     // We are now labeling a column about "healthy control" as about "diagnosis"
     cy.get('[data-cy="4-column-annotation-card"]').scrollIntoView();
-    cy.get('[data-cy="4-column-annotation-card-standardized-variable-dropdown"]').type(
-      'diagnosis{downArrow}{enter}'
-    );
-    cy.get('[data-cy="5-column-annotation-card-standardized-variable-dropdown"]').type(
-      'assessment{downArrow}{enter}'
-    );
-    cy.get('[data-cy="next-button"]').should('contain', 'Multi-Column Measures');
-    cy.get('[data-cy="next-button"]').click();
+    cy.get('[data-cy="4-column-annotation-card"]').click();
+    cy.get('[data-cy="standardized-variable-item-nb:Diagnosis"]').click();
 
-    // Multi-Column Measures view
-    cy.get('[data-cy="back-button"]').should('contain', 'Column Annotation');
-    cy.get('[data-cy="next-button"]').should('contain', 'Value Annotation');
-    cy.get('[data-cy="nav-stepper"]').should('be.visible');
-    cy.get('[data-cy="Column Annotation-step"]').within(() => {
-      cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
-    });
-    cy.get('[data-cy="multi-column-measures-tab-Assessment Tool"]').should('be.visible');
-    cy.get('[data-cy="add-term-card-button"]').click();
-    cy.get('[data-cy="multi-column-measures-card-0"]').should('be.visible');
-    cy.get('[data-cy="multi-column-measures"]').should('contain.text', 'No columns assigned');
-    cy.get('[data-cy="multi-column-measures-card-0-title-dropdown"]').type(
-      'Previous IQ assessment{downArrow}{enter}'
-    );
-    cy.get('[data-cy="multi-column-measures-card-0-header"]').should(
-      'contain.text',
-      'Previous IQ assessment by pronunciation'
-    );
-    cy.get('[data-cy="multi-column-measures-card-0-columns-dropdown"]').type(
-      'iq{downArrow}{enter}'
-    );
-    cy.get('[data-cy="mapped-column-5"]').should('be.visible').and('contain', 'iq');
-    cy.get('[data-cy="multi-column-measures"]').should('contain.text', '1 column assigned');
+    // Map column 5 to Assessment Tool 'Previous IQ assessment'
+    cy.get('[data-cy="5-column-annotation-card"]').scrollIntoView();
+    cy.get('[data-cy="5-column-annotation-card"]').click();
+    cy.get('[data-cy="search-terms-input"]').type('Previous IQ assessment');
+    cy.get('[data-cy="collection-term-item-snomed:273712001"]').click();
+
     cy.get('[data-cy="next-button"]').click();
 
     // Value Annotation view
@@ -309,8 +282,10 @@ describe('Main user flow', () => {
     cy.get('[data-cy="4-Patient-missing-value-yes"]').click();
 
     cy.get('[data-cy="side-column-nav-bar-assessment tool-select-button"]').click();
-    cy.get('[data-cy="5-continuous"]').should('be.visible');
-    cy.get('[data-cy="5-continuous-table"]').should('be.visible').and('contain.text', '110');
+    cy.get('[data-cy="5-table-container"]').should('be.visible').and('contain.text', '110');
+    cy.get('[data-cy="next-button"]').click();
+
+    // Dataset Description view
     cy.get('[data-cy="next-button"]').click();
 
     // Download view
@@ -348,7 +323,6 @@ describe('Main user flow', () => {
 
     // Column Annotation view
     cy.get('[data-cy="1-description"]').should('contain', 'Age of the participant');
-    cy.get('[data-cy="1-column-annotation-card-standardized-variable-dropdown"]').click();
     cy.get('[data-cy="1-column-annotation-card-data-type"]').should('contain', 'Continuous');
     cy.get('[data-cy="2-column-annotation-card-data-type"]').should('contain', 'Categorical');
     cy.get('[data-cy="0-column-annotation-card-data-type"]').should('contain', 'Identifier');
@@ -356,17 +330,6 @@ describe('Main user flow', () => {
     // Scroll to access the 4th column annotation card
     cy.get('[data-cy="3-column-annotation-card"]').scrollIntoView();
     cy.get('[data-cy="3-column-annotation-card-data-type"]').should('contain', 'Categorical');
-    cy.get('[data-cy="next-button"]').click();
-
-    // Multi-Column Measures view
-    cy.get('[data-cy="add-term-card-button"]').click();
-    cy.get('[data-cy="multi-column-measures-card-0"]').should('be.visible');
-    cy.get('[data-cy="multi-column-measures-card-0-header"]').should(
-      'contain.text',
-      'Previous IQ assessment by pronunciation'
-    );
-    cy.get('[data-cy="mapped-column-5"]').should('be.visible').and('contain', 'iq');
-    cy.get('[data-cy="multi-column-measures"]').should('contain.text', '1 column assigned');
     cy.get('[data-cy="next-button"]').click();
 
     // Value Annotation view
@@ -397,9 +360,58 @@ describe('Main user flow', () => {
     );
     cy.get('[data-cy="next-button"]').click();
 
+    // Dataset Description view
+    cy.get('[data-cy="dataset-name-input"]').type('My Awesome Dataset');
+    cy.get('[data-cy="dataset-authors-input-0"] input').type('John Doe');
+    cy.get('[data-cy="dataset-authors-add"]').click();
+    cy.get('[data-cy="dataset-authors-input-1"] input').type('Jane Smith');
+    cy.get('[data-cy="dataset-accesstype-select"]').click();
+    cy.get('li[data-value="registered"]').click();
+    cy.get('[data-cy="dataset-instructions-input"]').type('Just download it');
+    cy.get('[data-cy="dataset-repo-input"]').type('https://github.com/my-repo');
+    cy.get('[data-cy="dataset-accessemail-input"]').type('contact@example.com');
+    cy.get('[data-cy="dataset-accesslink-input"]').type('https://example.com/access');
+
+    cy.contains('Reference info').click();
+    cy.get('[data-cy="dataset-references-input-0"] input').type('https://example.com/paper');
+    cy.get('[data-cy="dataset-references-add"]').click();
+    cy.get('[data-cy="dataset-references-input-1"] input').type('Author et al. (2024)');
+    cy.get('[data-cy="dataset-keywords-input-0"] input').type('fMRI');
+    cy.get('[data-cy="dataset-keywords-add"]').click();
+    cy.get('[data-cy="dataset-keywords-input-1"] input').type('neuroimaging');
+    cy.get('[data-cy="dataset-keywords-add"]').click();
+    cy.get('[data-cy="dataset-keywords-input-2"] input').type('nback');
+
+    // Functionally verify that the navigation container is sticky:
+    // Scroll to the top of this tall page and click the container without scrolling.
+    // If the element is not sticky (e.g. pushed to the bottom of the long page), this will fail.
+    cy.scrollTo('top');
+    cy.get('[data-cy="navigation-buttons-container"]').click({ scrollBehavior: false });
+
+    cy.get('[data-cy="next-button"]').click();
+
     // Download view
     cy.get('[data-cy="complete-annotations-alert"]').should('be.visible');
     cy.get('[data-cy="download-datadictionary-button"]').click();
+    cy.get('[data-cy="download-datasetdescription-button"]').click();
+
+    const outputDescriptionFileName = `${mockDataDictionaryFileName.split('.')[0]}_dataset_description.json`;
+    const outputDescriptionPath = `cypress/downloads/${outputDescriptionFileName}`;
+    cy.readFile(outputDescriptionPath).then((fileContent) => {
+      expect(fileContent.Name).to.equal('My Awesome Dataset');
+      expect(fileContent.Authors).to.deep.equal(['John Doe', 'Jane Smith']);
+      expect(fileContent.AccessType).to.equal('registered');
+      expect(fileContent.AccessInstructions).to.equal('Just download it');
+      expect(fileContent.RepositoryURL).to.equal('https://github.com/my-repo');
+      expect(fileContent.AccessEmail).to.equal('contact@example.com');
+      expect(fileContent.AccessLink).to.equal('https://example.com/access');
+      expect(fileContent.ReferencesAndLinks).to.deep.equal([
+        'https://example.com/paper',
+        'Author et al. (2024)',
+      ]);
+      expect(fileContent.Keywords).to.deep.equal(['fMRI', 'neuroimaging', 'nback']);
+      expect(fileContent.ParticipantCount).to.be.greaterThan(0);
+    });
 
     cy.readFile(outputPath).then((fileContent) => {
       expect(fileContent.participant_id.Description).to.equal('A participant ID');

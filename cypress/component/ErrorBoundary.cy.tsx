@@ -12,14 +12,16 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>
     );
 
-    cy.get('img[alt="Emoji"]').should('be.visible');
-    cy.contains('This is not supposed to happen').should('be.visible');
-    cy.contains('Show Details').should('be.visible');
+    cy.get('img[alt="errorboundary-emoji"]').should('be.visible');
+    cy.get('[data-cy="error-message"]').should('be.visible');
+    cy.get('[data-cy="toggle-details-button"]').should('be.visible');
+    cy.get('[data-cy="reload-page-button"]').should('be.visible');
 
-    cy.contains('Show Details').click();
+    cy.get('[data-cy="toggle-details-button"]').click();
 
-    cy.contains('Error: Test error').should('be.visible');
-    cy.contains('Component Stack:').should('be.visible');
-    cy.contains('at ErrorThrowingComponent').should('be.visible');
+    cy.get('[data-cy="error-text"]').should('contain.text', 'Error: Test error').and('be.visible');
+    cy.get('[data-cy="component-stack"]')
+      .should('contain.text', 'at ErrorThrowingComponent')
+      .and('be.visible');
   });
 });
