@@ -37,14 +37,16 @@ All standardized variables share a set of common fields, with additional type-sp
 #### Type-Specific Fields
 
 **Categorical Variables** (`data_type: "Categorical"`)
-| Field Name | Description | Required | Type | Example |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- |
-| `terms_file` | Path to the vocabulary JSON file containing allowed standardized term options for variable instances, relative to the configuration's directory | Yes | string | `"sexTerms.json"` |
+
+| Field Name   | Description                                                                                                                                     | Required | Type   | Example           |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | ----------------- |
+| `terms_file` | Path to the vocabulary JSON file containing allowed standardized term options for variable instances, relative to the configuration's directory | Yes      | string | `"sexTerms.json"` |
 
 **Continuous Variables** (`data_type: "Continuous"`)
-| Field Name | Description | Required | Type | Example |
-| ---------- | -------------------------------------- | -------- | ----------------------- | -------------------------- |
-| `formats` | Array of allowed format options for column values | Yes | list of Format objects | See Format Configuration below |
+
+| Field Name | Description                                       | Required | Type                   | Example                        |
+| ---------- | ------------------------------------------------- | -------- | ---------------------- | ------------------------------ |
+| `formats`  | Array of allowed format options for column values | Yes      | list of Format objects | See Format Configuration below |
 
 **Other Variables** (`data_type: null`)
 

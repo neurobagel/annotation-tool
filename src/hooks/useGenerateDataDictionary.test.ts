@@ -6,7 +6,7 @@ import {
   useStandardizedTerms,
   useStandardizedVariables,
 } from '../stores/data';
-import { DataType, VariableType } from '../utils/internal_types';
+import { DataDictionary, DataType, VariableType } from '../utils/internal_types';
 import { mockDataDictionaryWithAnnotations } from '../utils/mocks';
 import { useGenerateDataDictionary } from './useGenerateDataDictionary';
 
@@ -84,6 +84,61 @@ describe('useGenerateDataDictionary', () => {
       },
       MissingValues: ['Unknown'],
     });
+  });
+
+  it('should not include missing values in Annotations.Levels but include them in BIDS Levels', () => {
+    mockedUseColumns.mockReturnValue({
+      '1': {
+        id: '1',
+        name: 'diagnosis',
+        allValues: [],
+        description: 'Diagnosis of participant',
+        dataType: DataType.categorical,
+        levels: {
+          HC: { description: 'Healthy Control', standardizedTerm: 'term:hc' },
+          PD: { description: 'Parkinsons Disease', standardizedTerm: 'term:pd' },
+          UNK: { description: 'Unknown diagnosis', standardizedTerm: '' },
+        },
+        standardizedVariable: 'nb:Diagnosis',
+        missingValues: ['UNK'],
+      },
+    });
+
+    mockedUseStandardizedVariables.mockReturnValue({
+      'nb:Diagnosis': {
+        id: 'nb:Diagnosis',
+        name: 'Diagnosis',
+      },
+    });
+
+    mockedUseStandardizedTerms.mockReturnValue({
+      'term:hc': {
+        id: 'term:hc',
+        label: 'Healthy Control',
+        standardizedVariableId: 'nb:Diagnosis',
+      },
+      'term:pd': {
+        id: 'term:pd',
+        label: 'Parkinsons Disease',
+        standardizedVariableId: 'nb:Diagnosis',
+      },
+    });
+
+    const { result } = renderHook(() => useGenerateDataDictionary());
+    const entry = result.current.diagnosis;
+
+    expect(entry.Levels).toEqual({
+      HC: { Description: 'Healthy Control', TermURL: 'term:hc' },
+      PD: { Description: 'Parkinsons Disease', TermURL: 'term:pd' },
+      UNK: { Description: 'Unknown diagnosis' },
+    });
+
+    expect(entry.Annotations?.Levels).toEqual({
+      HC: { TermURL: 'term:hc', Label: 'Healthy Control' },
+      PD: { TermURL: 'term:pd', Label: 'Parkinsons Disease' },
+    });
+
+    expect(entry.Annotations?.MissingValues).toEqual(['UNK']);
   });
 
   it('should build dictionary entries for continuous columns with units and formats', () => {
@@ -249,6 +304,73 @@ describe('useGenerateDataDictionary', () => {
     const entry = result.current.assessment_score;
 
     expect(entry.Annotations?.VariableType).toBe(VariableType.continuous);
+  });
+
+  it('should not compute Min and Max for age columns if there are any values that fail to parse with the chosen format', () => {
+    mockedUseColumns.mockReturnValue({
+      '1': {
+        id: '1',
+        name: 'age',
+        allValues: ['A', '20', '25'], // 1 invalid, 2 valid for 'nb:FromFloat'
+        dataType: DataType.continuous,
+        format: 'nb:FromFloat',
+        standardizedVariable: 'nb:Age',
+      },
+    });
+
+    mockedUseStandardizedVariables.mockReturnValue({
+      'nb:Age': {
+        id: 'nb:Age',
+        name: 'Age',
+      },
+    });
+
+    mockedUseStandardizedFormats.mockReturnValue({
+      'nb:FromFloat': {
+        standardizedVariableId: 'nb:Age',
+        identifier: 'nb:FromFloat',
+        label: 'float',
+      },
+    });
+
+    const { result } = renderHook(() => useGenerateDataDictionary());
+    const entry = result.current.age as DataDictionary[string];
+
+    expect(entry.Annotations?.ValueRange).toBeUndefined();
+  });
+
+  it('should correctly compute Min and Max for age columns if all active values parse successfully', () => {
+    mockedUseColumns.mockReturnValue({
+      '1': {
+        id: '1',
+        name: 'age',
+        allValues: ['20', '25'], // 0 invalid, 2 valid for 'nb:FromFloat'
+        dataType: DataType.continuous,
+        format: 'nb:FromFloat',
+        standardizedVariable: 'nb:Age',
+      },
+    });
+
+    mockedUseStandardizedVariables.mockReturnValue({
+      'nb:Age': {
+        id: 'nb:Age',
+        name: 'Age',
+      },
+    });
+
+    mockedUseStandardizedFormats.mockReturnValue({
+      'nb:FromFloat': {
+        standardizedVariableId: 'nb:Age',
+        identifier: 'nb:FromFloat',
+        label: 'float',
+      },
+    });
+
+    const { result } = renderHook(() => useGenerateDataDictionary());
+    const entry = result.current.age as DataDictionary[string];
+
+    expect(entry.Annotations?.ValueRange?.Min).toBe(20);
+    expect(entry.Annotations?.ValueRange?.Max).toBe(25);
   });
   it('should match legacy getDataDictionary output for a fully annotated dataset', () => {
     mockedUseColumns.mockReturnValue({

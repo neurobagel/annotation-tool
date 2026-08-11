@@ -22,6 +22,9 @@ describe('Regression tests', () => {
     // Value Annotation view
     cy.get('[data-cy="next-button"]').click();
 
+    // Dataset Description view
+    cy.get('[data-cy="next-button"]').click();
+
     // Download view
     cy.get('[data-cy="download-datadictionary-button"]').click();
 

@@ -22,7 +22,7 @@ export default function SearchFilter({
   filteredCount,
 }: SearchFilterProps) {
   return (
-    <div className="flex flex-col gap-1 w-full max-w-md" data-cy="search-filter-container">
+    <div className="relative w-full max-w-md" data-cy="search-filter-container">
       <TextField
         size="small"
         placeholder={placeholder}
@@ -53,9 +53,15 @@ export default function SearchFilter({
           },
         }}
       />
-      <Typography variant="caption" className="text-gray-500 ml-1" data-cy="search-filter-counter">
-        Showing {filteredCount} of {totalCount} columns
-      </Typography>
+      <div className="absolute top-full left-1 mt-1">
+        <Typography
+          variant="caption"
+          className="text-gray-500 whitespace-nowrap"
+          data-cy="search-filter-counter"
+        >
+          Showing {filteredCount} of {totalCount} columns
+        </Typography>
+      </div>
     </div>
   );
 }
