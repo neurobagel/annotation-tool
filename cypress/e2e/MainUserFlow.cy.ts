@@ -30,12 +30,6 @@ describe('Main user flow', () => {
     // Using click here triggers a check for whether the element is covered by another element
     cy.get('[data-cy="nav-stepper"]').click();
 
-    // Functionally verify that the navigation container is sticky:
-    // Scroll to the top of this tall page and click the container without scrolling.
-    // If the element is not sticky (e.g. pushed to the bottom of the long page), this will fail.
-    cy.scrollTo('top');
-    cy.get('[data-cy="navigation-buttons-container"]').click({ scrollBehavior: false });
-
     // Wait for config skeleton to disappear and dropdown to be ready
     cy.get('[data-cy="config-card-dropdown"]', { timeout: 10000 }).should('be.visible');
     cy.get('[data-config-loading="false"]').should('exist');
@@ -387,6 +381,12 @@ describe('Main user flow', () => {
     cy.get('[data-cy="dataset-keywords-input-1"] input').type('neuroimaging');
     cy.get('[data-cy="dataset-keywords-add"]').click();
     cy.get('[data-cy="dataset-keywords-input-2"] input').type('nback');
+
+    // Functionally verify that the navigation container is sticky:
+    // Scroll to the top of this tall page and click the container without scrolling.
+    // If the element is not sticky (e.g. pushed to the bottom of the long page), this will fail.
+    cy.scrollTo('top');
+    cy.get('[data-cy="navigation-buttons-container"]').click({ scrollBehavior: false });
 
     cy.get('[data-cy="next-button"]').click();
 
