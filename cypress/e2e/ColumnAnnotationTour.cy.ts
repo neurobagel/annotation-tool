@@ -34,7 +34,8 @@ describe('Column Annotation Tour', () => {
     cy.get('[data-tour="tour-bulk-action-bar"]').should('exist');
     cy.get('button[data-test-id="button-primary"]').click();
 
-    // Verify local storage was updated by reloading the page
+    // Simulate opening a new tab by clearing sessionStorage, then revisiting
+    cy.window().then((win) => win.sessionStorage.clear());
     cy.visit('http://localhost:5173');
     cy.get('[data-cy="next-button"]').click();
     cy.get('[data-cy="datatable-upload-input"]').selectFile(mockDataTableFilePath, { force: true });
