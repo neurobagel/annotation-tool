@@ -53,12 +53,8 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
       // Fallback UI
       return (
         <div className="flex min-h-screen w-full flex-col items-center justify-center space-y-5">
-          <img
-            src={emoji}
-            alt="Application error illustration"
-            className="max-h-20 animate-pulse"
-          />
-          <Typography variant="h5" className="text-center">
+          <img src={emoji} alt="errorboundary-emoji" className="max-h-20 animate-pulse" />
+          <Typography variant="h5" className="text-center" data-cy="error-message">
             This is not supposed to happen. Please try again,{' '}
             <a
               href="https://neurobagel.org/user_guide/annotation_tool/"
@@ -78,22 +74,36 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
             .
           </Typography>
           <div className="flex gap-4">
-            <Button variant="outlined" color="primary" onClick={this.toggleDetails}>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={this.toggleDetails}
+              data-cy="toggle-details-button"
+            >
               {showDetails ? 'Hide Details' : 'Show Details'}
             </Button>
-            <Button variant="contained" color="primary" onClick={() => window.location.reload()}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => window.location.reload()}
+              data-cy="reload-page-button"
+            >
               Reload page
             </Button>
           </div>
           <Collapse in={showDetails}>
             <div className="mt-4 w-11/12 max-w-lg overflow-auto rounded bg-gray-100 p-4 text-left shadow">
               {error && (
-                <Typography variant="body1" className="mb-2">
+                <Typography variant="body1" className="mb-2" data-cy="error-text">
                   <strong>Error:</strong> {error.message}
                 </Typography>
               )}
               {errorInfo && (
-                <Typography variant="body2" style={{ whiteSpace: 'pre-wrap' }}>
+                <Typography
+                  variant="body2"
+                  style={{ whiteSpace: 'pre-wrap' }}
+                  data-cy="component-stack"
+                >
                   <strong>Component Stack:</strong>
                   {'\n'}
                   {errorInfo.componentStack}
