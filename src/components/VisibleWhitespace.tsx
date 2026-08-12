@@ -1,5 +1,6 @@
 import { useContext } from 'react';
 import { FormattingMarksContext } from '../contexts/FormattingMarksContext';
+import { formatVisibleWhitespace } from '../utils/util';
 
 interface VisibleWhitespaceProps {
   value: unknown;
@@ -9,11 +10,20 @@ export default function VisibleWhitespace({ value }: VisibleWhitespaceProps) {
   const showFormattingMarks = useContext(FormattingMarksContext);
 
   if (typeof value !== 'string') {
-    return <span data-cy="visible-whitespace">{JSON.stringify(value)}</span>;
+    const stringified = JSON.stringify(value);
+    return (
+      <span data-cy="visible-whitespace" className="whitespace-pre-wrap font-mono">
+        {stringified ?? String(value)}
+      </span>
+    );
   }
 
   if (!showFormattingMarks) {
-    return <span data-cy="visible-whitespace">{value}</span>;
+    return (
+      <span data-cy="visible-whitespace" className="whitespace-pre-wrap font-mono">
+        {value}
+      </span>
+    );
   }
 
   if (value === '') {
@@ -24,15 +34,9 @@ export default function VisibleWhitespace({ value }: VisibleWhitespaceProps) {
     );
   }
 
-  const visuallyFormatted = value
-    .replace(/ /g, '·')
-    .replace(/\t/g, '→')
-    .replace(/\n/g, '¶\n')
-    .replace(/\r/g, '¤');
-
   return (
     <span data-cy="visible-whitespace" className="whitespace-pre-wrap font-mono">
-      {visuallyFormatted}
+      {formatVisibleWhitespace(value)}
     </span>
   );
 }

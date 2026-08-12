@@ -274,9 +274,10 @@ function ColumnTypeCollapse({
                     <List sx={{ pl: 4 }}>
                       {groupColumns.map((entry) => {
                         const isComplete = columnCompleteness[entry.id] ?? false;
+                        const dictionaryKey = entry.column.name ?? entry.id;
                         return (
                           <ListItem
-                            data-cy={`side-column-nav-bar-${labelToDisplay}-${groupName}-${JSON.stringify(entry.column.name ?? entry.id).slice(1, -1)}`}
+                            data-cy={`side-column-nav-bar-${labelToDisplay}-${groupName}-${JSON.stringify(dictionaryKey).slice(1, -1)}`}
                             key={entry.id}
                             divider
                             sx={{
@@ -289,7 +290,7 @@ function ColumnTypeCollapse({
                             }}
                           >
                             <Typography sx={{ flexGrow: 1, fontSize: '0.9rem' }}>
-                              <VisibleWhitespace value={entry.column.name ?? entry.id} />
+                              <VisibleWhitespace value={dictionaryKey} />
                             </Typography>
                             {isComplete ? (
                               <CheckRoundedIcon
@@ -369,9 +370,10 @@ function ColumnTypeCollapse({
         <List sx={{ pl: 4 }}>
           {columns.map((entry) => {
             const isComplete = columnCompleteness[entry.id] ?? false;
+            const dictionaryKey = entry.column.name ?? entry.id;
             return (
               <ListItem
-                data-cy={`side-column-nav-bar-${labelToDisplay}-${JSON.stringify(entry.column.name ?? entry.id).slice(1, -1)}`}
+                data-cy={`side-column-nav-bar-${labelToDisplay}-${JSON.stringify(dictionaryKey).slice(1, -1)}`}
                 key={entry.id}
                 divider
                 sx={{
@@ -384,7 +386,7 @@ function ColumnTypeCollapse({
                 }}
               >
                 <Typography sx={{ flexGrow: 1, fontSize: '0.9rem' }}>
-                  <VisibleWhitespace value={entry.column.name ?? entry.id} />
+                  <VisibleWhitespace value={dictionaryKey} />
                 </Typography>
                 {isComplete ? (
                   <CheckRoundedIcon

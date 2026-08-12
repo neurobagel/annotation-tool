@@ -139,7 +139,7 @@ function ValueAnnotation() {
             label={
               <div className="flex items-center gap-1">
                 <Typography variant="body2" color="textSecondary">
-                  Show formatting marks
+                  Show whitespace
                 </Typography>
                 <Tooltip
                   title="Display hidden formatting characters like spaces and newlines"

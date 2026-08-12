@@ -27,3 +27,7 @@ export const isValidUrl = (string: string) => {
 // Email regex corresponds to the HTML5 specification (approximates the RFC 5322 standard used by Pydantic's email-validator)
 export const emailRegex =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+
+export function formatVisibleWhitespace(value: string): string {
+  return value.replace(/ /g, '·').replace(/\t/g, '→').replace(/\n/g, '¶\n').replace(/\r/g, '¤');
+}

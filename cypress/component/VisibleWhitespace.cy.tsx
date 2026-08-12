@@ -38,6 +38,15 @@ describe('VisibleWhitespace Component', () => {
       );
       cy.get('[data-cy="visible-whitespace"]').should('have.text', 'null');
     });
+
+    it('should render undefined correctly via String fallback', () => {
+      cy.mount(
+        <FormattingMarksContext.Provider value={false}>
+          <VisibleWhitespace value={undefined} />
+        </FormattingMarksContext.Provider>
+      );
+      cy.get('[data-cy="visible-whitespace"]').should('have.text', 'undefined');
+    });
   });
 
   describe('With Formatting Marks', () => {
