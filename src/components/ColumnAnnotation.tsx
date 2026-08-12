@@ -7,7 +7,7 @@ import {
   useStandardizedVariables,
   useStandardizedTerms,
 } from '~/stores/data';
-import useSessionStore from '~/stores/session';
+import useLocalStore from '~/stores/local';
 import { useColumnCardData } from '../hooks/useColumnCardData';
 import { useIsParticipantIDMapped } from '../hooks/useIsParticipantIDMapped';
 import { useMappingMetrics } from '../hooks/useMappingMetrics';
@@ -38,7 +38,7 @@ function ColumnAnnotation() {
   const { annotatedColumnsCount, totalColumnsCount, mappedVariableCounts, mappedTermCounts } =
     useMappingMetrics();
 
-  const { setHasSeenColumnAnnotationTour } = useSessionStore();
+  const { setHasSeenColumnAnnotationTour } = useLocalStore();
 
   const columnCardData = useColumnCardData(columns, standardizedVariables, standardizedTerms);
   const { hasMappedParticipantId, hasMappedOtherColumns } = useIsParticipantIDMapped();

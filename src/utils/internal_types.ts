@@ -228,6 +228,7 @@ export interface StandardizedTermItem {
   id: string;
   label: string;
   abbreviation?: string;
+  description?: string;
 }
 
 export interface StandardizedVariableItem {

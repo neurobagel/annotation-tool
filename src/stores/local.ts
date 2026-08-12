@@ -1,22 +1,22 @@
 import { create } from 'zustand';
 import { devtools, persist, createJSONStorage } from 'zustand/middleware';
 
-type SessionStore = {
+type LocalStore = {
   hasSeenColumnAnnotationTour: boolean;
   setHasSeenColumnAnnotationTour: (seen: boolean) => void;
 };
 
-const sessionStoreCreator = persist<SessionStore>(
+const localStoreCreator = persist<LocalStore>(
   (set) => ({
     hasSeenColumnAnnotationTour: false,
     setHasSeenColumnAnnotationTour: (seen: boolean) => set({ hasSeenColumnAnnotationTour: seen }),
   }),
   {
-    name: 'session',
-    storage: createJSONStorage(() => sessionStorage),
+    name: 'local',
+    storage: createJSONStorage(() => localStorage),
   }
 );
 
-const useSessionStore = create<SessionStore>()(devtools(sessionStoreCreator));
+const useLocalStore = create<LocalStore>()(devtools(localStoreCreator));
 
-export default useSessionStore;
+export default useLocalStore;

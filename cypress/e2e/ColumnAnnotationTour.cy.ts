@@ -34,7 +34,8 @@ describe('Column Annotation Tour', () => {
     cy.get('[data-tour="tour-bulk-action-bar"]').should('exist');
     cy.get('button[data-test-id="button-primary"]').click();
 
-    // Verify session storage was updated by starting a new 'session' on the page
+    // Simulate opening a new tab by clearing sessionStorage, then revisiting
+    cy.window().then((win) => win.sessionStorage.clear());
     cy.visit('http://localhost:5173');
     cy.get('[data-cy="next-button"]').click();
     cy.get('[data-cy="datatable-upload-input"]').selectFile(mockDataTableFilePath, { force: true });
@@ -43,14 +44,14 @@ describe('Column Annotation Tour', () => {
     cy.get('.react-joyride__tooltip').should('not.exist');
   });
 
-  it('should persist session storage state when skipping early', () => {
+  it('should persist local storage state when skipping early', () => {
     cy.get('.react-joyride__tooltip', { timeout: 10000 }).should('be.visible');
 
     cy.get('button[data-test-id="button-skip"]').click();
 
     cy.get('.react-joyride__tooltip').should('not.exist');
 
-    // Verification across reload (simulates session storage)
+    // Verification across reload (simulates local storage)
     cy.visit('http://localhost:5173');
     cy.get('[data-cy="next-button"]').click();
 
