@@ -60,11 +60,11 @@ function FileUploader({
   let uploadAreaClasses = 'mx-auto max-w-[768px] rounded-3xl border-2 transition-all ';
 
   if (disabled) {
-    uploadAreaClasses += 'cursor-not-allowed border-gray-200 bg-gray-100 border-dashed p-8';
+    uploadAreaClasses += 'cursor-not-allowed border-gray-200 bg-gray-100 border-dashed p-6';
   } else if (isFileSelected) {
-    uploadAreaClasses += 'cursor-pointer bg-blue-50/30 border-solid p-6';
+    uploadAreaClasses += 'cursor-pointer bg-blue-50/30 border-solid p-4';
   } else {
-    uploadAreaClasses += 'cursor-pointer border-dashed p-8 ';
+    uploadAreaClasses += 'cursor-pointer border-dashed p-6';
     if (!hasError && !hasWarning) {
       uploadAreaClasses += 'border-gray-300 hover:border-primary-main';
     }
@@ -106,7 +106,7 @@ function FileUploader({
         {isFileSelected ? (
           <div className="flex flex-col items-center justify-center">
             <InsertDriveFile
-              className="mb-2 text-4xl"
+              className="mb-1 text-3xl"
               sx={{ color: hasWarning ? theme.palette.warning.main : theme.palette.primary.main }}
             />
             <Typography
@@ -155,7 +155,7 @@ function FileUploader({
               />
             ) : (
               <CloudUpload
-                className="mb-4 text-4xl"
+                className="mb-1 text-4xl"
                 sx={{
                   color: disabled ? theme.palette.grey[400] : theme.palette.primary.main,
                 }}
@@ -164,7 +164,7 @@ function FileUploader({
             <Typography
               data-cy={`${id}-upload-text`}
               variant="body1"
-              className="mb-2"
+              className="mb-1"
               sx={{
                 color: hasError
                   ? theme.palette.error.main
@@ -177,7 +177,7 @@ function FileUploader({
             </Typography>
             <Typography
               variant="body2"
-              className="mb-4"
+              className="mb-2"
               sx={{ color: theme.palette.text.secondary }}
             >
               <span

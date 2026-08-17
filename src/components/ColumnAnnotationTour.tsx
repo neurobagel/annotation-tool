@@ -1,6 +1,6 @@
 import { useTheme } from '@mui/material/styles';
 import Joyride, { CallBackProps, EVENTS, STATUS, Step } from 'react-joyride';
-import useSessionStore from '~/stores/session';
+import useLocalStore from '~/stores/local';
 
 interface ColumnAnnotationTourProps {
   firstCollectionVarId: string | null;
@@ -8,7 +8,7 @@ interface ColumnAnnotationTourProps {
 
 export default function ColumnAnnotationTour({ firstCollectionVarId }: ColumnAnnotationTourProps) {
   const theme = useTheme();
-  const { hasSeenColumnAnnotationTour, setHasSeenColumnAnnotationTour } = useSessionStore();
+  const { hasSeenColumnAnnotationTour, setHasSeenColumnAnnotationTour } = useLocalStore();
 
   const steps: Step[] = [
     {
