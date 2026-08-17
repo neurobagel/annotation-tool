@@ -1,5 +1,4 @@
-import { useContext } from 'react';
-import { FormattingMarksContext } from '../contexts/FormattingMarksContext';
+import { useFormattingMarks } from '../contexts/FormattingMarksContext';
 import { formatVisibleWhitespace } from '../utils/util';
 
 interface VisibleWhitespaceProps {
@@ -7,7 +6,7 @@ interface VisibleWhitespaceProps {
 }
 
 export default function VisibleWhitespace({ value }: VisibleWhitespaceProps) {
-  const showFormattingMarks = useContext(FormattingMarksContext);
+  const { showFormattingMarks } = useFormattingMarks();
 
   if (typeof value !== 'string') {
     const stringified = JSON.stringify(value);
