@@ -31,7 +31,7 @@
     "lodash": "^4.18.1",
     "match-sorter": "^8.3.0",
     "natural-compare-lite": "^1.4.0",
-    "papaparse": "^5.5.4",
+    "papaparse": "^5.6.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-joyride": "^2.9.3",
@@ -39,7 +39,7 @@
     "seedrandom": "^3.0.5",
     "use-debounce": "^10.1.1",
     "uuid": "^14.0.1",
-    "zustand": "^5.0.14"
+    "zustand": "^5.0.15"
   },
   "devDependencies": {
     "@cypress/code-coverage": "^4.0.3",
