@@ -1,3 +1,48 @@
+# v0.7.6 (Tue Aug 18 2026)
+
+:tada: This release contains work from new contributors! :tada:
+
+Thanks for all your work!
+
+:heart: Sarthak Jagota ([@SarthakJagota](https://github.com/SarthakJagota))
+
+:heart: Vritti ([@Vrittigyl](https://github.com/Vrittigyl))
+
+#### 🚀 Enhancements
+
+- [ENH] Render column headers and values as raw string [#599](https://github.com/neurobagel/annotation-tool/pull/599) ([@rmanaem](https://github.com/rmanaem))
+- [FIX] Add scrollbar to unannotated columns list in Value Annotation [#421](https://github.com/neurobagel/annotation-tool/pull/421) ([@Tusharjamdade](https://github.com/Tusharjamdade) [@surchs](https://github.com/surchs))
+- [REF] Reduce vertical space of upload drop areas on Upload page [#436](https://github.com/neurobagel/annotation-tool/pull/436) ([@Vrittigyl](https://github.com/Vrittigyl) [@alyssadai](https://github.com/alyssadai) [@rmanaem](https://github.com/rmanaem))
+- [ENH] Truncate long assessment tool names [#437](https://github.com/neurobagel/annotation-tool/pull/437) ([@Vrittigyl](https://github.com/Vrittigyl) [@rmanaem](https://github.com/rmanaem))
+- [ENH] Added assessment term descriptions on hover [#611](https://github.com/neurobagel/annotation-tool/pull/611) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Implement sticky bottom navigation buttons [#582](https://github.com/neurobagel/annotation-tool/pull/582) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Added tooltips explaining what Annotated and Unannotated mean in value annotation [#588](https://github.com/neurobagel/annotation-tool/pull/588) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Implemented interactive nav stepper with validation tooltips [#587](https://github.com/neurobagel/annotation-tool/pull/587) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Validate JSON on upload and show error for invalid files [#422](https://github.com/neurobagel/annotation-tool/pull/422) ([@Tusharjamdade](https://github.com/Tusharjamdade) [@rmanaem](https://github.com/rmanaem) [@surchs](https://github.com/surchs))
+
+#### 🐛 Bug Fixes
+
+- [FIX] Ensure tour preference persists across multiple browser tabs and sessions [#581](https://github.com/neurobagel/annotation-tool/pull/581) ([@rmanaem](https://github.com/rmanaem))
+- [FIX] Implement repeatable fields for dataset metadata inputs [#601](https://github.com/neurobagel/annotation-tool/pull/601) ([@rmanaem](https://github.com/rmanaem))
+- [FIX] Enforce explicit site selection for Google Drive uploads [#595](https://github.com/neurobagel/annotation-tool/pull/595) ([@rmanaem](https://github.com/rmanaem))
+
+#### 🏠 Internal
+
+- [ENH] Enhance ErrorBoundary with improved layout, accessibility, and recovery action [#445](https://github.com/neurobagel/annotation-tool/pull/445) ([@SarthakJagota](https://github.com/SarthakJagota) [@rmanaem](https://github.com/rmanaem))
+- [CI] Set up Lychee link checker [#604](https://github.com/neurobagel/annotation-tool/pull/604) ([@rmanaem](https://github.com/rmanaem))
+- [MNT] Removed eslint airbnb config and migrated to eslint 9 [#574](https://github.com/neurobagel/annotation-tool/pull/574) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 6
+
+- Alyssa Dai ([@alyssadai](https://github.com/alyssadai))
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+- Sarthak Jagota ([@SarthakJagota](https://github.com/SarthakJagota))
+- Sebastian Urchs ([@surchs](https://github.com/surchs))
+- Tushar Jamdade ([@Tusharjamdade](https://github.com/Tusharjamdade))
+- Vritti ([@Vrittigyl](https://github.com/Vrittigyl))
+
+---
+
 # v0.7.5 (Wed Jun 10 2026)
 
 #### 🚀 Enhancements
