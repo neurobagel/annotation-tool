@@ -107,6 +107,22 @@ describe('useUploadValidation', () => {
   });
 
   describe('JSON Validation', () => {
+    it('should reject a file with an invalid extension for JSON uploader', () => {
+      const { result } = renderHook(() =>
+        useUploadValidation({ allowedFileType: '.json', onFileUpload: onFileUploadMock })
+      );
+
+      const invalidFile = new File(['content'], 'test.txt', { type: 'text/plain' });
+
+      act(() => {
+        result.current.validateAndUpload(invalidFile);
+      });
+
+      expect(result.current.hasError).toBe(true);
+      expect(result.current.errorMessage).toBe('Invalid file type. Please upload a .json file.');
+      expect(onFileUploadMock).not.toHaveBeenCalled();
+    });
+
     it('should reject an invalid JSON file', async () => {
       const { result } = renderHook(() =>
         useUploadValidation({ allowedFileType: '.json', onFileUpload: onFileUploadMock })
