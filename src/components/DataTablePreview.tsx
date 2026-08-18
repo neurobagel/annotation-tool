@@ -18,7 +18,7 @@ function DataTablePreview({ dataTable }: { dataTable: DataTable }) {
   const headers = Object.keys(dataTable);
 
   // Transform data into row-based format for rendering
-  const rowData =
+  const rowData: string[][] =
     headers.length > 0
       ? dataTable[headers[0]].map((_, rowIndex) =>
           headers.map((header) => dataTable[header][rowIndex])
