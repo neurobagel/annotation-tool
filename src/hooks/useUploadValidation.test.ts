@@ -53,7 +53,7 @@ describe('useUploadValidation', () => {
       });
 
       // Need to wait for FileReader
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(result.current.hasError).toBe(true);
       expect(result.current.errorMessage).toBe(
@@ -76,7 +76,7 @@ describe('useUploadValidation', () => {
         result.current.validateAndUpload(emptyCellsFile);
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(result.current.hasWarning).toBe(true);
       expect(result.current.warningMessage).toBe(
@@ -98,7 +98,7 @@ describe('useUploadValidation', () => {
         result.current.validateAndUpload(validFile);
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(result.current.hasError).toBe(false);
       expect(result.current.hasWarning).toBe(false);
@@ -119,7 +119,7 @@ describe('useUploadValidation', () => {
         result.current.validateAndUpload(invalidFile);
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(result.current.hasError).toBe(true);
       expect(result.current.errorMessage).toBe(
@@ -140,7 +140,7 @@ describe('useUploadValidation', () => {
         result.current.validateAndUpload(validFile);
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(result.current.hasError).toBe(false);
       expect(result.current.hasWarning).toBe(false);

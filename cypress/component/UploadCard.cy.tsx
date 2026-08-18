@@ -1,4 +1,5 @@
 import UploadCard from '../../src/components/UploadCard';
+import { AllowedFileType } from '../../src/utils/internal_types';
 
 const exampleFileName = 'ds003653_participant.tsv';
 
@@ -6,7 +7,15 @@ function MockPreviewComponent() {
   return <div data-cy="some-title-datatable">Preview Component</div>;
 }
 
-const props = {
+const props: {
+  id: string;
+  title: string;
+  FileUploaderDisplayText: string;
+  allowedFileType: AllowedFileType;
+  uploadedFileName: string;
+  onFileUpload: () => void;
+  previewComponent: React.ReactNode;
+} = {
   id: 'someid',
   title: 'some title',
   FileUploaderDisplayText: 'some display text',
