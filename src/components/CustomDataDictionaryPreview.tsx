@@ -77,7 +77,7 @@ function CustomDataDictionaryPreview({ dataDictionary }: { dataDictionary: DataD
     }
     return (
       <Typography variant="body2" data-cy={`${key}-value`}>
-        {JSON.stringify(value)}
+        {String(value)}
       </Typography>
     );
   };
