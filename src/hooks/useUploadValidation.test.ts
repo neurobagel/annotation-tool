@@ -1,12 +1,66 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useUploadValidation } from './useUploadValidation';
+import {
+  useUploadValidation,
+  isValidFileExtension,
+  validateTsvContent,
+  validateJsonContent,
+} from './useUploadValidation';
 
 describe('useUploadValidation', () => {
   let onFileUploadMock: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     onFileUploadMock = vi.fn();
+  });
+
+  describe('Pure Helper Functions', () => {
+    it('isValidFileExtension correctly validates file extensions', () => {
+      expect(isValidFileExtension('file.tsv', '.tsv')).toBe(true);
+      expect(isValidFileExtension('FILE.TSV', '.tsv')).toBe(true);
+      expect(isValidFileExtension('file.txt', '.tsv')).toBe(false);
+      expect(isValidFileExtension('file.json', '.json')).toBe(true);
+    });
+
+    it('validateTsvContent returns error for duplicate headers', () => {
+      const result = validateTsvContent('col1\tcol1\nval1\tval2');
+      expect(result.status).toBe('error');
+      if (result.status === 'error') {
+        expect(result.message).toBe(
+          'The uploaded data table contains duplicate column names. Please ensure all column names are unique.'
+        );
+      }
+    });
+
+    it('validateTsvContent returns warning for empty rows/columns', () => {
+      const result = validateTsvContent('col1\tcol2\n\t\nval1\t\nval2\t');
+      expect(result.status).toBe('warning');
+      if (result.status === 'warning') {
+        expect(result.message).toBe(
+          'Warning: The uploaded file contains 1 empty column and 1 empty row.'
+        );
+      }
+    });
+
+    it('validateTsvContent returns valid for valid TSV', () => {
+      const result = validateTsvContent('col1\tcol2\nval1\tval2');
+      expect(result.status).toBe('valid');
+    });
+
+    it('validateJsonContent returns error for invalid JSON syntax', () => {
+      const result = validateJsonContent('{ "invalid": }');
+      expect(result.status).toBe('error');
+      if (result.status === 'error') {
+        expect(result.message).toBe(
+          'Invalid JSON file uploaded. Please check the file for syntax errors.'
+        );
+      }
+    });
+
+    it('validateJsonContent returns valid for valid JSON syntax', () => {
+      const result = validateJsonContent('{ "valid": true }');
+      expect(result.status).toBe('valid');
+    });
   });
 
   it('should initialize with default states', () => {
