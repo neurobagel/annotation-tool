@@ -1,5 +1,17 @@
-import { Paper, Typography, List, ListItem, ListItemText } from '@mui/material';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import {
+  Paper,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  FormControlLabel,
+  Switch,
+  Tooltip,
+} from '@mui/material';
 import { useState } from 'react';
+import { useFormattingMarks } from '../contexts/FormattingMarksContext';
+import { FormattingMarksProvider } from '../contexts/FormattingMarksProvider';
 import { useColumnsMetadata } from '../hooks/useColumnsMetadata';
 import { useValueAnnotationColumn } from '../hooks/useValueAnnotationColumn';
 import { useValueAnnotationNavData } from '../hooks/useValueAnnotationNavData';
@@ -10,7 +22,7 @@ import Instruction from './Instruction';
 import SideColumnNavBar from './SideColumnNavBar';
 import ValueAnnotationTabs from './ValueAnnotationTabs';
 
-function ValueAnnotation() {
+function ValueAnnotationContent() {
   const {
     userUpdatesValueDescription: userUpdatesColumnLevelDescription,
     userUpdatesColumnUnits,
@@ -21,6 +33,7 @@ function ValueAnnotation() {
   const [selectedColumnIds, setSelectedColumnIds] = useState<string[]>([]);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
   const navData = useValueAnnotationNavData();
+  const { showFormattingMarks, setShowFormattingMarks } = useFormattingMarks();
 
   const handleSelect = (params: {
     columnIDs: string[];
@@ -117,10 +130,34 @@ function ValueAnnotation() {
 
   return (
     <div className="mx-auto flex flex-col w-full max-w-7xl p-4">
-      <div className="mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <Instruction title="Value Annotation">
           <ValueAnnotationInstructions />
         </Instruction>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={showFormattingMarks}
+              onChange={(e) => setShowFormattingMarks(e.target.checked)}
+              color="primary"
+              size="small"
+            />
+          }
+          label={
+            <div className="flex items-center gap-1">
+              <Typography variant="body2" color="textSecondary">
+                Show whitespace
+              </Typography>
+              <Tooltip
+                title="Display hidden formatting characters like spaces and newlines"
+                placement="bottom"
+                arrow
+              >
+                <InfoOutlinedIcon color="action" sx={{ fontSize: '1rem' }} />
+              </Tooltip>
+            </div>
+          }
+        />
       </div>
       <div
         className="flex w-full max-h-[calc(100vh-320px)] space-x-4"
@@ -135,6 +172,14 @@ function ValueAnnotation() {
         <div className="flex-1 min-w-0">{renderContent()}</div>
       </div>
     </div>
+  );
+}
+
+function ValueAnnotation() {
+  return (
+    <FormattingMarksProvider>
+      <ValueAnnotationContent />
+    </FormattingMarksProvider>
   );
 }
 
