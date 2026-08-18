@@ -113,6 +113,11 @@ export function useUploadValidation({ allowedFileType, onFileUpload }: UseUpload
       }
 
       case '.json': {
+        if (!file.name.toLowerCase().endsWith('.json')) {
+          setError('Invalid file type. Please upload a .json file.');
+          return;
+        }
+
         const reader = new FileReader();
 
         reader.onload = (e) => {
@@ -140,8 +145,7 @@ export function useUploadValidation({ allowedFileType, onFileUpload }: UseUpload
       }
 
       default: {
-        clearErrorsAndWarnings();
-        onFileUpload(file);
+        setError('Invalid file type.');
         break;
       }
     }
