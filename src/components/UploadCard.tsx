@@ -2,6 +2,7 @@ import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import { Button, Card, CardHeader, CardContent, Collapse } from '@mui/material';
 import { useState } from 'react';
 import { useUploadValidation } from '../hooks/useUploadValidation';
+import { AllowedFileType } from '../utils/internal_types';
 import FileUploader from './FileUploader';
 
 /*
@@ -17,7 +18,7 @@ interface UploadCardProps {
   id: string;
   title: string;
   FileUploaderDisplayText: string;
-  allowedFileType: string;
+  allowedFileType: AllowedFileType;
   uploadedFileName: string | null;
   onFileUpload: (file: File) => void;
   previewComponent: React.ReactNode;

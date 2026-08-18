@@ -1,5 +1,6 @@
 import { CloudUpload, InsertDriveFile, ErrorOutline } from '@mui/icons-material';
 import { Card, Typography, useTheme, Tooltip } from '@mui/material';
+import { AllowedFileType } from '../utils/internal_types';
 
 /*
 Explicitly define the default props since eslint doesn't recognize the default props
@@ -39,7 +40,7 @@ function FileUploader({
   handleDragOver: (event: React.DragEvent<HTMLDivElement>) => void;
   handleFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
-  allowedFileType: string;
+  allowedFileType: AllowedFileType;
   disabled?: boolean;
   tooltipContent?: string;
   uploadedFileName?: string | null;
