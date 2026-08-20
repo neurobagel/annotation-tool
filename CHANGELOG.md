@@ -1,3 +1,15 @@
+# v0.7.7 (Thu Aug 20 2026)
+
+#### 🚀 Enhancements
+
+- [ENH] Add data table validation [#626](https://github.com/neurobagel/annotation-tool/pull/626) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.7.6 (Tue Aug 18 2026)
 
 :tada: This release contains work from new contributors! :tada:
