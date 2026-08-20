@@ -75,10 +75,9 @@ export function validateJsonContent(contents: string): ValidationResult {
 
 interface UseUploadValidationOptions {
   allowedFileType: AllowedFileType;
-  onFileUpload: (file: File) => void;
 }
 
-export function useUploadValidation({ allowedFileType, onFileUpload }: UseUploadValidationOptions) {
+export function useUploadValidation({ allowedFileType }: UseUploadValidationOptions) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [hasError, setHasError] = useState(false);
@@ -108,10 +107,10 @@ export function useUploadValidation({ allowedFileType, onFileUpload }: UseUpload
     setWarningMessage('');
   };
 
-  const validateAndUpload = async (file: File) => {
+  const validate = async (file: File): Promise<boolean> => {
     if (!isValidFileExtension(file.name, allowedFileType)) {
       setError(`Invalid file type. Please upload a ${allowedFileType} file.`);
-      return;
+      return false;
     }
 
     let contents: string;
@@ -119,7 +118,7 @@ export function useUploadValidation({ allowedFileType, onFileUpload }: UseUpload
       contents = await readFile(file);
     } catch {
       setError('Unable to read the selected file. Please try again.');
-      return;
+      return false;
     }
 
     let result: ValidationResult;
@@ -137,7 +136,7 @@ export function useUploadValidation({ allowedFileType, onFileUpload }: UseUpload
 
     if (result.status === 'error') {
       setError(result.message);
-      return;
+      return false;
     }
 
     if (result.status === 'warning') {
@@ -146,7 +145,7 @@ export function useUploadValidation({ allowedFileType, onFileUpload }: UseUpload
       clearErrorsAndWarnings();
     }
 
-    onFileUpload(file);
+    return true;
   };
 
   return {
@@ -155,6 +154,6 @@ export function useUploadValidation({ allowedFileType, onFileUpload }: UseUpload
     errorMessage,
     hasWarning,
     warningMessage,
-    validateAndUpload,
+    validate,
   };
 }

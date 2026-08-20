@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   useUploadValidation,
   isValidFileExtension,
@@ -8,12 +8,6 @@ import {
 } from './useUploadValidation';
 
 describe('useUploadValidation', () => {
-  let onFileUploadMock: ReturnType<typeof vi.fn>;
-
-  beforeEach(() => {
-    onFileUploadMock = vi.fn();
-  });
-
   describe('Pure Helper Functions', () => {
     it('isValidFileExtension correctly validates file extensions', () => {
       expect(isValidFileExtension('file.tsv', '.tsv')).toBe(true);
@@ -64,9 +58,7 @@ describe('useUploadValidation', () => {
   });
 
   it('should initialize with default states', () => {
-    const { result } = renderHook(() =>
-      useUploadValidation({ allowedFileType: '.tsv', onFileUpload: onFileUploadMock })
-    );
+    const { result } = renderHook(() => useUploadValidation({ allowedFileType: '.tsv' }));
 
     expect(result.current.hasError).toBe(false);
     expect(result.current.errorMessage).toBe('');
@@ -76,145 +68,126 @@ describe('useUploadValidation', () => {
   });
 
   describe('TSV Validation', () => {
-    it('should reject a file with an invalid extension', () => {
-      const { result } = renderHook(() =>
-        useUploadValidation({ allowedFileType: '.tsv', onFileUpload: onFileUploadMock })
-      );
+    it('should reject a file with an invalid extension', async () => {
+      const { result } = renderHook(() => useUploadValidation({ allowedFileType: '.tsv' }));
 
       const invalidFile = new File(['content'], 'test.txt', { type: 'text/plain' });
 
-      act(() => {
-        result.current.validateAndUpload(invalidFile);
+      let isValid = false;
+      await act(async () => {
+        isValid = await result.current.validate(invalidFile);
       });
 
+      expect(isValid).toBe(false);
       expect(result.current.hasError).toBe(true);
       expect(result.current.errorMessage).toBe('Invalid file type. Please upload a .tsv file.');
-      expect(onFileUploadMock).not.toHaveBeenCalled();
     });
 
     it('should reject a TSV file with duplicate column names', async () => {
-      const { result } = renderHook(() =>
-        useUploadValidation({ allowedFileType: '.tsv', onFileUpload: onFileUploadMock })
-      );
+      const { result } = renderHook(() => useUploadValidation({ allowedFileType: '.tsv' }));
 
       const tsvContent = 'col1\tcol1\nval1\tval2';
       const duplicateHeaderFile = new File([tsvContent], 'test.tsv', {
         type: 'text/tab-separated-values',
       });
 
-      act(() => {
-        result.current.validateAndUpload(duplicateHeaderFile);
+      let isValid = false;
+      await act(async () => {
+        isValid = await result.current.validate(duplicateHeaderFile);
       });
 
-      // Need to wait for FileReader
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
+      expect(isValid).toBe(false);
       expect(result.current.hasError).toBe(true);
       expect(result.current.errorMessage).toBe(
         'The uploaded data table contains duplicate column names. Please ensure all column names are unique.'
       );
-      expect(onFileUploadMock).not.toHaveBeenCalled();
     });
 
     it('should show a warning for a TSV file with empty columns and rows', async () => {
-      const { result } = renderHook(() =>
-        useUploadValidation({ allowedFileType: '.tsv', onFileUpload: onFileUploadMock })
-      );
+      const { result } = renderHook(() => useUploadValidation({ allowedFileType: '.tsv' }));
 
       const tsvContent = 'col1\tcol2\n\t\nval1\t\nval2\t';
       const emptyCellsFile = new File([tsvContent], 'test.tsv', {
         type: 'text/tab-separated-values',
       });
 
-      act(() => {
-        result.current.validateAndUpload(emptyCellsFile);
+      let isValid = false;
+      await act(async () => {
+        isValid = await result.current.validate(emptyCellsFile);
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
+      expect(isValid).toBe(true);
       expect(result.current.hasWarning).toBe(true);
       expect(result.current.warningMessage).toBe(
         'Warning: The uploaded file contains 1 empty column and 1 empty row.'
       );
-      // Warning doesn't prevent upload
-      expect(onFileUploadMock).toHaveBeenCalledWith(emptyCellsFile);
     });
 
-    it('should successfully upload a valid TSV file without warnings', async () => {
-      const { result } = renderHook(() =>
-        useUploadValidation({ allowedFileType: '.tsv', onFileUpload: onFileUploadMock })
-      );
+    it('should successfully validate a valid TSV file without warnings', async () => {
+      const { result } = renderHook(() => useUploadValidation({ allowedFileType: '.tsv' }));
 
       const tsvContent = 'col1\tcol2\nval1\tval2';
       const validFile = new File([tsvContent], 'test.tsv', { type: 'text/tab-separated-values' });
 
-      act(() => {
-        result.current.validateAndUpload(validFile);
+      let isValid = false;
+      await act(async () => {
+        isValid = await result.current.validate(validFile);
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
+      expect(isValid).toBe(true);
       expect(result.current.hasError).toBe(false);
       expect(result.current.hasWarning).toBe(false);
-      expect(onFileUploadMock).toHaveBeenCalledWith(validFile);
     });
   });
 
   describe('JSON Validation', () => {
-    it('should reject a file with an invalid extension for JSON uploader', () => {
-      const { result } = renderHook(() =>
-        useUploadValidation({ allowedFileType: '.json', onFileUpload: onFileUploadMock })
-      );
+    it('should reject a file with an invalid extension for JSON uploader', async () => {
+      const { result } = renderHook(() => useUploadValidation({ allowedFileType: '.json' }));
 
       const invalidFile = new File(['content'], 'test.txt', { type: 'text/plain' });
 
-      act(() => {
-        result.current.validateAndUpload(invalidFile);
+      let isValid = false;
+      await act(async () => {
+        isValid = await result.current.validate(invalidFile);
       });
 
+      expect(isValid).toBe(false);
       expect(result.current.hasError).toBe(true);
       expect(result.current.errorMessage).toBe('Invalid file type. Please upload a .json file.');
-      expect(onFileUploadMock).not.toHaveBeenCalled();
     });
 
     it('should reject an invalid JSON file', async () => {
-      const { result } = renderHook(() =>
-        useUploadValidation({ allowedFileType: '.json', onFileUpload: onFileUploadMock })
-      );
+      const { result } = renderHook(() => useUploadValidation({ allowedFileType: '.json' }));
 
       const invalidJson = '{ "name": "test", }'; // Trailing comma
       const invalidFile = new File([invalidJson], 'test.json', { type: 'application/json' });
 
-      act(() => {
-        result.current.validateAndUpload(invalidFile);
+      let isValid = false;
+      await act(async () => {
+        isValid = await result.current.validate(invalidFile);
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
+      expect(isValid).toBe(false);
       expect(result.current.hasError).toBe(true);
       expect(result.current.errorMessage).toBe(
         'Invalid JSON file uploaded. Please check the file for syntax errors.'
       );
-      expect(onFileUploadMock).not.toHaveBeenCalled();
     });
 
-    it('should successfully upload a valid JSON file', async () => {
-      const { result } = renderHook(() =>
-        useUploadValidation({ allowedFileType: '.json', onFileUpload: onFileUploadMock })
-      );
+    it('should successfully validate a valid JSON file', async () => {
+      const { result } = renderHook(() => useUploadValidation({ allowedFileType: '.json' }));
 
       const validJson = '{ "name": "test" }';
       const validFile = new File([validJson], 'test.json', { type: 'application/json' });
 
-      act(() => {
-        result.current.validateAndUpload(validFile);
+      let isValid = false;
+      await act(async () => {
+        isValid = await result.current.validate(validFile);
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
+      expect(isValid).toBe(true);
       expect(result.current.hasError).toBe(false);
       expect(result.current.hasWarning).toBe(false);
-      expect(onFileUploadMock).toHaveBeenCalledWith(validFile);
     });
   });
 });

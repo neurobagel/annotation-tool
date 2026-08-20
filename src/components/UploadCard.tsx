@@ -37,24 +37,30 @@ function UploadCard({
   diableFileUploader = false,
   FileUploaderToolTipContent = 'Uploading is disabled',
 }: UploadCardProps) {
-  const { hasError, errorMessage, hasWarning, warningMessage, validateAndUpload, fileInputRef } =
-    useUploadValidation({ allowedFileType, onFileUpload });
+  const { hasError, errorMessage, hasWarning, warningMessage, validate, fileInputRef } =
+    useUploadValidation({ allowedFileType });
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const isFileUploaded = uploadedFileName !== null && uploadedFileName !== '';
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const uploadedFile = event.target.files?.[0];
     if (uploadedFile) {
-      validateAndUpload(uploadedFile);
+      const isValid = await validate(uploadedFile);
+      if (isValid) {
+        onFileUpload(uploadedFile);
+      }
     }
   };
 
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     const droppedFile = event.dataTransfer.files?.[0];
     if (droppedFile) {
-      validateAndUpload(droppedFile);
+      const isValid = await validate(droppedFile);
+      if (isValid) {
+        onFileUpload(droppedFile);
+      }
     }
   };
 
