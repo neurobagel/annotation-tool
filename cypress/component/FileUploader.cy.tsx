@@ -1,15 +1,25 @@
 import React from 'react';
 import FileUploader from '../../src/components/FileUploader';
+import { AllowedFileType } from '../../src/utils/internal_types';
 
-const props = {
+const props: {
+  id: string;
+  displayText: string;
+  handleClickToUpload: () => void;
+  handleDrop: () => void;
+  handleDragOver: () => void;
+  handleFileUpload: () => void;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
+  allowedFileType: AllowedFileType;
+} = {
   id: 'someid',
-  displayText: 'Upload your file (.csv)',
+  displayText: 'Upload your file (.tsv)',
   handleClickToUpload: () => {},
   handleDrop: () => {},
   handleDragOver: () => {},
   handleFileUpload: () => {},
   fileInputRef: React.createRef<HTMLInputElement | null>(),
-  allowedFileType: '.csv',
+  allowedFileType: '.tsv',
 };
 
 describe('FileUploader', () => {
@@ -27,8 +37,8 @@ describe('FileUploader', () => {
       />
     );
     cy.get('[data-cy="someid-upload-area"]').should('be.visible');
-    cy.get('[data-cy="someid-upload-area"]').should('contain', 'Upload your file (.csv)');
-    cy.get('[data-cy="someid-upload-input"]').should('have.attr', 'accept', '.csv');
+    cy.get('[data-cy="someid-upload-area"]').should('contain', 'Upload your file (.tsv)');
+    cy.get('[data-cy="someid-upload-input"]').should('have.attr', 'accept', '.tsv');
   });
 
   it('checks that input element and the upload area are disabled', () => {

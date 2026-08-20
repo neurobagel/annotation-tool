@@ -1,6 +1,8 @@
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import { Button, Card, CardHeader, CardContent, Collapse } from '@mui/material';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
+import { useUploadValidation } from '../hooks/useUploadValidation';
+import { AllowedFileType } from '../utils/internal_types';
 import FileUploader from './FileUploader';
 
 /*
@@ -16,7 +18,7 @@ interface UploadCardProps {
   id: string;
   title: string;
   FileUploaderDisplayText: string;
-  allowedFileType: string;
+  allowedFileType: AllowedFileType;
   uploadedFileName: string | null;
   onFileUpload: (file: File) => void;
   previewComponent: React.ReactNode;
@@ -35,66 +37,30 @@ function UploadCard({
   diableFileUploader = false,
   FileUploaderToolTipContent = 'Uploading is disabled',
 }: UploadCardProps) {
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const { hasError, errorMessage, hasWarning, warningMessage, validate, fileInputRef } =
+    useUploadValidation({ allowedFileType });
+
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-
-  const [hasError, setHasError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-
   const isFileUploaded = uploadedFileName !== null && uploadedFileName !== '';
 
-  const validateAndUpload = (file: File) => {
-    if (!allowedFileType.toLowerCase().includes('json')) {
-      setHasError(false);
-      setErrorMessage('');
-      onFileUpload(file);
-      return;
-    }
-
-    const reader = new FileReader();
-
-    const setReadError = (message: string) => {
-      setErrorMessage(message);
-      setHasError(true);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    };
-
-    reader.onload = (e) => {
-      const contents = e.target?.result;
-      if (typeof contents !== 'string') {
-        setReadError('Unable to read the selected file. Please try again.');
-        return;
-      }
-
-      try {
-        JSON.parse(contents);
-        setHasError(false);
-        setErrorMessage('');
-        onFileUpload(file);
-      } catch {
-        setReadError('Invalid JSON file uploaded. Please check the file for syntax errors.');
-      }
-    };
-
-    reader.onerror = () => {
-      setReadError('Unable to read the selected file. Please try again.');
-    };
-
-    reader.readAsText(file);
-  };
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const uploadedFile = event.target.files?.[0];
     if (uploadedFile) {
-      validateAndUpload(uploadedFile);
+      const isValid = await validate(uploadedFile);
+      if (isValid) {
+        onFileUpload(uploadedFile);
+      }
     }
   };
 
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     const droppedFile = event.dataTransfer.files?.[0];
     if (droppedFile) {
-      validateAndUpload(droppedFile);
+      const isValid = await validate(droppedFile);
+      if (isValid) {
+        onFileUpload(droppedFile);
+      }
     }
   };
 
@@ -132,6 +98,8 @@ function UploadCard({
             uploadedFileName={uploadedFileName}
             hasError={hasError}
             errorMessage={errorMessage}
+            hasWarning={hasWarning}
+            warningMessage={warningMessage}
           />
 
           {!hasError && isFileUploaded && (

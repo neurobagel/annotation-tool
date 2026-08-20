@@ -8,6 +8,8 @@ export enum View {
   Download = 'download',
 }
 
+export type AllowedFileType = '.tsv' | '.json';
+
 export interface GlobalMissingValue {
   value: string;
   description?: string;

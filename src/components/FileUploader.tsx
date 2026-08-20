@@ -1,5 +1,6 @@
 import { CloudUpload, InsertDriveFile, ErrorOutline } from '@mui/icons-material';
 import { Card, Typography, useTheme, Tooltip } from '@mui/material';
+import { AllowedFileType } from '../utils/internal_types';
 
 /*
 Explicitly define the default props since eslint doesn't recognize the default props
@@ -11,6 +12,8 @@ const defaultProps = {
   uploadedFileName: null,
   hasError: false,
   errorMessage: '',
+  hasWarning: false,
+  warningMessage: '',
 };
 
 function FileUploader({
@@ -27,6 +30,8 @@ function FileUploader({
   uploadedFileName,
   hasError,
   errorMessage,
+  hasWarning,
+  warningMessage,
 }: {
   id: string;
   displayText: string;
@@ -35,12 +40,14 @@ function FileUploader({
   handleDragOver: (event: React.DragEvent<HTMLDivElement>) => void;
   handleFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
-  allowedFileType: string;
+  allowedFileType: AllowedFileType;
   disabled?: boolean;
   tooltipContent?: string;
   uploadedFileName?: string | null;
   hasError?: boolean;
   errorMessage?: string;
+  hasWarning?: boolean;
+  warningMessage?: string;
 }) {
   const theme = useTheme();
 
@@ -58,8 +65,8 @@ function FileUploader({
   } else if (isFileSelected) {
     uploadAreaClasses += 'cursor-pointer bg-blue-50/30 border-solid p-4';
   } else {
-    uploadAreaClasses += 'cursor-pointer border-dashed p-6 ';
-    if (!hasError) {
+    uploadAreaClasses += 'cursor-pointer border-dashed p-6';
+    if (!hasError && !hasWarning) {
       uploadAreaClasses += 'border-gray-300 hover:border-primary-main';
     }
   }
@@ -78,24 +85,31 @@ function FileUploader({
         onDragOver={handleDragOverEvent}
         sx={{
           borderColor:
-            isFileSelected && !disabled
-              ? theme.palette.primary.main
-              : hasError && !disabled
-                ? theme.palette.error.main
-                : undefined,
+            hasError && !disabled
+              ? theme.palette.error.main
+              : hasWarning && !disabled
+                ? theme.palette.warning.main
+                : isFileSelected && !disabled
+                  ? theme.palette.primary.main
+                  : undefined,
           '&:hover': {
             borderColor: disabled
               ? theme.palette.grey[400]
               : hasError
                 ? theme.palette.error.main
-                : theme.palette.primary.main,
+                : hasWarning
+                  ? theme.palette.warning.main
+                  : theme.palette.primary.main,
             backgroundColor: isFileSelected && !disabled ? theme.palette.action.hover : undefined,
           },
         }}
       >
         {isFileSelected ? (
           <div className="flex flex-col items-center justify-center">
-            <InsertDriveFile className="mb-1 text-3xl" sx={{ color: theme.palette.primary.main }} />
+            <InsertDriveFile
+              className="mb-1 text-3xl"
+              sx={{ color: hasWarning ? theme.palette.warning.main : theme.palette.primary.main }}
+            />
             <Typography
               data-cy={`${id}-uploaded-file-name`}
               variant="h6"
@@ -104,6 +118,16 @@ function FileUploader({
             >
               {uploadedFileName}
             </Typography>
+            {hasWarning && (
+              <Typography
+                data-cy={`${id}-warning-text`}
+                variant="body2"
+                className="mb-2 max-w-[80%]"
+                sx={{ color: theme.palette.warning.main, fontWeight: 'bold' }}
+              >
+                {warningMessage}
+              </Typography>
+            )}
             <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
               <span
                 style={{
@@ -124,6 +148,12 @@ function FileUploader({
                 sx={{ color: theme.palette.error.main }}
                 data-cy={`${id}-error-icon`}
               />
+            ) : hasWarning ? (
+              <ErrorOutline
+                className="mb-4 text-4xl"
+                sx={{ color: theme.palette.warning.main }}
+                data-cy={`${id}-warning-icon`}
+              />
             ) : (
               <CloudUpload
                 className="mb-1 text-4xl"
@@ -136,9 +166,15 @@ function FileUploader({
               data-cy={`${id}-upload-text`}
               variant="body1"
               className="mb-1"
-              sx={{ color: hasError ? theme.palette.error.main : theme.palette.text.primary }}
+              sx={{
+                color: hasError
+                  ? theme.palette.error.main
+                  : hasWarning
+                    ? theme.palette.warning.main
+                    : theme.palette.text.primary,
+              }}
             >
-              {hasError ? errorMessage : displayText}
+              {hasError ? errorMessage : hasWarning ? warningMessage : displayText}
             </Typography>
             <Typography
               variant="body2"
