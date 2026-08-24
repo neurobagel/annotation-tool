@@ -60,7 +60,7 @@
     "@vitest/coverage-istanbul": "^3.2.7",
     "@vitest/ui": "^3.0.9",
     "autoprefixer": "^10.5.4",
-    "cypress": "^15.20.1",
+    "cypress": "^15.21.0",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^9.1.2",
     "eslint-import-resolver-typescript": "^3.10.1",
