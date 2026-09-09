@@ -47,7 +47,7 @@
           },
           {
             "id": "FromBounded",
-            "name": "bounded number",
+            "name": "lower-bounded",
             "examples": ["30+"]
           },
           {
