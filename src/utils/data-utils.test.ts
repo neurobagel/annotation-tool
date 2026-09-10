@@ -252,9 +252,9 @@ describe('convertStandardizedFormats', () => {
     const floatFormat = result['nb:FromFloat'];
     expect(floatFormat).toBeDefined();
     expect(floatFormat.identifier).toBe('nb:FromFloat');
-    expect(floatFormat.label).toBe('float');
+    expect(floatFormat.label).toBe('decimal');
     expect(floatFormat.standardizedVariableId).toBe('nb:Age');
-    expect(floatFormat.examples).toEqual(['31.5']);
+    expect(floatFormat.examples).toEqual(['31', '31.5']);
   });
 
   it('should map all age formats', () => {
@@ -694,7 +694,7 @@ describe('applyDataDictionaryToColumns', () => {
           VariableType: 'Continuous' as const,
           Format: {
             TermURL: 'nb:FromFloat',
-            Label: 'float',
+            Label: 'decimal',
           },
         },
         Units: 'years',
@@ -1356,6 +1356,7 @@ describe('parseContinuousValue', () => {
     expect(parseContinuousValue('bad', 'nb:FromEuro')).toBeNull();
   });
 
+  // TODO: revisit, since currently the CLI only accepts '+' as a bound character
   it('should parse nb:FromBounded', () => {
     expect(parseContinuousValue('+25+', 'nb:FromBounded')).toBe(25);
     expect(parseContinuousValue('25+', 'nb:FromBounded')).toBe(25);

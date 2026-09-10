@@ -166,7 +166,7 @@ describe('useGenerateDataDictionary', () => {
       'nb:FromFloat': {
         standardizedVariableId: 'nb:Age',
         identifier: 'nb:FromFloat',
-        label: 'float',
+        label: 'decimal',
       },
     });
 
@@ -177,7 +177,7 @@ describe('useGenerateDataDictionary', () => {
     expect(entry.Annotations).toEqual({
       IsAbout: { TermURL: 'nb:Age', Label: 'Age' },
       VariableType: VariableType.continuous,
-      Format: { TermURL: 'nb:FromFloat', Label: 'float' },
+      Format: { TermURL: 'nb:FromFloat', Label: 'decimal' },
     });
   });
 
@@ -329,7 +329,7 @@ describe('useGenerateDataDictionary', () => {
       'nb:FromFloat': {
         standardizedVariableId: 'nb:Age',
         identifier: 'nb:FromFloat',
-        label: 'float',
+        label: 'decimal',
       },
     });
 
@@ -362,7 +362,7 @@ describe('useGenerateDataDictionary', () => {
       'nb:FromFloat': {
         standardizedVariableId: 'nb:Age',
         identifier: 'nb:FromFloat',
-        label: 'float',
+        label: 'decimal',
       },
     });
 
@@ -509,7 +509,7 @@ describe('useGenerateDataDictionary', () => {
       'nb:FromFloat': {
         standardizedVariableId: 'nb:Age',
         identifier: 'nb:FromFloat',
-        label: 'float',
+        label: 'decimal',
       },
     });
 

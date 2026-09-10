@@ -25,8 +25,8 @@ const columnData: Record<string, ActiveValueAnnotationColumn> = {
     formatId: 'nb:FromFloat',
     termOptions: [],
     formatOptions: [
-      { id: 'nb:FromFloat', label: 'float', examples: ['31.5'] },
-      { id: 'nb:FromEuro', label: 'euro', examples: ['31,5'] },
+      { id: 'nb:FromFloat', label: 'decimal', examples: ['31.5'] },
+      { id: 'nb:FromEuro', label: 'European decimal', examples: ['31,5'] },
     ],
     showStandardizedTerm: false,
     showMissingToggle: true,
