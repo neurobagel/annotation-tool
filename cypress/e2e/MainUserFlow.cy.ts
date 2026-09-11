@@ -336,7 +336,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="side-column-nav-bar-age-age"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-age-select-button"]').click();
     cy.get('[data-cy="1-description"]').should('contain', 'Years');
-    cy.get('[data-cy="1-format-dropdown"] input').should('have.value', 'float');
+    cy.get('[data-cy="1-format-dropdown"] input').should('have.value', 'decimal');
     cy.get('[data-cy="side-column-nav-bar-sex-sex"]').should('be.visible');
     cy.get('[data-cy="side-column-nav-bar-sex-select-button"]').click();
     cy.get('[data-cy="2-M-description"]').should('contain', 'Male');
@@ -424,7 +424,7 @@ describe('Main user flow', () => {
       expect(fileContent.age.Annotations.IsAbout.Label).to.equal('Age');
       expect(fileContent.age.Units).to.equal('Years');
       expect(fileContent.age.Annotations.Format.TermURL).to.equal('nb:FromFloat');
-      expect(fileContent.age.Annotations.Format.Label).to.equal('float');
+      expect(fileContent.age.Annotations.Format.Label).to.equal('decimal');
 
       expect(fileContent.sex.Description).to.equal('');
       expect(fileContent.sex.Annotations.IsAbout.TermURL).to.equal('nb:Sex');

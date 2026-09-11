@@ -63,7 +63,7 @@ When specifying `formats` for continuous variables, each allowed format must be 
 | Field Name | Description                            | Required | Type            | Default Value | Example            |
 | ---------- | -------------------------------------- | -------- | --------------- | ------------- | ------------------ |
 | `id`       | Unique identifier for the format       | Yes      | string          | -             | `"FromFloat"`      |
-| `name`     | Human-readable name for the format     | Yes      | string          | -             | `"float"`          |
+| `name`     | Human-readable name for the format     | Yes      | string          | -             | `"decimal"`        |
 | `examples` | Array of example values in this format | No       | list of strings | `[]`          | `["24.2", "32.3"]` |
 
 For an example `formats` field, see the `"Age"` variable in the Example Configuration below.
@@ -98,8 +98,8 @@ For an example `formats` field, see the `"Age"` variable in the Example Configur
         "formats": [
           {
             "id": "FromFloat",
-            "name": "float",
-            "examples": ["31.5"]
+            "name": "decimal",
+            "examples": ["31", "31.5"]
           },
           {
             "id": "FromEuro",
