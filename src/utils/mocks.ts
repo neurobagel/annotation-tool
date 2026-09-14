@@ -29,7 +29,7 @@ export const mockDataDictionaryWithAnnotations = {
       },
       Format: {
         TermURL: 'nb:FromFloat',
-        Label: 'float',
+        Label: 'decimal',
       },
       VariableType: 'Continuous' as VariableType,
     },
@@ -155,7 +155,7 @@ export const mockDataDictionaryWithNoDescription = {
       },
       Format: {
         TermURL: 'nb:FromFloat',
-        Label: 'float',
+        Label: 'decimal',
       },
       VariableType: 'Continuous' as VariableType,
     },
@@ -546,19 +546,19 @@ export const mockStandardizedFormats = {
   'nb:FromFloat': {
     standardizedVariableId: 'nb:Age',
     identifier: 'nb:FromFloat',
-    label: 'float',
-    examples: ['31.5'],
+    label: 'decimal',
+    examples: ['31', '31.5'],
   },
   'nb:FromEuro': {
     standardizedVariableId: 'nb:Age',
     identifier: 'nb:FromEuro',
-    label: 'euro',
+    label: 'European decimal',
     examples: ['31,5'],
   },
   'nb:FromBounded': {
     standardizedVariableId: 'nb:Age',
     identifier: 'nb:FromBounded',
-    label: 'bounded',
+    label: 'lower-bounded',
     examples: ['30+'],
   },
   'nb:FromRange': {
@@ -570,7 +570,7 @@ export const mockStandardizedFormats = {
   'nb:FromISO8601': {
     standardizedVariableId: 'nb:Age',
     identifier: 'nb:FromISO8601',
-    label: 'iso8601',
+    label: 'ISO 8601',
     examples: ['31Y6M'],
   },
 };
@@ -683,17 +683,17 @@ export const mockConfigFile: ConfigFile = {
       formats: [
         {
           id: 'FromFloat',
-          name: 'float',
-          examples: ['31.5'],
+          name: 'decimal',
+          examples: ['31', '31.5'],
         },
         {
           id: 'FromEuro',
-          name: 'euro',
+          name: 'European decimal',
           examples: ['31,5'],
         },
         {
           id: 'FromBounded',
-          name: 'bounded',
+          name: 'lower-bounded',
           examples: ['30+'],
         },
         {
@@ -703,7 +703,7 @@ export const mockConfigFile: ConfigFile = {
         },
         {
           id: 'FromISO8601',
-          name: 'iso8601',
+          name: 'ISO 8601',
           examples: ['31Y6M'],
         },
       ],
