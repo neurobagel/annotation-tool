@@ -1,3 +1,15 @@
+# v0.7.8 (Fri Sep 11 2026)
+
+#### 🏠 Internal
+
+- [REF] Update age format names and examples in `default_config.json` and tests [#639](https://github.com/neurobagel/annotation-tool/pull/639) ([@alyssadai](https://github.com/alyssadai))
+
+#### Authors: 1
+
+- Alyssa Dai ([@alyssadai](https://github.com/alyssadai))
+
+---
+
 # v0.7.7 (Thu Aug 20 2026)
 
 #### 🚀 Enhancements
