@@ -125,4 +125,40 @@ describe('useGenerateDatasetDescription', () => {
     const { result } = renderHook(() => useGenerateDatasetDescription());
     expect(result.current?.ParticipantCount).toBeUndefined();
   });
+
+  it('should not count empty strings and missing values towards the ParticipantCount', () => {
+    mockedUseDatasetDescription.mockReturnValue({
+      Name: 'Participant Test With Empty Values',
+      Authors: [''],
+      AccessType: '',
+      AccessInstructions: '',
+      ReferencesAndLinks: [''],
+      Keywords: [''],
+      RepositoryURL: '',
+      AccessEmail: '',
+      AccessLink: '',
+    });
+
+    mockedUseColumns.mockReturnValue({
+      col1: {
+        id: 'col1',
+        name: 'participant_id',
+        allValues: ['sub-01', '', '   ', 'sub-02', 'NA'],
+        missingValues: ['NA'],
+        dataType: null,
+        standardizedVariable: 'nb:ParticipantID',
+      },
+    });
+
+    mockedUseStandardizedVariables.mockReturnValue({
+      'nb:ParticipantID': {
+        id: 'nb:ParticipantID',
+        name: 'Participant ID',
+        variable_type: VariableType.identifier,
+      },
+    });
+
+    const { result } = renderHook(() => useGenerateDatasetDescription());
+    expect(result.current?.ParticipantCount).toBe(2);
+  });
 });
