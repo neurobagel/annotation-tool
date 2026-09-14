@@ -174,14 +174,14 @@ describe('userSelectsConfig', () => {
     const floatFormat = result.current.standardizedFormats['nb:FromFloat'];
     expect(floatFormat).toBeDefined();
     expect(floatFormat.identifier).toBe('nb:FromFloat');
-    expect(floatFormat.label).toBe('float');
+    expect(floatFormat.label).toBe('decimal');
     expect(floatFormat.standardizedVariableId).toBe('nb:Age');
-    expect(floatFormat.examples).toEqual(['31.5']);
+    expect(floatFormat.examples).toEqual(['31', '31.5']);
 
     const iso8601Format = result.current.standardizedFormats['nb:FromISO8601'];
     expect(iso8601Format).toBeDefined();
     expect(iso8601Format.identifier).toBe('nb:FromISO8601');
-    expect(iso8601Format.label).toBe('iso8601');
+    expect(iso8601Format.label).toBe('ISO 8601');
     expect(iso8601Format.examples).toEqual(['31Y6M']);
   });
 });
