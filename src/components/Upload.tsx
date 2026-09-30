@@ -72,7 +72,7 @@ function Upload({ disableConfig }: UploadProps) {
       <UploadCard
         id="datatable"
         title="Data Table"
-        FileUploaderDisplayText="Upload your tabular phenotypic .tsv file (required)"
+        FileUploaderDisplayText="Load a tabular phenotypic file (.tsv) *"
         allowedFileType=".tsv"
         uploadedFileName={uploadedDataTableFileName}
         onFileUpload={handleDataTableFileUpload}
@@ -82,7 +82,7 @@ function Upload({ disableConfig }: UploadProps) {
       <UploadCard
         id="datadictionary"
         title="Data Dictionary"
-        FileUploaderDisplayText="Upload your data dictionary .json file (optional)"
+        FileUploaderDisplayText="Load a data dictionary .json file (optional)"
         allowedFileType=".json"
         uploadedFileName={fileName}
         onFileUpload={userUploadsDataDictionaryFile}
