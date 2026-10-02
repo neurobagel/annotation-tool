@@ -93,6 +93,46 @@ describe('Download', () => {
     cy.get('[data-cy="download-datadictionary-button"]').should('be.enabled');
   });
 
+  it('should render participant-id-missing-values error and disable download button when participant ID column has missing values', () => {
+    useDataStore.setState((state) => ({
+      ...state,
+      columns: {
+        col_id: {
+          id: 'col_id',
+          name: 'participant_id',
+          allValues: ['sub-01', ''],
+          description: '',
+          dataType: null,
+          standardizedVariable: 'nb:ParticipantID',
+        },
+      },
+      standardizedVariables: {
+        'nb:ParticipantID': {
+          id: 'nb:ParticipantID',
+          name: 'Participant ID',
+          variable_type: VariableType.identifier,
+          required: true,
+          description: 'Participant identifier',
+          is_multi_column_measure: false,
+          can_have_multiple_columns: false,
+        },
+      },
+      standardizedTerms: {},
+      standardizedFormats: {},
+    }));
+
+    cy.mount(<Download />);
+
+    cy.get('[data-cy="participant-id-missing-values-error"]')
+      .should('be.visible')
+      .and('contain', 'Missing values in Participant ID column')
+      .and('contain', 'participant_id');
+    cy.get('[data-cy="complete-annotations-alert"]').should('not.exist');
+    cy.get('[data-cy="download-datadictionary-button"]').should('be.disabled');
+    cy.get('[data-cy="force-download-switch"]').should('be.visible').click();
+    cy.get('[data-cy="download-datadictionary-button"]').should('be.enabled');
+  });
+
   it('should generate valid data dictionary with descriptions provided by user', () => {
     initializeStore({ columns: mockAnnotatedColumns });
 

@@ -1,15 +1,16 @@
-import { useIsParticipantIDMapped } from '../hooks/useIsParticipantIDMapped';
+import { usePageAlerts } from '../hooks/usePageAlerts';
+import { View } from '../utils/internal_types';
 import DatasetDescriptionForm from './DatasetDescriptionForm';
-import MissingParticipantIdAlert from './MissingParticipantIdAlert';
+import PageAlert from './PageAlert';
 
 function DatasetDescription() {
-  const { hasMappedParticipantId, hasMappedOtherColumns } = useIsParticipantIDMapped();
+  const alerts = usePageAlerts(View.DatasetDescription);
 
   return (
     <div className="flex flex-col items-center p-6" data-cy="dataset-description-page">
-      {hasMappedOtherColumns && !hasMappedParticipantId && (
-        <MissingParticipantIdAlert className="mb-6 w-full max-w-2xl" />
-      )}
+      {alerts.map((alert) => (
+        <PageAlert key={alert.id} {...alert} className="mb-6 w-full max-w-2xl" />
+      ))}
 
       <div className="w-full max-w-2xl">
         <DatasetDescriptionForm />

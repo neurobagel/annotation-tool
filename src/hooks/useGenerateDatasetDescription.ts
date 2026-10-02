@@ -19,7 +19,16 @@ export function useGenerateDatasetDescription(): DatasetDescription | null {
     });
 
     if (participantColumn) {
-      const uniqueIDs = new Set(participantColumn.allValues);
+      const missingSet = new Set(participantColumn.missingValues);
+      const uniqueIDs = new Set<string>();
+
+      // Don't count missing values in participant ID column
+      for (const val of participantColumn.allValues) {
+        if (val.trim() !== '' && !missingSet.has(val)) {
+          uniqueIDs.add(val);
+        }
+      }
+
       count = uniqueIDs.size;
     }
     return count;
