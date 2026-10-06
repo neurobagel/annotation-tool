@@ -37,7 +37,7 @@ jobs:
           component: false
 
       - name: Upload e2e screenshots on failure
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.1
         if: failure()
         with:
           name: e2e-screenshots
@@ -45,7 +45,7 @@ jobs:
           retention-days: 30
 
       - name: Upload e2e coverage artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: e2eCov
           path: coverage
@@ -65,7 +65,7 @@ jobs:
           component: true
       
       - name: Upload component coverage artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: compCov
           path: coverage
@@ -88,7 +88,7 @@ jobs:
         run: npm run test:unit
 
       - name: Upload unit coverage artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: unitCov
           path: coverage
