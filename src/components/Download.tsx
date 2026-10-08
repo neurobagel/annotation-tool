@@ -18,12 +18,15 @@ import emoji from '../assets/download-emoji.png';
 import { useDatasetDescriptionFormValidation } from '../hooks/useDatasetDescriptionFormValidation';
 import { useGenerateDataDictionary } from '../hooks/useGenerateDataDictionary';
 import { useGenerateDatasetDescription } from '../hooks/useGenerateDatasetDescription';
+import { usePageAlerts } from '../hooks/usePageAlerts';
+import { useParticipantIdStatus } from '../hooks/useParticipantIdStatus';
 import { useSchemaValidation } from '../hooks/useSchemaValidation';
 import { useDataActions, useUploadedDataTableFileName, useConfig } from '../stores/data';
 import useViewStore from '../stores/view';
 import { View } from '../utils/internal_types';
 import DataDictionaryPreview from './DataDictionaryPreview';
 import GoogleDriveUpload from './GoogleDriveUpload';
+import PageAlert from './PageAlert';
 
 function Download() {
   const [dictionaryCollapsed, setDictionaryCollapsed] = useState(false);
@@ -39,6 +42,10 @@ function Download() {
   const datasetDescription = useGenerateDatasetDescription();
   const { isFormInvalid } = useDatasetDescriptionFormValidation();
   const { schemaValid, schemaErrors } = useSchemaValidation(dataDictionary);
+  const { hasParticipantIdMissingValues } = useParticipantIdStatus();
+  const alerts = usePageAlerts(View.Download);
+  const isParticipantIdValid = !hasParticipantIdMissingValues;
+  const isDownloadReady = schemaValid && isParticipantIdValid;
 
   const handleDownloadDataDictionary = () => {
     const dataDictionaryBlob = new Blob([JSON.stringify(dataDictionary, null, 2)], {
@@ -78,32 +85,11 @@ function Download() {
 
   return (
     <div className="flex flex-col items-center p-6" data-cy="download">
-      {schemaValid ? (
-        <Alert
-          data-cy="complete-annotations-alert"
-          severity="success"
-          className="mb-6 w-full max-w-2xl"
-        >
-          <div className="flex items-center gap-2">
-            <img src={emoji} alt="bagel confetti" className="h-10 w-10" />
-            <Typography variant="h4" className="font-bold">
-              Congratulations!
-            </Typography>
-          </div>
-          <Typography variant="body1">
-            You have successfully created a{' '}
-            <Link
-              href="https://neurobagel.org/data_models/dictionaries/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:underline"
-            >
-              neurobagel annotated .json data dictionary
-            </Link>
-            .
-          </Typography>
-        </Alert>
-      ) : (
+      {alerts.map((alert) => (
+        <PageAlert key={alert.id} {...alert} className="mb-6 w-full max-w-2xl" />
+      ))}
+
+      {!schemaValid && (
         <Alert
           severity="warning"
           data-cy="incomplete-annotations-alert"
@@ -131,6 +117,33 @@ function Download() {
             annotations, the data dictionary will not work as-is with other Neurobagel tools.
             However, you can download and re-upload the partially annotation .json to complete
             annotations later, if desired.
+          </Typography>
+        </Alert>
+      )}
+
+      {isDownloadReady && (
+        <Alert
+          data-cy="complete-annotations-alert"
+          severity="success"
+          className="mb-6 w-full max-w-2xl"
+        >
+          <div className="flex items-center gap-2">
+            <img src={emoji} alt="bagel confetti" className="h-10 w-10" />
+            <Typography variant="h4" className="font-bold">
+              Congratulations!
+            </Typography>
+          </div>
+          <Typography variant="body1">
+            You have successfully created a{' '}
+            <Link
+              href="https://neurobagel.org/data_models/dictionaries/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              neurobagel annotated .json data dictionary
+            </Link>
+            .
           </Typography>
         </Alert>
       )}
@@ -240,7 +253,7 @@ function Download() {
                 color="primary"
                 endIcon={<CloudUploadIcon />}
                 onClick={() => setUploadDialogOpen(true)}
-                disabled={!schemaValid && !forceAllowDownload}
+                disabled={!isDownloadReady && !forceAllowDownload}
                 className="mt-4"
                 data-cy="upload-drive-button"
               >
@@ -251,7 +264,7 @@ function Download() {
           </>
         )}
 
-        {!schemaValid ? (
+        {!isDownloadReady ? (
           <FormControlLabel
             control={
               <Switch
@@ -281,8 +294,8 @@ function Download() {
           <Button
             data-cy="download-datadictionary-button"
             variant="contained"
-            color={schemaValid ? 'success' : 'warning'}
-            disabled={!schemaValid && !forceAllowDownload}
+            color={isDownloadReady ? 'success' : 'warning'}
+            disabled={!isDownloadReady && !forceAllowDownload}
             onClick={handleDownloadDataDictionary}
             endIcon={<DownloadIcon />}
           >

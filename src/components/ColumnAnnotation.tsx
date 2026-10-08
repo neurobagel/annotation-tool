@@ -9,16 +9,16 @@ import {
 } from '~/stores/data';
 import useLocalStore from '~/stores/local';
 import { useColumnCardData } from '../hooks/useColumnCardData';
-import { useIsParticipantIDMapped } from '../hooks/useIsParticipantIDMapped';
 import { useMappingMetrics } from '../hooks/useMappingMetrics';
 import { useMultiSelect } from '../hooks/useMultiSelect';
+import { usePageAlerts } from '../hooks/usePageAlerts';
 import { useSearchFilter } from '../hooks/useSearchFilter';
 import { useStandardizedVariableOptions } from '../hooks/useStandardizedVariableOptions';
-import { VariableType } from '../utils/internal_types';
+import { VariableType, View } from '../utils/internal_types';
 import BulkActionBar from './BulkActionBar';
 import ColumnAnnotationCard from './ColumnAnnotationCard';
 import ColumnAnnotationTour from './ColumnAnnotationTour';
-import MissingParticipantIdAlert from './MissingParticipantIdAlert';
+import PageAlert from './PageAlert';
 import SearchFilter from './SearchFilter';
 import StandardizedVariablesList from './StandardizedVariablesList';
 import VirtualColumnList from './VirtualColumnList';
@@ -41,7 +41,7 @@ function ColumnAnnotation() {
   const { setHasSeenColumnAnnotationTour } = useLocalStore();
 
   const columnCardData = useColumnCardData(columns, standardizedVariables, standardizedTerms);
-  const { hasMappedParticipantId, hasMappedOtherColumns } = useIsParticipantIDMapped();
+  const alerts = usePageAlerts(View.ColumnAnnotation);
 
   const [hideAnnotated, setHideAnnotated] = useState(false);
 
@@ -136,9 +136,9 @@ function ColumnAnnotation() {
         {/* Main Column Listing - Left Side */}
         <div className="flex-1 flex flex-col min-w-0 py-4">
           <div className="flex-shrink-0 flex flex-col items-start gap-4 mb-4">
-            {hasMappedOtherColumns && !hasMappedParticipantId && (
-              <MissingParticipantIdAlert className="w-full" />
-            )}
+            {alerts.map((alert) => (
+              <PageAlert key={alert.id} {...alert} className="w-full" />
+            ))}
             <Button
               variant="outlined"
               startIcon={<InfoOutlinedIcon />}
