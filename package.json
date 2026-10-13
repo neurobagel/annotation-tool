@@ -88,8 +88,9 @@
     "vite-plugin-istanbul": "^6.0.2",
     "vitest": "^5.0.1"
   },
-  "//overrides": "react-joyride and react-floater require React 15-18. This causes an ERESOLVE peer dependency error during strict npm ci installs in our React 19 environment. These overrides force npm to resolve to React 19.",
+  "//overrides": "postcss-selector-parser: Temporary override to patch a security vulnerability in selector parsing (Dependabot alert #143) until tailwindcss updates upstream or upgrades to v4. react-joyride and react-floater: require React 15-18. This causes an ERESOLVE peer dependency error during strict npm ci installs in our React 19 environment. These overrides force npm to resolve to React 19.",
   "overrides": {
+    "postcss-selector-parser": "^7.1.6",
     "react-joyride": {
       "react": "$react",
       "react-dom": "$react-dom"
