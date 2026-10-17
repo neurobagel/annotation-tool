@@ -40,7 +40,7 @@ function DatasetDescriptionForm() {
         Dataset Description
       </Typography>
       <Typography variant="body2" className="text-gray-600 mb-4">
-        The information you enter into this form will be available to download as a
+        The information you enter into this form will be available to save as a
         dataset_description.json file on the next page. For more information about each dataset
         description field, see the{' '}
         <Link

@@ -7,12 +7,12 @@ const props = {
 describe('Upload', () => {
   it('should render correctly', () => {
     cy.mount(<Upload disableConfig={props.disableConfig} />);
-    cy.contains('Upload');
+    cy.contains('Load');
     cy.get('[data-cy="config-card"]').should('be.visible');
   });
   it('should not render ConfigCard when disableConfig is false', () => {
     cy.mount(<Upload disableConfig />);
-    cy.contains('Upload');
+    cy.contains('Load');
     cy.get('[data-cy="config-card"]').should('not.exist');
   });
 });

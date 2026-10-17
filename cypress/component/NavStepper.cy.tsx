@@ -10,11 +10,11 @@ describe('Stepper component', () => {
     cy.mount(<NavStepper currentView={props.currentView} />);
     cy.get('[data-cy="nav-stepper"]').should('be.visible');
     cy.get('[data-cy="nav-stepper"]')
-      .should('contain', 'Upload')
+      .should('contain', 'Load data files')
       .and('contain', 'Column Annotation')
       .and('contain', 'Value Annotation')
-      .and('contain', 'Download');
-    cy.get('[data-cy="Upload-step"]').within(() => {
+      .and('contain', 'Save');
+    cy.get('[data-cy="Load data files-step"]').within(() => {
       cy.get('.MuiStepLabel-iconContainer').should('not.have.class', 'Mui-active');
     });
     cy.get('[data-cy="Value Annotation-step"]').within(() => {
