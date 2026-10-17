@@ -38,7 +38,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="back-button"]').should('contain', 'Landing');
     cy.get('[data-cy="next-button"]').should('contain', 'Column Annotation').and('be.disabled');
     cy.get('[data-cy="nav-stepper"]').should('be.visible');
-    cy.get('[data-cy="Upload-step"]').within(() => {
+    cy.get('[data-cy="Load data files-step"]').within(() => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
     });
 
@@ -64,7 +64,7 @@ describe('Main user flow', () => {
     cy.get('[data-cy="Column Annotation-step"]').click();
 
     // Column Annotation view
-    cy.get('[data-cy="back-button"]').should('contain', 'Upload');
+    cy.get('[data-cy="back-button"]').should('contain', 'Load data files');
     cy.get('[data-cy="next-button"]').should('contain', 'Value Annotation');
     cy.get('[data-cy="nav-stepper"]').should('be.visible');
     cy.get('[data-cy="Column Annotation-step"]').within(() => {
@@ -150,11 +150,11 @@ describe('Main user flow', () => {
     cy.get('[data-cy="Dataset Description-step"]').click();
 
     // Dataset Description view
-    cy.get('[data-cy="Download-step"]').click();
+    cy.get('[data-cy="Save-step"]').click();
 
-    // Download
+    // Save
     cy.get('[data-cy="back-button"]').should('contain', 'Dataset Description');
-    cy.get('[data-cy="Download-step"]').within(() => {
+    cy.get('[data-cy="Save-step"]').within(() => {
       cy.get('.MuiStepLabel-iconContainer').should('have.class', 'Mui-active');
     });
     cy.get('[data-cy="incomplete-annotations-alert"]').should('be.visible');
