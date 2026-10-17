@@ -1,7 +1,7 @@
-import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DescriptionIcon from '@mui/icons-material/Description';
 import FactCheckIcon from '@mui/icons-material/FactCheck';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import ViewAgendaIcon from '@mui/icons-material/ViewAgenda';
 import { View, StepConfig } from './internal_types';
 
@@ -10,7 +10,7 @@ export const steps: StepConfig[] = [
   { label: 'Column Annotation', view: View.ColumnAnnotation, icon: ViewAgendaIcon },
   { label: 'Value Annotation', view: View.ValueAnnotation, icon: FactCheckIcon },
   { label: 'Dataset Description', view: View.DatasetDescription, icon: DescriptionIcon },
-  { label: 'Download', view: View.Download, icon: CloudDownloadIcon },
+  { label: 'Save', view: View.Download, icon: SaveAltIcon },
 ];
 
 export const fetchConfigGitHubURL =
