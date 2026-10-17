@@ -12,7 +12,7 @@ export function UploadInstructions() {
         <ListItemText
           primary={
             <>
-              <strong>*</strong> Load a tabular phenotypic <code>.tsv</code> file.
+              <strong>[required]</strong> Load a tabular phenotypic <code>.tsv</code> file.
             </>
           }
         />
