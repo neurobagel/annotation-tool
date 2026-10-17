@@ -20,7 +20,7 @@
       "VariableType": "Continuous",
       "Format": {
         "TermURL": "nb:FromFloat",
-        "Label": "float"
+        "Label": "decimal"
       }
     }
   },

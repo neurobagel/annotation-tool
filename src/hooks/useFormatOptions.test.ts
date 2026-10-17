@@ -17,15 +17,15 @@ describe('useFormatOptions', () => {
 
   it('should return format options for a standardized variable', () => {
     const formats: StandardizedFormats = {
-      'nb:Float': {
-        identifier: 'nb:Float',
-        label: 'float',
+      'nb:FromFloat': {
+        identifier: 'nb:FromFloat',
+        label: 'decimal',
         examples: ['1.23'],
         standardizedVariableId: 'nb:Age',
       },
-      'nb:Int': {
-        identifier: 'nb:Int',
-        label: 'integer',
+      'nb:FromEuro': {
+        identifier: 'nb:FromEuro',
+        label: 'European decimal',
         standardizedVariableId: 'nb:Age',
       },
       'nb:Other': {
@@ -40,8 +40,8 @@ describe('useFormatOptions', () => {
     const { result } = renderHook(() => useFormatOptions('nb:Age'));
 
     expect(result.current).toEqual([
-      { id: 'nb:Float', label: 'float', examples: ['1.23'] },
-      { id: 'nb:Int', label: 'integer', examples: undefined },
+      { id: 'nb:FromFloat', label: 'decimal', examples: ['1.23'] },
+      { id: 'nb:FromEuro', label: 'European decimal', examples: undefined },
     ]);
   });
 });
