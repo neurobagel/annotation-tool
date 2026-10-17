@@ -1,6 +1,6 @@
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import DownloadIcon from '@mui/icons-material/Download';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import {
   Button,
   Alert,
@@ -100,7 +100,7 @@ function Download() {
           </Typography>
           <Typography variant="body1" className="mb-2">
             There are incomplete annotations for columns that were mapped to variables. You can go
-            back and complete these annotations before you download the .json data dictionary.
+            back and complete these annotations before you save the .json data dictionary.
           </Typography>
           <Typography variant="body1" className="mb-2">
             The following columns have incomplete value annotations:
@@ -113,10 +113,9 @@ function Download() {
             ))}
           </List>
           <Typography variant="body1" className="mb-2">
-            <b>NOTE</b>: If you download the .json data dictionary without completing the
-            annotations, the data dictionary will not work as-is with other Neurobagel tools.
-            However, you can download and re-upload the partially annotation .json to complete
-            annotations later, if desired.
+            <b>NOTE</b>: If you save the .json data dictionary without completing the annotations,
+            the data dictionary will not work as-is with other Neurobagel tools. However, you can
+            save and reload the partially annotated .json to complete annotations later, if desired.
           </Typography>
         </Alert>
       )}
@@ -176,8 +175,8 @@ function Download() {
         <List className="list-disc pl-6" data-cy="datadictionary-next-steps-list">
           <ListItem className="list-item">
             <Typography variant="body1">
-              Download the .json data dictionary to your local hard drive by clicking the green
-              &quot;Download&quot; button.
+              Save the .json data dictionary to your local hard drive by clicking the green
+              &quot;Save&quot; button.
             </Typography>
           </ListItem>
           <ListItem className="list-item">
@@ -273,7 +272,7 @@ function Download() {
                 onChange={(e) => setForceAllowDownload(e.target.checked)}
               />
             }
-            label="Let me download, I know what I'm doing!"
+            label="Let me save, I know what I'm doing!"
           />
         ) : null}
 
@@ -284,8 +283,7 @@ function Download() {
             data-cy="dataset-description-invalid-alert"
           >
             <Typography variant="body2">
-              The Dataset Description form is incomplete. Only the Data Dictionary can be
-              downloaded.
+              The Dataset Description form is incomplete. Only the Data Dictionary can be saved.
             </Typography>
           </Alert>
         )}
@@ -297,9 +295,9 @@ function Download() {
             color={isDownloadReady ? 'success' : 'warning'}
             disabled={!isDownloadReady && !forceAllowDownload}
             onClick={handleDownloadDataDictionary}
-            endIcon={<DownloadIcon />}
+            endIcon={<SaveAltIcon />}
           >
-            Download Data Dictionary
+            Save Data Dictionary
           </Button>
           {!isFormInvalid && (
             <Button
@@ -307,9 +305,9 @@ function Download() {
               variant="contained"
               color="success"
               onClick={handleDownloadDatasetDescription}
-              endIcon={<DownloadIcon />}
+              endIcon={<SaveAltIcon />}
             >
-              Download Dataset Description
+              Save Dataset Description
             </Button>
           )}
         </div>
