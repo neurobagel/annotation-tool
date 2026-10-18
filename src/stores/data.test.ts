@@ -340,16 +340,23 @@ value4\tvalue5\t
 });
 
 describe('userUploadsDataDictionaryFile', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+  const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
+    type: 'text/tab-separated-values',
+  });
+  const mockDictFile = new File([mockDataDictionaryRaw], 'mock.json', {
+    type: 'application/json',
+  });
+  const secondDataDictionary = {
+    age: {
+      Description: 'Updated age description',
+    },
+  };
+  const secondDictRaw = JSON.stringify(secondDataDictionary);
+  const secondDictFile = new File([secondDictRaw], 'second.json', {
+    type: 'application/json',
   });
 
-  it('should process data dictionary file and update columns with annotations', async () => {
-    // Upload data table to populate columns object in store
-    const mockTsvFile = new File([mockTsvRaw], 'mock.tsv', {
-      type: 'text/tab-separated-values',
-    });
-
+  const setupDataTableAndConfig = async (actions: ReturnType<typeof useDataActions>) => {
     mockedReadFile.mockResolvedValueOnce(mockTsvRaw);
     mockedParseTsvContent.mockReturnValueOnce({
       headers: ['participant_id', 'age', 'sex', 'group_dx', 'group', 'iq'],
@@ -359,35 +366,29 @@ describe('userUploadsDataDictionaryFile', () => {
         ['sub-718214', '25.0', 'N/A', 'ADHD', 'HC', '95'],
       ],
     });
-
-    const { result } = renderHook(() => ({
-      actions: useDataActions(),
-      columns: useColumns(),
-      standardizedVariables: useStandardizedVariables(),
-      standardizedTerms: useStandardizedTerms(),
-      standardizedFormats: useStandardizedFormats(),
-      uploadedDataDictionary: useUploadedDataDictionary(),
-    }));
-
-    // Upload data table first
-    await act(async () => {
-      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
-    });
-
-    // Load config to have standardized variables, terms, and formats
     mockedFetchConfig.mockResolvedValueOnce({
       config: mockConfigFile,
       termsData: mockTermsData,
     });
 
     await act(async () => {
-      await result.current.actions.userSelectsConfig('Neurobagel');
+      await actions.userUploadsDataTableFile(mockTsvFile);
+      await actions.userSelectsConfig('Neurobagel');
     });
+  };
 
-    // Upload data dictionary
-    const mockDictFile = new File([mockDataDictionaryRaw], 'mock.json', {
-      type: 'application/json',
-    });
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should process data dictionary file and update columns with annotations', async () => {
+    const { result } = renderHook(() => ({
+      actions: useDataActions(),
+      columns: useColumns(),
+      uploadedDataDictionary: useUploadedDataDictionary(),
+    }));
+
+    await setupDataTableAndConfig(result.current.actions);
 
     mockedReadFile.mockResolvedValueOnce(mockDataDictionaryRaw);
 
@@ -439,7 +440,7 @@ describe('userUploadsDataDictionaryFile', () => {
   it('should handle data dictionary upload when columns do not match', async () => {
     // Upload data table with different columns
     const tsvContent = 'col1\tcol2\tcol3\nval1\tval2\tval3';
-    const mockTsvFile = new File([tsvContent], 'test.tsv', {
+    const nonMatchingTsvFile = new File([tsvContent], 'test.tsv', {
       type: 'text/tab-separated-values',
     });
 
@@ -455,7 +456,7 @@ describe('userUploadsDataDictionaryFile', () => {
     }));
 
     await act(async () => {
-      await result.current.actions.userUploadsDataTableFile(mockTsvFile);
+      await result.current.actions.userUploadsDataTableFile(nonMatchingTsvFile);
     });
 
     // Load config
@@ -469,10 +470,6 @@ describe('userUploadsDataDictionaryFile', () => {
     });
 
     // Upload data dictionary with non-matching columns
-    const mockDictFile = new File([mockDataDictionaryRaw], 'mock.json', {
-      type: 'application/json',
-    });
-
     mockedReadFile.mockResolvedValueOnce(mockDataDictionaryRaw);
 
     await act(async () => {
@@ -484,11 +481,48 @@ describe('userUploadsDataDictionaryFile', () => {
     expect(result.current.columns['0'].standardizedVariable).toBeUndefined();
   });
 
-  it('should reset uploadedDataDictionary when file reading fails', async () => {
-    const mockDictFile = new File(['invalid'], 'invalid.json', {
-      type: 'application/json',
+  it('should reset previous dictionary annotations when a new data dictionary is uploaded', async () => {
+    const { result } = renderHook(() => ({
+      actions: useDataActions(),
+      columns: useColumns(),
+      uploadedDataDictionary: useUploadedDataDictionary(),
+    }));
+
+    await setupDataTableAndConfig(result.current.actions);
+
+    // Upload first data dictionary
+    mockedReadFile.mockResolvedValueOnce(mockDataDictionaryRaw);
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataDictionaryFile(mockDictFile);
     });
 
+    expect(result.current.columns['1'].description).toBe('Age of the participant');
+    expect(result.current.columns['1'].standardizedVariable).toBe('nb:Age');
+    expect(result.current.columns['2'].description).toBe('Sex of the participant');
+    expect(result.current.columns['2'].standardizedVariable).toBe('nb:Sex');
+    expect(result.current.uploadedDataDictionary.fileName).toBe('mock.json');
+
+    // Upload second data dictionary
+    mockedReadFile.mockResolvedValueOnce(secondDictRaw);
+
+    await act(async () => {
+      await result.current.actions.userUploadsDataDictionaryFile(secondDictFile);
+    });
+
+    expect(result.current.columns['1'].description).toBe('Updated age description');
+    expect(result.current.columns['1'].standardizedVariable).toBeUndefined();
+    expect(result.current.columns['2'].description).toBeUndefined();
+    expect(result.current.columns['2'].standardizedVariable).toBeUndefined();
+    expect(result.current.columns['2'].dataType).toBeUndefined();
+    expect(result.current.columns['2'].levels).toBeUndefined();
+    expect(result.current.columns['0'].name).toBe('participant_id');
+    expect(result.current.columns['1'].name).toBe('age');
+    expect(result.current.columns['2'].name).toBe('sex');
+    expect(result.current.uploadedDataDictionary.fileName).toBe('second.json');
+  });
+
+  it('should reset uploadedDataDictionary when file reading fails', async () => {
     mockedReadFile.mockRejectedValueOnce(new Error('File read error'));
 
     const { result } = renderHook(() => ({
@@ -506,10 +540,6 @@ describe('userUploadsDataDictionaryFile', () => {
 
   it('should reset uploadedDataDictionary when JSON parsing fails', async () => {
     const invalidJson = '{ invalid json }';
-    const mockDictFile = new File([invalidJson], 'invalid.json', {
-      type: 'application/json',
-    });
-
     mockedReadFile.mockResolvedValueOnce(invalidJson);
 
     const { result } = renderHook(() => ({

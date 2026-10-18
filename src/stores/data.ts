@@ -11,6 +11,7 @@ import {
   parseTsvContent,
   applyDataDictionaryToColumns,
   applyDataTypeToColumn,
+  resetColumnAnnotations,
 } from '../utils/data-utils';
 import {
   Columns,
@@ -138,8 +139,10 @@ const useDataStore = create<DataStore>()((set, get) => ({
 
         const { columns, standardizedVariables, standardizedTerms, standardizedFormats } = get();
 
+        const baseColumns = resetColumnAnnotations(columns);
+
         const updatedColumns = applyDataDictionaryToColumns(
-          columns,
+          baseColumns,
           dataDictionary,
           standardizedVariables,
           standardizedTerms,
