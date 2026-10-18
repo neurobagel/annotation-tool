@@ -15,6 +15,7 @@ import {
   buildCategoricalLevels,
   applyDataDictionaryToColumns,
   applyDataTypeToColumn,
+  resetColumnAnnotations,
   validateContinuousValues,
   parseContinuousValue,
 } from './data-utils';
@@ -1385,5 +1386,56 @@ describe('parseContinuousValue', () => {
     // Should automatically prepend 'P' if missing
     expect(parseContinuousValue('1Y6M', 'nb:FromISO8601')).toBe(1.5);
     expect(parseContinuousValue('bad', 'nb:FromISO8601')).toBeNull();
+  });
+});
+
+describe('resetColumnAnnotations', () => {
+  it('should strip annotations and descriptions and return only base data table properties', () => {
+    const annotatedColumns: Columns = {
+      '0': {
+        id: '0',
+        name: 'age',
+        allValues: ['20', '30'],
+        description: 'Age in years',
+        dataType: DataType.continuous,
+        units: 'years',
+        standardizedVariable: 'nb:Age',
+        missingValues: ['-999'],
+        format: 'nb:FromFloat',
+        isPartOf: 'snomed:123',
+        levels: null,
+      },
+      '1': {
+        id: '1',
+        name: 'sex',
+        allValues: ['M', 'F'],
+        description: 'Biological sex',
+        dataType: DataType.categorical,
+        levels: {
+          M: { description: 'Male', standardizedTerm: 'snomed:248153007' },
+          F: { description: 'Female', standardizedTerm: 'snomed:248152002' },
+        },
+        standardizedVariable: 'nb:Sex',
+      },
+    };
+
+    const result = resetColumnAnnotations(annotatedColumns);
+
+    expect(result).toEqual({
+      '0': {
+        id: '0',
+        name: 'age',
+        allValues: ['20', '30'],
+      },
+      '1': {
+        id: '1',
+        name: 'sex',
+        allValues: ['M', 'F'],
+      },
+    });
+  });
+
+  it('should handle empty columns object', () => {
+    expect(resetColumnAnnotations({})).toEqual({});
   });
 });
