@@ -11,6 +11,7 @@ import {
   StandardizedTerms,
   StandardizedFormats,
   DataDictionary,
+  Column,
   Columns,
   VariableType,
   DataType,
@@ -436,6 +437,28 @@ export function applyDataTypeToColumn<T extends ColumnDataShape>(
   return updatedColumn;
 }
 
+function inferColumnDataTypeFromDictionary(
+  column: Column,
+  columnData: DataDictionary[string],
+  standardizedTerms: StandardizedTerms,
+  standardizedFormats: StandardizedFormats
+): void {
+  if (columnData.Levels) {
+    column.dataType = DataType.categorical;
+    column.levels = buildCategoricalLevels({ column, columnData, standardizedTerms });
+  } else if (columnData.Units !== undefined) {
+    column.dataType = DataType.continuous;
+    column.units = columnData.Units;
+
+    if (columnData.Annotations?.Format?.TermURL) {
+      const formatId = columnData.Annotations.Format.TermURL;
+      if (standardizedFormats[formatId]) {
+        column.format = formatId;
+      }
+    }
+  }
+}
+
 export function applyDataDictionaryToColumns(
   columns: Columns,
   dataDictionary: DataDictionary,
@@ -509,21 +532,12 @@ export function applyDataDictionaryToColumns(
       case VariableType.collection:
         column.dataType = undefined;
 
-        // Infer collection data type from the presence of levels or units in BIDS portion of the data dictionary.
-        if (columnData.Levels) {
-          column.dataType = DataType.categorical;
-          column.levels = buildCategoricalLevels({ column, columnData, standardizedTerms });
-        } else if (columnData.Units !== undefined) {
-          column.dataType = DataType.continuous;
-          column.units = columnData.Units;
-
-          if (columnData.Annotations?.Format?.TermURL) {
-            const formatId = columnData.Annotations.Format.TermURL;
-            if (standardizedFormats[formatId]) {
-              column.format = formatId;
-            }
-          }
-        }
+        inferColumnDataTypeFromDictionary(
+          column,
+          columnData,
+          standardizedTerms,
+          standardizedFormats
+        );
 
         if (columnData.Annotations?.IsPartOf?.TermURL) {
           const termId = columnData.Annotations.IsPartOf.TermURL;
@@ -534,6 +548,12 @@ export function applyDataDictionaryToColumns(
         break;
 
       default:
+        inferColumnDataTypeFromDictionary(
+          column,
+          columnData,
+          standardizedTerms,
+          standardizedFormats
+        );
         break;
     }
 
