@@ -1329,6 +1329,78 @@ describe('applyDataDictionaryToColumns', () => {
     expect(result['0'].levels).toBeUndefined();
     expect(result['0'].units).toBeUndefined();
   });
+
+  it('should preserve data type and not set levels when uploading an unannotated dictionary with Levels over an already-mapped continuous column', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'age',
+        allValues: ['25', '30'],
+        dataType: 'Continuous',
+        standardizedVariable: 'nb:Age',
+        units: 'years',
+      },
+    };
+
+    const mockDataDict = {
+      age: {
+        Description: 'Age of participant',
+        Levels: {
+          '25': 'Twenty-five',
+          '30': 'Thirty',
+        },
+      },
+    };
+
+    const mockStandardizedVariables: StandardizedVariables = {
+      'nb:Age': {
+        id: 'nb:Age',
+        name: 'Age',
+        variable_type: VariableType.continuous,
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      mockStandardizedVariables,
+      {} as StandardizedTerms,
+      {} as StandardizedFormats
+    );
+
+    expect(result['0'].standardizedVariable).toBe('nb:Age');
+    expect(result['0'].dataType).toBe('Continuous');
+    expect(result['0'].levels).toBeUndefined();
+    expect(result['0'].description).toBe('Age of participant');
+  });
+
+  it('should preserve existing dataType when uploading an unannotated dictionary without Levels or Units', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'site',
+        allValues: ['site1', 'site2'],
+        dataType: 'Categorical',
+      },
+    };
+
+    const mockDataDict = {
+      site: {
+        Description: 'Site identifier',
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      {} as StandardizedVariables,
+      {} as StandardizedTerms,
+      {} as StandardizedFormats
+    );
+
+    expect(result['0'].description).toBe('Site identifier');
+    expect(result['0'].dataType).toBe('Categorical');
+  });
 });
 
 describe('applyDataTypeToColumn', () => {
