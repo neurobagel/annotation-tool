@@ -21,6 +21,7 @@ import {
   useStandardizedFormats,
   useConfig,
   useColumns,
+  useBaseColumns,
   useUploadedDataTableFileName,
   useUploadedDataDictionary,
 } from './data';
@@ -216,6 +217,7 @@ describe('userUploadsDataTableFile', () => {
     const { result } = renderHook(() => ({
       actions: useDataActions(),
       columns: useColumns(),
+      baseColumns: useBaseColumns(),
       fileName: useUploadedDataTableFileName(),
     }));
 
@@ -226,6 +228,7 @@ describe('userUploadsDataTableFile', () => {
     expect(mockedReadFile).toHaveBeenCalledWith(mockFile);
     expect(mockedParseTsvContent).toHaveBeenCalledWith(mockTsvRaw);
     expect(result.current.columns).toEqual(mockColumnsAfterDataTableUpload);
+    expect(result.current.baseColumns).toEqual(mockColumnsAfterDataTableUpload);
     expect(result.current.fileName).toBe('mock.tsv');
   });
 
@@ -485,10 +488,13 @@ describe('userUploadsDataDictionaryFile', () => {
     const { result } = renderHook(() => ({
       actions: useDataActions(),
       columns: useColumns(),
+      baseColumns: useBaseColumns(),
       uploadedDataDictionary: useUploadedDataDictionary(),
     }));
 
     await setupDataTableAndConfig(result.current.actions);
+
+    const initialBaseColumns = structuredClone(result.current.baseColumns);
 
     // Upload first data dictionary
     mockedReadFile.mockResolvedValueOnce(mockDataDictionaryRaw);
@@ -520,6 +526,9 @@ describe('userUploadsDataDictionaryFile', () => {
     expect(result.current.columns['1'].name).toBe('age');
     expect(result.current.columns['2'].name).toBe('sex');
     expect(result.current.uploadedDataDictionary.fileName).toBe('second.json');
+    expect(result.current.baseColumns).toEqual(initialBaseColumns);
+    expect(result.current.baseColumns['1'].description).toBeUndefined();
+    expect(result.current.baseColumns['1'].standardizedVariable).toBeUndefined();
   });
 
   it('should reset uploadedDataDictionary when file reading fails', async () => {

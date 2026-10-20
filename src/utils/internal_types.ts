@@ -165,6 +165,7 @@ export interface UploadedDataDictionaryFile {
 
 export type DataStoreState = {
   columns: Columns;
+  baseColumns: Columns;
   standardizedVariables: StandardizedVariables;
   standardizedTerms: StandardizedTerms;
   standardizedFormats: StandardizedFormats;

@@ -11,7 +11,6 @@ import {
   parseTsvContent,
   applyDataDictionaryToColumns,
   applyDataTypeToColumn,
-  resetColumnAnnotations,
 } from '../utils/data-utils';
 import {
   Columns,
@@ -23,6 +22,7 @@ import {
 
 const initialState = {
   columns: {},
+  baseColumns: {},
   standardizedVariables: {},
   standardizedTerms: {},
   standardizedFormats: {},
@@ -122,12 +122,14 @@ const useDataStore = create<DataStore>()((set, get) => ({
 
         set({
           columns,
+          baseColumns: columns,
           uploadedDataTableFileName: dataTableFile.name,
         });
       } catch (error) {
         // TODO: show a notif error
         set({
           columns: {},
+          baseColumns: {},
           uploadedDataTableFileName: null,
         });
       }
@@ -137,9 +139,8 @@ const useDataStore = create<DataStore>()((set, get) => ({
         const content = await readFile(dataDictionaryFile);
         const dataDictionary: DataDictionary = JSON.parse(content);
 
-        const { columns, standardizedVariables, standardizedTerms, standardizedFormats } = get();
-
-        const baseColumns = resetColumnAnnotations(columns);
+        const { baseColumns, standardizedVariables, standardizedTerms, standardizedFormats } =
+          get();
 
         const updatedColumns = applyDataDictionaryToColumns(
           baseColumns,
@@ -479,6 +480,7 @@ const useDataStore = create<DataStore>()((set, get) => ({
 }));
 
 export const useColumns = () => useDataStore((state) => state.columns);
+export const useBaseColumns = () => useDataStore((state) => state.baseColumns);
 export const useStandardizedVariables = () => useDataStore((state) => state.standardizedVariables);
 export const useStandardizedTerms = () => useDataStore((state) => state.standardizedTerms);
 export const useStandardizedFormats = () => useDataStore((state) => state.standardizedFormats);

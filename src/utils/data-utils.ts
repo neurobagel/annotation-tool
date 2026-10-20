@@ -436,19 +436,6 @@ export function applyDataTypeToColumn<T extends ColumnDataShape>(
   return updatedColumn;
 }
 
-export function resetColumnAnnotations(columns: Columns): Columns {
-  return Object.fromEntries(
-    Object.entries(columns).map(([id, col]) => [
-      id,
-      {
-        id: col.id,
-        name: col.name,
-        allValues: col.allValues,
-      },
-    ])
-  );
-}
-
 export function applyDataDictionaryToColumns(
   columns: Columns,
   dataDictionary: DataDictionary,
