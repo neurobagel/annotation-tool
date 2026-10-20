@@ -394,8 +394,11 @@ export function buildCategoricalLevels({
         ? annotationLevel.TermURL
         : level.standardizedTerm;
 
+    const description =
+      typeof dictLevel === 'string' ? dictLevel : dictLevel?.Description || level.description;
+
     finalLevels[value] = {
-      description: dictLevel?.Description || level.description,
+      description,
       standardizedTerm,
     };
   });
