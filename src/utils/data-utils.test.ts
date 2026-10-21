@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { describe, it, expect, vi } from 'vitest';
+import exampleSyntheticRaw from '../../cypress/fixtures/examples/example_synthetic.json?raw';
 import mockDataDictionaryRaw from '../../cypress/fixtures/examples/mock.json?raw';
 import mockTsvRaw from '../../cypress/fixtures/examples/mock.tsv?raw';
 import mockTsvWithEmptyLineRaw from '../../cypress/fixtures/examples/mock_with_empty_line.tsv?raw';
@@ -23,6 +24,7 @@ import {
   DataDictionary,
   StandardizedVariables,
   StandardizedTerms,
+  StandardizedFormats,
   DataType,
   VariableType,
 } from './internal_types';
@@ -372,6 +374,24 @@ describe('buildCategoricalLevels', () => {
     });
 
     expect(result.A.description).toBe('Alpha');
+    expect(result.B.description).toBe('');
+    expect(result.C).toBeUndefined();
+  });
+
+  it('should apply dictionary descriptions when levels are string values', () => {
+    const result = buildCategoricalLevels({
+      column: { allValues: ['A', 'B'], missingValues: [] },
+      columnData: {
+        Description: '',
+        Levels: {
+          A: 'Apple',
+          C: 'Orange',
+        },
+      },
+      standardizedTerms: {},
+    });
+
+    expect(result.A.description).toBe('Apple');
     expect(result.B.description).toBe('');
     expect(result.C).toBeUndefined();
   });
@@ -1116,6 +1136,270 @@ describe('applyDataDictionaryToColumns', () => {
     expect(result['0'].missingValues).toEqual(['NA']);
     expect(result['0'].levels).toBeDefined();
     expect(result['0'].levels?.NA).toEqual({ description: '', standardizedTerm: '' });
+  });
+
+  it('should infer categorical data type and restore levels for unannotated columns with Levels', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'sex',
+        allValues: ['M', 'F'],
+      },
+    };
+
+    const mockDataDict = {
+      sex: {
+        Description: 'Sex as assigned at birth',
+        Levels: {
+          M: { Description: 'Assigned male sex at birth' },
+          F: { Description: 'Assigned female sex at birth' },
+        },
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      {} as StandardizedVariables,
+      {} as StandardizedTerms,
+      {} as StandardizedFormats
+    );
+
+    expect(result['0'].description).toBe('Sex as assigned at birth');
+    expect(result['0'].standardizedVariable).toBeUndefined();
+    expect(result['0'].dataType).toBe('Categorical');
+    expect(result['0'].levels).toBeDefined();
+    expect(result['0'].levels?.M).toEqual({
+      description: 'Assigned male sex at birth',
+      standardizedTerm: '',
+    });
+    expect(result['0'].levels?.F).toEqual({
+      description: 'Assigned female sex at birth',
+      standardizedTerm: '',
+    });
+  });
+
+  it('should infer categorical data type and restore string-valued levels for unannotated columns', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'sex',
+        allValues: ['M', 'F'],
+      },
+    };
+
+    const mockDataDict = {
+      sex: {
+        Description: 'Sex as assigned at birth',
+        Levels: {
+          M: 'Assigned male sex at birth',
+          F: 'Assigned female sex at birth',
+        },
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      {} as StandardizedVariables,
+      {} as StandardizedTerms,
+      {} as StandardizedFormats
+    );
+
+    expect(result['0'].description).toBe('Sex as assigned at birth');
+    expect(result['0'].standardizedVariable).toBeUndefined();
+    expect(result['0'].dataType).toBe('Categorical');
+    expect(result['0'].levels).toBeDefined();
+    expect(result['0'].levels?.M).toEqual({
+      description: 'Assigned male sex at birth',
+      standardizedTerm: '',
+    });
+    expect(result['0'].levels?.F).toEqual({
+      description: 'Assigned female sex at birth',
+      standardizedTerm: '',
+    });
+  });
+
+  it('should apply data dictionary with string-valued levels from example_synthetic.json', () => {
+    const syntheticDict = JSON.parse(exampleSyntheticRaw);
+
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'participant_id',
+        allValues: ['sub-01', 'sub-02'],
+      },
+      '1': {
+        id: '1',
+        name: 'pheno_sex',
+        allValues: ['M', 'F', 'missing'],
+      },
+      '2': {
+        id: '2',
+        name: 'pheno_group',
+        allValues: ['PAT', 'ADHD'],
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      syntheticDict,
+      mockStandardizedVariables,
+      mockStandardizedTerms,
+      mockStandardizedFormats
+    );
+
+    expect(result['1'].description).toBe('Sex variable');
+    expect(result['1'].dataType).toBe('Categorical');
+    expect(result['1'].standardizedVariable).toBe('nb:Sex');
+    expect(result['1'].levels?.M).toEqual({
+      description: 'Male',
+      standardizedTerm: 'snomed:248153007',
+    });
+    expect(result['1'].levels?.F).toEqual({
+      description: 'Female',
+      standardizedTerm: 'snomed:248152002',
+    });
+    expect(result['1'].missingValues).toEqual(['missing']);
+
+    expect(result['2'].description).toBe('Group variable');
+    expect(result['2'].dataType).toBe('Categorical');
+    expect(result['2'].levels?.PAT.description).toBe('Patient');
+    expect(result['2'].levels?.ADHD.description).toBe(
+      'Attention deficit hyperactivity disorder, predominantly hyperactive impulsive type'
+    );
+  });
+
+  it('should infer continuous data type and restore units for unannotated columns with Units', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'age',
+        allValues: ['25', '30'],
+      },
+    };
+
+    const mockDataDict = {
+      age: {
+        Description: 'Age of participant',
+        Units: 'years',
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      {} as StandardizedVariables,
+      {} as StandardizedTerms,
+      {} as StandardizedFormats
+    );
+
+    expect(result['0'].description).toBe('Age of participant');
+    expect(result['0'].standardizedVariable).toBeUndefined();
+    expect(result['0'].dataType).toBe('Continuous');
+    expect(result['0'].units).toBe('years');
+  });
+
+  it('should update description without setting data type for unannotated columns without Levels or Units', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'notes',
+        allValues: ['note 1', 'note 2'],
+      },
+    };
+
+    const mockDataDict = {
+      notes: {
+        Description: 'General notes',
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      {} as StandardizedVariables,
+      {} as StandardizedTerms,
+      {} as StandardizedFormats
+    );
+
+    expect(result['0'].description).toBe('General notes');
+    expect(result['0'].standardizedVariable).toBeUndefined();
+    expect(result['0'].dataType).toBeUndefined();
+    expect(result['0'].levels).toBeUndefined();
+    expect(result['0'].units).toBeUndefined();
+  });
+
+  it('should preserve data type and not set levels when uploading an unannotated dictionary with Levels over an already-mapped continuous column', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'age',
+        allValues: ['25', '30'],
+        dataType: 'Continuous',
+        standardizedVariable: 'nb:Age',
+        units: 'years',
+      },
+    };
+
+    const mockDataDict = {
+      age: {
+        Description: 'Age of participant',
+        Levels: {
+          '25': 'Twenty-five',
+          '30': 'Thirty',
+        },
+      },
+    };
+
+    const mockStandardizedVariables: StandardizedVariables = {
+      'nb:Age': {
+        id: 'nb:Age',
+        name: 'Age',
+        variable_type: VariableType.continuous,
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      mockStandardizedVariables,
+      {} as StandardizedTerms,
+      {} as StandardizedFormats
+    );
+
+    expect(result['0'].standardizedVariable).toBe('nb:Age');
+    expect(result['0'].dataType).toBe('Continuous');
+    expect(result['0'].levels).toBeUndefined();
+    expect(result['0'].description).toBe('Age of participant');
+  });
+
+  it('should preserve existing dataType when uploading an unannotated dictionary without Levels or Units', () => {
+    const mockColumns = {
+      '0': {
+        id: '0',
+        name: 'site',
+        allValues: ['site1', 'site2'],
+        dataType: 'Categorical',
+      },
+    };
+
+    const mockDataDict = {
+      site: {
+        Description: 'Site identifier',
+      },
+    };
+
+    const result = applyDataDictionaryToColumns(
+      mockColumns as unknown as Columns,
+      mockDataDict as unknown as DataDictionary,
+      {} as StandardizedVariables,
+      {} as StandardizedTerms,
+      {} as StandardizedFormats
+    );
+
+    expect(result['0'].description).toBe('Site identifier');
+    expect(result['0'].dataType).toBe('Categorical');
   });
 });
 
