@@ -23,7 +23,7 @@ export function usePageAlerts(view: View): AlertItem[] {
         id: 'participant-id-missing-values',
         severity: 'error',
         title: 'Missing values in Participant ID column',
-        message: `The column mapped to Participant ID${columnText} contains missing or empty values. Please ensure every row contains a participant ID in your tabular file.`,
+        message: `The column mapped to Participant ID${columnText} contains missing or empty values. Please ensure every row contains a participant ID in your tabular file.\nMissing participant IDs will result in errors in downstream Neurobagel tools.`,
         dataCy: 'participant-id-missing-values-error',
       });
     }

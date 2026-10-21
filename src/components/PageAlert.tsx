@@ -23,7 +23,9 @@ export default function PageAlert({ severity, title, message, dataCy, className 
       <Typography variant="h6" className="mb-2 font-bold">
         {title}
       </Typography>
-      <Typography variant="body1">{message}</Typography>
+      <Typography variant="body1" className="whitespace-pre-line">
+        {message}
+      </Typography>
     </Alert>
   );
 }
