@@ -127,7 +127,7 @@ export interface StandardizedFormats {
 export interface DataDictionary {
   [key: string]: {
     Description: string;
-    Levels?: { [key: string]: { Description: string; TermURL?: string } };
+    Levels?: { [key: string]: string | { Description: string; TermURL?: string } };
     Units?: string;
     Annotations?: {
       IsAbout?: {

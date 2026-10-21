@@ -393,8 +393,11 @@ export function buildCategoricalLevels({
         ? annotationLevel.TermURL
         : level.standardizedTerm;
 
+    const description =
+      typeof dictLevel === 'string' ? dictLevel : dictLevel?.Description || level.description;
+
     finalLevels[value] = {
-      description: dictLevel?.Description || level.description,
+      description,
       standardizedTerm,
     };
   });
@@ -471,25 +474,37 @@ export function applyDataDictionaryToColumns(
         column.standardizedVariable = standardizedVariableId;
         variableType = standardizedVariables[standardizedVariableId].variable_type;
       }
+    } else if (column.standardizedVariable && standardizedVariables[column.standardizedVariable]) {
+      variableType = standardizedVariables[column.standardizedVariable].variable_type;
     }
 
     if (!variableType && columnData.Annotations?.VariableType) {
       variableType = columnData.Annotations.VariableType;
     }
 
-    switch (variableType) {
-      case VariableType.categorical:
-        column.dataType = DataType.categorical;
+    let dataType: DataType | null | undefined = column.dataType;
+    if (variableType === VariableType.categorical) {
+      dataType = DataType.categorical;
+    } else if (variableType === VariableType.continuous) {
+      dataType = DataType.continuous;
+    } else if (variableType === VariableType.identifier) {
+      dataType = undefined;
+    } else if (columnData.Levels) {
+      dataType = DataType.categorical;
+    } else if (columnData.Units !== undefined) {
+      dataType = DataType.continuous;
+    } else if (variableType === VariableType.collection) {
+      dataType = undefined;
+    }
 
-        // Create levels from data table values, then update those levels using
-        // data dictionary entries only when keys match data table values.
+    column.dataType = dataType;
+
+    switch (dataType) {
+      case DataType.categorical:
         column.levels = buildCategoricalLevels({ column, columnData, standardizedTerms });
-
         break;
 
-      case VariableType.continuous:
-        column.dataType = DataType.continuous;
-
+      case DataType.continuous:
         if (columnData.Units !== undefined) {
           column.units = columnData.Units;
         }
@@ -502,39 +517,15 @@ export function applyDataDictionaryToColumns(
         }
         break;
 
-      case VariableType.identifier:
-        column.dataType = undefined;
-        break;
-
-      case VariableType.collection:
-        column.dataType = undefined;
-
-        // Infer collection data type from the presence of levels or units in BIDS portion of the data dictionary.
-        if (columnData.Levels) {
-          column.dataType = DataType.categorical;
-          column.levels = buildCategoricalLevels({ column, columnData, standardizedTerms });
-        } else if (columnData.Units !== undefined) {
-          column.dataType = DataType.continuous;
-          column.units = columnData.Units;
-
-          if (columnData.Annotations?.Format?.TermURL) {
-            const formatId = columnData.Annotations.Format.TermURL;
-            if (standardizedFormats[formatId]) {
-              column.format = formatId;
-            }
-          }
-        }
-
-        if (columnData.Annotations?.IsPartOf?.TermURL) {
-          const termId = columnData.Annotations.IsPartOf.TermURL;
-          if (standardizedTerms[termId]) {
-            column.isPartOf = termId;
-          }
-        }
-        break;
-
       default:
         break;
+    }
+
+    if (variableType === VariableType.collection && columnData.Annotations?.IsPartOf?.TermURL) {
+      const termId = columnData.Annotations.IsPartOf.TermURL;
+      if (standardizedTerms[termId]) {
+        column.isPartOf = termId;
+      }
     }
 
     return {
