@@ -10,7 +10,7 @@ vi.mock('../stores/data', () => ({
 }));
 
 describe('useParticipantIdStatus', () => {
-  it('should return false for both when no columns are mapped', () => {
+  it('should return false for hasMappedParticipantId, hasMappedOtherColumns, and hasParticipantIdMissingValues when no columns are mapped', () => {
     vi.mocked(dataStore.useColumns).mockReturnValue({});
     vi.mocked(dataStore.useStandardizedVariables).mockReturnValue({});
 
@@ -23,7 +23,7 @@ describe('useParticipantIdStatus', () => {
     });
   });
 
-  it('should return true for isParticipantIDMapped and false for hasMappedOtherColumns when only participant ID is mapped', () => {
+  it('should return true for hasMappedParticipantId and false for hasMappedOtherColumns when only participant ID is mapped', () => {
     const mockColumns: Columns = {
       col1: {
         id: 'col1',
@@ -55,7 +55,7 @@ describe('useParticipantIdStatus', () => {
     });
   });
 
-  it('should return false for isParticipantIDMapped and true for hasMappedOtherColumns when other columns are mapped but participant ID is not', () => {
+  it('should return false for hasMappedParticipantId and true for hasMappedOtherColumns when other columns are mapped but participant ID is not', () => {
     const mockColumns: Columns = {
       col1: {
         id: 'col1',
@@ -87,7 +87,7 @@ describe('useParticipantIdStatus', () => {
     });
   });
 
-  it('should return true for both when both participant ID and other columns are mapped', () => {
+  it('should return true for hasMappedParticipantId and hasMappedOtherColumns when both participant ID and other columns are mapped', () => {
     const mockColumns: Columns = {
       col1: {
         id: 'col1',
