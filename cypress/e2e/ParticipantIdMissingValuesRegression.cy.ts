@@ -7,6 +7,7 @@ describe('Participant ID Missing Values Validation Regression', () => {
     cy.intercept('GET', '**/raw.githubusercontent.com/**', { forceNetworkError: true });
 
     cy.visit('/');
+    cy.contains('Welcome to the Neurobagel Annotation Tool');
     cy.get('[data-cy="next-button"]').click();
 
     cy.get('[data-cy="datatable-upload-input"]').selectFile(whitespaceTablePath, {
@@ -24,7 +25,7 @@ describe('Participant ID Missing Values Validation Regression', () => {
       .should('be.visible')
       .and('contain', 'Missing values in Participant ID column')
       .and('contain', 'contains missing or empty values')
-      .and('contain', 'Please ensure every row has a valid participant ID in your tabular file.');
+      .and('contain', 'Please ensure every row contains a participant ID in your tabular file.');
 
     cy.get('[data-cy="1-clear-mapped-variable"]').click();
     cy.get('[data-cy="participant-id-missing-values-error"]').should('not.exist');
@@ -67,7 +68,7 @@ describe('Participant ID Missing Values Validation Regression', () => {
       .and('contain', 'contains missing or empty values');
 
     // Download page
-    cy.get('[data-cy="Download-step"]').click();
+    cy.get('[data-cy="Save-step"]').click();
 
     cy.get('[data-cy="participant-id-missing-values-error"]')
       .should('be.visible')

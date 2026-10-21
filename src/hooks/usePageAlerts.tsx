@@ -13,7 +13,7 @@ export function usePageAlerts(view: View): AlertItem[] {
 
   return useMemo(() => {
     const alerts: AlertItem[] = [];
-    const columnText = participantIdColumnName ? `, ${participantIdColumnName}` : '';
+    const columnText = participantIdColumnName ? `, ${participantIdColumnName},` : '';
 
     if (
       hasParticipantIdMissingValues &&
@@ -23,7 +23,7 @@ export function usePageAlerts(view: View): AlertItem[] {
         id: 'participant-id-missing-values',
         severity: 'error',
         title: 'Missing values in Participant ID column',
-        message: `The column${columnText} mapped to Participant ID, contains missing or empty values. Please ensure every row has a valid participant ID in your tabular file.`,
+        message: `The column mapped to Participant ID${columnText} contains missing or empty values. Please ensure every row contains a participant ID in your tabular file.`,
         dataCy: 'participant-id-missing-values-error',
       });
     }

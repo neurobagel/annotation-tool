@@ -9,8 +9,8 @@ vi.mock('./useParticipantIdStatus', () => ({
 }));
 
 describe('usePageAlerts', () => {
-  describe('alert definitions', () => {
-    it('should return participant-id-missing-values error with all expected fields', () => {
+  describe('when called for ColumnAnnotation view', () => {
+    it('should return participant-id-missing-values error with all expected fields when participant ID column has missing values', () => {
       vi.mocked(participantHook.useParticipantIdStatus).mockReturnValue({
         hasMappedParticipantId: true,
         hasMappedOtherColumns: true,
@@ -26,7 +26,7 @@ describe('usePageAlerts', () => {
         title: 'Missing values in Participant ID column',
         dataCy: 'participant-id-missing-values-error',
         message:
-          'The column, participant_id mapped to Participant ID, contains missing or empty values. Please ensure every row has a valid participant ID in your tabular file.',
+          'The column mapped to Participant ID, participant_id, contains missing or empty values. Please ensure every row contains a participant ID in your tabular file.',
       });
     });
 
@@ -40,11 +40,11 @@ describe('usePageAlerts', () => {
 
       const { result } = renderHook(() => usePageAlerts(View.ColumnAnnotation));
       expect(result.current[0].message).toBe(
-        'The column mapped to Participant ID, contains missing or empty values. Please ensure every row has a valid participant ID in your tabular file.'
+        'The column mapped to Participant ID contains missing or empty values. Please ensure every row contains a participant ID in your tabular file.'
       );
     });
 
-    it('should return missing-participant-id warning with all expected fields', () => {
+    it('should return missing-participant-id warning with all expected fields when other columns are mapped but participant ID is not', () => {
       vi.mocked(participantHook.useParticipantIdStatus).mockReturnValue({
         hasMappedParticipantId: false,
         hasMappedOtherColumns: true,
@@ -62,121 +62,93 @@ describe('usePageAlerts', () => {
       });
       expect(result.current[0].message).toBeDefined();
     });
+
+    it('should return an empty array when participant ID is properly mapped and has no missing values', () => {
+      vi.mocked(participantHook.useParticipantIdStatus).mockReturnValue({
+        hasMappedParticipantId: true,
+        hasMappedOtherColumns: true,
+        hasParticipantIdMissingValues: false,
+        participantIdColumnName: 'sub_id',
+      });
+
+      const { result } = renderHook(() => usePageAlerts(View.ColumnAnnotation));
+      expect(result.current).toEqual([]);
+    });
   });
 
-  describe('view routing', () => {
-    describe('ColumnAnnotation view', () => {
-      it('should return missing-participant-id warning when other columns are mapped but participant ID is not', () => {
-        vi.mocked(participantHook.useParticipantIdStatus).mockReturnValue({
-          hasMappedParticipantId: false,
-          hasMappedOtherColumns: true,
-          hasParticipantIdMissingValues: false,
-          participantIdColumnName: null,
-        });
-
-        const { result } = renderHook(() => usePageAlerts(View.ColumnAnnotation));
-        expect(result.current.map((a) => a.id)).toEqual(['missing-participant-id']);
+  describe('when called for DatasetDescription view', () => {
+    it('should return missing-participant-id warning when participant ID is unmapped', () => {
+      vi.mocked(participantHook.useParticipantIdStatus).mockReturnValue({
+        hasMappedParticipantId: false,
+        hasMappedOtherColumns: true,
+        hasParticipantIdMissingValues: false,
+        participantIdColumnName: null,
       });
 
-      it('should return participant-id-missing-values error when participant ID column has missing values', () => {
-        vi.mocked(participantHook.useParticipantIdStatus).mockReturnValue({
-          hasMappedParticipantId: true,
-          hasMappedOtherColumns: true,
-          hasParticipantIdMissingValues: true,
-          participantIdColumnName: 'participant_id',
-        });
-
-        const { result } = renderHook(() => usePageAlerts(View.ColumnAnnotation));
-        expect(result.current.map((a) => a.id)).toEqual(['participant-id-missing-values']);
-      });
-
-      it('should return an empty array when participant ID is properly mapped and has no missing values', () => {
-        vi.mocked(participantHook.useParticipantIdStatus).mockReturnValue({
-          hasMappedParticipantId: true,
-          hasMappedOtherColumns: true,
-          hasParticipantIdMissingValues: false,
-          participantIdColumnName: 'sub_id',
-        });
-
-        const { result } = renderHook(() => usePageAlerts(View.ColumnAnnotation));
-        expect(result.current).toEqual([]);
-      });
+      const { result } = renderHook(() => usePageAlerts(View.DatasetDescription));
+      expect(result.current.map((a) => a.id)).toEqual(['missing-participant-id']);
     });
 
-    describe('Download view', () => {
-      it('should return participant-id-missing-values error when participant ID has missing values', () => {
-        vi.mocked(participantHook.useParticipantIdStatus).mockReturnValue({
-          hasMappedParticipantId: true,
-          hasMappedOtherColumns: true,
-          hasParticipantIdMissingValues: true,
-          participantIdColumnName: 'participant_id',
-        });
-
-        const { result } = renderHook(() => usePageAlerts(View.Download));
-        expect(result.current.map((a) => a.id)).toEqual(['participant-id-missing-values']);
+    it('should not return participant-id-missing-values error on datasetDescription page', () => {
+      vi.mocked(participantHook.useParticipantIdStatus).mockReturnValue({
+        hasMappedParticipantId: true,
+        hasMappedOtherColumns: true,
+        hasParticipantIdMissingValues: true,
+        participantIdColumnName: 'participant_id',
       });
 
-      it('should not return missing-participant-id warning on download page even if unmapped', () => {
-        vi.mocked(participantHook.useParticipantIdStatus).mockReturnValue({
-          hasMappedParticipantId: false,
-          hasMappedOtherColumns: true,
-          hasParticipantIdMissingValues: false,
-          participantIdColumnName: null,
-        });
-
-        const { result } = renderHook(() => usePageAlerts(View.Download));
-        expect(result.current).toEqual([]);
-      });
-
-      it('should return an empty array when participant ID is properly mapped and has no missing values', () => {
-        vi.mocked(participantHook.useParticipantIdStatus).mockReturnValue({
-          hasMappedParticipantId: true,
-          hasMappedOtherColumns: true,
-          hasParticipantIdMissingValues: false,
-          participantIdColumnName: 'sub_id',
-        });
-
-        const { result } = renderHook(() => usePageAlerts(View.Download));
-        expect(result.current).toEqual([]);
-      });
+      const { result } = renderHook(() => usePageAlerts(View.DatasetDescription));
+      expect(result.current).toEqual([]);
     });
 
-    describe('DatasetDescription view', () => {
-      it('should return missing-participant-id warning when participant ID is unmapped', () => {
-        vi.mocked(participantHook.useParticipantIdStatus).mockReturnValue({
-          hasMappedParticipantId: false,
-          hasMappedOtherColumns: true,
-          hasParticipantIdMissingValues: false,
-          participantIdColumnName: null,
-        });
-
-        const { result } = renderHook(() => usePageAlerts(View.DatasetDescription));
-        expect(result.current.map((a) => a.id)).toEqual(['missing-participant-id']);
+    it('should return an empty array when participant ID is properly mapped', () => {
+      vi.mocked(participantHook.useParticipantIdStatus).mockReturnValue({
+        hasMappedParticipantId: true,
+        hasMappedOtherColumns: true,
+        hasParticipantIdMissingValues: false,
+        participantIdColumnName: 'sub_id',
       });
 
-      it('should not return participant-id-missing-values error on datasetDescription page', () => {
-        vi.mocked(participantHook.useParticipantIdStatus).mockReturnValue({
-          hasMappedParticipantId: true,
-          hasMappedOtherColumns: true,
-          hasParticipantIdMissingValues: true,
-          participantIdColumnName: 'participant_id',
-        });
+      const { result } = renderHook(() => usePageAlerts(View.DatasetDescription));
+      expect(result.current).toEqual([]);
+    });
+  });
 
-        const { result } = renderHook(() => usePageAlerts(View.DatasetDescription));
-        expect(result.current).toEqual([]);
+  describe('when called for Download view', () => {
+    it('should return participant-id-missing-values error when participant ID has missing values', () => {
+      vi.mocked(participantHook.useParticipantIdStatus).mockReturnValue({
+        hasMappedParticipantId: true,
+        hasMappedOtherColumns: true,
+        hasParticipantIdMissingValues: true,
+        participantIdColumnName: 'participant_id',
       });
 
-      it('should return an empty array when participant ID is properly mapped', () => {
-        vi.mocked(participantHook.useParticipantIdStatus).mockReturnValue({
-          hasMappedParticipantId: true,
-          hasMappedOtherColumns: true,
-          hasParticipantIdMissingValues: false,
-          participantIdColumnName: 'sub_id',
-        });
+      const { result } = renderHook(() => usePageAlerts(View.Download));
+      expect(result.current.map((a) => a.id)).toEqual(['participant-id-missing-values']);
+    });
 
-        const { result } = renderHook(() => usePageAlerts(View.DatasetDescription));
-        expect(result.current).toEqual([]);
+    it('should not return missing-participant-id warning on download page even if unmapped', () => {
+      vi.mocked(participantHook.useParticipantIdStatus).mockReturnValue({
+        hasMappedParticipantId: false,
+        hasMappedOtherColumns: true,
+        hasParticipantIdMissingValues: false,
+        participantIdColumnName: null,
       });
+
+      const { result } = renderHook(() => usePageAlerts(View.Download));
+      expect(result.current).toEqual([]);
+    });
+
+    it('should return an empty array when participant ID is properly mapped and has no missing values', () => {
+      vi.mocked(participantHook.useParticipantIdStatus).mockReturnValue({
+        hasMappedParticipantId: true,
+        hasMappedOtherColumns: true,
+        hasParticipantIdMissingValues: false,
+        participantIdColumnName: 'sub_id',
+      });
+
+      const { result } = renderHook(() => usePageAlerts(View.Download));
+      expect(result.current).toEqual([]);
     });
   });
 });
