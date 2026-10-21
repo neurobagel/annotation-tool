@@ -126,7 +126,7 @@ describe('useGenerateDatasetDescription', () => {
     expect(result.current?.ParticipantCount).toBeUndefined();
   });
 
-  it('should not count empty strings and missing values towards the ParticipantCount', () => {
+  it('should not include ParticipantCount if the Participant ID column has missing or empty values', () => {
     mockedUseDatasetDescription.mockReturnValue({
       Name: 'Participant Test With Empty Values',
       Authors: [''],
@@ -159,6 +159,6 @@ describe('useGenerateDatasetDescription', () => {
     });
 
     const { result } = renderHook(() => useGenerateDatasetDescription());
-    expect(result.current?.ParticipantCount).toBe(2);
+    expect(result.current?.ParticipantCount).toBeUndefined();
   });
 });

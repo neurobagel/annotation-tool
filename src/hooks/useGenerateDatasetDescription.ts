@@ -19,17 +19,14 @@ export function useGenerateDatasetDescription(): DatasetDescription | null {
     });
 
     if (participantColumn) {
-      const missingSet = new Set(participantColumn.missingValues);
-      const uniqueIDs = new Set<string>();
+      const hasMissingValues =
+        (participantColumn.missingValues?.length ?? 0) > 0 ||
+        participantColumn.allValues.some((val) => val.trim() === '');
 
-      // Don't count missing values in participant ID column
-      for (const val of participantColumn.allValues) {
-        if (val.trim() !== '' && !missingSet.has(val)) {
-          uniqueIDs.add(val);
-        }
+      // Do not compute participant count if there are missing or empty values
+      if (!hasMissingValues) {
+        count = new Set(participantColumn.allValues).size;
       }
-
-      count = uniqueIDs.size;
     }
     return count;
   }, [columns, standardizedVariables]);
