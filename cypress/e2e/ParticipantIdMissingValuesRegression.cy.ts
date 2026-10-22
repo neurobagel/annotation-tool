@@ -25,7 +25,7 @@ describe('Participant ID Missing Values Validation Regression', () => {
       .should('be.visible')
       .and('contain', 'Missing values in Participant ID column')
       .and('contain', 'contains missing or empty values')
-      .and('contain', 'Please ensure every row contains a participant ID in your tabular file.');
+      .and('contain', 'Please ensure every row in your tabular file contains a participant ID.');
 
     cy.get('[data-cy="1-clear-mapped-variable"]').click();
     cy.get('[data-cy="participant-id-missing-values-error"]').should('not.exist');

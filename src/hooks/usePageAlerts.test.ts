@@ -26,7 +26,7 @@ describe('usePageAlerts', () => {
         title: 'Missing values in Participant ID column',
         dataCy: 'participant-id-missing-values-error',
         message:
-          'The column mapped to Participant ID, participant_id, contains missing or empty values. Please ensure every row contains a participant ID in your tabular file.\nMissing participant IDs will result in errors in downstream Neurobagel tools.',
+          'The column mapped to Participant ID, participant_id, contains missing or empty values. Please ensure every row in your tabular file contains a participant ID. Missing participant IDs will result in errors in downstream Neurobagel tools.',
       });
     });
 
@@ -40,7 +40,7 @@ describe('usePageAlerts', () => {
 
       const { result } = renderHook(() => usePageAlerts(View.ColumnAnnotation));
       expect(result.current[0].message).toBe(
-        'The column mapped to Participant ID contains missing or empty values. Please ensure every row contains a participant ID in your tabular file.\nMissing participant IDs will result in errors in downstream Neurobagel tools.'
+        'The column mapped to Participant ID contains missing or empty values. Please ensure every row in your tabular file contains a participant ID. Missing participant IDs will result in errors in downstream Neurobagel tools.'
       );
     });
 
