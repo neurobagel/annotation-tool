@@ -516,4 +516,36 @@ describe('useGenerateDataDictionary', () => {
     const { result } = renderHook(() => useGenerateDataDictionary());
     expect(result.current).toEqual(mockDataDictionaryWithAnnotations);
   });
+
+  it('should not add MissingValues field for identifier columns', () => {
+    mockedUseColumns.mockReturnValue({
+      '0': {
+        id: '0',
+        name: 'participant_id',
+        allValues: ['sub-01', 'NA'],
+        description: 'A participant ID',
+        dataType: null,
+        standardizedVariable: 'nb:ParticipantID',
+        missingValues: ['NA'],
+      },
+    });
+
+    mockedUseStandardizedVariables.mockReturnValue({
+      'nb:ParticipantID': {
+        id: 'nb:ParticipantID',
+        name: 'Participant ID',
+        variable_type: VariableType.identifier,
+      },
+    });
+
+    const { result } = renderHook(() => useGenerateDataDictionary());
+    const entry = result.current.participant_id;
+
+    expect(entry.Annotations?.IsAbout).toEqual({
+      TermURL: 'nb:ParticipantID',
+      Label: 'Participant ID',
+    });
+    expect(entry.Annotations?.VariableType).toBe(VariableType.identifier);
+    expect(entry.Annotations?.MissingValues).toBeUndefined();
+  });
 });
