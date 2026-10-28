@@ -228,7 +228,52 @@ describe('convertStandardizedTerms', () => {
     expect(adhdTerm.id).toBe('snomed:406506008');
     expect(adhdTerm.label).toBe('Attention deficit hyperactivity disorder');
     expect(adhdTerm.standardizedVariableId).toBe('nb:Diagnosis');
+    expect(adhdTerm.abbreviation).toBeUndefined();
     expect(adhdTerm.collectionCreatedAt).toBeUndefined();
+  });
+
+  it('should not include a generated abbreviation when there is none provided in vocabulary for a collection term', () => {
+    const result = convertStandardizedTerms(
+      mockTermsData,
+      mockConfigFile.standardized_variables,
+      mockConfigFile.namespace_prefix
+    );
+
+    const rtgcsTerm = result['snomed:1303696008'];
+    expect(rtgcsTerm).toBeDefined();
+    expect(rtgcsTerm.label).toBe('Robson Ten Group Classification System');
+    expect(rtgcsTerm.abbreviation).toBeUndefined();
+  });
+
+  it('should retain abbreviation when provided in vocabulary for collection terms', () => {
+    const customTermsData = {
+      'assessment.json': [
+        {
+          namespace_prefix: 'snomed',
+          namespace_url: 'http://snomed.info/sct/',
+          vocabulary_name: 'SNOMED CT',
+          version: '1.0.0',
+          terms: [
+            {
+              id: '1234',
+              name: "Beck's Depression Inventory",
+              abbreviation: 'BDI',
+            },
+          ],
+        },
+      ],
+    };
+
+    const result = convertStandardizedTerms(
+      customTermsData,
+      mockConfigFile.standardized_variables,
+      mockConfigFile.namespace_prefix
+    );
+
+    const bdiTerm = result['snomed:1234'];
+    expect(bdiTerm).toBeDefined();
+    expect(bdiTerm.label).toBe("Beck's Depression Inventory");
+    expect(bdiTerm.abbreviation).toBe('BDI');
   });
 });
 

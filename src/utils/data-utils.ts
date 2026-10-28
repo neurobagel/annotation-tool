@@ -15,7 +15,6 @@ import {
   VariableType,
   DataType,
 } from './internal_types';
-import { generateAbbreviation } from './util';
 
 /**
  * Parses a string value into a number based on a specified format.
@@ -262,9 +261,7 @@ export function convertStandardizedTerms(
 
         const isCollection = parentVariable?.variable_type === VariableType.collection;
 
-        const computedAbbreviation = isCollection
-          ? abbreviation || (name ? generateAbbreviation(name) || name : undefined)
-          : undefined;
+        const computedAbbreviation = isCollection ? abbreviation || undefined : undefined;
 
         return {
           [termIdentifier]: {
