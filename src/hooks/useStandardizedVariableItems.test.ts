@@ -165,8 +165,47 @@ describe('useStandardizedVariableItems', () => {
     const { result } = renderHook(() => useStandardizedVariableItems());
 
     expect(result.current.collectionVariables[0].terms).toEqual([
-      { id: 'term:1', label: 'Subscale A', abbreviation: undefined },
       { id: 'term:2', label: 'Subscale B', abbreviation: 'SB' },
+      { id: 'term:1', label: 'Subscale A', abbreviation: undefined },
+    ]);
+  });
+
+  it('should sort collection terms by their rendered display text (abbreviation - label if abbreviation exists, otherwise label)', () => {
+    mockedUseStandardizedVariables.mockReturnValue({
+      'var:collection': {
+        id: 'var:collection',
+        name: 'Assessment Tool',
+        description: '',
+        variable_type: VariableType.collection,
+      },
+    });
+
+    mockedUseStandardizedTerms.mockReturnValue({
+      'term:1': {
+        id: 'term:1',
+        label: 'Beta',
+        abbreviation: 'ZZ',
+        standardizedVariableId: 'var:collection',
+      },
+      'term:2': {
+        id: 'term:2',
+        label: 'Gamma',
+        standardizedVariableId: 'var:collection',
+      },
+      'term:3': {
+        id: 'term:3',
+        label: 'Zeta',
+        abbreviation: 'AA',
+        standardizedVariableId: 'var:collection',
+      },
+    });
+
+    const { result } = renderHook(() => useStandardizedVariableItems());
+
+    expect(result.current.collectionVariables[0].terms).toEqual([
+      { id: 'term:3', label: 'Zeta', abbreviation: 'AA' },
+      { id: 'term:2', label: 'Gamma', abbreviation: undefined },
+      { id: 'term:1', label: 'Beta', abbreviation: 'ZZ' },
     ]);
   });
 });
