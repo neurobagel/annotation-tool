@@ -196,4 +196,32 @@ describe('ColumnAnnotationCard', () => {
     // The main card selection (onSelect) should NOT be called due to stopPropagation
     cy.get('@onSelectSpy').should('not.have.been.called');
   });
+
+  it('should display the term abbreviation when termAbbreviation is provided', () => {
+    cy.mount(
+      <ColumnAnnotationCard
+        {...props}
+        standardizedVariableId="nb:Assessment"
+        termLabel="Beck's Depression Inventory"
+        termAbbreviation="BDI"
+      />
+    );
+    cy.get('[data-cy="1-column-annotation-card-mapped-variable"]')
+      .should('be.visible')
+      .and('contain', 'Assessment Tool: BDI');
+  });
+
+  it('should display only the label when termAbbreviation is not provided', () => {
+    cy.mount(
+      <ColumnAnnotationCard
+        {...props}
+        standardizedVariableId="nb:Assessment"
+        termLabel="Robson Ten Group Classification System"
+        termAbbreviation={null}
+      />
+    );
+    cy.get('[data-cy="1-column-annotation-card-mapped-variable"]')
+      .should('be.visible')
+      .and('contain', 'Assessment Tool');
+  });
 });
