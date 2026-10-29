@@ -27,7 +27,6 @@ interface ColumnAnnotationCardProps {
 const defaultProps = {
   selected: false,
   termLabel: null,
-  termAbbreviation: null,
 };
 
 function ColumnAnnotationCard({
@@ -37,7 +36,6 @@ function ColumnAnnotationCard({
   dataType,
   standardizedVariableId,
   termLabel,
-  termAbbreviation,
   standardizedVariableOptions,
   inferredDataTypeLabel,
   onDescriptionChange,
@@ -59,13 +57,9 @@ function ColumnAnnotationCard({
     dataTypeLabel = 'Continuous';
   }
 
-  // Prefix the term label with the variable label so that when the full text is
-  // displayed as a hover-tooltip, it provides clear context for the term.
-  const displayFullText =
-    [mappedStandardizedVariable?.label, termLabel].filter(Boolean).join(': ') || null;
+  const isAssessmentTool = standardizedVariableId === 'nb:Assessment';
 
-  const displayAbbrText =
-    [mappedStandardizedVariable?.label, termAbbreviation].filter(Boolean).join(': ') || null;
+  const displayText = termLabel || mappedStandardizedVariable?.label || null;
 
   return (
     // The jsx-a11y linter expects any element with role="button" and an onClick handler
@@ -129,18 +123,18 @@ function ColumnAnnotationCard({
           />
         </div>
 
-        <div className="flex-shrink-0 w-full">
-          {displayFullText ? (
-            <Tooltip title={displayFullText} arrow placement="top">
+        <div className="flex-shrink-0 w-full min-w-0">
+          {displayText ? (
+            <Tooltip title={displayText} arrow placement="top">
               <Box
-                bgcolor="primary.main"
-                color="primary.contrastText"
+                bgcolor={isAssessmentTool ? 'primary.light' : 'primary.main'}
+                color={isAssessmentTool ? 'grey.900' : 'primary.contrastText'}
                 className="h-10 pl-3 pr-1 flex items-center justify-between rounded w-fit max-w-full shadow-sm"
                 data-cy={`${id}-column-annotation-card-mapped-variable`}
               >
-                <div className="flex items-center min-w-0 pr-2">
+                <div className="flex items-center min-w-0 pr-1">
                   <Typography variant="body2" className="font-medium truncate">
-                    {displayAbbrText}
+                    {displayText}
                   </Typography>
                 </div>
                 {onClearMapping && (
@@ -150,7 +144,7 @@ function ColumnAnnotationCard({
                       e.stopPropagation();
                       onClearMapping(id);
                     }}
-                    sx={{ color: 'primary.contrastText', opacity: 0.8, '&:hover': { opacity: 1 } }}
+                    sx={{ color: 'inherit', opacity: 0.8, '&:hover': { opacity: 1 } }}
                     data-cy={`${id}-clear-mapped-variable`}
                     className="flex-shrink-0"
                   >
