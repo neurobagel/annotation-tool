@@ -1,4 +1,6 @@
+import { ThemeProvider } from '@mui/material';
 import ColumnAnnotationCard from '../../src/components/ColumnAnnotationCard';
+import NBTheme from '../../src/theme';
 import { DataType } from '../../src/utils/internal_types';
 
 const props = {
@@ -197,31 +199,56 @@ describe('ColumnAnnotationCard', () => {
     cy.get('@onSelectSpy').should('not.have.been.called');
   });
 
-  it('should display the term abbreviation when termAbbreviation is provided', () => {
+  it('should display the full term name without prefix even when abbreviation is provided, with assessment styling', () => {
     cy.mount(
-      <ColumnAnnotationCard
-        {...props}
-        standardizedVariableId="nb:Assessment"
-        termLabel="Beck's Depression Inventory"
-        termAbbreviation="BDI"
-      />
+      <ThemeProvider theme={NBTheme}>
+        <ColumnAnnotationCard
+          {...props}
+          standardizedVariableId="nb:Assessment"
+          termLabel="Beck's Depression Inventory"
+          termAbbreviation="BDI"
+        />
+      </ThemeProvider>
     );
     cy.get('[data-cy="1-column-annotation-card-mapped-variable"]')
       .should('be.visible')
-      .and('contain', 'Assessment Tool: BDI');
+      .and('contain', "Beck's Depression Inventory")
+      .and('not.contain', 'Assessment Tool')
+      .and('have.css', 'background-color', 'rgb(245, 168, 155)');
   });
 
-  it('should display only the label when termAbbreviation is not provided', () => {
+  it('should display the full term name when abbreviation is not provided, with assessment styling', () => {
     cy.mount(
-      <ColumnAnnotationCard
-        {...props}
-        standardizedVariableId="nb:Assessment"
-        termLabel="Robson Ten Group Classification System"
-        termAbbreviation={null}
-      />
+      <ThemeProvider theme={NBTheme}>
+        <ColumnAnnotationCard
+          {...props}
+          standardizedVariableId="nb:Assessment"
+          termLabel="Robson Ten Group Classification System"
+          termAbbreviation={null}
+        />
+      </ThemeProvider>
     );
     cy.get('[data-cy="1-column-annotation-card-mapped-variable"]')
       .should('be.visible')
-      .and('contain', 'Assessment Tool');
+      .and('contain', 'Robson Ten Group Classification System')
+      .and('not.contain', 'Assessment Tool')
+      .and('have.css', 'background-color', 'rgb(245, 168, 155)');
+  });
+
+  it('should use primary theme color for non-assessment standardized variables', () => {
+    cy.mount(
+      <ThemeProvider theme={NBTheme}>
+        <ColumnAnnotationCard
+          {...props}
+          standardizedVariableId="nb:ParticipantID"
+          termLabel={null}
+          termAbbreviation={null}
+        />
+      </ThemeProvider>
+    );
+    cy.get('[data-cy="1-column-annotation-card-mapped-variable"]')
+      .should('be.visible')
+      .and('contain', 'Participant ID')
+      .and('have.css', 'background-color', 'rgb(217, 116, 141)');
   });
 });
