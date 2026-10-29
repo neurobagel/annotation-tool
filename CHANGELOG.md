@@ -1,3 +1,33 @@
+# v0.7.9 (Thu Oct 22 2026)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, CHANDAN YADAV ([@NobleCoder69](https://github.com/NobleCoder69)), for all your work!
+
+#### 🚀 Enhancements
+
+- [MNT] clarify downstream errors for missing participant IDs [#679](https://github.com/neurobagel/annotation-tool/pull/679) ([@rmanaem](https://github.com/rmanaem))
+- [ENH] Change "Upload" language to "Load" for clarity [#640](https://github.com/neurobagel/annotation-tool/pull/640) ([@NobleCoder69](https://github.com/NobleCoder69) [@rmanaem](https://github.com/rmanaem))
+
+#### 🐛 Bug Fixes
+
+- [FIX] Restore column data types and value descriptions/units for unannotated columns [#674](https://github.com/neurobagel/annotation-tool/pull/674) ([@rmanaem](https://github.com/rmanaem))
+
+#### 🏠 Internal
+
+- [FIX] override postcss-selector-parser to patch vulnerability [#668](https://github.com/neurobagel/annotation-tool/pull/668) ([@rmanaem](https://github.com/rmanaem) [@surchs](https://github.com/surchs))
+- [MNT] Restrict GitHub Actions token permissions to least privilege [#659](https://github.com/neurobagel/annotation-tool/pull/659) ([@rmanaem](https://github.com/rmanaem))
+- [MNT] Add OpenSSF Scorecard badge to README [#655](https://github.com/neurobagel/annotation-tool/pull/655) ([@alyssadai](https://github.com/alyssadai))
+
+#### Authors: 4
+
+- Alyssa Dai ([@alyssadai](https://github.com/alyssadai))
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+- CHANDAN YADAV ([@NobleCoder69](https://github.com/NobleCoder69))
+- Sebastian Urchs ([@surchs](https://github.com/surchs))
+
+---
+
 # v0.7.8 (Fri Sep 11 2026)
 
 #### 🏠 Internal

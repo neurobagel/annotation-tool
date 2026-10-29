@@ -131,7 +131,11 @@ export function buildColumnEntry(
       }
     }
 
-    if (column.missingValues && column.missingValues.length > 0) {
+    if (
+      column.missingValues &&
+      column.missingValues.length > 0 &&
+      resolvedVariableType !== VariableType.identifier
+    ) {
       entry.Annotations.MissingValues = column.missingValues;
     }
 

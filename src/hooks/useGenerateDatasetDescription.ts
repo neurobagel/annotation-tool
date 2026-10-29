@@ -19,8 +19,14 @@ export function useGenerateDatasetDescription(): DatasetDescription | null {
     });
 
     if (participantColumn) {
-      const uniqueIDs = new Set(participantColumn.allValues);
-      count = uniqueIDs.size;
+      const hasMissingValues =
+        (participantColumn.missingValues?.length ?? 0) > 0 ||
+        participantColumn.allValues.some((val) => val.trim() === '');
+
+      // Do not compute participant count if there are missing or empty values
+      if (!hasMissingValues) {
+        count = new Set(participantColumn.allValues).size;
+      }
     }
     return count;
   }, [columns, standardizedVariables]);
