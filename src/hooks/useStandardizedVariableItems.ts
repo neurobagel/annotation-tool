@@ -36,11 +36,7 @@ export function useStandardizedVariableItems() {
         } as StandardizedVariableItem);
       } else {
         const termsForVar = termsByVariableId[stdVar.id] || [];
-        termsForVar.sort((a, b) => {
-          const displayA = a.abbreviation ? `${a.abbreviation} - ${a.label}` : a.label;
-          const displayB = b.abbreviation ? `${b.abbreviation} - ${b.label}` : b.label;
-          return displayA.localeCompare(displayB);
-        });
+        termsForVar.sort((a, b) => a.label.localeCompare(b.label));
 
         const stdVarItem: StandardizedVariableItem = {
           id: stdVar.id,
