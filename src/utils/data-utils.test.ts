@@ -234,7 +234,7 @@ describe('convertStandardizedTerms', () => {
     expect(adhdTerm.collectionCreatedAt).toBeUndefined();
   });
 
-  it('should not include a generated abbreviation when there is none provided in vocabulary for a collection term', () => {
+  it('should leave abbreviation undefined when not provided in vocabulary for collection terms', () => {
     const result = convertStandardizedTerms(
       mockTermsData,
       mockConfigFile.standardized_variables,

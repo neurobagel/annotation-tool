@@ -261,14 +261,14 @@ export function convertStandardizedTerms(
 
         const isCollection = parentVariable?.variable_type === VariableType.collection;
 
-        const computedAbbreviation = isCollection ? abbreviation || undefined : undefined;
+        const termAbbreviation = isCollection ? abbreviation || undefined : undefined;
 
         return {
           [termIdentifier]: {
             standardizedVariableId,
             id: termIdentifier,
             label: name,
-            abbreviation: computedAbbreviation,
+            abbreviation: termAbbreviation,
             ...restTermFields,
             collectionCreatedAt: undefined,
           },

@@ -1,4 +1,4 @@
-import { ThemeProvider } from '@mui/material';
+import { hexToRgb, ThemeProvider } from '@mui/material';
 import ColumnAnnotationCard from '../../src/components/ColumnAnnotationCard';
 import NBTheme from '../../src/theme';
 import { DataType } from '../../src/utils/internal_types';
@@ -214,7 +214,7 @@ describe('ColumnAnnotationCard', () => {
       .should('be.visible')
       .and('contain', "Beck's Depression Inventory")
       .and('not.contain', 'Assessment Tool')
-      .and('have.css', 'background-color', 'rgb(245, 168, 155)');
+      .and('have.css', 'background-color', hexToRgb(NBTheme.palette.primary.light));
   });
 
   it('should display the full term name when abbreviation is not provided, with assessment styling', () => {
@@ -232,7 +232,7 @@ describe('ColumnAnnotationCard', () => {
       .should('be.visible')
       .and('contain', 'Robson Ten Group Classification System')
       .and('not.contain', 'Assessment Tool')
-      .and('have.css', 'background-color', 'rgb(245, 168, 155)');
+      .and('have.css', 'background-color', hexToRgb(NBTheme.palette.primary.light));
   });
 
   it('should use primary theme color for non-assessment standardized variables', () => {
@@ -249,6 +249,6 @@ describe('ColumnAnnotationCard', () => {
     cy.get('[data-cy="1-column-annotation-card-mapped-variable"]')
       .should('be.visible')
       .and('contain', 'Participant ID')
-      .and('have.css', 'background-color', 'rgb(217, 116, 141)');
+      .and('have.css', 'background-color', hexToRgb(NBTheme.palette.primary.main));
   });
 });
