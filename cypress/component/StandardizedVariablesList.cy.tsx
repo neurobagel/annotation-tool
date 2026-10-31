@@ -179,7 +179,7 @@ describe('StandardizedVariablesList', () => {
     cy.get('[data-cy="mapped-count-badge-term-term-2"]').should('not.exist');
   });
 
-  it('should render collection terms sorted by their display text (abbreviation - label if abbreviation exists, otherwise label)', () => {
+  it('should render collection terms sorted alphabetically by full label with abbreviation at the end', () => {
     const termsWithAbbr: Record<string, StandardizedTerm> = {
       'term-1': {
         id: 'term-1',
@@ -189,13 +189,13 @@ describe('StandardizedVariablesList', () => {
       },
       'term-2': {
         id: 'term-2',
-        label: 'Unified Parkinson Disease Rating Scale',
+        label: 'Parkinson Psychosis Rating Scale',
         standardizedVariableId: 'var-2',
       },
       'term-3': {
         id: 'term-3',
-        label: 'Beck Depression Inventory',
-        abbreviation: 'BDI',
+        label: 'Picture Naming Test',
+        abbreviation: 'PNT',
         standardizedVariableId: 'var-2',
       },
       'term-4': {
@@ -219,21 +219,21 @@ describe('StandardizedVariablesList', () => {
       />
     );
 
-    // Expected alphabetical order:
+    // Expected alphabetical order by full label:
     // 1. "Adaptive Behavior Scale"
-    // 2. "BDI - Beck Depression Inventory"
-    // 3. "MoCA - Montreal Cognitive Assessment"
-    // 4. "Unified Parkinson Disease Rating Scale"
+    // 2. "Montreal Cognitive Assessment (MoCA)"
+    // 3. "Parkinson Psychosis Rating Scale"
+    // 4. "Picture Naming Test (PNT)"
     cy.get('[data-cy^="collection-term-item-"]').should('have.length', 4);
     cy.get('[data-cy^="collection-term-item-"]').eq(0).should('contain', 'Adaptive Behavior Scale');
     cy.get('[data-cy^="collection-term-item-"]')
       .eq(1)
-      .should('contain', 'BDI - Beck Depression Inventory');
+      .should('contain', 'Montreal Cognitive Assessment (MoCA)');
     cy.get('[data-cy^="collection-term-item-"]')
       .eq(2)
-      .should('contain', 'MoCA - Montreal Cognitive Assessment');
+      .should('contain', 'Parkinson Psychosis Rating Scale');
     cy.get('[data-cy^="collection-term-item-"]')
       .eq(3)
-      .should('contain', 'Unified Parkinson Disease Rating Scale');
+      .should('contain', 'Picture Naming Test (PNT)');
   });
 });
