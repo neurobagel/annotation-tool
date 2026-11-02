@@ -1,3 +1,16 @@
+# v0.7.10 (Mon Nov 02 2026)
+
+#### 🐛 Bug Fixes
+
+- [FIX] Omit collection term abbreviation if not provided in vocabulary [#685](https://github.com/neurobagel/annotation-tool/pull/685) ([@rmanaem](https://github.com/rmanaem))
+- [FIX] Reset previous column annotations when loading a new data dictionary [#673](https://github.com/neurobagel/annotation-tool/pull/673) ([@rmanaem](https://github.com/rmanaem))
+
+#### Authors: 1
+
+- Arman Jahanpour ([@rmanaem](https://github.com/rmanaem))
+
+---
+
 # v0.7.9 (Thu Oct 22 2026)
 
 :tada: This release contains work from a new contributor! :tada:
