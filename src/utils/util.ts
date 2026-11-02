@@ -4,16 +4,6 @@ export function getColumnsAssignedText(mappedColumnsCount: number): string {
   return `${mappedColumnsCount} columns assigned`;
 }
 
-// TODO: refine the logic for generating abbreviations
-export function generateAbbreviation(label: string): string {
-  if (!label) return '';
-  const words = label.trim().split(/[\s_-]+/);
-  if (words.length > 1) {
-    return words.map((word) => word[0].toUpperCase()).join('');
-  }
-  return label;
-}
-
 // URL validation uses the browser's native WHATWG URL parser (the exact same standard rust-url implements)
 export const isValidUrl = (string: string) => {
   try {

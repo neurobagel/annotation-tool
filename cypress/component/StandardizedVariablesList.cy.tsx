@@ -178,4 +178,65 @@ describe('StandardizedVariablesList', () => {
     cy.get('[data-cy="mapped-count-badge-term-term-1"]').should('contain', '3');
     cy.get('[data-cy="mapped-count-badge-term-term-2"]').should('not.exist');
   });
+
+  it('should render collection terms sorted alphabetically by full label with abbreviation at the end', () => {
+    const termsWithAbbr: Record<string, StandardizedTerm> = {
+      'term-1': {
+        id: 'term-1',
+        label: 'Montreal Cognitive Assessment',
+        abbreviation: 'MoCA',
+        standardizedVariableId: 'var-2',
+      },
+      'term-2': {
+        id: 'term-2',
+        label: 'Unified Parkinson Disease Rating Scale',
+        standardizedVariableId: 'var-2',
+      },
+      'term-3': {
+        id: 'term-3',
+        label: 'Beck Depression Inventory',
+        abbreviation: 'BDI',
+        standardizedVariableId: 'var-2',
+      },
+      'term-4': {
+        id: 'term-4',
+        label: 'Adaptive Behavior Scale',
+        abbreviation: 'BSA',
+        standardizedVariableId: 'var-2',
+      },
+    };
+
+    useDataStore.setState({
+      standardizedVariables: mockVariables as unknown as Record<string, StandardizedVariable>,
+      standardizedTerms: termsWithAbbr as unknown as Record<string, StandardizedTerm>,
+    });
+
+    cy.mount(
+      <StandardizedVariablesList
+        annotatedColumnsCount={0}
+        totalColumnsCount={0}
+        mappedVariableCounts={{}}
+        mappedTermCounts={{}}
+      />
+    );
+
+    // Expected alphabetical order by full label:
+    // 1. "Adaptive Behavior Scale (BSA)" (sorted by label 'A', even though abbreviation 'BSA' would follow 'BDI')
+    // 2. "Beck Depression Inventory (BDI)"
+    // 3. "Montreal Cognitive Assessment (MoCA)"
+    // 4. "Unified Parkinson Disease Rating Scale"
+    cy.get('[data-cy^="collection-term-item-"]').should('have.length', 4);
+    cy.get('[data-cy^="collection-term-item-"]')
+      .eq(0)
+      .should('contain', 'Adaptive Behavior Scale (BSA)');
+    cy.get('[data-cy^="collection-term-item-"]')
+      .eq(1)
+      .should('contain', 'Beck Depression Inventory (BDI)');
+    cy.get('[data-cy^="collection-term-item-"]')
+      .eq(2)
+      .should('contain', 'Montreal Cognitive Assessment (MoCA)');
+    cy.get('[data-cy^="collection-term-item-"]')
+      .eq(3)
+      .should('contain', 'Unified Parkinson Disease Rating Scale');
+  });
 });

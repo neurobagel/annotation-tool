@@ -23,6 +23,9 @@ const getEstimatedHeight = (displayString: string) => {
   return BASE_ROW_HEIGHT + lines * LINE_HEIGHT;
 };
 
+const getTermDisplayString = (term: { label: string; abbreviation?: string }) =>
+  term.abbreviation ? `${term.label} (${term.abbreviation})` : term.label;
+
 interface CollectionItemProps {
   variable: StandardizedVariableItem;
   onTermSelect: (termId: string) => void;
@@ -48,7 +51,7 @@ function CollectionItem({
     if (query.trim() === '') return variable.terms;
 
     return matchSorter(variable.terms, query, {
-      keys: [(term) => (term.abbreviation ? `${term.abbreviation} - ${term.label}` : term.label)],
+      keys: [getTermDisplayString],
       threshold: rankings.CONTAINS,
     });
   }, [variable.terms, query]);
@@ -115,19 +118,11 @@ function CollectionItem({
           <div className="border rounded-md border-gray-200 overflow-hidden bg-white">
             <VirtualListbox
               itemCount={filteredTerms.length}
-              itemSize={(index) => {
-                const term = filteredTerms[index];
-                const displayString = term.abbreviation
-                  ? `${term.abbreviation} - ${term.label}`
-                  : term.label;
-                return getEstimatedHeight(displayString);
-              }}
+              itemSize={(index) => getEstimatedHeight(getTermDisplayString(filteredTerms[index]))}
             >
               {({ index, style }) => {
                 const term = filteredTerms[index];
-                const displayString = term.abbreviation
-                  ? `${term.abbreviation} - ${term.label}`
-                  : term.label;
+                const displayString = getTermDisplayString(term);
 
                 return (
                   <div key={term.id} style={style}>

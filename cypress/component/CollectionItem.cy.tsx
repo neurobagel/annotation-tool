@@ -62,7 +62,7 @@ describe('CollectionItem', () => {
     );
     cy.get('[data-cy="collection-term-item-nb:termTwo"]').should(
       'contain',
-      'QPE - Questionnaire for Psychotic Experiences'
+      'Questionnaire for Psychotic Experiences (QPE)'
     );
 
     // Verify that long terms naturally wrap and are fully displayed without truncation
