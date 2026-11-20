@@ -61,6 +61,34 @@ For detailed technical information about creating and customizing configurations
 
 The Annotation tool uses [Cypress](https://www.cypress.io/) for integration and component testing, and [Vitest](https://vitest.dev/) for unit testing.
 
+## Working in the monorepo
+
+This tool lives in `packages/annotation-tool` of the Neurobagel monorepo ([neurobagel/neurobagel](https://github.com/neurobagel/neurobagel)). Clone the monorepo, not the old `neurobagel/annotation-tool` repository, which is a read-only mirror of this folder:
+
+```bash
+git clone --recurse-submodules https://github.com/neurobagel/neurobagel.git
+cd neurobagel
+```
+
+Run the commands from `packages/annotation-tool`. From the monorepo root:
+
+```bash
+cd packages/annotation-tool
+npm ci
+npm run typecheck
+npm run lint:check
+npm run format:check
+npm run test:unit
+npx cypress run --component
+NB_DISABLE_CONFIG=false npm run build
+npm run preview &
+npx cypress run --e2e
+```
+
+Stop the preview server afterwards (for example with `fg`, then Ctrl+C).
+
+Code style checks run through the monorepo's root pre-commit configuration (`pre-commit install` at the repository root). Pull request titles must be conventional commits, and releases (tags `annotation-tool-v<version>`) are made from the monorepo; see [DEVELOPING.md](https://github.com/neurobagel/neurobagel/blob/main/DEVELOPING.md).
+
 ## License
 
 The Neurobagel Annotation tool uses the [MIT License](https://github.com/neurobagel/annotation-tool/blob/main/LICENSE).
